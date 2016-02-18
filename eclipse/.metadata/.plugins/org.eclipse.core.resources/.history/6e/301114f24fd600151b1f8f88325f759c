@@ -1,0 +1,7 @@
+package com.contained.main.entity;
+
+import net.minecraft.entity.Entity;
+
+public interface CEntity<T extends Entity> {
+
+}

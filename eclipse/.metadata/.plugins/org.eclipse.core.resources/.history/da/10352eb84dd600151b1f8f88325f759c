@@ -1,0 +1,5 @@
+package com.contained.main.entity;
+
+public class EntityLivingBase {
+
+}

@@ -1,0 +1,7 @@
+package com.contained.main.entity;
+
+import net.minecraft.entity.EntityLivingBase;
+
+public interface CEntityLivingBase<T extends EntityLivingBase> extends CEntity<T>{
+
+}

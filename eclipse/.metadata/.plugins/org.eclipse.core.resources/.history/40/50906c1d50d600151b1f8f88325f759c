@@ -1,0 +1,22 @@
+package com.contained.main.entity;
+
+import net.minecraft.entity.Entity;
+
+public interface CEntity<T extends Entity> {
+	/*
+	 * @return the npc location x,y,z
+	 */
+	public double getXPos();
+	public double getYPos();
+	public double getZPos();
+	
+	/*
+	 * @param set the npc location x,y,z 
+	 */
+	public void setXPos(double x);
+	public void setYPos(double y);
+	public void setZPos(double z);
+	
+	
+	
+}

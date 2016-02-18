@@ -1,0 +1,25 @@
+package com.contained.main.entity;
+
+import net.minecraft.entity.EntityLivingBase;
+
+public interface CEntityLivingBase<T extends EntityLivingBase> extends CEntity<T>{
+	public boolean isChild();
+	
+	public float getHealth();
+	public float getMaxHealth();
+	
+	public void setHealth();
+	public void setMaxHealth(float health);
+	
+	public boolean isAttacking();
+	public void setTarget(CEntityLivingBase entity);
+	public CEntityLivingBase getTartget();
+	public CEntityLivingBase getLastAttacked();
+	
+	public boolean visibleEntity(CEntity entity);
+	
+	public void swingHand();
+	
+	@Override
+	public T getMCEntity();
+}

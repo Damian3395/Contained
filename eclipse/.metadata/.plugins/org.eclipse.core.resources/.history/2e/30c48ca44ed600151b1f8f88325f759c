@@ -1,0 +1,5 @@
+package com.contained.main.entity;
+
+public interface CEntityLivingBase<T extends CEntityLivingBase> extends CEntity<T>{
+
+}
