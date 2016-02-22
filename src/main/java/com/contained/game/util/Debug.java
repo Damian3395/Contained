@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.Contained;
-import com.contained.game.world.GeneratePostWorld;
+import com.contained.game.world.GenerateWorld;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -54,12 +54,12 @@ public class Debug implements ICommand{
 							sender.getPlayerCoordinates().posZ/16);
 		
 		String out = "";
-		for(int i=0; i<GeneratePostWorld.oreSpawnProperties.length; i++) {
-			if (GeneratePostWorld.oreSpawnProperties[i].spawnChunks.contains(p)) {
+		for(int i=0; i<GenerateWorld.oreSpawnProperties.length; i++) {
+			if (GenerateWorld.oreSpawnProperties[i].spawnChunks.contains(p)) {
 				if (out.equals(""))
-					out += GeneratePostWorld.oreSpawnProperties[i].type.getLocalizedName();
+					out += GenerateWorld.oreSpawnProperties[i].type.getLocalizedName();
 				else
-					out += ", "+GeneratePostWorld.oreSpawnProperties[i].type.getLocalizedName();
+					out += ", "+GenerateWorld.oreSpawnProperties[i].type.getLocalizedName();
 			}
 		}
 		

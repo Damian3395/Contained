@@ -9,6 +9,7 @@ import com.contained.game.data.ExtendedPlayer;
 import com.contained.game.util.Data;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -16,14 +17,18 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 public class DataVisualization extends Gui{
-private Minecraft mc;
+	private Minecraft mc;
 	
-	public boolean guiRender = true;
+	public boolean guiRender = false;
 	private int chartDataPoints = 100;
 	private long nextChartUpdate;
 	private boolean initialized = false;
@@ -40,7 +45,7 @@ private Minecraft mc;
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void onRenderExperienceBar(RenderGameOverlayEvent event) {
+	public void onRenderLevel(RenderGameOverlayEvent event) {
 		if (event.isCancelable() || event.type != ElementType.EXPERIENCE)
 			return;
 		
@@ -112,8 +117,7 @@ private Minecraft mc;
 		drawPieChart(x, y, diameter, copyVals, captions);
 	}
 	
-	private void drawPieChart(int x, int y, int diameter, double[] values, String[] captions) 
-	{
+	private void drawPieChart(int x, int y, int diameter, double[] values, String[] captions) {
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
         GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
@@ -130,8 +134,7 @@ private Minecraft mc;
         	maxValue += values[i];
         
         //Draw Pie Chart
-        for (int l = 0; l < values.length; ++l)
-        {
+        for (int l = 0; l < values.length; ++l) {
         	double percent = (values[l]/maxValue)*100.0D;
             int i1 = MathHelper.floor_double(percent / 4.0D) + 1;
             tessellator.startDrawing(6);
@@ -151,8 +154,7 @@ private Minecraft mc;
             tessellator.startDrawing(5);
             tessellator.setColorOpaque_I((hueGrad(l, values.length).hashCode() & 16711422) >> 1);
 
-            for (int j1 = i1; j1 >= 0; --j1)
-            {
+            for (int j1 = i1; j1 >= 0; --j1){
                 f = (float)((d0 + percent * (double)j1 / (double)i1) * Math.PI * 2.0D / 100.0D);
                 f1 = MathHelper.sin(f) * (float)diameter;
                 f2 = MathHelper.cos(f) * (float)diameter * 0.5F;
@@ -166,8 +168,7 @@ private Minecraft mc;
         
         //Draw Graph Key
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-        for (int i = 0; i < values.length; i++)
-        {
+        for (int i = 0; i < values.length; i++){
             mc.fontRenderer.drawStringWithShadow(captions[i] + ": " + values[i],
             		xx+diameter+10, y+i*8, hueGrad(i, values.length).hashCode());
         }
@@ -186,8 +187,7 @@ private Minecraft mc;
 	 * @param numGuidelines     Number of numerical guidelines to show along the vertical axis (min and max values will always be shown)
 	 * @param values 			Arrays of values to visualize. Each array corresponds to a single line on the graph.
 	 */
-	private void drawLineGraph(int x, int y, int width, int height, int numElements, int numGuidelines, Double[]... values) 
-	{
+	private void drawLineGraph(int x, int y, int width, int height, int numElements, int numGuidelines, Double[]... values) {
 		//Determine min and max values
 		double minElement = Double.MAX_VALUE;
 		double maxElement = -Double.MAX_VALUE;
@@ -288,5 +288,20 @@ private Minecraft mc;
 			bright = 1.0f + (hue - 0.5f);
 		}
 		return Color.getHSBColor(hue, sat, bright);
+	}
+	
+	public static MovingObjectPosition getLookBlock(World world, EntityPlayer entity, float range) {
+		Vec3 posVec = Vec3.createVectorHelper(entity.posX, entity.posY /*+ entity.getEyeHeight()*/, entity.posZ);
+		Vec3 lookVec = entity.getLookVec();
+		MovingObjectPosition mop = world.rayTraceBlocks(posVec, lookVec);
+
+		if (mop == null || (float)mop.hitVec.distanceTo(posVec) > range) {
+			return null;
+		} else 
+			return mop;
+	}
+	
+	public static float vec3Dist(int x1, int y1, int z1, int x2, int y2, int z2) {
+		return (float)Math.sqrt(Math.pow((double)(x2-x1), 2.0)+Math.pow((double)(y2-y1), 2.0)+Math.pow((double)(z2-z1), 2.0));
 	}
 }
