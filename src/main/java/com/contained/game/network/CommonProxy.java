@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.contained.game.Contained;
+import com.contained.game.util.Resources;
 
+import codechicken.lib.packet.PacketCustom;
 import net.minecraft.nbt.NBTTagCompound;
 
 /*
@@ -14,7 +16,7 @@ public class CommonProxy {
 	private static final Map<String, NBTTagCompound> extendedEntityData = new HashMap<String, NBTTagCompound>();
 
 	public void registerRenderers(Contained ins) {
-		
+		PacketCustom.assignHandler(Resources.MOD_ID, new ServerPacketHandler());
 	}
 
 	/**

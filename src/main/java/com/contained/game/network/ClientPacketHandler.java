@@ -3,15 +3,15 @@ package com.contained.game.network;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-import com.contained.game.data.ExtendedPlayer;
+import com.contained.game.data.Data;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
-import com.contained.game.util.Data;
 
 import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.packet.PacketCustom.IClientPacketHandler;
 
 public class ClientPacketHandler implements IClientPacketHandler{
-private DataVisualization gui;
+	private DataVisualization gui;
 	
 	public ClientPacketHandler(DataVisualization gui) {
 		this.gui = gui;

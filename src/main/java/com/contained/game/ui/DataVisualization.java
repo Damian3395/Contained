@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import org.lwjgl.opengl.GL11;
 
-import com.contained.game.data.ExtendedPlayer;
-import com.contained.game.util.Data;
+import com.contained.game.data.Data;
+import com.contained.game.entity.ExtendedPlayer;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.IGuiHandler;

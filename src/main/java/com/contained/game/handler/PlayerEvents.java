@@ -2,15 +2,21 @@ package com.contained.game.handler;
 
 import java.util.ArrayList;
 
-import com.contained.game.data.ExtendedPlayer;
-import com.contained.game.util.Data;
-import com.contained.game.util.DataItemStack;
+import com.contained.game.data.Data;
+import com.contained.game.data.DataItemStack;
+import com.contained.game.data.Data.OccupationRank;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Data.OccupationRank;
+import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.ItemSmeltedEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,7 +24,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -36,6 +41,8 @@ public class PlayerEvents {
 			//so the visualizations can be updated.
 			if (player != null && Math.random() <= 1.0/20.0) {
 				int[] occupationData = ExtendedPlayer.get(player).getOccupationValues();
+				ArrayList<String> achievements = ExtendedPlayer.get(player).getAchievement();
+				
 				PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, 1);
 				for(int i=0; i<occupationData.length; i++)
 					occPacket.writeInt(occupationData[i]);
@@ -86,7 +93,7 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	public void onEntityConstructing(EntityConstructing event) {	
+	public void onEntityConstructing(EntityConstructing event) {
 		if (event.entity instanceof EntityPlayer && ExtendedPlayer.get((EntityPlayer) event.entity) == null)
 			ExtendedPlayer.register((EntityPlayer) event.entity);
 	}

@@ -7,9 +7,17 @@ import java.util.LinkedList;
 
 import org.lwjgl.opengl.GL11;
 
-import com.contained.game.data.ExtendedPlayer;
-import com.contained.game.util.Data;
+import com.contained.game.data.Data;
+import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.ui.perks.BaseClass;
+import com.contained.game.ui.perks.BuilderClass;
+import com.contained.game.ui.perks.CollectorClass;
+import com.contained.game.ui.perks.CookClass;
+import com.contained.game.ui.perks.WarriorClass;
+import com.contained.game.ui.perks.WizardClass;
+import com.contained.game.util.Resources;
 
+import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,112 +25,140 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 public class ClassPerks extends GuiScreen{
-	private int level = 1000;
-	private GuiButton mining;
-	private GuiButton cooking;
-	private GuiButton farming;
-	private GuiButton fishing;
-	private GuiButton lumber;
-	private GuiButton figher;
-	private GuiButton potion;
-	private GuiButton building;
-	private GuiButton machine;
-	private GuiButton transport;
+	public static final int NONE = -1;
+	public static final int COLLECTOR = 0;
+	public static final int BUILDER = 1;
+	public static final int COOK = 2;
+	public static final int WIZARD = 3;
+	public static final int WARRIOR = 4;
 	
+	private BaseClass base;
+	private CollectorClass collector;
+	private BuilderClass builder;
+	private CookClass cook;
+	private WizardClass wizard;
+	private WarriorClass warrior;
+	
+	private int collectorXP = 0;
+	private int cookXP = 0;
+	private int builderXP = 0;
+	private int wizardXP = 0;
+	private int warriorXP = 0;
 	private int[] classXP;
 	private int selectedClass;
+	private int level;
+	
+	private boolean update = false;
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui(){
 		selectedClass = ExtendedPlayer.get(mc.thePlayer).getOccupationClass();
-		if(selectedClass == -1){
-			int x = this.width-60;
-			this.buttonList.add(this.mining = new GuiButton(0, x, 15, 30, 20, "Perk"));
-			this.buttonList.add(this.cooking = new GuiButton(1, x, 35, 30, 20, "Perk"));
-			this.buttonList.add(this.farming = new GuiButton(2, x, 55, 30, 20, "Perk"));
-			this.buttonList.add(this.fishing = new GuiButton(3, x, 75, 30, 20, "Perk"));
-			this.buttonList.add(this.lumber = new GuiButton(4, x, 95, 30, 20, "Perk"));
-			this.buttonList.add(this.figher = new GuiButton(5, x, 115, 30, 20, "Perk"));
-			this.buttonList.add(this.potion = new GuiButton(6, x, 135, 30, 20, "Perk"));
-			this.buttonList.add(this.building = new GuiButton(7, x, 155, 30, 20, "Perk"));
-			this.buttonList.add(this.machine = new GuiButton(8, x, 175, 30, 20, "Perk"));
-			this.buttonList.add(this.transport = new GuiButton(9, x, 195, 30, 20, "Perk"));
-			
-			classXP = ExtendedPlayer.get(mc.thePlayer).getOccupationValues();
-			
-			this.mining.enabled = (classXP[Data.MINING] >= level) ? true : false;
-			this.cooking.enabled = (classXP[Data.COOKING] >= level) ? true : false;
-			this.farming.enabled = (classXP[Data.FARMING] >= level) ? true : false;
-			this.fishing.enabled = (classXP[Data.FISHING] >= level) ? true : false;
-			this.lumber.enabled = (classXP[Data.LUMBER] >= level) ? true : false;
-			this.figher.enabled = (classXP[Data.FIGHTER] >= level) ? true : false;
-			this.potion.enabled = (classXP[Data.POTION] >= level) ? true : false;
-			this.building.enabled = (classXP[Data.BUILDING] >= level) ? true : false;
-			this.machine.enabled = (classXP[Data.MACHINE] >= level) ? true : false;
-			this.transport.enabled = (classXP[Data.TRANSPORT] >= level) ? true : false;
-		}else{
-			/*
-			 * Create A Complex Level System For Each Class
-			 */
+		classXP = ExtendedPlayer.get(mc.thePlayer).getOccupationValues();
+		level = ExtendedPlayer.get(mc.thePlayer).occupationLevel;
+		
+		collectorXP = classXP[Data.MINING] + classXP[Data.LUMBER];
+		cookXP = classXP[Data.FARMING] + classXP[Data.FISHING] + classXP[Data.COOKING];
+		builderXP = classXP[Data.BUILDING] + classXP[Data.MACHINE] + classXP[Data.TRANSPORT];
+		wizardXP = classXP[Data.POTION];
+		warriorXP = classXP[Data.FIGHTER];
+		
+		switch(selectedClass){
+		case NONE:
+			base = new BaseClass(this, collectorXP, cookXP, builderXP, wizardXP, warriorXP);
+			this.buttonList = base.getButtonList();
+			break;
+		case COLLECTOR:
+			collector = new CollectorClass(this, collectorXP, level);
+			this.buttonList = collector.getButtonList();
+			break;
+		case BUILDER:
+			builder = new BuilderClass(this, builderXP, level);
+			this.buttonList = builder.getButtonList();
+			break;
+		case COOK:
+			cook = new CookClass(this, cookXP, level);
+			this.buttonList = cook.getButtonList();
+			break;
+		case WIZARD:
+			wizard = new WizardClass(this, wizardXP, level);
+			this.buttonList = wizard.getButtonList();
+			break;
+		case WARRIOR:
+			warrior = new WarriorClass(this, warriorXP, level);
+			this.buttonList = warrior.getButtonlist();
+			break;
 		}
 	}
 	
 	@Override
 	public void updateScreen(){
-		
+		if(this.update){
+			switch(selectedClass){
+			case NONE:
+				base = new BaseClass(this, collectorXP, cookXP, builderXP, wizardXP, warriorXP);
+				this.buttonList = base.getButtonList();
+				break;
+			case COLLECTOR:
+				collector = new CollectorClass(this, collectorXP, level);
+				this.buttonList = collector.getButtonList();
+				break;
+			case BUILDER:
+				builder = new BuilderClass(this, builderXP, level);
+				this.buttonList = builder.getButtonList();
+				break;
+			case COOK:
+				cook = new CookClass(this, cookXP, level);
+				this.buttonList = cook.getButtonList();
+				break;
+			case WIZARD:
+				wizard = new WizardClass(this, wizardXP, level);
+				this.buttonList = wizard.getButtonList();
+				break;
+			case WARRIOR:
+				warrior = new WarriorClass(this, warriorXP, level);
+				this.buttonList = warrior.getButtonlist();
+				break;
+			}
+			this.update = false;
+		}
 	}
 	
 	@Override
 	public void drawScreen(int w, int h, float ticks){
 		this.drawDefaultBackground();
 		
-		if(selectedClass == -1){
-			int textColor = Color.white.hashCode();
-			this.mc.fontRenderer.drawString("Class Perks", this.width/2 - this.mc.fontRenderer.getStringWidth("Class Perks")/2, 5, textColor);
-			
-			this.mc.fontRenderer.drawString("Mining: ", 10, 20, textColor);
-			drawXPBar(100, 20, classXP[Data.MINING], level);
-			
-			this.mc.fontRenderer.drawString("Cooking: ", 10, 40, textColor);
-			drawXPBar(100, 40, classXP[Data.COOKING], level);
-			
-			this.mc.fontRenderer.drawString("Farming: ", 10, 60, textColor);
-			drawXPBar(100, 60, classXP[Data.FARMING], level);
-			
-			this.mc.fontRenderer.drawString("Fishing: ", 10, 80, textColor);
-			drawXPBar(100,  80, classXP[Data.FISHING], level);
-			
-			this.mc.fontRenderer.drawString("Lumber: ", 10, 100, textColor);
-			drawXPBar(100,  100, classXP[Data.LUMBER], level);
-			
-			this.mc.fontRenderer.drawString("Fighting: ", 10, 120, textColor);
-			drawXPBar(100,  120, classXP[Data.FIGHTER], level);
-			
-			this.mc.fontRenderer.drawString("Brewing: ", 10, 140, textColor);
-			drawXPBar(100,  140, classXP[Data.POTION], level);
-			
-			this.mc.fontRenderer.drawString("Building: ", 10, 160, textColor);
-			drawXPBar(100,  160, classXP[Data.BUILDING], level);
-			
-			this.mc.fontRenderer.drawString("Engineering: ", 10, 180, textColor);
-			drawXPBar(100,  180, classXP[Data.MACHINE], level);
-			
-			this.mc.fontRenderer.drawString("Transporting: ", 10, 200, textColor);
-			drawXPBar(100,  200, classXP[Data.TRANSPORT], level);
+		this.mc.getTextureManager().bindTexture(new ResourceLocation("minecraft", "textures/gui/background.png"));
+		this.drawTexturedModalRect((this.width-256)/2, ((this.height-256)/2) + 20, 0, 0, 256, 256);
+		
+		switch(selectedClass){
+		case NONE:
+			base.render();
+			break;
+		case COLLECTOR:
+			collector.render();
+			break;
+		case BUILDER:
+			builder.render();
+			break;
+		case COOK:
+			cook.render();
+			break;
+		case WIZARD:
+			wizard.render();
+			break;
+		case WARRIOR:
+			warrior.render();
+			break;
 		}
 		
 		super.drawScreen(w, h, ticks);
-	}
-	
-	private void drawXPBar(int x, int y, int xp, int level){
-		drawRect(x, y, x + ((int)(200.0 * ((double)xp/(double)level))), y + 15, Color.GREEN.hashCode());
-		this.mc.fontRenderer.drawString(xp + "/" + level, this.width - 80 - this.mc.fontRenderer.getStringWidth(xp + "/" + level), y, Color.WHITE.hashCode());
 	}
 	
 	@Override
@@ -132,10 +168,44 @@ public class ClassPerks extends GuiScreen{
 	
 	@Override
 	protected void actionPerformed(GuiButton button){
-		if(button.id <= 9 && button.id >= 0){
-			ExtendedPlayer.get(mc.thePlayer).setOccupationClass(button.id);
-			this.selectedClass = button.id;
-		}
+		if(!this.update){
+			//Debug For Now
+			if(button.id >= -1 && button.id <= 4){
+				ExtendedPlayer.get(mc.thePlayer).setOccupationClass(button.id);
+				
+				/*
+				PacketCustom classPacket = new PacketCustom(Resources.MOD_ID, 1);
+				classPacket.writeInt(ExtendedPlayer.get(mc.thePlayer).getOccupationClass());
+				classPacket.sendToServer();
+				*/
+				
+				this.selectedClass = button.id;
+				this.update = true;
+			}
+			
+			/*
+			switch(selectedClass){
+			case NONE:
+				base.actionPerformed(button);
+				break;
+			case COLLECTOR:
+				collector.actionPerformed(button);
+				break;
+			case BUILDER:
+				builder.actionPerformed(button);
+				break;
+			case COOK:
+				cook.actionPerformed(button);
+				break;
+			case WIZARD:
+				wizard.actionPerformed(button);
+				break;
+			case WARRIOR:
+				warrior.actionPerformed(button);
+				break;
+			}
+			*/
+		}		
 	}
 	
 	@Override

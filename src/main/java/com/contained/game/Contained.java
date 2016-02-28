@@ -1,8 +1,11 @@
 package com.contained.game;
 
+import com.contained.game.data.DataLogger;
+import com.contained.game.handler.DataEvents;
+import com.contained.game.handler.FMLDataEvents;
 import com.contained.game.handler.FMLEvents;
+import com.contained.game.handler.PerkEvents;
 import com.contained.game.handler.PlayerEvents;
-import com.contained.game.handler.TerritoryEvents;
 import com.contained.game.handler.WorldEvents;
 import com.contained.game.network.CommonProxy;
 import com.contained.game.util.Debug;
@@ -47,13 +50,16 @@ public class Contained{
 	public void init(FMLInitializationEvent event){
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
-		MinecraftForge.EVENT_BUS.register(new TerritoryEvents());
-		FMLCommonHandler.instance().bus().register(new FMLEvents());
+		MinecraftForge.EVENT_BUS.register(new DataEvents());
+		MinecraftForge.EVENT_BUS.register(new PerkEvents());
+		
+		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
 		world.init();
 	}
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
+		new DataLogger();
 		world.preInit(event);
 		proxy.registerRenderers(this);
 	}
