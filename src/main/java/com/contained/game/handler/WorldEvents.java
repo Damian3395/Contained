@@ -1,14 +1,18 @@
 package com.contained.game.handler;
 
+import java.awt.Point;
+
 import com.contained.game.util.Load;
 import com.contained.game.util.Save;
 import com.contained.game.util.Util;
+import com.contained.game.world.GenerateWorld;
 import com.contained.game.world.WorldGenDecoration;
-import com.contained.game.world.biomes.WastelandBiome;
+import com.contained.game.world.biome.WastelandBiome;
 import com.contained.game.world.block.WastelandBlock;
 import com.contained.game.world.block.WastelandBush;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -19,21 +23,29 @@ public class WorldEvents {
 	@SubscribeEvent
 	//Make all chunks within a specified distance from spawn be empty wasteland.
 	public void biomeControl(ChunkProviderEvent.ReplaceBiomeBlocks event) {
-		if (event.world.provider.dimensionId == 0) {
+		if (event.world.provider.dimensionId == 0 && readyToGen && !event.world.isRemote) {
 			float wasteAmount = Util.isWasteland(event.world, event.chunkX, event.chunkZ);
-			if (wasteAmount > 0 && readyToGen) {
+			BiomeGenBase biomeOverride = null;
+			if (wasteAmount > 0) {
 				for (int i=0; i<event.blockArray.length; i++) {
 					if (Util.isSolidBlock(event.blockArray[i])) {
 						if (Math.random() <= wasteAmount)
 							event.blockArray[i] = WastelandBlock.block;
 					}
 				}
-				if (wasteAmount == 1.0f) {
-					for(int i=0; i<event.biomeArray.length; i++) {
-						event.biomeArray[i] = WastelandBiome.biome;
-					}
-				}
+				if (wasteAmount == 1.0f)
+					biomeOverride = WastelandBiome.biome;
 			}
+			if (biomeOverride == null) {
+				Point p = new Point(event.chunkX, event.chunkZ);
+				if (GenerateWorld.biomeProperties.biomeMapping.containsKey(p))
+					biomeOverride = GenerateWorld.biomeProperties.biomeMapping.get(p);
+				else
+					biomeOverride = WastelandBiome.biome;
+			}
+				
+			for(int i=0; i<event.biomeArray.length; i++)
+				event.biomeArray[i] = biomeOverride;
 		}
 	}
 	

@@ -7,11 +7,8 @@ import com.contained.game.util.Util;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -53,7 +50,6 @@ public class DataEvents {
 	public void onJoinServer(EntityJoinWorldEvent event){
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer){
 			EntityPlayer player = (EntityPlayer)event.entity;
-			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			DataLogger.insertLogin("DebugMode", player.getDisplayName(), Util.getDate());
 		}
 	}

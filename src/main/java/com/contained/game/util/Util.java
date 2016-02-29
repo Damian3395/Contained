@@ -26,27 +26,19 @@ import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
-
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityWitch;
-
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
-public class Util {
-	public static final int COAL = 0;
-	public static final int IRON = 1;
-	public static final int GOLD = 2;
-	public static final int LAPIS = 3;
-	public static final int REDSTONE = 4;
-	public static final int DIAMOND = 5;
-	public static final int EMERALD = 6;
-	public static final int NUM_MINERALS = 7;
-	
+public class Util {	
 	/**
 	 * Euclidean distance between two points
 	 */
@@ -96,5 +88,23 @@ public class Util {
 	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	
+	/**
+	 * Makes the given entity invulnerable or not.
+	 */
+	public static void setEntityInvulnerability(Entity ent, boolean value) {
+		NBTTagCompound ntc = new NBTTagCompound();
+		ent.writeToNBT(ntc);
+		ntc.setBoolean("Invulnerable", value);
+		ent.readFromNBT(ntc);
+	}
+	
+	/**
+	 * Outputs a message to chat, if debug mode is enabled.
+	 */
+	public static void debugMessage(EntityPlayer player, String msg) {
+		if (Resources.DEBUG_ENABLED)
+			player.addChatComponentMessage(new ChatComponentText(msg));
 	}
 }

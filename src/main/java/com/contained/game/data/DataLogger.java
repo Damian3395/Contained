@@ -3,11 +3,6 @@ package com.contained.game.data;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import net.minecraftforge.event.entity.EntityEvent;
 
 /*
  * Added Events:

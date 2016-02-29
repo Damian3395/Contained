@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.contained.game.data.Data;
 
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;

@@ -1,4 +1,4 @@
-package com.contained.game.world.biomes;
+package com.contained.game.world.biome;
 
 import java.awt.Color;
 

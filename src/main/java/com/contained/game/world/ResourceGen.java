@@ -2,7 +2,7 @@ package com.contained.game.world;
 
 import java.util.Random;
 
-import com.contained.game.Contained;
+import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
@@ -19,34 +19,34 @@ public class ResourceGen {
 	public void generateOre(OreGenEvent.GenerateMinable event) {	
 		if (event.type == EventType.COAL) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.COAL]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.COAL]);
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.IRON) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.IRON]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.IRON]);
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.GOLD) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.GOLD]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.GOLD]);
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.DIAMOND) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.DIAMOND]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.DIAMOND]);
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.EMERALD]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.EMERALD]);
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.REDSTONE) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.REDSTONE]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.REDSTONE]);
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.LAPIS) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Util.LAPIS]);
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.LAPIS]);
 			event.setResult(Result.DENY);
 		} 
 	}

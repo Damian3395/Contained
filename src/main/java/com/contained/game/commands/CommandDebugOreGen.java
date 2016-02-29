@@ -1,10 +1,9 @@
-package com.contained.game.util;
+package com.contained.game.commands;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.contained.game.Contained;
 import com.contained.game.world.GenerateWorld;
 
 import net.minecraft.command.ICommand;
@@ -12,16 +11,16 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ChatComponentText;
 
-public class Debug implements ICommand{
+public class CommandDebugOreGen implements ICommand{
 	private final List<String> aliases;
 
 	protected String fullEntityName; 
 	protected Entity conjuredEntity; 
 
-	public Debug() 
+	public CommandDebugOreGen() 
 	{ 
 		aliases = new ArrayList<String>(); 
-		aliases.add("fwgdebug"); 
+		aliases.add("oredebug"); 
 	} 
 
 	@Override 
@@ -33,13 +32,13 @@ public class Debug implements ICommand{
 	@Override 
 	public String getCommandName() 
 	{ 
-		return "fwgdebug"; 
+		return "oredebug"; 
 	} 
 
 	@Override         
 	public String getCommandUsage(ICommandSender var1) 
 	{ 
-		return "/fwgdebug"; 
+		return "/oredebug"; 
 	} 
 
 	@Override 

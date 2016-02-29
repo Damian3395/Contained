@@ -6,6 +6,7 @@ import com.contained.game.data.Data;
 import com.contained.game.data.DataItemStack;
 import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -43,12 +44,12 @@ public class PlayerEvents {
 				int[] occupationData = ExtendedPlayer.get(player).getOccupationValues();
 				ArrayList<String> achievements = ExtendedPlayer.get(player).getAchievement();
 				
-				PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, 1);
+				PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.OCCUPATIONAL_DATA);
 				for(int i=0; i<occupationData.length; i++)
 					occPacket.writeInt(occupationData[i]);
 				occPacket.sendToPlayer(player);
 				
-				PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, 2);
+				PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.ITEM_USAGE_DATA);
 				usePacket.writeInt(ExtendedPlayer.get(player).usedOwnItems);
 				usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
 				usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);
