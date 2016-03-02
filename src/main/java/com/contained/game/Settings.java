@@ -8,8 +8,8 @@ import net.minecraftforge.common.config.Configuration;
  */
 public class Settings {
 
-	public static final String protectCategory = "Protection Rules";
-	public static final String teamCategory = "Player Teams and Territory";
+	public static final String protectCategory = "protect";
+	public static final String teamCategory = "teams";
 	
 	public boolean buildProtect;
 	public boolean breakProtect;

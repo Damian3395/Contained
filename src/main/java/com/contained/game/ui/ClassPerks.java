@@ -1,5 +1,7 @@
 package com.contained.game.ui;
 
+import org.lwjgl.opengl.GL11;
+
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.perks.BaseClass;
@@ -116,7 +118,7 @@ public class ClassPerks extends GuiScreen{
 	@Override
 	public void drawScreen(int w, int h, float ticks){
 		this.drawDefaultBackground();
-		
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(new ResourceLocation(Resources.MOD_ID, "textures/gui/background.png"));
 		this.drawTexturedModalRect((this.width-256)/2, ((this.height-256)/2) + 20, 0, 0, 256, 256);
 		

@@ -19,7 +19,7 @@ public interface CEntity<T extends Entity> {
 	public void setPosition(double x, double y, double z);
 	
 	/*
-	 * @return the entity block location x,y,z
+	 * @return the entity instance location x,y,z
 	 */
 	public int getBlockX();
 	public int getBlockY();

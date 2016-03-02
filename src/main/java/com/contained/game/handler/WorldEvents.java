@@ -30,7 +30,7 @@ public class WorldEvents {
 				for (int i=0; i<event.blockArray.length; i++) {
 					if (Util.isSolidBlock(event.blockArray[i])) {
 						if (Math.random() <= wasteAmount)
-							event.blockArray[i] = WastelandBlock.block;
+							event.blockArray[i] = WastelandBlock.instance;
 					}
 				}
 				if (wasteAmount == 1.0f)
@@ -62,7 +62,7 @@ public class WorldEvents {
 				int x = event.chunkX + event.rand.nextInt(16) + 8;
 				int z = event.chunkZ + event.rand.nextInt(16) + 8;
 				int y = event.rand.nextInt(Math.max(1, event.world.getHeightValue(x, z) * 2));
-				(new WorldGenDecoration(WastelandBush.block)).generate(event.world, event.rand, x, y, z);
+				(new WorldGenDecoration(WastelandBush.instance)).generate(event.world, event.rand, x, y, z);
 			}
 		}
 	}

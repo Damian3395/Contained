@@ -9,10 +9,10 @@ import net.minecraft.world.World;
 
 public class WastelandBush extends BlockDeadBush {
 	public static String blockName = "wastelandBush";
-	public static BlockWastelandBush block = new BlockWastelandBush();
+	public static BlockWastelandBush instance = new BlockWastelandBush();
 
 	public void preInit(FMLPreInitializationEvent event){
-		GameRegistry.registerBlock(block, blockName);
+		GameRegistry.registerBlock(instance, blockName);
 	}
 	
 	static class BlockWastelandBush extends BlockDeadBush {
@@ -32,7 +32,7 @@ public class WastelandBush extends BlockDeadBush {
 		@Override
 		public boolean canPlaceBlockOn(Block b) {
 			return b == Blocks.grass || b == Blocks.dirt || b == Blocks.farmland
-			  || b == Blocks.sand || b == Blocks.soul_sand || b == WastelandBlock.block;
+			  || b == Blocks.sand || b == Blocks.soul_sand || b == WastelandBlock.instance;
 		}
 	}
 }

@@ -66,16 +66,18 @@ public class DataEvents {
 			if(event.entity instanceof EntityPlayer){
 				player = (EntityPlayer) event.entity;
 				victim = player.getDisplayName();
-			}else{
+			} else if (event.entity instanceof EntityLivingBase) {
 				victim = LanguageRegistry.instance().getStringLocalization("entity." + EntityList.getEntityString((EntityLivingBase) event.entityLiving)+".name", "en_US");
-			}
+			} else
+				victim = event.entity.getClass().getSimpleName();
 			
 			if(event.source.getSourceOfDamage() instanceof EntityPlayer){
 				player = (EntityPlayer) event.source.getSourceOfDamage();
 				killer = player.getDisplayName();
-			}else{
-				killer = victim = LanguageRegistry.instance().getStringLocalization("entity." + EntityList.getEntityString((EntityLivingBase) event.source.getSourceOfDamage())+".name", "en_US");
-			}
+			} else if (event.source.getSourceOfDamage() instanceof EntityLivingBase) {
+				killer = LanguageRegistry.instance().getStringLocalization("entity." + EntityList.getEntityString((EntityLivingBase) event.source.getSourceOfDamage())+".name", "en_US");
+			} else
+				killer = event.source.getDamageType();
 			DataLogger.insertKill("DebugMode", killer, victim, Util.getDate());
 		}
 	}

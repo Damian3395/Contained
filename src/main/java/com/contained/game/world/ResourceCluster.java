@@ -35,8 +35,8 @@ public static final String oreGenCategory = "oreGen";
 	
 	/**
 	 * @param type 		       Block to spawn
-	 * @param minVein          Minimum amount of that block in a "vein"
-	 * @param maxVein   	   Maximum amount of that block in a "vein"
+	 * @param minVein          Minimum amount of that instance in a "vein"
+	 * @param maxVein   	   Maximum amount of that instance in a "vein"
 	 * @param minVeinCount     Minimum number of veins in a chunk
 	 * @param maxVeinCount     Maximum number of veins in a chunk
 	 * @param minClusterSize   Minimum number of chunks this cluster occupies
@@ -107,7 +107,7 @@ public static final String oreGenCategory = "oreGen";
 	 * Determine a connected series of adjacent chunks to use as a cluster
 	 * for generation, centered around a given starting chunk. This method 
 	 * will avoid selecting any chunks that have already been generated of this
-	 * block type previously. It will select a cluster of chunks equal to the 
+	 * instance type previously. It will select a cluster of chunks equal to the 
 	 * requested size -- however, note that if the finite world is too small, or
 	 * the number of adjacent ungenerated chunks is too small, this size may not
 	 * be able to be reached. In that case, will return the largest cluster it
@@ -137,7 +137,7 @@ public static final String oreGenCategory = "oreGen";
 			if (exploreOrder[i] == 3) { probe.x = x+1; probe.y = z; } // Right
 				
 			// If the desired adjacent chunk has not been generated with this
-			// block type yet, let's explore it as a potential candidate.
+			// instance type yet, let's explore it as a potential candidate.
 			ArrayList<Point> nextExplore = null;
 			if (!used.contains(probe) && !spawnChunks.contains(probe)
 						&& Util.isWasteland(w, probe.x, probe.y) == 0) 
@@ -252,7 +252,7 @@ public static final String oreGenCategory = "oreGen";
 				" VeinSize: The number of blocks that can appear together in a single vein."
 				+ "\n SpawnHeight: The vertical range in which the veins can be spawned."
 				+ "\n VeinsPerChunk: The number of veins that can appear within a 16x16 area of blocks."
-				+ "\n ChunksPerCluster: The number of adjacent chunks that will spawn this type of block."
+				+ "\n ChunksPerCluster: The number of adjacent chunks that will spawn this type of instance."
 				+ "\n ClustersInWorld: The number of these chunk clusters that can appear within the entire finite world.");
 	}
 }

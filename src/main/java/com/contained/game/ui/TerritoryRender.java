@@ -114,7 +114,7 @@ public class TerritoryRender {
 	}
 	
 	/**
-	 * Returns the team occupying the given block coordinates, or null
+	 * Returns the team occupying the given instance coordinates, or null
 	 * if the area is not claimed by any groups.
 	 */
 	private PlayerTeam getTerritory(int x, int z) {

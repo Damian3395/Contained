@@ -3,8 +3,6 @@ package com.contained.game.world;
 import com.contained.game.util.Resources;
 import com.contained.game.world.biome.BiomeProperties;
 import com.contained.game.world.biome.WastelandBiome;
-import com.contained.game.world.block.WastelandBlock;
-import com.contained.game.world.block.WastelandBush;
 
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.init.Blocks;
@@ -14,8 +12,6 @@ import net.minecraftforge.common.config.Configuration;
 public class GenerateWorld {
 	public static ResourceCluster[] oreSpawnProperties;
 	public static BiomeProperties biomeProperties;
-	WastelandBlock wasteland = new WastelandBlock();
-	WastelandBush wastelandBush = new WastelandBush();
 	WastelandBiome wastelandBiome = new WastelandBiome();
 	
 	public void init(){
@@ -48,8 +44,5 @@ public class GenerateWorld {
 		BiomeProperties.writeConfigComment(config);
 		biomeProperties = BiomeProperties.generateFromConfig(config);
 		config.save();
-		
-		wasteland.preInit(event);
-		wastelandBush.preInit(event);
 	}
 }

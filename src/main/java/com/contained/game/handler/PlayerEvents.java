@@ -1,5 +1,6 @@
 package com.contained.game.handler;
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import com.contained.game.Contained;
@@ -19,6 +20,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -28,6 +30,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
@@ -122,6 +125,24 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
+	// For players that are in teams, only allow them to sleep in beds that are
+	// within their team's territory.
+	public void onBedSleep(PlayerSleepInBedEvent ev) {
+		if (ev.entityPlayer != null && !ev.entityPlayer.worldObj.isRemote) {
+			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.entityPlayer);
+			if (playerData.teamID != null) {
+				Point probe = new Point(ev.x, ev.z);
+				if (!Contained.territoryData.containsKey(probe)
+						|| !Contained.territoryData.get(probe).equals(playerData.teamID)) {
+					ev.result = EntityPlayer.EnumStatus.OTHER_PROBLEM;
+					ev.entityPlayer.addChatMessage(new ChatComponentText(
+						"§cYou can only sleep within your team's territory."));
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void onEntityConstructing(EntityConstructing event) {
 		if (event.entity instanceof EntityPlayer && ExtendedPlayer.get((EntityPlayer) event.entity) == null)
 			ExtendedPlayer.register((EntityPlayer) event.entity);
@@ -164,7 +185,7 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	//Handle firing the functionality of BlockInteractItems when right-clicked on a block.
+	//Handle firing the functionality of BlockInteractItems when right-clicked on a instance.
 	public void onItemUse(PlayerInteractEvent event) {
 		if (!event.world.isRemote) {
 			ItemStack usedItem = event.entityPlayer.getHeldItem();
@@ -213,7 +234,7 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	//When a block is harvested, the dropped items are owned by the harvester.
+	//When a instance is harvested, the dropped items are owned by the harvester.
 	public void onItemHarvested(HarvestDropsEvent event) {
 		ArrayList<ItemStack> drops = event.drops;
 		for (ItemStack stack : drops)

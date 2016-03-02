@@ -23,10 +23,10 @@ public class WastelandBlock {
 	public static String blockName = "wasteland";
 	public static String textureName = Resources.MOD_ID+":wasteland";
 	
-	public static BlockWasteland block = new BlockWasteland();
+	public static BlockWasteland instance = new BlockWasteland();
 	
 	public void preInit(FMLPreInitializationEvent event){
-		GameRegistry.registerBlock(block,  blockName);
+		GameRegistry.registerBlock(instance,  blockName);
 	}
 	
 	static class BlockWasteland extends Block {
