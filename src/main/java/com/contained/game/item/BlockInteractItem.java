@@ -3,7 +3,7 @@ package com.contained.game.item;
 import net.minecraft.entity.player.EntityPlayer;
 
 /**
- * An item which should perform an action when right-clicked on a instance.
+ * An item which should perform an action when right-clicked on a block.
  */
 public interface BlockInteractItem {
 

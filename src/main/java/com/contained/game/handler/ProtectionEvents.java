@@ -238,9 +238,9 @@ public class ProtectionEvents {
 	 * in a region of protected land.
 	 * 
 	 * @param ent The entity performing the action
-	 * @param x   The x coordinate of the instance/entity being affected by the action
-	 * @param y   The y coordinate of the instance/entity being affected by the action
-	 * @param z   The z coordinate of the instance/entity being affected by the action
+	 * @param x   The x coordinate of the block/entity being affected by the action
+	 * @param y   The y coordinate of the block/entity being affected by the action
+	 * @param z   The z coordinate of the block/entity being affected by the action
 	 * @return
 	 */
 	public static boolean inProtectRange(EntityPlayer ent, double x, double y, double z) {

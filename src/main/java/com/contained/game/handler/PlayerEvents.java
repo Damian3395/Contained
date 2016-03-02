@@ -185,7 +185,7 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	//Handle firing the functionality of BlockInteractItems when right-clicked on a instance.
+	//Handle firing the functionality of BlockInteractItems when right-clicked on a block.
 	public void onItemUse(PlayerInteractEvent event) {
 		if (!event.world.isRemote) {
 			ItemStack usedItem = event.entityPlayer.getHeldItem();
@@ -234,7 +234,7 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	//When a instance is harvested, the dropped items are owned by the harvester.
+	//When a block is harvested, the dropped items are owned by the harvester.
 	public void onItemHarvested(HarvestDropsEvent event) {
 		ArrayList<ItemStack> drops = event.drops;
 		for (ItemStack stack : drops)
