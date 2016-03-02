@@ -1,10 +1,10 @@
 [
 {
-  "modid": "examplemod",
+  "modid": "contained",
   "name": "Contained",
   "description": "Minecraft Mod For Analyzing Player Personality",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "1.0",
+  "mcversion": "1.7.10",
   "url": "",
   "updateUrl": "",
   "authorList": ["Damian Debkowski", "Nicole Yson", "Andrew Marrero", "Yichen Yue", "Li Yin"],

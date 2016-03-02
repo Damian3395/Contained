@@ -1,12 +1,5 @@
 package com.contained.game.ui;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-
-import org.lwjgl.opengl.GL11;
-
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.perks.BaseClass;
@@ -17,18 +10,9 @@ import com.contained.game.ui.perks.WarriorClass;
 import com.contained.game.ui.perks.WizardClass;
 import com.contained.game.util.Resources;
 
-import codechicken.lib.packet.PacketCustom;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 public class ClassPerks extends GuiScreen{
 	public static final int NONE = -1;
@@ -56,7 +40,6 @@ public class ClassPerks extends GuiScreen{
 	
 	private boolean update = false;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui(){
 		selectedClass = ExtendedPlayer.get(mc.thePlayer).getOccupationClass();
@@ -134,7 +117,7 @@ public class ClassPerks extends GuiScreen{
 	public void drawScreen(int w, int h, float ticks){
 		this.drawDefaultBackground();
 		
-		this.mc.getTextureManager().bindTexture(new ResourceLocation("minecraft", "textures/gui/background.png"));
+		this.mc.getTextureManager().bindTexture(new ResourceLocation(Resources.MOD_ID, "textures/gui/background.png"));
 		this.drawTexturedModalRect((this.width-256)/2, ((this.height-256)/2) + 20, 0, 0, 256, 256);
 		
 		switch(selectedClass){

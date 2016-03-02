@@ -1,7 +1,7 @@
 package com.contained.game.util;
 
 public class Resources {
-	public static final String MOD_ID = "ContainedOverhaulMod";
+	public static final String MOD_ID = "contained";
 	public static final String NAME = "Contained";
 	public static final String VERSION = "1.0";
 	
@@ -10,6 +10,7 @@ public class Resources {
 	public static int wastelandPadding = 5; //Number of "transition" chunks between world and wasteland.
 	
 	public static final boolean DEBUG_ENABLED = false;
+	public static final boolean LOGGING_ENABLED = false; //Should log to the SQL database?
 	
 	public static final int COAL = 0;
 	public static final int IRON = 1;

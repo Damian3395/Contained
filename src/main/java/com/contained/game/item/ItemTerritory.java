@@ -26,7 +26,7 @@ public class ItemTerritory {
 		Item.itemRegistry.addObject(472, "ItemRemoveTerritory", removeTerritory);
 	}
 
-	public static class TerritoryRod extends Item {
+	public static class TerritoryRod extends Item implements BlockInteractItem {
 		public TerritoryRod(){
 			setMaxDamage(0);
 			maxStackSize = 64;
@@ -39,7 +39,7 @@ public class ItemTerritory {
 			return 1.0F;
 		}
 		
-		public void claimTerritory(EntityPlayer p, int x, int z) {
+		public void onBlockInteract(EntityPlayer p, int x, int y, int z) {
 			if (!p.worldObj.isRemote) {
 				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
 				Point toClaim = new Point(x,z);
@@ -55,7 +55,7 @@ public class ItemTerritory {
 		}
 	}
 	
-	public static class AntiTerritoryRod extends Item {
+	public static class AntiTerritoryRod extends Item implements BlockInteractItem  {
 		public AntiTerritoryRod(){
 			setMaxDamage(0);
 			maxStackSize = 64;
@@ -68,7 +68,7 @@ public class ItemTerritory {
 			return 1.0F;
 		}
 		
-		public void removeTerritory(EntityPlayer p, int x, int z) {
+		public void onBlockInteract(EntityPlayer p, int x, int y, int z) {
 			if (!p.worldObj.isRemote) {
 				Point toRemove = new Point(x,z);
 				if (Contained.territoryData.containsKey(toRemove)) {

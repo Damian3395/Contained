@@ -1,0 +1,11 @@
+tile.wasteland.name=Wasteland
+tile.wastelandBush.name=Dead Bush
+
+item.ItemClaimTerritory.name=Debug Claim Territory
+item.ItemRemoveTerritory.name=Debug Remove Territory
+item.TerritoryFlag.name=Territory Flag
+item.contained.book.main.name=Contained Tutorial
+
+key.categories.contained=Contained
+key.dataVisGUI=Toggle Data GUI
+key.classPerkGUI=View Perks

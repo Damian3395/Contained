@@ -2,36 +2,64 @@ package com.contained.game.handler;
 
 import java.util.ArrayList;
 
+import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
 import com.contained.game.data.Data;
 import com.contained.game.data.DataItemStack;
 import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.item.BlockInteractItem;
 import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.ItemSmeltedEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
 public class PlayerEvents {
+	@SubscribeEvent
+	//When a player joins the server, send their client the territory & team data.
+	public void onJoin(EntityJoinWorldEvent event) {
+		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
+			EntityPlayer joined = (EntityPlayer)event.entity;
+			
+			//Future TODO:
+			//  -Remind the player on join if they have pending invitations.
+			//  -Notify the player on join if one of their invitations got accepted
+			//   since the last time they were online.
+			
+			if (PlayerTeamIndividual.get(joined) == null) {
+				// Server has no info about this player, this must be their first
+				// time joining. Initialize their custom data.
+				Contained.teamMemberData.add(new PlayerTeamIndividual(joined.getDisplayName()));
+			
+				//Give first time players a tutorial book.
+				if (!joined.inventory.hasItem(ContainedRegistry.book))
+					event.world.spawnEntityInWorld(new EntityItem(event.world, 
+							joined.posX, joined.posY+1, joined.posZ, 
+							new ItemStack(ContainedRegistry.book, 1)));
+			}
+			
+			ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToPlayer(joined);
+			ClientPacketHandler.packetSyncTerritories(Contained.territoryData).sendToPlayer(joined);			
+		}
+	}
+	
 	@SubscribeEvent
 	public void onEntityLiving(LivingUpdateEvent event) {
 		if (event.entity != null && event.entity instanceof EntityPlayer
@@ -133,6 +161,21 @@ public class PlayerEvents {
 	public void onItemUsed(PlayerUseItemEvent.Finish event) {
 		if (event.entityPlayer != null && event.item != null)
 			processItemUsage(event.entityPlayer, event.item);
+	}
+	
+	@SubscribeEvent
+	//Handle firing the functionality of BlockInteractItems when right-clicked on a block.
+	public void onItemUse(PlayerInteractEvent event) {
+		if (!event.world.isRemote) {
+			ItemStack usedItem = event.entityPlayer.getHeldItem();
+			if (usedItem == null)
+				return;
+			if (usedItem.getItem() instanceof BlockInteractItem
+					&& event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+				BlockInteractItem intItem = (BlockInteractItem)usedItem.getItem();
+				intItem.onBlockInteract(event.entityPlayer, event.x, event.y, event.z);
+			}
+		}
 	}
 	
 	/*

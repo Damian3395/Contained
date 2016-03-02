@@ -60,7 +60,7 @@ public class CommandInvitationSend implements ICommand {
 				if (pdata.isLeader) {
 					//Leaders can only send invitations to players not in teams.
 					PlayerTeam leadersTeam = PlayerTeam.get(pdata.teamID);
-					if (leadersTeam.numMembers() >= PlayerTeam.MAX_TEAM_SIZE)
+					if (leadersTeam.numMembers() >= Contained.configs.maxTeamSize)
 						out = "Your team already has the max number of members.";
 					else {
 						PlayerTeamIndividual recipient = PlayerTeamIndividual.get(inviteName);
@@ -94,7 +94,7 @@ public class CommandInvitationSend implements ICommand {
 						else {
 							if (teamData == null)
 								teamData = PlayerTeam.get(leaderData.teamID);
-							if (teamData.numMembers() >= PlayerTeam.MAX_TEAM_SIZE)
+							if (teamData.numMembers() >= Contained.configs.maxTeamSize)
 								out = "Can't send invitation, beacuse the requested team is already full.";
 							else
 								newInvite = new PlayerTeamInvitation(pdata.playerName, teamData.id, PlayerTeamInvitation.TO);

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;

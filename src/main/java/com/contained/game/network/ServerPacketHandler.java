@@ -1,6 +1,5 @@
 package com.contained.game.network;
 
-import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 
 import codechicken.lib.packet.PacketCustom;

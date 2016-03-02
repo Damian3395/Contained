@@ -3,13 +3,14 @@ package com.contained.game.ui;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
+
 import org.lwjgl.opengl.GL11;
 
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.util.ColorUtil;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -138,7 +139,7 @@ public class DataVisualization extends Gui{
         	double percent = (values[l]/maxValue)*100.0D;
             int i1 = MathHelper.floor_double(percent / 4.0D) + 1;
             tessellator.startDrawing(6);
-            tessellator.setColorOpaque_I(hueGrad(l, values.length).hashCode());
+            tessellator.setColorOpaque_I(ColorUtil.hueGrad(l, values.length).hashCode());
             tessellator.addVertex((double)xx, (double)yy, 0.0D);
             float f, f1, f2;
 
@@ -152,7 +153,7 @@ public class DataVisualization extends Gui{
 
             tessellator.draw();
             tessellator.startDrawing(5);
-            tessellator.setColorOpaque_I((hueGrad(l, values.length).hashCode() & 16711422) >> 1);
+            tessellator.setColorOpaque_I((ColorUtil.hueGrad(l, values.length).hashCode() & 16711422) >> 1);
 
             for (int j1 = i1; j1 >= 0; --j1){
                 f = (float)((d0 + percent * (double)j1 / (double)i1) * Math.PI * 2.0D / 100.0D);
@@ -170,7 +171,7 @@ public class DataVisualization extends Gui{
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         for (int i = 0; i < values.length; i++){
             mc.fontRenderer.drawStringWithShadow(captions[i] + ": " + values[i],
-            		xx+diameter+10, y+i*8, hueGrad(i, values.length).hashCode());
+            		xx+diameter+10, y+i*8, ColorUtil.hueGrad(i, values.length).hashCode());
         }
 	}
 	
@@ -228,7 +229,7 @@ public class DataVisualization extends Gui{
 		for (int i=0; i<values.length; i++) {
 			Tessellator t = Tessellator.instance;
 			t.startDrawing(GL11.GL_LINE_STRIP);
-			Color lineCol = hueGrad(i, values.length);
+			Color lineCol = ColorUtil.hueGrad(i, values.length);
 			t.setColorOpaque(lineCol.getRed(),lineCol.getGreen(),lineCol.getBlue());
 			GL11.glLineWidth(2.0f);
 			
@@ -269,25 +270,6 @@ public class DataVisualization extends Gui{
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
         GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
-	}
-	
-	//Generate a color code from a String
-	private int colorHash(String s) {
-        return (s.hashCode() & 11184810) + 4473924;
-    }
-	
-	//Generate a hue spectrum over a number range
-	private Color hueGrad(float val, float max) {
-		float hue = val/max;
-		// Tweak saturation & val in green/blue area of spectrum to 
-		// increase visibility
-		float sat = 0.6f;
-		float bright = 1.0f;
-		if (hue >= 0.25 && hue <= 0.5) {
-			sat = 0.6f + (hue - 0.25f);
-			bright = 1.0f + (hue - 0.5f);
-		}
-		return Color.getHSBColor(hue, sat, bright);
 	}
 	
 	public static MovingObjectPosition getLookBlock(World world, EntityPlayer entity, float range) {

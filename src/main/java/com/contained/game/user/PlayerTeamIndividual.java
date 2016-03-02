@@ -39,7 +39,7 @@ public class PlayerTeamIndividual {
 			PlayerTeam requestedTeam = PlayerTeam.get(teamID);
 			if (requestedTeam == null)
 				return Error.NOT_EXISTS; //Team doesn't exist.
-			else if (requestedTeam.numMembers() >= PlayerTeam.MAX_TEAM_SIZE)
+			else if (requestedTeam.numMembers() >= Contained.configs.maxTeamSize)
 				return Error.TEAM_FULL; //Team is full.
 			
 			this.teamID = teamID;

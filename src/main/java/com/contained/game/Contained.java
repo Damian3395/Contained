@@ -26,9 +26,7 @@ import com.contained.game.handler.FMLDataEvents;
 import com.contained.game.handler.PerkEvents;
 import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
-import com.contained.game.handler.TeamTerritoryEvents;
 import com.contained.game.handler.WorldEvents;
-import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.CommonProxy;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -45,6 +43,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = Resources.MOD_ID, name=Resources.NAME, version=Resources.VERSION)
@@ -56,8 +55,8 @@ public class Contained{
 	public static Contained instance;
 	
 	public static Settings configs;
-	ItemTerritory territoryItems = new ItemTerritory();
 	GenerateWorld world = new GenerateWorld();
+	ContainedRegistry registry = new ContainedRegistry();
 	
 	public static HashMap<Point, String> territoryData; //coordinates, teamID
 	public static ArrayList<PlayerTeam>  teamData;
@@ -96,17 +95,19 @@ public class Contained{
 		MinecraftForge.EVENT_BUS.register(new DataEvents());
 		MinecraftForge.EVENT_BUS.register(new PerkEvents());
 		MinecraftForge.EVENT_BUS.register(new ProtectionEvents());
-		MinecraftForge.EVENT_BUS.register(new TeamTerritoryEvents());
 		
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
 		world.init();
+		registry.init(event);
 	}
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		new DataLogger();
-		
+		registry.preInit(event);
 		configs = new Settings(event);
+		
+		NetworkRegistry.INSTANCE.registerGuiHandler(Contained.instance, proxy);
 		
 		world.preInit(event);
 		proxy.registerRenderers(this);

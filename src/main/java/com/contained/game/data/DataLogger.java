@@ -4,6 +4,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import com.contained.game.util.Resources;
+
 /*
  * Added Events:
  * Territory
@@ -27,6 +29,9 @@ public class DataLogger {
 	}
 	
 	public static void insertChat(String server, String user, String message, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CHAT VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -40,6 +45,9 @@ public class DataLogger {
 	}
 	
 	public static void insertMove(String server, String user, int x, int y, int z, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO POSITION VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -55,6 +63,9 @@ public class DataLogger {
 	}
 	
 	public static void insertConsume(String server, String user, String item, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CONSUME VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -68,6 +79,9 @@ public class DataLogger {
 	}
 	
 	public static void insertUsed(String server, String user, String item, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO USED VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -81,6 +95,9 @@ public class DataLogger {
 	}
 	
 	public static void insertSmelt(String server, String user, String item, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SMELT VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -94,6 +111,9 @@ public class DataLogger {
 	}
 	
 	public static void insertCraft(String server, String user, String item, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CRAFT VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -107,6 +127,9 @@ public class DataLogger {
 	}
 	
 	public static void insertAnvil(String server, String user, String left, int l_size, String right, int r_size, String out, int o_size, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO ANVIL VALUES (?,?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -125,6 +148,9 @@ public class DataLogger {
 	}
 	
 	public static void insertMine(String server, String user, String block, int x, int y, int z, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO MINE VALUES (?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -141,6 +167,9 @@ public class DataLogger {
 	}
 	
 	public static void insertBuild(String server, String user, String block, int x, int y, int z, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO BUILD VALUES (?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -157,6 +186,9 @@ public class DataLogger {
 	}
 	
 	public static void insertKill(String server, String killer, String victim, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO KILLED VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -170,6 +202,9 @@ public class DataLogger {
 	}
 	
 	public static void insertLogin(String server, String user, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO LOGIN VALUES (?,?,?)");
 			preparedStatement.setString(1, server);
@@ -182,6 +217,9 @@ public class DataLogger {
 	}
 	
 	public static void insertLogOut(String server, String user, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO LOGOUT VALUES (?,?,?)");
 			preparedStatement.setString(1, server);
@@ -194,6 +232,9 @@ public class DataLogger {
 	}
 	
 	public static void insertAchievement(String server, String user, String type, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO ACHIEVEMENT VALUES (?,?,?,?)");
 			preparedStatement.setString(1, server);
@@ -207,6 +248,9 @@ public class DataLogger {
 	}
 	
 	private void connectDataBase(){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}catch(ClassNotFoundException e){
@@ -221,6 +265,9 @@ public class DataLogger {
 	}
 	
 	public static void disconnectDataBase(){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
 		try{
 			if(DB != null && !DB.isClosed())
 				DB.close();

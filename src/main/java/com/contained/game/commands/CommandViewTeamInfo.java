@@ -64,7 +64,7 @@ public class CommandViewTeamInfo implements ICommand {
 					sender.addChatMessage(new ChatComponentText("No team found with that name."));
 				else {
 					sender.addChatMessage(new ChatComponentText("Team: "+toView.getFormatCode()+"§l"
-								+toView.displayName+"§r ("+toView.numMembers()+"/"+PlayerTeam.MAX_TEAM_SIZE+")"));
+								+toView.displayName+"§r ("+toView.numMembers()+"/"+Contained.configs.maxTeamSize+")"));
 					
 					String leaderList = "";
 					for (PlayerTeamIndividual player : Contained.teamMemberData) {

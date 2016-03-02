@@ -23,7 +23,7 @@ public class KeyBindings {
 		// Class Perks GUI Container Keyboard Event Handler
 		toggleClassPerks = new KeyBinding("key.classPerkGUI"
 				, Keyboard.KEY_P
-				, "key.categories"+Resources.MOD_ID);
+				, "key.categories."+Resources.MOD_ID);
 		ClientRegistry.registerKeyBinding(toggleClassPerks);
 	}
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<book>
+<page type="intro">
+<text>Contained
+A guide to a new society
+
+Volume 1
+</text>
+</page>
+
+<page type="contents">
+<text>Table of Contents</text>
+<link>
+ <text>Getting Started</text>
+ <icon>TerritoryFlag</icon>
+ <jump>1</jump>
+</link>
+</page>
+
+<page type="text">
+<text>Hello world! Lorem ipsum and stuff...</text>
+</page>
+
+<page type="crafting">
+<text>Territory Flag</text>
+<recipe>
+ <name>TerritoryFlag</name>
+ <size>three</size>
+</recipe>
+</page>
+
+</book>

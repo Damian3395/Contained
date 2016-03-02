@@ -1,7 +1,6 @@
 package com.contained.game.world;
 
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 import com.contained.game.world.biome.BiomeProperties;
 import com.contained.game.world.biome.WastelandBiome;
 import com.contained.game.world.block.WastelandBlock;

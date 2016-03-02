@@ -1,1 +1,13 @@
 /bin/
+/saves/
+/mods/
+/logs/
+/gradle/
+/crash-reports/
+/config/
+/build/
+/resourcepacks/
+/eclipse/
+options.txt
+usernamecache.json
+*.launch

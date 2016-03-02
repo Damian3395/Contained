@@ -18,8 +18,6 @@ import net.minecraft.util.ChatComponentText;
  */
 public class PlayerTeam {
 
-	public static final int MAX_TEAM_SIZE = 5; //Max number of players that can be in a team.
-	
 	public String id;
 	public String displayName;
 	private int colorID; //Index for format codes below

@@ -1,5 +1,7 @@
 package com.contained.game.world.block;
 
+import com.contained.game.util.Resources;
+
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -19,7 +21,7 @@ import net.minecraft.world.World;
 
 public class WastelandBlock {
 	public static String blockName = "wasteland";
-	public static String textureName = "wasteland";
+	public static String textureName = Resources.MOD_ID+":wasteland";
 	
 	public static BlockWasteland block = new BlockWasteland();
 	
