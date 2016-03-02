@@ -11,3 +11,5 @@
 options.txt
 usernamecache.json
 *.launch
+.project
+.classpath
