@@ -194,7 +194,7 @@ public class PlayerEvents {
 			if (usedItem.getItem() instanceof BlockInteractItem
 					&& event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
 				BlockInteractItem intItem = (BlockInteractItem)usedItem.getItem();
-				intItem.onBlockInteract(event.entityPlayer, event.x, event.y, event.z);
+				intItem.onBlockInteract(event.entityPlayer, event.x, event.y, event.z, usedItem);
 			}
 		}
 	}

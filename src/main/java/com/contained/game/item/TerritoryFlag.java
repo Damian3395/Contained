@@ -77,7 +77,7 @@ public class TerritoryFlag {
 			return 1.0F;
 		}
 		
-		public void onBlockInteract(EntityPlayer p, int x, int y, int z) {
+		public void onBlockInteract(EntityPlayer p, int x, int y, int z, ItemStack data) {
 			if (!p.worldObj.isRemote) {
 				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
 				Point toClaim = new Point(x,z);
@@ -104,7 +104,6 @@ public class TerritoryFlag {
 				}
 				
 				p.addExperienceLevel(-Contained.configs.flagXPCost);
-				p.inventory.consumeInventoryItem(TerritoryFlag.instance);
 				Contained.territoryData.put(toClaim, playerData.teamID);
 				ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).sendToClients();
 				

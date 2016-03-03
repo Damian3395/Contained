@@ -2,8 +2,8 @@ tile.townHall.name=Town Hall
 tile.wasteland.name=Wasteland
 tile.wastelandBush.name=Dead Bush
 
-item.ItemClaimTerritory.name=Debug Claim Territory
-item.ItemRemoveTerritory.name=Debug Remove Territory
+item.ItemClaimTerritory.name=Territory Gem
+item.ItemRemoveTerritory.name=Anti-Territory Gem
 item.TerritoryFlag.name=Territory Flag
 item.contained.book.main.name=Contained Tutorial
 
