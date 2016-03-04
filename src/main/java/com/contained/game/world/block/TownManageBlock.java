@@ -69,7 +69,7 @@ public class TownManageBlock {
 			if (p.worldObj.isRemote) {
 				Minecraft mc = Minecraft.getMinecraft();
 				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
-				mc.displayGuiScreen(new GuiTownManage(playerData.teamID));
+				mc.displayGuiScreen(new GuiTownManage(p.inventory, playerData.teamID));
 			}
 			return true;
 		}
