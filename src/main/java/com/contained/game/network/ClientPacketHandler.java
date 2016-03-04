@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.INetHandlerPlayClient;
+import net.minecraft.tileentity.TileEntity;
 
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
@@ -13,6 +14,7 @@ import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.util.Resources;
+import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.packet.PacketCustom.IClientPacketHandler;
@@ -28,6 +30,8 @@ public class ClientPacketHandler implements IClientPacketHandler{
 	public static final int ADD_TERRITORY_BLOCK = 4;
 	public static final int REMOVE_TERRITORY_BLOCK = 5;
 	public static final int SYNC_TEAMS = 6;
+	public static final int TE_PARTICLE = 7;
+	public static final int TMACHINE_STATE = 8;
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
@@ -37,6 +41,7 @@ public class ClientPacketHandler implements IClientPacketHandler{
 	@Override
 	public void handlePacket(PacketCustom packet, Minecraft mc, INetHandlerPlayClient net) {
 		BlockCoord bc;
+		TileEntity te;
 		
 		switch(packet.getType()) {
 			case OCCUPATIONAL_DATA:
@@ -90,6 +95,27 @@ public class ClientPacketHandler implements IClientPacketHandler{
 					for (Point p : terrToRemove)
 						render.teamBlocks.remove(p);
 					render.regenerateEdges();
+				}
+			break;
+			
+			case TE_PARTICLE:
+				te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
+				if (te instanceof TerritoryMachineTE) {
+					TerritoryMachineTE machine = (TerritoryMachineTE)te;
+					machine.displayParticle = packet.readString();
+				}
+			break;
+			
+			case TMACHINE_STATE:
+				te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
+				if (te instanceof TerritoryMachineTE) {
+					TerritoryMachineTE machine = (TerritoryMachineTE)te;
+					machine.tickTimer = packet.readInt();
+					String teamID = packet.readString();
+					if (teamID.equals(""))
+						teamID = null;
+					machine.teamID = teamID;
+					machine.shouldClaim = packet.readBoolean();
 				}
 			break;
 		}

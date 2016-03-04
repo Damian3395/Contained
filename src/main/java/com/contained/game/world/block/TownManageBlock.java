@@ -2,6 +2,7 @@ package com.contained.game.world.block;
 
 import com.contained.game.item.TerritoryFlag;
 import com.contained.game.ui.GuiTownManage;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -13,7 +14,6 @@ import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,7 +68,8 @@ public class TownManageBlock {
 		public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer p, int par6, float par7, float par8, float par9) {
 			if (p.worldObj.isRemote) {
 				Minecraft mc = Minecraft.getMinecraft();
-				mc.displayGuiScreen(new GuiTownManage());
+				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
+				mc.displayGuiScreen(new GuiTownManage(playerData.teamID));
 			}
 			return true;
 		}

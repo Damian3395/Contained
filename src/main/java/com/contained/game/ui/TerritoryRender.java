@@ -24,6 +24,7 @@ public class TerritoryRender {
 	public HashMap<Point, String> teamBlocks;
 	public HashMap<TerritoryEdge, String> teamEdges;
 	public PlayerTeam currentTerritory = null;
+	public boolean doRender = true;
 	
 	public TerritoryRender() {
 		this.teamData = new ArrayList<PlayerTeam>();
@@ -51,7 +52,7 @@ public class TerritoryRender {
 	
 	@SubscribeEvent
 	public void onRenderScreen(RenderWorldLastEvent ev) {
-		if (mc.theWorld != null) {
+		if (mc.theWorld != null && doRender) {
 			float dt = ev.partialTicks;
 			float px = (float)mc.thePlayer.prevPosX;
 			float py = (float)mc.thePlayer.prevPosY;

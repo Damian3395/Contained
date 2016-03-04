@@ -61,6 +61,26 @@ public class Util {
 		return (int)(Math.random()*(double)(max-min))+min;
 	}
 	
+	//Randomly return true/false, with true occurring with 'bias' probability.	
+	public static boolean biasedCoinFlip(float bias) {
+		if (Math.random() <= bias)
+			return true;
+		else
+			return false;
+	}
+	
+	public static byte biasedCoinFlipByte(float bias) {
+		if (Math.random() <= bias)
+			return 1;
+		else
+			return 0;
+	}
+	
+	//Get a random value uniformly distributed around a fixed point.
+	public static double randomBoth(double range) {
+		return (Math.random()*range*2.0)-range;
+	}
+	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 	}

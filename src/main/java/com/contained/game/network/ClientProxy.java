@@ -8,8 +8,11 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.util.Resources;
+import com.contained.game.world.block.TerritoryMachineRender;
+import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -28,8 +31,10 @@ public class ClientProxy extends CommonProxy{
 		
 		MinecraftForge.EVENT_BUS.register(gui);
 		MinecraftForge.EVENT_BUS.register(territory);
-		FMLCommonHandler.instance().bus().register(new KeyInputHandler(gui));
-		MinecraftForgeClient.registerItemRenderer(ItemTerritory.removeTerritory, new AntiTerritoryRender());
+		FMLCommonHandler.instance().bus().register(new KeyInputHandler(gui, territory));
 		KeyBindings.init();
+		
+		MinecraftForgeClient.registerItemRenderer(ItemTerritory.removeTerritory, new AntiTerritoryRender());
+		ClientRegistry.bindTileEntitySpecialRenderer(TerritoryMachineTE.class, new TerritoryMachineRender());	
 	}
 }

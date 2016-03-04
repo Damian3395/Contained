@@ -3,7 +3,8 @@ package com.contained.game.util;
 public class ErrorCase {
 
 	public enum Error {
-		NONE, LEADER_ONLY, TEAM_ONLY, IND_ONLY, TEAM_FULL, NOT_EXISTS, INVALID, ALREADY_LEADER, CANNOT_DEMOTE
+		NONE, LEADER_ONLY, TEAM_ONLY, IND_ONLY, TEAM_FULL, NOT_EXISTS, INVALID, 
+		ALREADY_LEADER, CANNOT_DEMOTE, ALREADY_OWNED, ADJACENT_ONLY, WRONG_TEAM
 	};
 	
 	public static String getErrorCaption(ErrorCase.Error type) {

@@ -1,4 +1,6 @@
 tile.townHall.name=Town Hall
+tile.ClaimTerritoryMachine.name=Territory Machine
+tile.RemoveTerritoryMachine.name=Anti-Territory Machine
 tile.wasteland.name=Wasteland
 tile.wastelandBush.name=Dead Bush
 
@@ -9,4 +11,5 @@ item.contained.book.main.name=Contained Tutorial
 
 key.categories.contained=Contained
 key.dataVisGUI=Toggle Data GUI
+key.territoryRender=Toggle Territory Render
 key.classPerkGUI=View Perks

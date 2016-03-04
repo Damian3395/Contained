@@ -12,15 +12,19 @@ public class ContainedRegistry {
 	public static WastelandBlock wasteland;
 	public static WastelandBush wastelandBush;
 	public static TownManageBlock townHall;
+	public static TerritoryMachine claimMachine;
+	public static AntiTerritoryMachine antiMachine;
 	
 	public static ItemTerritory territoryItems;
 	public static TerritoryFlag claimFlag;
 	public static TutorialBook book;
 	
 	public void preInit(FMLPreInitializationEvent event) {
-		wasteland = new WastelandBlock(); 		wasteland.preInit(event);
-		wastelandBush = new WastelandBush(); 	wastelandBush.preInit(event);
-		townHall = new TownManageBlock(); 		townHall.preInit(event);
+		wasteland = new WastelandBlock(); 		  wasteland.preInit(event);
+		wastelandBush = new WastelandBush(); 	  wastelandBush.preInit(event);
+		townHall = new TownManageBlock(); 		  townHall.preInit(event);
+		claimMachine = new TerritoryMachine();    claimMachine.preInit(event);
+		antiMachine = new AntiTerritoryMachine(); antiMachine.preInit(event);
 		
 		territoryItems = new ItemTerritory();
 		claimFlag = new TerritoryFlag();
@@ -31,6 +35,7 @@ public class ContainedRegistry {
 	public void init(FMLInitializationEvent event) {
 		TerritoryFlag.defineRecipe();
 		TownManageBlock.defineRecipe();
+		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");
 	}
 	
 }

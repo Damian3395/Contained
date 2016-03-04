@@ -8,6 +8,7 @@ import com.contained.game.data.Data;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Resources;
 
 import net.minecraft.block.*;
@@ -53,21 +54,22 @@ public class ItemTerritory {
 			if (!p.worldObj.isRemote) {
 				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
 				Point toClaim = new Point(x,z);
+				Point probe = new Point();
 				
-				if (playerData.teamID == null) {
+				ErrorCase.Error testClaim = 
+						canClaim(playerData.teamID, toClaim, probe);
+				
+				if (testClaim == ErrorCase.Error.TEAM_ONLY) {
 					p.addChatMessage(new ChatComponentText(
 							"§cYou must be in a team to use this item."));
 					return;
 				} 
-				if (Contained.territoryData.containsKey(toClaim)) {
+				if (testClaim == ErrorCase.Error.ALREADY_OWNED) {
 					p.addChatMessage(new ChatComponentText(
 							"§cYou can't claim this area, it already belongs to a team."));
 					return;
 				}
-				if (!(Contained.territoryData.containsKey(new Point(toClaim.x+1, toClaim.y))
-				   || Contained.territoryData.containsKey(new Point(toClaim.x-1, toClaim.y))
-				   || Contained.territoryData.containsKey(new Point(toClaim.x,   toClaim.y+1))
-				   || Contained.territoryData.containsKey(new Point(toClaim.x,   toClaim.y-1)))) 
+				if (testClaim == ErrorCase.Error.ADJACENT_ONLY) 
 				{
 					p.addChatMessage(new ChatComponentText(
 							"§cThis item can only claim territory blocks directly adjacent to your team's current territory."));
@@ -102,35 +104,25 @@ public class ItemTerritory {
 		public void onBlockInteract(EntityPlayer p, int x, int y, int z, ItemStack data) {
 			if (!p.worldObj.isRemote) {
 				Point blockToRemove = new Point(x,z);
-				if (Contained.territoryData.containsKey(blockToRemove)) {
-					//The team that owns this unit of land.
-					String teamOwnedBy = Contained.territoryData.get(blockToRemove);
-					
+				Point probe = new Point();
+				
+				if (Contained.territoryData.containsKey(blockToRemove)) {					
 					//The team this item is allowed to remove the land of.
 					NBTTagCompound itemData = Data.getTagCompound(data);	
 					String teamToRemove = itemData.getString("teamOwner");
-					if (teamToRemove == null || teamToRemove.equals(""))
-						teamToRemove = "";
+					ErrorCase.Error testRemove = 
+							canRemove(teamToRemove, blockToRemove, probe);				
 					
-					if (!teamToRemove.equals(teamOwnedBy)) {
+					if (testRemove == ErrorCase.Error.WRONG_TEAM) {
 						p.addChatMessage(new ChatComponentText(
 								"§cThis item can only remove territory from the team it's linked to."));
 						return;
 					}
-					
-					String ownedNorth = Contained.territoryData.get(new Point(blockToRemove.x, blockToRemove.y+1));
-					String ownedSouth = Contained.territoryData.get(new Point(blockToRemove.x, blockToRemove.y-1));
-					String ownedEast  = Contained.territoryData.get(new Point(blockToRemove.x-1, blockToRemove.y));
-					String ownedWest  = Contained.territoryData.get(new Point(blockToRemove.x+1, blockToRemove.y));
-					if (ownedNorth != null && ownedNorth.equals(teamToRemove)
-							&& ownedSouth != null && ownedSouth.equals(teamToRemove)
-							&& ownedEast  != null && ownedEast.equals(teamToRemove)
-							&& ownedWest  != null && ownedWest.equals(teamToRemove)) 
-						{
-							p.addChatMessage(new ChatComponentText(
-									"§cThis item can only remove territory at the edge of the team's claimed land."));
-							return;
-						}
+					if (testRemove == ErrorCase.Error.ADJACENT_ONLY) {
+						p.addChatMessage(new ChatComponentText(
+								"§cThis item can only remove territory at the edge of the team's claimed land."));
+						return;
+					}
 					
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
@@ -161,5 +153,81 @@ public class ItemTerritory {
 			
 			list.add("Linked Team: "+formatCode+"§l"+teamName);
 		}
+	}
+	
+	/**
+	 * Does this area of land satisfy all the rules required to be claimed
+	 * by a territory gem item? (Possible Errors: TEAM_ONLY, ALREADY_OWNED, ADJACENT_ONLY)
+	 */
+	public static ErrorCase.Error canClaim(String teamID, Point toClaim, Point probe) {
+		if (teamID == null)
+			return ErrorCase.Error.TEAM_ONLY;
+		else if (Contained.territoryData.containsKey(toClaim))
+			return ErrorCase.Error.ALREADY_OWNED;
+		
+		boolean foundAdj = false;
+		for(int i=-1; i<=1; i+=2) {
+			for(int j=0; j<=1; j++) {
+				if (j == 0) {
+					probe.x = toClaim.x+i;
+					probe.y = toClaim.y;
+				} else {
+					probe.x = toClaim.x;
+					probe.y = toClaim.y+i;
+				}
+				if (Contained.territoryData.containsKey(probe)) {
+					foundAdj = true;
+					break;
+				}
+			}
+			if (foundAdj)
+				break;
+		}
+		if (!foundAdj)
+			return ErrorCase.Error.ADJACENT_ONLY;
+		
+		return ErrorCase.Error.NONE;
+	}
+	
+	
+	/**
+	 * Does this area of land satisfy all the rules required to be removed
+	 * by a territory gem item? (Possible Errors: TEAM_ONLY, WRONG_TEAM, ADJACENT_ONLY)
+	 */
+	public static ErrorCase.Error canRemove(String teamID, Point toRemove, Point probe) {
+		if (Contained.territoryData.containsKey(toRemove)) {
+			if (teamID != null && !Contained.territoryData.get(toRemove).equals(teamID))
+				return ErrorCase.Error.WRONG_TEAM;
+		}
+		else
+			return ErrorCase.Error.TEAM_ONLY;
+		
+		String teamOwnedBy = teamID;
+		if (teamOwnedBy == null)
+			teamOwnedBy = Contained.territoryData.get(toRemove);
+		
+		boolean foundAdj = false;
+		for(int i=-1; i<=1; i+=2) {
+			for(int j=0; j<=1; j++) {
+				if (j == 0) {
+					probe.x = toRemove.x+i;
+					probe.y = toRemove.y;
+				} else {
+					probe.x = toRemove.x;
+					probe.y = toRemove.y+i;
+				}
+				String teamProbed = Contained.territoryData.get(probe);
+				if (teamProbed == null || !teamProbed.equals(teamOwnedBy)) {
+					foundAdj = true;
+					break;
+				}
+			}
+			if (foundAdj)
+				break;
+		}
+		if (!foundAdj)
+			return ErrorCase.Error.ADJACENT_ONLY;
+		
+		return ErrorCase.Error.NONE;
 	}
 }

@@ -13,6 +13,8 @@ import com.contained.game.item.BlockInteractItem;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
+import com.contained.game.world.block.TerritoryMachine;
+import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -20,6 +22,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -32,6 +35,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
 public class PlayerEvents {
@@ -198,6 +202,20 @@ public class PlayerEvents {
 			}
 		}
 	}
+	
+    @SubscribeEvent
+    //Transfer player's team to a territory machine when placed.
+    public void onBlockPlacement(BlockEvent.PlaceEvent ev) {
+    	if (!ev.world.isRemote && ev.player != null &&
+    			ev.block instanceof TerritoryMachine.BlockClaimTerritory) {
+    		TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
+    		if (te != null && te instanceof TerritoryMachineTE) {
+    			TerritoryMachineTE machine = (TerritoryMachineTE)te;
+    			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.player);
+    			machine.teamID = playerData.teamID;
+    		}
+    	}
+    }
 	
 	/*
 	 * =====================================================================

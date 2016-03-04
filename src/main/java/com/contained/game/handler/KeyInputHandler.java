@@ -2,6 +2,7 @@ package com.contained.game.handler;
 
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
+import com.contained.game.ui.TerritoryRender;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -11,21 +12,21 @@ import net.minecraft.client.Minecraft;
 public class KeyInputHandler {
 	private Minecraft mc = FMLClientHandler.instance().getClient();
 	private DataVisualization gui_data;
-	private ClassPerks gui_perks;
+	private TerritoryRender territory;
 	
-	public KeyInputHandler(DataVisualization guiReference) {
+	public KeyInputHandler(DataVisualization guiReference,
+							   TerritoryRender terrReference) {
 		this.gui_data = guiReference;
-	}
-	
-	public KeyInputHandler(ClassPerks guiReference){
-		this.gui_perks = guiReference;
+		this.territory = terrReference;
 	}
 	
 	@SubscribeEvent
 	public void onKeyInput(InputEvent.KeyInputEvent event) {
 		if (KeyBindings.toggleVisualizerGUI.isPressed())
 			gui_data.guiRender = !gui_data.guiRender;
-		if(KeyBindings.toggleClassPerks.isPressed())
+		if (KeyBindings.toggleClassPerks.isPressed())
 			mc.displayGuiScreen(new ClassPerks());
+		if (KeyBindings.toggleTerritoryRender.isPressed())
+			territory.doRender = !territory.doRender;
 	}
 }
