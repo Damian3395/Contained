@@ -159,9 +159,9 @@ public class ClassPerks extends GuiScreen{
 				ExtendedPlayer.get(mc.thePlayer).setOccupationClass(button.id);
 				
 				/*
-				PacketCustom classPacket = new PacketCustom(Resources.MOD_ID, 1);
+				PacketCustom classPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.UPDATE_CLASS);
 				classPacket.writeInt(ExtendedPlayer.get(mc.thePlayer).getOccupationClass());
-				classPacket.sendToServer();
+				ServerPacketHandler.sendToServer(classPacket.toPacket());
 				*/
 				
 				this.selectedClass = button.id;

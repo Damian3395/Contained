@@ -105,7 +105,7 @@ public class TerritoryFlag {
 				
 				p.addExperienceLevel(-Contained.configs.flagXPCost);
 				Contained.territoryData.put(toClaim, playerData.teamID);
-				ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).sendToClients();
+				Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 				
 				PlayerTeam team = PlayerTeam.get(playerData.teamID);
 				team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+playerData.playerName+" started a new territory sector at ("+x+","+z+").");

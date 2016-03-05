@@ -103,7 +103,7 @@ public class PlayerTeam {
 		//Remove the team.
 		Contained.teamData.remove(this);	
 		
-		ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
+		Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package com.contained.game.world.block;
 
+import com.contained.game.Contained;
 import com.contained.game.item.TerritoryFlag;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -12,13 +13,16 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
@@ -50,7 +54,7 @@ public class TownManageBlock {
 		}
 	}
 	
-	static class BlockTownHall extends Block {
+	static class BlockTownHall extends BlockContainer {
 		IIcon gor = null, dol = null, st1 = null, st2 = null, st3 = null, st4 = null;
 		
 		protected BlockTownHall(){
@@ -66,11 +70,11 @@ public class TownManageBlock {
 		
 		@Override
 		public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer p, int par6, float par7, float par8, float par9) {
-			if (p.worldObj.isRemote) {
-				Minecraft mc = Minecraft.getMinecraft();
-				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
-				mc.displayGuiScreen(new GuiTownManage(p.inventory, playerData.teamID));
-			}
+			TileEntity te = w.getTileEntity(x, y, z);
+			if (te == null || p.isSneaking())
+				return false;
+			
+			p.openGui(Contained.instance, 0, w, x, y, z);
 			return true;
 		}
 		
@@ -97,6 +101,11 @@ public class TownManageBlock {
 			this.st2 = reg.registerIcon(TownManageBlock.textureSide);
 			this.st3 = reg.registerIcon(TownManageBlock.textureSide);
 			this.st4 = reg.registerIcon(TownManageBlock.textureSide);
+		}
+
+		@Override
+		public TileEntity createNewTileEntity(World arg0, int arg1) {
+			return new TownManageTE();
 		}
 	}	
 }

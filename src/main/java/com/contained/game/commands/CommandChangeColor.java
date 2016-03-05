@@ -50,7 +50,7 @@ public class CommandChangeColor implements ICommand {
 								out = getCommandUsage(sender);
 							else {
 								team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] The team color has been changed.");
-								ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
+								Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
 							}
 						} else
 							out = "Only team leaders can change the team's color.";

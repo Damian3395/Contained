@@ -13,6 +13,7 @@ import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
 import com.contained.game.handler.WorldEvents;
 import com.contained.game.network.CommonProxy;
+import com.contained.game.ui.GuiHandler;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -28,6 +29,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -38,6 +40,8 @@ public class Contained{
 	
 	@Instance(Resources.MOD_ID)
 	public static Contained instance;
+	
+	public static FMLEventChannel channel; //For client -> server packets.
 	
 	public static Settings configs;
 	GenerateWorld world = new GenerateWorld();
@@ -84,6 +88,9 @@ public class Contained{
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
 		world.init();
 		registry.init(event);
+		
+		Contained.channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(Resources.MOD_ID);
+		proxy.init(event);
 	}
 	
 	@EventHandler
@@ -92,7 +99,7 @@ public class Contained{
 		registry.preInit(event);
 		configs = new Settings(event);
 		
-		NetworkRegistry.INSTANCE.registerGuiHandler(Contained.instance, proxy);
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
 		
 		world.preInit(event);
 		proxy.registerRenderers(this);

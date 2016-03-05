@@ -8,15 +8,18 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerTownHall extends Container {
 
-	public ContainerTownHall(InventoryPlayer inv) {
+	protected TownManageTE tileEntity;
+	
+	public ContainerTownHall(InventoryPlayer inv, TownManageTE te) {
 		int guiX = 9;
 		int guiY = 103;
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 9; j++)
+		for (int i = 0; i < 3; ++i)
+			for (int j = 0; j < 9; ++j)
 				this.addSlotToContainer(new Slot(inv, j + i * 9 + 9, guiX + j * 18, guiY + i * 18));
 
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < 9; ++i)
 			this.addSlotToContainer(new Slot(inv, i, guiX + i * 18, guiY+58));
+		this.tileEntity = te;
 	}
 
 	@Override
@@ -35,17 +38,6 @@ public class ContainerTownHall extends Container {
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
-
-			if (slotID >= 0 && slotID < 27) {
-				if (!this.mergeItemStack(itemstack1, 27, 36, false))
-					return null;
-			}
-			else if (slotID >= 27 && slotID < 36) {
-				if (!this.mergeItemStack(itemstack1, 1, 27, false))
-					return null;
-			}
-			else if (!this.mergeItemStack(itemstack1, 1, 36, false))
-				return null;
 
 			if (itemstack1.stackSize == 0)
 				slot.putStack((ItemStack)null);

@@ -3,12 +3,15 @@ package com.contained.game.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.contained.game.data.Data;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
@@ -93,6 +96,49 @@ public class Util {
 		ent.writeToNBT(ntc);
 		ntc.setBoolean("Invulnerable", value);
 		ent.readFromNBT(ntc);
+	}
+	
+	/**
+	 * Attempts to remove a certain quantity of an item from a player's inventory.
+	 */
+	public static void removeItem(ItemStack toRemove, EntityPlayer player) {
+		int amountLeft = toRemove.stackSize;
+		ItemStack[] inv = player.inventory.mainInventory;
+		for(int i=0; i<inv.length; i++) {
+			if (inv[i] == null) continue;
+			if (Util.itemsEqual(inv[i], toRemove)) {
+				if (inv[i].stackSize > amountLeft) {
+					inv[i].stackSize -= amountLeft;
+					amountLeft = 0;
+					break;
+				} else {
+					amountLeft -= inv[i].stackSize;
+					inv[i] = null;
+				}
+				if (amountLeft == 0)
+					break;
+			}
+		}
+	}
+	
+	/**
+	 * Compares equivalency of two itemstacks, except disregards their
+	 * stack size, unlike the normal ItemStack comparing function.
+	 * Also disregard item ownership tracking.
+	 */
+	public static boolean itemsEqual(ItemStack itemA, ItemStack itemB) {
+		ItemStack itemADup = itemA.copy();
+		ItemStack itemBDup = itemB.copy();
+		NBTTagCompound itemData = Data.getTagCompound(itemADup);
+		itemData.removeTag("owner");
+		itemADup.setTagCompound(itemData);
+		
+		itemData = Data.getTagCompound(itemBDup);
+		itemData.removeTag("ower");
+		itemBDup.setTagCompound(itemData);
+		
+		return itemADup.isItemEqual(itemBDup) 
+				&& ItemStack.areItemStackTagsEqual(itemADup, itemBDup);
 	}
 	
 	/**

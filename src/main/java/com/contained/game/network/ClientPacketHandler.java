@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.tileentity.TileEntity;
 
 import com.contained.game.data.Data;
@@ -17,10 +16,15 @@ import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
-import codechicken.lib.packet.PacketCustom.IClientPacketHandler;
 import codechicken.lib.vec.BlockCoord;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import cpw.mods.fml.relauncher.Side;
 
-public class ClientPacketHandler implements IClientPacketHandler{
+/**
+ * Handling of packets sent from server to client.
+ */
+public class ClientPacketHandler extends ServerPacketHandler {
 	private DataVisualization gui;
 	private TerritoryRender render;
 	
@@ -38,86 +42,92 @@ public class ClientPacketHandler implements IClientPacketHandler{
 		this.render = render;
 	}
 	
-	@Override
-	public void handlePacket(PacketCustom packet, Minecraft mc, INetHandlerPlayClient net) {
+	@SubscribeEvent
+	public void handlePacket(ClientCustomPacketEvent event) {	
 		BlockCoord bc;
 		TileEntity te;
+		channelName = event.packet.channel();
+		Minecraft mc = Minecraft.getMinecraft();
 		
-		switch(packet.getType()) {
-			case OCCUPATIONAL_DATA:
-				for(int i=0; i<Data.occupationNames.length; i++)
-					ExtendedPlayer.get(mc.thePlayer).setOccupation(i, packet.readInt());
+		if (channelName.equals(Resources.MOD_ID) && event.packet.getTarget() == Side.CLIENT) {
+			PacketCustom packet = new PacketCustom(event.packet.payload());
+		
+			switch(packet.getType()) {
+				case OCCUPATIONAL_DATA:
+					for(int i=0; i<Data.occupationNames.length; i++)
+						ExtendedPlayer.get(mc.thePlayer).setOccupation(i, packet.readInt());
+					break;
+					
+				case ITEM_USAGE_DATA:
+					ExtendedPlayer.get(mc.thePlayer).usedOwnItems = packet.readInt();
+					ExtendedPlayer.get(mc.thePlayer).usedOthersItems = packet.readInt();
+					ExtendedPlayer.get(mc.thePlayer).usedByOthers = packet.readInt();
+					break;
+					
+				case FULL_TERRITORY_SYNC:
+					int numBlocks = packet.readInt();
+					render.teamBlocks.clear();
+					for(int i=0; i<numBlocks; i++) {
+						bc = packet.readCoord();
+						render.teamBlocks.put(new Point(bc.x, bc.z), packet.readString());
+					}
+					render.regenerateEdges();
 				break;
-				
-			case ITEM_USAGE_DATA:
-				ExtendedPlayer.get(mc.thePlayer).usedOwnItems = packet.readInt();
-				ExtendedPlayer.get(mc.thePlayer).usedOthersItems = packet.readInt();
-				ExtendedPlayer.get(mc.thePlayer).usedByOthers = packet.readInt();
-				break;
-				
-			case FULL_TERRITORY_SYNC:
-				int numBlocks = packet.readInt();
-				render.teamBlocks.clear();
-				for(int i=0; i<numBlocks; i++) {
+					
+				case ADD_TERRITORY_BLOCK:
 					bc = packet.readCoord();
 					render.teamBlocks.put(new Point(bc.x, bc.z), packet.readString());
-				}
-				render.regenerateEdges();
-			break;
-				
-			case ADD_TERRITORY_BLOCK:
-				bc = packet.readCoord();
-				render.teamBlocks.put(new Point(bc.x, bc.z), packet.readString());
-				render.regenerateEdges();
-			break;
-			
-			case REMOVE_TERRITORY_BLOCK:
-				bc = packet.readCoord();
-				render.teamBlocks.remove(new Point(bc.x, bc.z));
-				render.regenerateEdges();
-			break;
-				
-			case SYNC_TEAMS:
-				int numTeamsBefore = render.teamData.size();
-				render.teamData.clear();
-				int numTeams = packet.readInt();
-				for(int i=0; i<numTeams; i++)
-					render.teamData.add(new PlayerTeam(packet.readString(), packet.readString(),packet.readInt()));
-			
-				if (render.teamData.size() < numTeamsBefore) {
-					//Some team got disbanded. Need to remove stale territory blocks.
-					ArrayList<Point> terrToRemove = new ArrayList<Point>();
-					for(Point p : render.teamBlocks.keySet()) {
-						String terrID = render.teamBlocks.get(p);
-						if (PlayerTeam.get(render.teamData, terrID) == null)
-							terrToRemove.add(p);
-					}
-					for (Point p : terrToRemove)
-						render.teamBlocks.remove(p);
 					render.regenerateEdges();
-				}
-			break;
-			
-			case TE_PARTICLE:
-				te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
-				if (te instanceof TerritoryMachineTE) {
-					TerritoryMachineTE machine = (TerritoryMachineTE)te;
-					machine.displayParticle = packet.readString();
-				}
-			break;
-			
-			case TMACHINE_STATE:
-				te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
-				if (te instanceof TerritoryMachineTE) {
-					TerritoryMachineTE machine = (TerritoryMachineTE)te;
-					machine.tickTimer = packet.readInt();
-					String teamID = packet.readString();
-					if (teamID.equals(""))
-						teamID = null;
-					machine.teamID = teamID;
-					machine.shouldClaim = packet.readBoolean();
-				}
-			break;
+				break;
+				
+				case REMOVE_TERRITORY_BLOCK:
+					bc = packet.readCoord();
+					render.teamBlocks.remove(new Point(bc.x, bc.z));
+					render.regenerateEdges();
+				break;
+					
+				case SYNC_TEAMS:
+					int numTeamsBefore = render.teamData.size();
+					render.teamData.clear();
+					int numTeams = packet.readInt();
+					for(int i=0; i<numTeams; i++)
+						render.teamData.add(new PlayerTeam(packet.readString(), packet.readString(),packet.readInt()));
+				
+					if (render.teamData.size() < numTeamsBefore) {
+						//Some team got disbanded. Need to remove stale territory blocks.
+						ArrayList<Point> terrToRemove = new ArrayList<Point>();
+						for(Point p : render.teamBlocks.keySet()) {
+							String terrID = render.teamBlocks.get(p);
+							if (PlayerTeam.get(render.teamData, terrID) == null)
+								terrToRemove.add(p);
+						}
+						for (Point p : terrToRemove)
+							render.teamBlocks.remove(p);
+						render.regenerateEdges();
+					}
+				break;
+				
+				case TE_PARTICLE:
+					te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
+					if (te instanceof TerritoryMachineTE) {
+						TerritoryMachineTE machine = (TerritoryMachineTE)te;
+						machine.displayParticle = packet.readString();
+					}
+				break;
+				
+				case TMACHINE_STATE:
+					te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
+					if (te instanceof TerritoryMachineTE) {
+						TerritoryMachineTE machine = (TerritoryMachineTE)te;
+						machine.tickTimer = packet.readInt();
+						String teamID = packet.readString();
+						if (teamID.equals(""))
+							teamID = null;
+						machine.teamID = teamID;
+						machine.shouldClaim = packet.readBoolean();
+					}
+				break;
+			}
 		}
 	}
 	

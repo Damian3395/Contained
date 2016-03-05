@@ -79,7 +79,7 @@ public class ItemTerritory {
 				if (!p.capabilities.isCreativeMode)
 					p.inventory.consumeInventoryItem(ItemTerritory.addTerritory);
 				Contained.territoryData.put(toClaim, playerData.teamID);
-				ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).sendToClients();
+				Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public class ItemTerritory {
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
 					Contained.territoryData.remove(blockToRemove);
-					ClientPacketHandler.packetRemoveTerrBlock(x, z).sendToClients();
+					Contained.channel.sendToAll(ClientPacketHandler.packetRemoveTerrBlock(x, z).toPacket());
 				}
 			}
 		}

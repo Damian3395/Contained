@@ -14,6 +14,7 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.util.ErrorCase;
 
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -76,7 +77,7 @@ public class TerritoryMachineTE extends TileEntity {
 						Collections.shuffle(candidates);
 						Point toRemove = candidates.get(0);
 						Contained.territoryData.remove(toRemove);
-						ClientPacketHandler.packetRemoveTerrBlock(toRemove.x, toRemove.y).sendToClients();
+						Contained.channel.sendToAll(ClientPacketHandler.packetRemoveTerrBlock(toRemove.x, toRemove.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail
 				} else {
@@ -100,7 +101,7 @@ public class TerritoryMachineTE extends TileEntity {
 						Collections.shuffle(candidates);
 						Point toClaim = candidates.get(0);
 						Contained.territoryData.put(toClaim, this.teamID);
-						ClientPacketHandler.packetAddTerrBlock(this.teamID, toClaim.x, toClaim.y).sendToClients();
+						Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(this.teamID, toClaim.x, toClaim.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail
 				}
@@ -119,7 +120,7 @@ public class TerritoryMachineTE extends TileEntity {
 				else
 					packet.writeString(this.teamID);
 				packet.writeBoolean(this.shouldClaim);
-				packet.sendPacketToAllAround(this.xCoord, this.yCoord, this.zCoord, 50, this.worldObj.provider.dimensionId);
+				Contained.channel.sendToAllAround(packet.toPacket(), new TargetPoint(this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 50));
 			}
 		} else {
 			if (tickTimer >= claimDelay)
@@ -158,7 +159,7 @@ public class TerritoryMachineTE extends TileEntity {
 		packet.writeInt(this.yCoord);
 		packet.writeInt(this.zCoord);
 		packet.writeString(type);
-		packet.sendPacketToAllAround(this.xCoord, this.yCoord, this.zCoord, 50, this.worldObj.provider.dimensionId);
+		Contained.channel.sendToAllAround(packet.toPacket(), new TargetPoint(this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 50));
 	}
 	
 	@Override

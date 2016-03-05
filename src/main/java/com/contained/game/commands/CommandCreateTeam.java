@@ -63,7 +63,7 @@ public class CommandCreateTeam implements ICommand {
 							System.out.println(pdata.joinTeam(newTeam.id).toString());
 							pdata.isLeader = true;
 							out = "You are now the leader of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+".";
-							ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
+							Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
 						} else
 							out = "Another team is already using that name.";
 					} else

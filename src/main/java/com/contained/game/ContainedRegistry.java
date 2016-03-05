@@ -36,6 +36,7 @@ public class ContainedRegistry {
 		TerritoryFlag.defineRecipe();
 		TownManageBlock.defineRecipe();
 		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");
+		GameRegistry.registerTileEntity(TownManageTE.class, "TownManageTE");
 	}
 	
 }

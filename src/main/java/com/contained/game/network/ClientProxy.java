@@ -7,14 +7,12 @@ import com.contained.game.item.AntiTerritoryRender;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
-import com.contained.game.util.Resources;
-import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineRender;
 import com.contained.game.world.block.TerritoryMachineTE;
 
-import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,13 +21,11 @@ import net.minecraftforge.common.MinecraftForge;
  * Client Side Handlers
  */
 public class ClientProxy extends CommonProxy{
+	public static DataVisualization gui = new DataVisualization(Minecraft.getMinecraft());
+	public static TerritoryRender territory = new TerritoryRender();
+	
 	@Override
-	public void registerRenderers(Contained ins) {
-		DataVisualization gui = new DataVisualization(Minecraft.getMinecraft());
-		TerritoryRender territory = new TerritoryRender();
-		
-		PacketCustom.assignHandler(Resources.MOD_ID, new ClientPacketHandler(gui, territory));
-		
+	public void registerRenderers(Contained ins) {		
 		MinecraftForge.EVENT_BUS.register(gui);
 		MinecraftForge.EVENT_BUS.register(territory);
 		FMLCommonHandler.instance().bus().register(new KeyInputHandler(gui, territory));
@@ -37,5 +33,9 @@ public class ClientProxy extends CommonProxy{
 		
 		MinecraftForgeClient.registerItemRenderer(ItemTerritory.removeTerritory, new AntiTerritoryRender());
 		ClientRegistry.bindTileEntitySpecialRenderer(TerritoryMachineTE.class, new TerritoryMachineRender());	
+	}
+	
+	public void init(FMLInitializationEvent event) {
+		Contained.channel.register(new ClientPacketHandler(gui, territory));
 	}
 }

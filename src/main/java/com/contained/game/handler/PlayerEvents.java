@@ -10,6 +10,7 @@ import com.contained.game.data.DataItemStack;
 import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.BlockInteractItem;
+import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
@@ -19,8 +20,10 @@ import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -28,6 +31,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -63,8 +67,10 @@ public class PlayerEvents {
 							new ItemStack(ContainedRegistry.book, 1)));
 			}
 			
-			ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToPlayer(joined);
-			ClientPacketHandler.packetSyncTerritories(Contained.territoryData).sendToPlayer(joined);			
+			if (joined instanceof EntityPlayerMP) {
+				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
+				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
+			}
 		}
 	}
 	
@@ -80,16 +86,18 @@ public class PlayerEvents {
 				int[] occupationData = ExtendedPlayer.get(player).getOccupationValues();
 				ArrayList<String> achievements = ExtendedPlayer.get(player).getAchievement();
 				
-				PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.OCCUPATIONAL_DATA);
-				for(int i=0; i<occupationData.length; i++)
-					occPacket.writeInt(occupationData[i]);
-				occPacket.sendToPlayer(player);
-				
-				PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.ITEM_USAGE_DATA);
-				usePacket.writeInt(ExtendedPlayer.get(player).usedOwnItems);
-				usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
-				usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);
-				usePacket.sendToPlayer(player);
+				if (player instanceof EntityPlayerMP) {
+					PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.OCCUPATIONAL_DATA);
+					for(int i=0; i<occupationData.length; i++)
+						occPacket.writeInt(occupationData[i]);
+					Contained.channel.sendTo(occPacket.toPacket(), (EntityPlayerMP)player);
+					
+					PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.ITEM_USAGE_DATA);
+					usePacket.writeInt(ExtendedPlayer.get(player).usedOwnItems);
+					usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
+					usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);
+					Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)player);
+				}
 			}
 			
 			//Update items in a player's inventory which
@@ -126,6 +134,29 @@ public class PlayerEvents {
 				event.setCanceled(true);
 			if(occupation == Data.LUMBER && damage.compareTo("lightingBolt") == 0)
 				event.setCanceled(true);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onEntityDeath(LivingDeathEvent event) {
+		// Players in teams should drop anti-territory gems when they are killed
+		// by other players.
+		Entity source = event.source.getSourceOfDamage();
+		
+		if (event.entityLiving != null && source != null && !event.entityLiving.worldObj.isRemote
+		 && event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
+			EntityPlayer killed = (EntityPlayer)event.entityLiving;
+			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(killed);
+			if (playerData.teamID != null) {
+				int amount = 1;
+				if (playerData.isLeader) //Leaders drop more anti-gems on death.
+					amount = 4;				
+				ItemStack toDrop = new ItemStack(ItemTerritory.removeTerritory, amount);
+				NBTTagCompound itemData = Data.getTagCompound(toDrop);
+				itemData.setString("teamOwner", playerData.teamID);
+				toDrop.setTagCompound(itemData);
+				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
+			}
 		}
 	}
 	

@@ -59,7 +59,7 @@ public class CommandChangeName implements ICommand {
 								PlayerTeam team = PlayerTeam.get(pdata.teamID);
 								team.displayName = name;
 								team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] The team has been renamed to "+team.getFormatCode()+"§l"+team.displayName+team.getFormatCode()+".");
-								ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
+								Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
 							} else
 								out = "Another team is already using that name.";
 						} else
