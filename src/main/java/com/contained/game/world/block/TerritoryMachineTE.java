@@ -47,7 +47,7 @@ public class TerritoryMachineTE extends TileEntity {
 	
 	@Override
 	public void updateEntity() {
-		if (this.teamID != null || !this.shouldClaim)
+		if (this.teamID != null)
 			tickTimer++;
 		
 		if (!this.worldObj.isRemote) {			
@@ -65,7 +65,7 @@ public class TerritoryMachineTE extends TileEntity {
 							probe.x = this.xCoord+i;
 							probe.y = this.zCoord+j;
 							Point toRemove = new Point(probe.x, probe.y);
-							if (ItemTerritory.canRemove(null, toRemove, probe) == ErrorCase.Error.NONE)
+							if (ItemTerritory.canRemove(this.teamID, toRemove, probe) == ErrorCase.Error.NONE)
 								candidates.add(toRemove);
 						}
 					}

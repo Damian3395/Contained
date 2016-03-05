@@ -8,6 +8,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.util.Resources;
+import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineRender;
 import com.contained.game.world.block.TerritoryMachineTE;
 

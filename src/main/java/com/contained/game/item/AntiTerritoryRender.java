@@ -31,7 +31,7 @@ public class AntiTerritoryRender implements IItemRenderer {
 
 		@Override
 		public void renderItem(ItemRenderType type, ItemStack itemStack, Object... data) {
-			int x = 9;
+			int x = 1;
 			int y = 9;
 			int w = 6;
 			int h = 6;

@@ -13,6 +13,7 @@ import com.contained.game.item.BlockInteractItem;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
+import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -206,13 +207,25 @@ public class PlayerEvents {
     @SubscribeEvent
     //Transfer player's team to a territory machine when placed.
     public void onBlockPlacement(BlockEvent.PlaceEvent ev) {
-    	if (!ev.world.isRemote && ev.player != null &&
-    			ev.block instanceof TerritoryMachine.BlockClaimTerritory) {
+    	if (ev.player != null &&
+    			(ev.block instanceof TerritoryMachine.BlockClaimTerritory
+    		  || ev.block instanceof AntiTerritoryMachine.BlockAntiTerritory)) {
     		TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
     		if (te != null && te instanceof TerritoryMachineTE) {
     			TerritoryMachineTE machine = (TerritoryMachineTE)te;
-    			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.player);
-    			machine.teamID = playerData.teamID;
+    			
+    			if (!ev.world.isRemote && ev.block instanceof TerritoryMachine.BlockClaimTerritory) {
+    				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.player);
+    				machine.teamID = playerData.teamID;
+    			} 
+    			if (ev.block instanceof AntiTerritoryMachine.BlockAntiTerritory && ev.itemInHand != null) {
+    				NBTTagCompound itemData = Data.getTagCompound(ev.itemInHand);
+    				String teamID = itemData.getString("teamOwner");
+    				if (teamID == null || teamID.equals(""))
+    					machine.teamID = null;
+    				else
+    					machine.teamID = teamID;
+    			}
     		}
     	}
     }

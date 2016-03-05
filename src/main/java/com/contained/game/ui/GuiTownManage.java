@@ -46,8 +46,10 @@ public class GuiTownManage extends GuiContainer {
 	private String[] tabTitles = {"Purchase Territory", "NPC Villagers"};
 	private ItemStack[] tabItems = {new ItemStack(TerritoryFlag.instance, 1)
 								  , new ItemStack(Items.emerald, 1)};
-	private int[] listCounts = {20, 0};
+	private int[] listCounts = {5, 0};
 	private ItemStack[][] listItems;
+	private int[][] xpCosts;
+	private ItemStack[][] itemCosts;
 	
 	private float currentScroll = 0f;
 	private boolean isScrolling = false;
@@ -65,6 +67,7 @@ public class GuiTownManage extends GuiContainer {
 	private Rectangle bScrollSel   = new Rectangle(176, 176, 11, 14);
 	private Rectangle bScrollUnsel = new Rectangle(188, 176, 11, 14);
 	private Rectangle bScrollBg	   = new Rectangle(242, 0, 13, 96);
+	private Rectangle bDivider     = new Rectangle(200, 176, 2, 12);
 	
 	public GuiTownManage(InventoryPlayer inv, String teamID) {
 		super(new ContainerTownHall(inv));
@@ -90,6 +93,9 @@ public class GuiTownManage extends GuiContainer {
 				maxLen = i;
 		}
 		listItems = new ItemStack[numTabs][maxLen];
+		xpCosts = new int[numTabs][maxLen];
+		itemCosts = new ItemStack[numTabs][maxLen];
+		
 		listItems[0][0] = new ItemStack(ItemTerritory.addTerritory, 1);
 		listItems[0][1] = new ItemStack(ItemTerritory.addTerritory, 10);
 		listItems[0][2] = new ItemStack(ItemTerritory.removeTerritory, 1);
@@ -99,9 +105,17 @@ public class GuiTownManage extends GuiContainer {
 		listItems[0][3] = new ItemStack(TerritoryMachine.instance, 1);
 		listItems[0][4] = new ItemStack(AntiTerritoryMachine.instance, 1);
 		
-		//scrollbar test
-		for(int i=5;i<20;i++)
-			listItems[0][i] = new ItemStack(ItemTerritory.removeTerritory, i);
+		xpCosts[0][0] = 1;
+		xpCosts[0][1] = 8;
+		xpCosts[0][2] = -1;
+		xpCosts[0][3] = 30;
+		xpCosts[0][4] = 30;
+		
+		itemCosts[0][0] = null;
+		itemCosts[0][1] = null;
+		itemCosts[0][2] = new ItemStack(Items.dye, 4, 4);
+		itemCosts[0][3] = null;
+		itemCosts[0][4] = new ItemStack(ItemTerritory.removeTerritory, 4);
 	}
 	
 	@Override
@@ -161,46 +175,70 @@ public class GuiTownManage extends GuiContainer {
 		
 		//Page Contents
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		if (selectedTab == 0)
-			territoryList();
-		else if (selectedTab == 1)
-			npcList();
+		if (selectedTab <= 1)
+			shopList();
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_LIGHTING);
 	}
 	
-	private void territoryList() {	
-		int page = 0;
+	private void shopList() {	
+		FontRenderer fr = this.mc.fontRenderer;
         int offset = 0;
-        if (needsScrollBars())
-        	offset = (int)(this.currentScroll*(float)((listCounts[page])-5));
+        int priceX = listX+137;
+        if (needsScrollBars()) {
+        	offset = (int)(this.currentScroll*(float)((listCounts[selectedTab])-5));
+        	priceX -= bScrollBg.width;
+        }
     
-		for(int i=offset; i<offset+Math.min(5, listCounts[page]); i++) {
+		for(int i=offset; i<offset+Math.min(5, listCounts[selectedTab]); i++) {
+			//Item Icon
 			int x = listX+4;
 			int y = listY+2+bSelRect.height*(i-offset);
-			ItemStack stack = listItems[page][i];
+			ItemStack stack = listItems[selectedTab][i];
 			if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, x, y)) {
 				texMan.bindTexture(TextureMap.locationItemsTexture);
-				GuiScreen.itemRender.renderItemAndEffectIntoGUI(this.mc.fontRenderer, texMan, stack, x, y);
+				GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, x, y);
 			}
-			GuiScreen.itemRender.renderItemOverlayIntoGUI(this.mc.fontRenderer, texMan, stack, x, y);
+			GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, x, y);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_ALPHA_TEST);
+			
+			texMan.bindTexture(bg);
+			this.drawTexturedModalRect(priceX-24, y+1, bDivider.x, bDivider.y, bDivider.width, bDivider.height);
+			
+			int itemOff = -16;
+			if (xpCosts[selectedTab][i] == -1)
+				itemOff = 0;
+			else {
+				//XP cost
+				texMan.bindTexture(bg);
+				this.drawTexturedModalRect(priceX, y, bXPOrb.x, bXPOrb.y, bXPOrb.width, bXPOrb.height);
+				fr.drawStringWithShadow(""+xpCosts[selectedTab][i], priceX+8, y+8, 0xFFFFFF);
+			}
+			
+			if (itemCosts[selectedTab][i] != null) {
+				//Item Cost
+				stack = itemCosts[selectedTab][i];
+				if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, priceX+itemOff, y)) {
+					texMan.bindTexture(TextureMap.locationItemsTexture);
+					GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, priceX+itemOff, y);
+				}
+				GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, priceX+itemOff, y);
+				GL11.glDisable(GL11.GL_LIGHTING);
+				GL11.glEnable(GL11.GL_ALPHA_TEST);
+			}
+			
 		}
-		
-        endList(page);
+        endList();
 	}
 	
-	private void npcList() {
-		int page = 1;
-		endList(page);
-	}
-	
-	private void endList(int page) {
+	private void endList() {
 		if (needsScrollBars())
 			return;
 		
 		texMan.bindTexture(bg);
-		for(int i=listCounts[page]; i<5; i++) {
+		for(int i=listCounts[selectedTab]; i<5; i++) {
 			int y = listY+bUnselRect.height*i;
 			this.drawTexturedModalRect(listX, y, bUnselRect.x, bUnselRect.y, bUnselRect.width, bUnselRect.height);
 		}
