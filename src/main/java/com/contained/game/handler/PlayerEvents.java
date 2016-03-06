@@ -248,14 +248,17 @@ public class PlayerEvents {
     			if (!ev.world.isRemote && ev.block instanceof TerritoryMachine.BlockClaimTerritory) {
     				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.player);
     				machine.teamID = playerData.teamID;
+    				machine.refreshColor();
     			} 
     			if (ev.block instanceof AntiTerritoryMachine.BlockAntiTerritory && ev.itemInHand != null) {
     				NBTTagCompound itemData = Data.getTagCompound(ev.itemInHand);
     				String teamID = itemData.getString("teamOwner");
     				if (teamID == null || teamID.equals(""))
     					machine.teamID = null;
-    				else
+    				else {
     					machine.teamID = teamID;
+    					machine.refreshColor();
+    				}
     			}
     		}
     	}

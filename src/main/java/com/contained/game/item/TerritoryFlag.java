@@ -97,7 +97,13 @@ public class TerritoryFlag {
 							"§cYou can't claim this area, it already belongs to a team."));
 					return;
 				}
-				if (p.experienceLevel < Contained.configs.flagXPCost) {
+				
+				int flagXPCost = Contained.configs.flagXPCost;
+				PlayerTeam team = PlayerTeam.get(playerData.teamID);
+				if (team.territoryCount() == 0)
+					flagXPCost = 0; //First usage of the flag should be free.
+				
+				if (p.experienceLevel < flagXPCost) {
 					p.addChatMessage(new ChatComponentText(
 							"§cYou need at least "+Contained.configs.flagXPCost+" XP levels to claim the territory."));
 					return;
@@ -106,8 +112,6 @@ public class TerritoryFlag {
 				p.addExperienceLevel(-Contained.configs.flagXPCost);
 				Contained.territoryData.put(toClaim, playerData.teamID);
 				Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
-				
-				PlayerTeam team = PlayerTeam.get(playerData.teamID);
 				team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+playerData.playerName+" started a new territory sector at ("+x+","+z+").");
 			}
 		}

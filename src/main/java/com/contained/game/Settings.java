@@ -25,6 +25,10 @@ public class Settings {
 	
 	public int maxTeamSize;
 	public int flagXPCost;
+	public int claimDelay;
+	public int claimRadius;
+	public int antiClaimDelay;
+	public int antiClaimRadius;
 	
 	public Settings(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -56,6 +60,14 @@ public class Settings {
 				"What is the maximum player capacity of a team?");
 		flagXPCost = config.getInt("flagXPCost", teamCategory, 30, 0, 999, 
 				"How many Minecraft levels do you need to use the flag item?");
+		claimRadius = config.getInt("claimRadius", teamCategory, 2, 0, 10, 
+				"What is the radius, in blocks, that the Territory Machines can claim land?");
+		claimDelay = config.getInt("claimRadius", teamCategory, 90, 1, 60000, 
+				"How long, in seconds, does it take for the Territory Machine to claim a block of land?");
+		antiClaimRadius = config.getInt("claimRadius", teamCategory, 2, 0, 10, 
+				"What is the radius, in blocks, that the Anti-Territory Machines can steal land?");
+		antiClaimDelay = config.getInt("claimRadius", teamCategory, 90, 1, 60000, 
+				"How long, in seconds, does it take for the Anti-Territory Machine to steal a block of land?");
 		
 		config.save();
 	}

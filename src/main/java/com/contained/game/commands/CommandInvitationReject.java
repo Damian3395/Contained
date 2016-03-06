@@ -104,7 +104,11 @@ public class CommandInvitationReject implements ICommand {
 	} 
 	
 	@Override 
-	public int compareTo(Object o) { return 0; } 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
+		return 0; 
+	} 
 
 	@Override 
 	public List<String> getCommandAliases() { return this.aliases; } 

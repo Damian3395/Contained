@@ -24,8 +24,9 @@ public class CommandDebugOreGen implements ICommand{
 	} 
 
 	@Override 
-	public int compareTo(Object o)
-	{ 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
 		return 0; 
 	} 
 

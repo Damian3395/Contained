@@ -65,8 +65,11 @@ public class ItemTerritory {
 					return;
 				} 
 				if (testClaim == ErrorCase.Error.ALREADY_OWNED) {
-					p.addChatMessage(new ChatComponentText(
-							"§cYou can't claim this area, it already belongs to a team."));
+					String ownedBy = Contained.territoryData.get(toClaim);
+					if (!ownedBy.equals(playerData.teamID)) {
+						p.addChatMessage(new ChatComponentText(
+								"§cYou can't claim this area, it already belongs to a team."));
+					}
 					return;
 				}
 				if (testClaim == ErrorCase.Error.ADJACENT_ONLY) 
@@ -124,6 +127,11 @@ public class ItemTerritory {
 						return;
 					}
 					
+					PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
+					if (playerData.teamID.equals(teamToRemove)) {
+						//If removing your own team's territory, refund 1 experience level.
+						p.experienceLevel += 1;
+					}
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
 					Contained.territoryData.remove(blockToRemove);

@@ -27,11 +27,11 @@ import net.minecraft.tileentity.TileEntity;
  */
 public class TerritoryMachineTE extends TileEntity {
 
-	private int claimDelay = 20*10; //TODO: Add this to config file.
-	private int claimRadius = 2;    //TODO: Add this to config file.
+	private int claimDelay;
+	private int claimRadius; 
 	public int tickTimer = 0;
 	public boolean shouldClaim; //Is this is claim mode, or remove mode?
-	public String teamID;		 //The team this machine belongs to.
+	public String teamID;		 //The team this machine is linked to.
 	public int renderColor;
 	public String displayParticle = null;
 	
@@ -44,6 +44,14 @@ public class TerritoryMachineTE extends TileEntity {
 		this.shouldClaim = mode;
 		this.teamID = null;
 		this.renderColor = 0xFFFFFF;
+		
+		if (shouldClaim) {
+			this.claimDelay = Contained.configs.claimDelay;
+			this.claimRadius = Contained.configs.claimRadius;
+		} else {
+			this.claimDelay = Contained.configs.antiClaimDelay;
+			this.claimRadius = Contained.configs.antiClaimRadius;
+		}
 	}
 	
 	@Override
@@ -128,11 +136,8 @@ public class TerritoryMachineTE extends TileEntity {
 		}
 		
 		//Periodically check for team color changes.
-		if (this.teamID != null && Math.random() <= 1.0/20.0) {
-			PlayerTeam team = PlayerTeam.get(this.teamID);
-			if (team != null)
-				this.renderColor = team.getColor();
-		}
+		if (Math.random() <= 1.0/20.0)
+			refreshColor();
 		
 		//Spawn some particle effects on action completion for feedback.
 		if (this.worldObj.isRemote && displayParticle != null) {
@@ -146,6 +151,14 @@ public class TerritoryMachineTE extends TileEntity {
 				this.worldObj.spawnParticle(displayParticle, d0, d1, d2, d3, d4, d5);
 			}
 			displayParticle = null;
+		}
+	}
+	
+	public void refreshColor() {
+		if (this.teamID != null) {
+			PlayerTeam team = PlayerTeam.get(this.teamID);
+			if (team != null)
+				this.renderColor = team.getColor();
 		}
 	}
 	

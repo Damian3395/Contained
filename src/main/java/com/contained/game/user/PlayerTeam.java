@@ -146,6 +146,18 @@ public class PlayerTeam {
 	}
 	
 	/**
+	 * Get the number of blocks of land this team owns.
+	 */
+	public int territoryCount() {
+		int count = 0;
+		for(Point territory : Contained.territoryData.keySet()) {
+			if (Contained.territoryData.get(territory).equals(id))
+				count++;
+		}
+		return count;
+	}
+	
+	/**
 	 * Sets the player's color via a string command.
 	 * Accepted commands:
 	 * 		<ul>
