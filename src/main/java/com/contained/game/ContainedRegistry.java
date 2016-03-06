@@ -1,6 +1,11 @@
 package com.contained.game;
 
+import net.minecraft.item.ItemStack;
+import mantle.client.MProxyClient;
+import mantle.lib.client.MantleClientRegistry;
+
 import com.contained.game.item.*;
+import com.contained.game.ui.ToolPage;
 import com.contained.game.world.block.*;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -35,6 +40,12 @@ public class ContainedRegistry {
 	public void init(FMLInitializationEvent event) {
 		TerritoryFlag.defineRecipe();
 		TownManageBlock.defineRecipe();
+		MantleClientRegistry.registerManualIcon(ItemTerritory.addTerritoryName, new ItemStack(ItemTerritory.addTerritory, 1));
+		MantleClientRegistry.registerManualIcon(ItemTerritory.removeTerritoryName, new ItemStack(ItemTerritory.removeTerritory, 1));
+		MantleClientRegistry.registerManualIcon(AntiTerritoryMachine.blockName, new ItemStack(AntiTerritoryMachine.instance, 1));
+		MantleClientRegistry.registerManualIcon(TerritoryMachine.blockName, new ItemStack(TerritoryMachine.instance, 1));
+		MProxyClient.registerManualPage("toolpage", ToolPage.class);
+		
 		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");
 		GameRegistry.registerTileEntity(TownManageTE.class, "TownManageTE");
 	}

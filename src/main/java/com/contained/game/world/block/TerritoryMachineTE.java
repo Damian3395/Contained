@@ -46,10 +46,10 @@ public class TerritoryMachineTE extends TileEntity {
 		this.renderColor = 0xFFFFFF;
 		
 		if (shouldClaim) {
-			this.claimDelay = Contained.configs.claimDelay;
+			this.claimDelay = Contained.configs.claimDelay*20;
 			this.claimRadius = Contained.configs.claimRadius;
 		} else {
-			this.claimDelay = Contained.configs.antiClaimDelay;
+			this.claimDelay = Contained.configs.antiClaimDelay*20;
 			this.claimRadius = Contained.configs.antiClaimRadius;
 		}
 	}
@@ -117,27 +117,12 @@ public class TerritoryMachineTE extends TileEntity {
 			
 			// Once every second, sync the state of this machine with the
 			// clients to update rendering.
-			if (tickTimer % 20 == 0) {
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.TMACHINE_STATE);
-				packet.writeInt(this.xCoord);
-				packet.writeInt(this.yCoord);
-				packet.writeInt(this.zCoord);
-				packet.writeInt(this.tickTimer);
-				if (this.teamID == null)
-					packet.writeString("");
-				else
-					packet.writeString(this.teamID);
-				packet.writeBoolean(this.shouldClaim);
-				Contained.channel.sendToAllAround(packet.toPacket(), new TargetPoint(this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 50));
-			}
+			if (tickTimer % 20 == 0)
+				sendInfoPacket();
 		} else {
 			if (tickTimer >= claimDelay)
 				tickTimer = 0;
 		}
-		
-		//Periodically check for team color changes.
-		if (Math.random() <= 1.0/20.0)
-			refreshColor();
 		
 		//Spawn some particle effects on action completion for feedback.
 		if (this.worldObj.isRemote && displayParticle != null) {
@@ -160,6 +145,20 @@ public class TerritoryMachineTE extends TileEntity {
 			if (team != null)
 				this.renderColor = team.getColor();
 		}
+	}
+	
+	public void sendInfoPacket() {
+		PacketCustom packet = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.TMACHINE_STATE);
+		packet.writeInt(this.xCoord);
+		packet.writeInt(this.yCoord);
+		packet.writeInt(this.zCoord);
+		packet.writeInt(this.tickTimer);
+		if (this.teamID == null)
+			packet.writeString("");
+		else
+			packet.writeString(this.teamID);
+		packet.writeBoolean(this.shouldClaim);
+		Contained.channel.sendToAllAround(packet.toPacket(), new TargetPoint(this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 50));
 	}
 	
 	public float getProgress() {

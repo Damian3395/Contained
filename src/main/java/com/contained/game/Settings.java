@@ -62,11 +62,11 @@ public class Settings {
 				"How many Minecraft levels do you need to use the flag item?");
 		claimRadius = config.getInt("claimRadius", teamCategory, 2, 0, 10, 
 				"What is the radius, in blocks, that the Territory Machines can claim land?");
-		claimDelay = config.getInt("claimRadius", teamCategory, 90, 1, 60000, 
+		claimDelay = config.getInt("claimDelay", teamCategory, 90, 1, 60000, 
 				"How long, in seconds, does it take for the Territory Machine to claim a block of land?");
-		antiClaimRadius = config.getInt("claimRadius", teamCategory, 2, 0, 10, 
+		antiClaimRadius = config.getInt("antiClaimRadius", teamCategory, 2, 0, 10, 
 				"What is the radius, in blocks, that the Anti-Territory Machines can steal land?");
-		antiClaimDelay = config.getInt("claimRadius", teamCategory, 90, 1, 60000, 
+		antiClaimDelay = config.getInt("antiClaimDelay", teamCategory, 90, 1, 60000, 
 				"How long, in seconds, does it take for the Anti-Territory Machine to steal a block of land?");
 		
 		config.save();

@@ -125,6 +125,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 							teamID = null;
 						machine.teamID = teamID;
 						machine.shouldClaim = packet.readBoolean();
+						machine.refreshColor();
 					}
 				break;
 			}

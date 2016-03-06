@@ -24,13 +24,15 @@ import net.minecraft.util.ChatComponentText;
 public class ItemTerritory {
 	public ItemTerritory(){}
 	public static Item addTerritory;
+	public static final String addTerritoryName = "ItemClaimTerritory";
 	public static Item removeTerritory;
+	public static final String removeTerritoryName = "ItemRemoveTerritory";
 
 	static {
 		addTerritory = (new TerritoryGem());
-		Item.itemRegistry.addObject(471, "ItemClaimTerritory", addTerritory);
+		Item.itemRegistry.addObject(471, addTerritoryName, addTerritory);
 		removeTerritory = (new AntiTerritoryGem());
-		Item.itemRegistry.addObject(472, "ItemRemoveTerritory", removeTerritory);
+		Item.itemRegistry.addObject(472, removeTerritoryName, removeTerritory);
 	}
 
 	/**
@@ -41,7 +43,7 @@ public class ItemTerritory {
 		public TerritoryGem(){
 			setMaxDamage(0);
 			maxStackSize = 64;
-			setUnlocalizedName("ItemClaimTerritory");
+			setUnlocalizedName(addTerritoryName);
 			setTextureName(Resources.MOD_ID+":territory_gem");
 			setCreativeTab(CreativeTabs.tabTools);
 		}
@@ -95,7 +97,7 @@ public class ItemTerritory {
 		public AntiTerritoryGem(){
 			setMaxDamage(0);
 			maxStackSize = 64;
-			setUnlocalizedName("ItemRemoveTerritory");
+			setUnlocalizedName(removeTerritoryName);
 			setTextureName(Resources.MOD_ID+":antiterritory_gem");
 			setCreativeTab(CreativeTabs.tabTools);
 		}

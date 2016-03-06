@@ -84,7 +84,6 @@ public class PlayerEvents {
 			//so the visualizations can be updated.
 			if (player != null && Math.random() <= 1.0/20.0) {
 				int[] occupationData = ExtendedPlayer.get(player).getOccupationValues();
-				ArrayList<String> achievements = ExtendedPlayer.get(player).getAchievement();
 				
 				if (player instanceof EntityPlayerMP) {
 					PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.OCCUPATIONAL_DATA);
@@ -248,7 +247,7 @@ public class PlayerEvents {
     			if (!ev.world.isRemote && ev.block instanceof TerritoryMachine.BlockClaimTerritory) {
     				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.player);
     				machine.teamID = playerData.teamID;
-    				machine.refreshColor();
+    				machine.sendInfoPacket();
     			} 
     			if (ev.block instanceof AntiTerritoryMachine.BlockAntiTerritory && ev.itemInHand != null) {
     				NBTTagCompound itemData = Data.getTagCompound(ev.itemInHand);
@@ -257,7 +256,7 @@ public class PlayerEvents {
     					machine.teamID = null;
     				else {
     					machine.teamID = teamID;
-    					machine.refreshColor();
+    					machine.sendInfoPacket();
     				}
     			}
     		}

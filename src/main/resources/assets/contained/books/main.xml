@@ -1,12 +1,9 @@
 <?xml version="1.0"?>
 
 <book>
-<page type="intro">
-<text>Contained
-A guide to a new society
-
-Volume 1
-</text>
+<page type="picture">
+<text> </text>
+<location>contained:books/logo.png</location>
 </page>
 
 <page type="contents">
@@ -18,8 +15,9 @@ Volume 1
 </link>
 </page>
 
-<page type="text">
-<text>Hello world! Lorem ipsum and stuff...</text>
+<page type="sectionpage">
+<title>Territory Flag</title>
+<text>This is an item usable only by team leaders. It allows you to start a single block of land as your territory, which you and your team members can later expand off of. There are no restrictions on where you can use this, as long as the block is not already owned by another team. The first time use of the flag is free, but subsequent uses require a steep amount of experience levels. </text>
 </page>
 
 <page type="crafting">
@@ -28,6 +26,56 @@ Volume 1
  <name>TerritoryFlag</name>
  <size>three</size>
 </recipe>
+</page>
+
+<page type="sectionpage">
+<title>Town Hall</title>
+<text>This is an important block that every team should have. It enables the purchasing and managing of various things that will be essential for the growth and success of the players' town.
+
+§lTerritory Purchasing:§r This tab allows you to spend experience levels in order to purchase items that will allow you to expand your team's territory, as well as take over other teams' territories, if you so desire.
+
+§lNPC Management:§r [TODO]
+</text>
+</page>
+
+<page type="crafting">
+<text>Town Hall</text>
+<recipe>
+ <name>townHall</name>
+ <size>two</size>
+</recipe>
+</page>
+
+<page type="toolpage">
+<title>Territory Gems</title>
+<text>One-time use item that allows acquisition of a single extra block of territory… but it must be one that’s directly adjacent to the land your team already owns.
+
+The Anti-gem is similar, except it allows you to remove a block of another (specific) team’s territory. It must be territory at the very edge/perimeter of that team’s land. Using one on your own territory refunds you experience levels.
+
+Anti-gems drop when you kill
+a player from another team.
+</text>
+<item>
+ <text>Territory Gem</text>
+ <icon>ItemClaimTerritory</icon>
+</item>
+<item>
+ <text>Anti-Territory Gem</text>
+ <icon>ItemRemoveTerritory</icon>
+</item>
+</page>
+
+<page type="toolpage">
+<title>Territory Machines</title>
+<text>Unlimited use versions of the territory gems, that passively claim/remove land for you over time. You place the machine into the world, and it very slowly converts land within a small radius. The machines are confined to the same restrictions as the territory gems; for example, they can only claim land directly adjacent to your current territory.</text>
+<item>
+ <text>Territory Machine</text>
+ <icon>ClaimTerritoryMachine</icon>
+</item>
+<item>
+ <text>Anti-Territory Machine</text>
+ <icon>RemoveTerritoryMachine</icon>
+</item>
 </page>
 
 </book>
