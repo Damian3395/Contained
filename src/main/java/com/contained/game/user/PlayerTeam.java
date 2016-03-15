@@ -220,6 +220,8 @@ public class PlayerTeam {
 	}
 	
 	public PlayerTeamPermission getPermissions(String teamID) {
+		if (teamID == null)
+			return (new PlayerTeamPermission());
 		if (teamID.equals(this.id)) {
 			//Requested permissions for our own team. Nothing should be disabled.
 			PlayerTeamPermission retPerm = new PlayerTeamPermission();
