@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.ui.ClassPerks;
-import com.contained.game.ui.IconButton;
+import com.contained.game.ui.components.IconButton;
+import com.contained.game.ui.components.ProgressBar;
 
 import net.minecraft.client.gui.GuiButton;
 
@@ -23,6 +24,8 @@ public class CollectorClass {
 	private IconButton diamondPickAxe, diamondAxe, diamondShovel, goldShovel;
 	private IconButton bucket, ladder, lamp, tree;
 	
+	private ProgressBar collector;
+	
 	public CollectorClass(ClassPerks gui, int collectorXP, int level) {
 		this.gui = gui;
 		this.collectorXP = collectorXP;
@@ -35,45 +38,48 @@ public class CollectorClass {
 		}else if(collectorXP < levelThree){
 			nextLevel = levelThree;
 		}
+		
+		collector = new ProgressBar(this.gui.width/2-50, this.gui.height/2+30, ProgressBar.RED, collectorXP, nextLevel, this.gui.mc);
 	}
 
 	public List getButtonList(){
-		this.buttonList.add(woodenShovel = new IconButton(-1, this.gui.width/2-15, 30, 20, 20, "perkIcons.png", 0, 0));
+		int x = this.gui.width/2;
+		int y = this.gui.height/2;
+		this.buttonList.add(woodenShovel = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 0, "Test"));
 		
-		this.buttonList.add(stonePickAxe = new IconButton(5, this.gui.width/2-75, 60, 20, 20, "perkIcons.png", 16, 0));
-		this.buttonList.add(stoneAxe = new IconButton(6, this.gui.width/2+45, 60, 20, 20, "perkIcons.png", 32, 0));
+		this.buttonList.add(stonePickAxe = new IconButton(5, x-75, y-60, 20, 20, "perkIcons.png", 16, 0, "Test"));
+		this.buttonList.add(stoneAxe = new IconButton(6, x+45, y-60, 20, 20, "perkIcons.png", 32, 0, "Test"));
 		
-		this.buttonList.add(ironPickAxe = new IconButton(7, this.gui.width/2-105, 90, 20, 20, "perkIcons.png", 48, 0));
-		this.buttonList.add(ironAxe = new IconButton(8, this.gui.width/2-45, 90, 20, 20, "perkIcons.png", 64, 0));
+		this.buttonList.add(ironPickAxe = new IconButton(7, x-105, y-30, 20, 20, "perkIcons.png", 48, 0, "Test"));
+		this.buttonList.add(ironAxe = new IconButton(8, x-45, y-30, 20, 20, "perkIcons.png", 64, 0, "Test"));
 		
-		this.buttonList.add(goldPickAxe = new IconButton(9, this.gui.width/2+15, 90, 20, 20, "perkIcons.png", 80, 0));
-		this.buttonList.add(goldAxe = new IconButton(10, this.gui.width/2+75, 90, 20, 20, "perkIcons.png", 96, 0));
+		this.buttonList.add(goldPickAxe = new IconButton(9, x+15, y-30, 20, 20, "perkIcons.png", 80, 0, "Test"));
+		this.buttonList.add(goldAxe = new IconButton(10, x+75, y-30, 20, 20, "perkIcons.png", 96, 0, "Test"));
 		
-		this.buttonList.add(diamondPickAxe = new IconButton(11, this.gui.width/2-120, 120, 20, 20, "perkIcons.png", 112, 0));
-		this.buttonList.add(diamondShovel = new IconButton(12, this.gui.width/2-90, 120, 20, 20, "perkIcons.png", 144, 0));
-		this.buttonList.add(bucket = new IconButton(13, this.gui.width/2-60, 120, 20, 20, "perkIcons.png", 176, 0));
-		this.buttonList.add(ladder = new IconButton(14, this.gui.width/2-30, 120, 20, 20, "perkIcons.png", 192, 0));
+		this.buttonList.add(diamondAxe = new IconButton(15, x+90, y, 20, 20, "perkIcons.png", 128, 0, "Test"));
+		this.buttonList.add(goldShovel = new IconButton(16, x+60, y, 20, 20, "perkIcons.png", 160, 0, "Test"));
+		this.buttonList.add(lamp = new IconButton(17, x+30, y, 20, 20, "perkIcons.png", 208, 0, "Test"));
+		this.buttonList.add(tree = new IconButton(18, x, y, 20, 20, "perkIcons.png", 224, 0, "Test"));
 		
-		this.buttonList.add(diamondAxe = new IconButton(15, this.gui.width/2+90, 120, 20, 20, "perkIcons.png", 128, 0));
-		this.buttonList.add(goldShovel = new IconButton(16, this.gui.width/2+60, 120, 20, 20, "perkIcons.png", 160, 0));
-		this.buttonList.add(lamp = new IconButton(17, this.gui.width/2+30, 120, 20, 20, "perkIcons.png", 208, 0));
-		this.buttonList.add(tree = new IconButton(18, this.gui.width/2, 120, 20, 20, "perkIcons.png", 224, 0));
+		this.buttonList.add(ladder = new IconButton(14, x-30, y, 20, 20, "perkIcons.png", 192, 0, "Test"));
+		this.buttonList.add(bucket = new IconButton(13, x-60, y, 20, 20, "perkIcons.png", 176, 0, "Test"));
+		this.buttonList.add(diamondShovel = new IconButton(12, x-90, y, 20, 20, "perkIcons.png", 144, 0, "Test"));
+		this.buttonList.add(diamondPickAxe = new IconButton(11, x-120, y, 20, 20, "perkIcons.png", 112, 0, "Test"));
+		
 		return buttonList;
 	}
 	
 	public void render(){
 		this.gui.mc.fontRenderer.drawStringWithShadow("The Collector", 
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("The Collector")/2),
-				20, Color.WHITE.hashCode());
+				(this.gui.height/2)-100, Color.WHITE.hashCode());
 		this.gui.mc.fontRenderer.drawStringWithShadow("LeveL: " + this.level,
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("LeveL: " + this.level)/2) - 100,
-				155, Color.WHITE.hashCode());
-		drawXPBar(this.gui.width/2-55, 150, collectorXP, Color.BLUE);
-	}
-	
-	private void drawXPBar(int x, int y, int xp, Color color){
-		this.gui.mc.fontRenderer.drawStringWithShadow(xp + "/" + this.nextLevel, x - this.gui.mc.fontRenderer.getStringWidth(xp + "/" + this.nextLevel) + 160, y+5, Color.WHITE.hashCode());
-		this.gui.mc.currentScreen.drawRect(x, y, x + ((int)(100.0 * ((double)xp/(double)this.nextLevel))), y + 20, color.hashCode());
+				gui.height/2+35, Color.WHITE.hashCode());
+		this.gui.mc.fontRenderer.drawStringWithShadow(this.collectorXP + "/" + this.nextLevel, 
+				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth(this.collectorXP + "/" + this.nextLevel)/2) + 80, 
+				gui.height/2+35, Color.WHITE.hashCode());
+		collector.render();
 	}
 	
 	public void actionPerformed(GuiButton buton){

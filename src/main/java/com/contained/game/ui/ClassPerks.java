@@ -1,20 +1,17 @@
 package com.contained.game.ui;
 
-import org.lwjgl.opengl.GL11;
-
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.ui.components.Container;
 import com.contained.game.ui.perks.BaseClass;
 import com.contained.game.ui.perks.BuilderClass;
 import com.contained.game.ui.perks.CollectorClass;
 import com.contained.game.ui.perks.CookClass;
 import com.contained.game.ui.perks.WarriorClass;
 import com.contained.game.ui.perks.WizardClass;
-import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.ResourceLocation;
 
 public class ClassPerks extends GuiScreen{
 	public static final int NONE = -1;
@@ -23,6 +20,8 @@ public class ClassPerks extends GuiScreen{
 	public static final int COOK = 2;
 	public static final int WIZARD = 3;
 	public static final int WARRIOR = 4;
+	
+	private Container background;
 	
 	private BaseClass base;
 	private CollectorClass collector;
@@ -37,16 +36,18 @@ public class ClassPerks extends GuiScreen{
 	private int wizardXP = 0;
 	private int warriorXP = 0;
 	private int[] classXP;
-	private int selectedClass;
+	public int selectedClass;
 	private int level;
 	
-	private boolean update = false;
+	public boolean update = false;
 	
 	@Override
 	public void initGui(){
 		selectedClass = ExtendedPlayer.get(mc.thePlayer).getOccupationClass();
 		classXP = ExtendedPlayer.get(mc.thePlayer).getOccupationValues();
 		level = ExtendedPlayer.get(mc.thePlayer).occupationLevel;
+		
+		background = new Container((this.width-256)/2, ((this.height-256)/2) + 20, 256, 176, "ui.png", this);
 		
 		collectorXP = classXP[Data.MINING] + classXP[Data.LUMBER];
 		cookXP = classXP[Data.FARMING] + classXP[Data.FISHING] + classXP[Data.COOKING];
@@ -117,10 +118,7 @@ public class ClassPerks extends GuiScreen{
 	
 	@Override
 	public void drawScreen(int w, int h, float ticks){
-		this.drawDefaultBackground();
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(new ResourceLocation(Resources.MOD_ID, "textures/gui/background.png"));
-		this.drawTexturedModalRect((this.width-256)/2, ((this.height-256)/2) + 20, 0, 0, 256, 256);
+		background.render();
 		
 		switch(selectedClass){
 		case NONE:
@@ -154,21 +152,6 @@ public class ClassPerks extends GuiScreen{
 	@Override
 	protected void actionPerformed(GuiButton button){
 		if(!this.update){
-			//Debug For Now
-			if(button.id >= -1 && button.id <= 4){
-				ExtendedPlayer.get(mc.thePlayer).setOccupationClass(button.id);
-				
-				/*
-				PacketCustom classPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.UPDATE_CLASS);
-				classPacket.writeInt(ExtendedPlayer.get(mc.thePlayer).getOccupationClass());
-				ServerPacketHandler.sendToServer(classPacket.toPacket());
-				*/
-				
-				this.selectedClass = button.id;
-				this.update = true;
-			}
-			
-			/*
 			switch(selectedClass){
 			case NONE:
 				base.actionPerformed(button);
@@ -189,8 +172,7 @@ public class ClassPerks extends GuiScreen{
 				warrior.actionPerformed(button);
 				break;
 			}
-			*/
-		}		
+		}	
 	}
 	
 	@Override

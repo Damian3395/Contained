@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.ui.ClassPerks;
-import com.contained.game.ui.IconButton;
+import com.contained.game.ui.components.IconButton;
+import com.contained.game.ui.components.ProgressBar;
 
 import net.minecraft.client.gui.GuiButton;
 
@@ -22,6 +23,8 @@ public class WarriorClass {
 	private IconButton woodSword, chestPlate, stoneSword, arrow, ironHorse, goldHorse, diamondHorse;
 	private IconButton saddle, bow, ironPlate, ironSword, goldPlate, goldSword, diamondPlate, diamondSword;
 
+	private ProgressBar warrior;
+	
 	public WarriorClass(ClassPerks gui, int warriorXP, int level){
 		this.gui = gui;
 		this.warriorXP = warriorXP;
@@ -34,45 +37,49 @@ public class WarriorClass {
 		}else if(warriorXP < levelThree){
 			nextLevel = levelThree;
 		}
+		
+		warrior = new ProgressBar(this.gui.width/2-50, this.gui.height/2+30, ProgressBar.YELLOW, warriorXP, nextLevel, this.gui.mc);
 	}
 	
 	public List getButtonlist(){
-		this.buttonList.add(woodSword = new IconButton(-1, this.gui.width/2-15, 30, 20, 20, "perkIcons.png", 0, 64));
+		int x = this.gui.width/2;
+		int y = this.gui.height/2;
 		
-		this.buttonList.add(chestPlate = new IconButton(61, this.gui.width/2-75, 60, 20, 20, "perkIcons.png", 16, 64));
-		this.buttonList.add(stoneSword = new IconButton(62, this.gui.width/2+45, 60, 20, 20, "perkIcons.png", 32, 64));
+		this.buttonList.add(woodSword = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 64, "Test"));
 		
-		this.buttonList.add(arrow = new IconButton(63, this.gui.width/2-105, 90, 20, 20, "perkIcons.png", 48, 64));
-		this.buttonList.add(ironHorse = new IconButton(64, this.gui.width/2-45, 90, 20, 20, "perkIcons.png", 64, 64));
+		this.buttonList.add(chestPlate = new IconButton(61, x-75, y-60, 20, 20, "perkIcons.png", 16, 64, "Test"));
+		this.buttonList.add(stoneSword = new IconButton(62, x+45, y-60, 20, 20, "perkIcons.png", 32, 64, "Test"));
 		
-		this.buttonList.add(goldHorse = new IconButton(65, this.gui.width/2+15, 90, 20, 20, "perkIcons.png", 80, 64));
-		this.buttonList.add(diamondHorse = new IconButton(66, this.gui.width/2+75, 90, 20, 20, "perkIcons.png", 96, 64));
+		this.buttonList.add(arrow = new IconButton(63, x-105, y-30, 20, 20, "perkIcons.png", 48, 64, "Test"));
+		this.buttonList.add(ironHorse = new IconButton(64, x-45, y-30, 20, 20, "perkIcons.png", 64, 64, "Test"));
+		
+		this.buttonList.add(goldHorse = new IconButton(65, x+15, y-30, 20, 20, "perkIcons.png", 80, 64, "Test"));
+		this.buttonList.add(diamondHorse = new IconButton(66, x+75, y-30, 20, 20, "perkIcons.png", 96, 64, "Test"));
 
-		this.buttonList.add(saddle = new IconButton(67, this.gui.width/2-120, 120, 20, 20, "perkIcons.png", 112, 64));
-		this.buttonList.add(bow = new IconButton(68, this.gui.width/2-90, 120, 20, 20, "perkIcons.png", 128, 64));
-		this.buttonList.add(ironPlate = new IconButton(69, this.gui.width/2-60, 120, 20, 20, "perkIcons.png", 144, 64));
-		this.buttonList.add(ironSword = new IconButton(70, this.gui.width/2-30, 120, 20, 20, "perkIcons.png", 160, 64));
-		
-		this.buttonList.add(goldPlate = new IconButton(71, this.gui.width/2, 120, 20, 20, "perkIcons.png", 176, 64));
-		this.buttonList.add(goldSword = new IconButton(72, this.gui.width/2+30, 120, 20, 20, "perkIcons.png", 192, 64));
-		this.buttonList.add(diamondPlate = new IconButton(73, this.gui.width/2+60, 120, 20, 20, "perkIcons.png", 208, 64));
-		this.buttonList.add(diamondSword = new IconButton(74, this.gui.width/2+90, 120, 20, 20, "perkIcons.png", 224, 64));
+		this.buttonList.add(diamondSword = new IconButton(74, x+90, y, 20, 20, "perkIcons.png", 224, 64, "Test"));
+		this.buttonList.add(diamondPlate = new IconButton(73, x+60, y, 20, 20, "perkIcons.png", 208, 64, "Test"));
+		this.buttonList.add(goldSword = new IconButton(72, x+30, y, 20, 20, "perkIcons.png", 192, 64, "Test"));
+		this.buttonList.add(goldPlate = new IconButton(71, x, y, 20, 20, "perkIcons.png", 176, 64, "Test"));
+
+		this.buttonList.add(ironSword = new IconButton(70, x-30, y, 20, 20, "perkIcons.png", 160, 64, "Test"));
+		this.buttonList.add(ironPlate = new IconButton(69, x-60, y, 20, 20, "perkIcons.png", 144, 64, "Test"));
+		this.buttonList.add(bow = new IconButton(68, x-90, y, 20, 20, "perkIcons.png", 128, 64, "Test"));
+		this.buttonList.add(saddle = new IconButton(67, x-120, y, 20, 20, "perkIcons.png", 112, 64, "Test"));
+
 		return buttonList;
 	}
 	
 	public void render(){
 		this.gui.mc.fontRenderer.drawStringWithShadow("The Warrior", 
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("The Warrior")/2),
-				20, Color.WHITE.hashCode());
+				(this.gui.height/2)-100, Color.WHITE.hashCode());
 		this.gui.mc.fontRenderer.drawStringWithShadow("LeveL: " + this.level,
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("LeveL: " + this.level)/2) - 100,
-				155, Color.WHITE.hashCode());
-		drawXPBar(this.gui.width/2-55, 150, warriorXP, Color.BLUE);
-	}
-	
-	private void drawXPBar(int x, int y, int xp, Color color){
-		this.gui.mc.fontRenderer.drawStringWithShadow(xp + "/" + this.nextLevel, x - this.gui.mc.fontRenderer.getStringWidth(xp + "/" + this.nextLevel) + 160, y+5, Color.WHITE.hashCode());
-		this.gui.mc.currentScreen.drawRect(x, y, x + ((int)(100.0 * ((double)xp/(double)this.nextLevel))), y + 20, color.hashCode());
+				gui.height/2+35, Color.WHITE.hashCode());
+		this.gui.mc.fontRenderer.drawStringWithShadow(warriorXP + "/" + this.nextLevel,
+				((this.gui.width)/2) - this.gui.mc.fontRenderer.getStringWidth(warriorXP + "/" + this.nextLevel)/2 + 80,
+				gui.height/2+35, Color.WHITE.hashCode());
+		warrior.render();
 	}
 	
 	public void actionPerformed(GuiButton button){

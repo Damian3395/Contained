@@ -12,6 +12,7 @@ public class KeyBindings {
 	public static KeyBinding toggleVisualizerGUI;
 	public static KeyBinding toggleTerritoryRender;
 	public static KeyBinding toggleClassPerks;
+	public static KeyBinding toggleGuild;
 	
 	public static void init() {
 		// Data Visualization GUI Container Keyboard Event Handler
@@ -31,5 +32,11 @@ public class KeyBindings {
 				, Keyboard.KEY_P
 				, "key.categories."+Resources.MOD_ID);
 		ClientRegistry.registerKeyBinding(toggleClassPerks);
+		
+		// Guild GUI Container Keyboard Event Handler
+		toggleGuild = new KeyBinding("key.guildGUI"
+				, Keyboard.KEY_G
+				,"key.categories."+Resources.MOD_ID);
+		ClientRegistry.registerKeyBinding(toggleGuild);
 	}
 }

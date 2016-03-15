@@ -36,6 +36,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int SYNC_TEAMS = 6;
 	public static final int TE_PARTICLE = 7;
 	public static final int TMACHINE_STATE = 8;
+	public static final int GUILD_STATUS = 9;
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
@@ -128,6 +129,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						machine.refreshColor();
 					}
 				break;
+				
+				case GUILD_STATUS:
+					ExtendedPlayer.get(mc.thePlayer).guild = packet.readInt();
+					break;
 			}
 		}
 	}
