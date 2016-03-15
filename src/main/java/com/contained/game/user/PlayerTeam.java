@@ -2,6 +2,7 @@ package com.contained.game.user;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import com.contained.game.network.ClientPacketHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 
@@ -20,6 +22,7 @@ public class PlayerTeam {
 
 	public String id;
 	public String displayName;
+	public HashMap<String, PlayerTeamPermission> permissions;
 	private int colorID; //Index for format codes below
 	
 	/*
@@ -63,6 +66,8 @@ public class PlayerTeam {
 	public PlayerTeam(String id, String name, int color) {
 		this.id = id;
 		this.displayName = name;
+		this.permissions = new HashMap<String, PlayerTeamPermission>();
+		
 		setColor(color);
 	}
 	
@@ -77,14 +82,14 @@ public class PlayerTeam {
 		MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), "say The team, "+displayName+", has been disbanded.");
 		
 		//For all players in this team, have them leave the team.
-		for(PlayerTeamIndividual player : Contained.teamMemberData) {
+		for (PlayerTeamIndividual player : Contained.teamMemberData) {
 			if (player.teamID != null && player.teamID.equals(this.id))
 				player.leaveTeam();
 		}
 		
 		//Remove team's territory.
 		ArrayList<Point> territoryToRemove = new ArrayList<Point>();
-		for(Point p : Contained.territoryData.keySet()) {
+		for (Point p : Contained.territoryData.keySet()) {
 			if (Contained.territoryData.get(p).equals(this.id))
 				territoryToRemove.add(p);
 		}
@@ -93,12 +98,16 @@ public class PlayerTeam {
 		
 		//Remove any pending invitations involving this team.
 		ArrayList<PlayerTeamInvitation> invitationsToRemove = new ArrayList<PlayerTeamInvitation>();
-		for(PlayerTeamInvitation invite : Contained.teamInvitations) {
+		for (PlayerTeamInvitation invite : Contained.teamInvitations) {
 			if (invite.teamID != null && invite.teamID.equals(this.id))
 				invitationsToRemove.add(invite);
 		}
 		for (PlayerTeamInvitation invite : invitationsToRemove)
 			Contained.teamInvitations.remove(invite);
+		
+		//Remove any custom permissions involving this team.
+		for (PlayerTeam team : Contained.teamData)
+			team.permissions.remove(this.id);
 		
 		//Remove the team.
 		Contained.teamData.remove(this);	
@@ -210,16 +219,48 @@ public class PlayerTeam {
 		return this.colorID;
 	}
 	
+	public PlayerTeamPermission getPermissions(String teamID) {
+		if (teamID.equals(this.id)) {
+			//Requested permissions for our own team. Nothing should be disabled.
+			PlayerTeamPermission retPerm = new PlayerTeamPermission();
+			retPerm.setAllowAll();
+			return retPerm;
+		}
+		else if (!this.permissions.containsKey(teamID)) {
+			//We don't have the requested team stored, return default permissions.
+			return (new PlayerTeamPermission());
+		}
+		else
+			return this.permissions.get(teamID);
+	}
+		
 	public void writeToNBT(NBTTagCompound ntc) {
 		ntc.setString("id", this.id);
 		ntc.setInteger("color", this.colorID);
 		ntc.setString("name", this.displayName);
+		
+		NBTTagList permList = new NBTTagList();
+		for(String team : this.permissions.keySet()) {
+			NBTTagCompound permData = new NBTTagCompound();
+			permData.setString("teamID", team);
+			this.permissions.get(team).writeToNBT(permData);
+			permList.appendTag(permData);
+		}
+		ntc.setTag("permissions", permList);
 	}
 	
 	public void readFromNBT(NBTTagCompound ntc) {
 		this.id = ntc.getString("id");
 		this.displayName = ntc.getString("name");
 		setColor(ntc.getInteger("color"));
+		
+		this.permissions = new HashMap<String, PlayerTeamPermission>();
+		NBTTagList permList = ntc.getTagList("permissions", (byte)10);
+		for(int i=0; i<permList.tagCount(); i++) {
+			NBTTagCompound permData = permList.getCompoundTagAt(i);
+			String team = permData.getString("teamID");
+			this.permissions.put(team, new PlayerTeamPermission(permData));
+		}
 	}
 	
 	@Override

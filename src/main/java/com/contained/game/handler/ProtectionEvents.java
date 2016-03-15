@@ -4,7 +4,9 @@ import java.awt.Point;
 import java.util.List;
 
 import com.contained.game.Contained;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.util.Util;
 
 import net.minecraft.block.Block;
@@ -51,9 +53,7 @@ public class ProtectionEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	//Break Protection
     public void onPlayerBreaksBlock(BlockEvent.BreakEvent ev) {
-		if (isExempt(ev.world, ev.getPlayer()))
-			return;
-		if (inProtectRange(ev.getPlayer(), ev.x, ev.y, ev.z) && Contained.configs.breakProtect) {
+		if (getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).breakDisable) {
 			Util.debugMessage(ev.getPlayer(), "breakProtect");
 			ev.setCanceled(true);		
 		}
@@ -74,8 +74,8 @@ public class ProtectionEvents {
 			else {
 				boolean foundAllowedPlayer = false;
 				for(EntityPlayer p : nearbyPlayers) {
-					if (!isExempt(m.worldObj, p) && inProtectRange(p, m.posX, m.posY, m.posZ)
-							&& Contained.configs.breakProtect) 
+					if (getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
+							.breakDisable) 
 					{
 						continue;
 					}
@@ -103,9 +103,7 @@ public class ProtectionEvents {
     }
 	
 	public void placeProtection(EntityPlayer player, BlockEvent.PlaceEvent ev) {
-		if (isExempt(ev.world, player))
-			return;
-		if (inProtectRange(player, ev.x, ev.y, ev.z) && Contained.configs.buildProtect) {
+		if (getPermissions(ev.world, player, ev.x, ev.y, ev.z).buildDisable) {
 			Util.debugMessage(player, "placeProtect");
 			ev.setCanceled(true);
 		}
@@ -115,37 +113,63 @@ public class ProtectionEvents {
 	//Damage & Death Protection
 	public void onEntityDamaged(LivingHurtEvent event) {
 		Entity damageSource = event.source.getEntity();
-		if (!(damageSource instanceof EntityPlayer) 
-				|| isExempt(event.entity.worldObj, (EntityPlayer)damageSource))
+		if (!(damageSource instanceof EntityPlayer))
 			return;
 		EntityPlayer attacker = (EntityPlayer)damageSource;
-		if (inProtectRange(attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ))
-		{
-			if (event.entityLiving != null && event.entityLiving instanceof EntityMob && Contained.configs.mobProtect) {
-				Util.debugMessage(attacker, "monsterProtect");
-				event.setCanceled(true);
+		
+		if (event.entityLiving != null && event.entityLiving instanceof EntityMob 
+				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
+				.mobDisable) {
+			Util.debugMessage(attacker, "monsterProtect");
+			event.setCanceled(true);
+		}
+		else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer) {
+			// Player versus Player: Disable PvP in the following cases:
+			//    -Players cannot attack their own team mates.
+			//    -Players not in a team cannot be attacked nor can they attack
+			//      other players.
+			//    -Players cannot be attacked within their territory if the
+			//      territory is still in its "infancy" (determined by config file)
+			
+			EntityPlayer victim = (EntityPlayer)event.entityLiving;
+			String victimTeam = PlayerTeamIndividual.get(victim).teamID;
+			String attackerTeam = PlayerTeamIndividual.get(attacker).teamID;
+			Point check = new Point((int)event.entityLiving.posX, (int)event.entityLiving.posZ);
+			boolean shouldCancel = false;
+			
+			if (victimTeam == null || attackerTeam == null)
+				shouldCancel = true;
+			else if (victimTeam.equals(attackerTeam))
+				shouldCancel = true;
+			else if (Contained.territoryData.containsKey(check)) {
+				String territoryTeamID = Contained.territoryData.get(check);
+				if (victimTeam.equals(territoryTeamID)) {
+					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID);
+					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize)
+						shouldCancel = true;
+				}
 			}
-			else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer && Contained.configs.playerProtect) {
+			
+			if (shouldCancel) {
 				Util.debugMessage(attacker, "playerProtect");
 				event.setCanceled(true);
 			}
-			else if (event.entityLiving != null && (event.entityLiving instanceof EntityAnimal 
-					|| event.entityLiving instanceof IMerchant
-					|| event.entityLiving instanceof EntityGolem)
-						&& Contained.configs.animalProtect) {
-				Util.debugMessage(attacker, "passiveEntityProtect");
-				event.setCanceled(true);
-			}
+		}
+		else if (event.entityLiving != null && (event.entityLiving instanceof EntityAnimal 
+				|| event.entityLiving instanceof IMerchant
+				|| event.entityLiving instanceof EntityGolem)
+				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
+				.animalDisable) {
+			Util.debugMessage(attacker, "passiveEntityProtect");
+			event.setCanceled(true);
 		}
 	}
 	
 	@SubscribeEvent
 	//Container Protection
 	public void onContainerOpen(PlayerOpenContainerEvent ev) {
-		if (isExempt(ev.entity.worldObj, ev.entityPlayer))
-			return;
-		if (inProtectRange(ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				&& Contained.configs.containerProtect) {
+		if (getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.containerDisable) {
 			Container c = ev.entityPlayer.openContainer;
 			if (c != null && (c instanceof ContainerDispenser
 				|| c instanceof ContainerBrewingStand
@@ -164,10 +188,8 @@ public class ProtectionEvents {
 	@SubscribeEvent
 	//Entity Interaction Protection
 	public void onEntityInteract(EntityInteractEvent ev) {
-		if (isExempt(ev.entity.worldObj, ev.entityPlayer))
-			return;
-		if (inProtectRange(ev.entityPlayer, ev.target.posX, ev.target.posY, ev.target.posZ)
-				&& Contained.configs.interactProtect) {
+		if (getPermissions(ev.entity.worldObj, ev.entityPlayer, ev.target.posX, ev.target.posY, ev.target.posZ)
+				.interactDisable) {
 			Util.debugMessage(ev.entityPlayer, "interactProtect");
 			ev.setCanceled(true);
 		}
@@ -176,10 +198,8 @@ public class ProtectionEvents {
 	@SubscribeEvent
 	//Bucket Protection
 	public void onBucketFill(FillBucketEvent ev) {
-		if (isExempt(ev.world, ev.entityPlayer))
-			return;
-		if (inProtectRange(ev.entityPlayer, ev.target.blockX, ev.target.blockY, ev.target.blockZ)
-				&& Contained.configs.bucketProtect) {
+		if (getPermissions(ev.world, ev.entityPlayer, ev.target.blockX, ev.target.blockY, ev.target.blockZ)
+				.bucketDisable) {
 			Util.debugMessage(ev.entityPlayer, "bucketProtect");
 			ev.setCanceled(true);
 		}
@@ -197,10 +217,8 @@ public class ProtectionEvents {
 	}
 	
 	public boolean pickupProtection(PlayerEvent ev) {
-		if (isExempt(ev.entity.worldObj, ev.entityPlayer))
-			return false;
-		if (inProtectRange(ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ) 
-				&& Contained.configs.itemProtect) {
+		if (getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.itemDisable) {
 			Util.debugMessage(ev.entityPlayer, "pickupProtect");
 			return true;
 		}
@@ -213,9 +231,8 @@ public class ProtectionEvents {
 		if (ev.action == Action.RIGHT_CLICK_BLOCK && !ev.world.isRemote) {
 			Block b = ev.world.getBlock(ev.x, ev.y, ev.z);
 			if (b != null && b instanceof BlockCrops) {
-				if (!isExempt(ev.world, ev.entityPlayer) 
-						&& inProtectRange(ev.entityPlayer, ev.x, ev.y, ev.z) 
-						&& Contained.configs.harvestProtect) {
+				if (getPermissions(ev.world, ev.entityPlayer, ev.x, ev.y, ev.z)
+						.harvestDisable) {
 					Util.debugMessage(ev.entityPlayer, "harvestProtect");
 					return;
 				}
@@ -234,8 +251,8 @@ public class ProtectionEvents {
 	}
 	
 	/**
-	 * Returns whether the current entity (the one performing the action) is currently
-	 * in a region of protected land.
+	 * Returns the territory permissions that the given entity has at the block of land they
+	 * are currently occupying.
 	 * 
 	 * @param ent The entity performing the action
 	 * @param x   The x coordinate of the block/entity being affected by the action
@@ -243,19 +260,21 @@ public class ProtectionEvents {
 	 * @param z   The z coordinate of the block/entity being affected by the action
 	 * @return
 	 */
-	public static boolean inProtectRange(EntityPlayer ent, double x, double y, double z) {
-		if (ent != null) {
+	public static PlayerTeamPermission getPermissions(World w, EntityPlayer ent, double x, double y, double z) {	
+		if (ent != null && !isExempt(w, ent)) {
 			Point check = new Point((int)x, (int)z);
 			if (Contained.territoryData.containsKey(check)) {
-				String teamOwner = Contained.territoryData.get(check);
+				//This player is in owned territory.
 				PlayerTeamIndividual entData = PlayerTeamIndividual.get(ent);
-				if (entData != null && teamOwner.equals(entData.teamID))
-					return false; //This player is in their own team's territory.
-				else
-					return true;  //This player is in another team's territory.
+				PlayerTeam team = PlayerTeam.get(Contained.territoryData.get(check));
+				return team.getPermissions(entData.teamID);  
 			}
 		}
-		return false; //This player is not inside claimed territory.
+		
+		//This player is not inside owned territory.
+		PlayerTeamPermission returnPerm = new PlayerTeamPermission();
+		returnPerm.setAllowAll();
+		return returnPerm; 
 	}
 	
 	/**
