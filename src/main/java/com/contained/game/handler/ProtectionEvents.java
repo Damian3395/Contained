@@ -10,21 +10,31 @@ import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.util.Util;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAnvil;
+import net.minecraft.block.BlockBrewingStand;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.block.BlockEnchantmentTable;
+import net.minecraft.block.BlockFurnace;
+import net.minecraft.block.BlockHopper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.item.EntityMinecartChest;
+import net.minecraft.entity.item.EntityMinecartFurnace;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerBrewingStand;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.ContainerDispenser;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.inventory.ContainerFurnace;
+import net.minecraft.inventory.ContainerHopper;
 import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.item.ItemStack;
@@ -53,9 +63,30 @@ public class ProtectionEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	//Break Protection
     public void onPlayerBreaksBlock(BlockEvent.BreakEvent ev) {
+		boolean shouldCancel = false;
 		if (getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).breakDisable) {
+			shouldCancel = true;
+		}
+		else {
+			Block b = ev.world.getBlock(ev.x, ev.y, ev.z);
+			// Even if break protection is disabled, if chest protection is enabled,
+			// don't allow chests to be broken.
+			if (b.equals(Blocks.chest)
+				&& getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).chestDisable) 
+			{
+				shouldCancel = true;
+			}
+			// Same for container protection.
+			else if (isProtectedContainerBlock(b)
+				&& getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).containerDisable) 
+			{
+				shouldCancel = true;
+			}
+		}
+		
+		if (shouldCancel) {
 			Util.debugMessage(ev.getPlayer(), "breakProtect");
-			ev.setCanceled(true);		
+			ev.setCanceled(true);
 		}
 	}
 	
@@ -76,6 +107,18 @@ public class ProtectionEvents {
 				for(EntityPlayer p : nearbyPlayers) {
 					if (getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
 							.breakDisable) 
+					{
+						continue;
+					}
+					else if (m instanceof EntityMinecartChest
+							&& getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
+							.chestDisable) 
+					{
+						continue;
+					}
+					else if (m instanceof EntityMinecartFurnace
+							&& getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
+							.containerDisable) 
 					{
 						continue;
 					}
@@ -168,20 +211,20 @@ public class ProtectionEvents {
 	@SubscribeEvent
 	//Container Protection
 	public void onContainerOpen(PlayerOpenContainerEvent ev) {
-		if (getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				.containerDisable) {
-			Container c = ev.entityPlayer.openContainer;
-			if (c != null && (c instanceof ContainerDispenser
-				|| c instanceof ContainerBrewingStand
-				|| c instanceof ContainerHorseInventory
-				|| c instanceof ContainerFurnace
-				|| c instanceof ContainerChest
-				|| c instanceof ContainerRepair
-				|| c instanceof ContainerEnchantment)) 
-			{
-				Util.debugMessage(ev.entityPlayer, "containerProtect");
-				ev.setResult(Event.Result.DENY);
-			}
+		Container c = ev.entityPlayer.openContainer;
+		if (c != null && isProtectedContainer(c)
+				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.containerDisable) 
+		{
+			Util.debugMessage(ev.entityPlayer, "containerProtect");
+			ev.setResult(Event.Result.DENY);
+		}
+		else if (c != null && c instanceof ContainerChest
+				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.chestDisable) 
+		{
+			Util.debugMessage(ev.entityPlayer, "chestProtect");
+			ev.setResult(Event.Result.DENY);
 		}
 	}
 	
@@ -286,6 +329,34 @@ public class ProtectionEvents {
 		if (ent == null)
 			return true;
 		if (ent.capabilities.isCreativeMode && Contained.configs.creativeOverride)
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Does this constitute something that we consider to fall into the
+	 * category of containers that should be protected by the containerDisable
+	 * rule?
+	 */
+	public static boolean isProtectedContainer(Container c) {
+		if (c instanceof ContainerDispenser
+				|| c instanceof ContainerBrewingStand
+				|| c instanceof ContainerHorseInventory
+				|| c instanceof ContainerFurnace
+				|| c instanceof ContainerRepair
+				|| c instanceof ContainerEnchantment
+				|| c instanceof ContainerHopper)
+			return true;
+		return false;
+	}
+	
+	public static boolean isProtectedContainerBlock(Block b) {
+		if (b instanceof BlockDispenser
+				|| b instanceof BlockBrewingStand
+				|| b instanceof BlockFurnace
+				|| b instanceof BlockAnvil
+				|| b instanceof BlockEnchantmentTable
+				|| b instanceof BlockHopper)
 			return true;
 		return false;
 	}
