@@ -26,11 +26,7 @@ public class DataEvents {
 		if(event.entity instanceof EntityPlayer && !event.entity.worldObj.isRemote){
 			ExtendedPlayer player = ExtendedPlayer.get(event.entityPlayer);
 			if(!player.achievements.contains(event.achievement.statId)){
-				DataLogger.insertAchievement("DebugMode", 
-						event.entityPlayer.getDisplayName(), 
-						event.entityPlayer.worldObj.provider.getDimensionName(), 
-						event.achievement.statId, 
-						Util.getDate());
+				DataLogger.insertAchievement("DebugMode", event.entityPlayer.getDisplayName(), event.achievement.statId, Util.getDate());
 				player.achievements.add(event.achievement.statId);
 			}
 		}
@@ -39,28 +35,14 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onBlockBuild(PlaceEvent event){
 		if(!event.world.isRemote){
-			DataLogger.insertBuild("DebugMode", 
-					event.player.getDisplayName(), 
-					event.world.provider.getDimensionName(),
-					event.block.getLocalizedName(), 
-					event.x, 
-					event.y, 
-					event.z, 
-					Util.getDate());
+			DataLogger.insertBuild("DebugMode", event.player.getDisplayName(), event.block.getLocalizedName(), event.x, event.y, event.z, Util.getDate());
 		}
 	}
 	
 	@SubscribeEvent
 	public void onBlockBreak(BreakEvent event){
 		if(!event.world.isRemote){
-			DataLogger.insertMine("DebugMode", 
-					event.getPlayer().getDisplayName(), 
-					event.world.provider.getDimensionName(),
-					event.block.getLocalizedName(), 
-					event.x, 
-					event.y, 
-					event.z, 
-					Util.getDate());
+			DataLogger.insertMine("DebugMode", event.getPlayer().getDisplayName(), event.block.getLocalizedName(), event.x, event.y, event.z, Util.getDate());
 		}
 	}
 	
@@ -68,12 +50,7 @@ public class DataEvents {
 	public void onJoinServer(EntityJoinWorldEvent event){
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer){
 			EntityPlayer player = (EntityPlayer)event.entity;
-			ExtendedPlayer properties = ExtendedPlayer.get(player);
-			properties.world = event.world.provider.getDimensionName();
-			DataLogger.insertLogin("DebugMode", 
-					player.getDisplayName(), 
-					event.world.provider.getDimensionName(), 
-					Util.getDate());
+			DataLogger.insertLogin("DebugMode", player.getDisplayName(), Util.getDate());
 		}
 	}
 	
@@ -101,20 +78,14 @@ public class DataEvents {
 				killer = LanguageRegistry.instance().getStringLocalization("entity." + EntityList.getEntityString((EntityLivingBase) event.source.getSourceOfDamage())+".name", "en_US");
 			} else
 				killer = event.source.getDamageType();
-			DataLogger.insertKill("DebugMode", 
-					event.entityLiving.worldObj.provider.getDimensionName(),
-					killer, 
-					victim, 
-					Util.getDate());
+			DataLogger.insertKill("DebugMode", killer, victim, Util.getDate());
 		}
 	}
 	
 	@SubscribeEvent
 	public void onAnvil(AnvilRepairEvent event){
 		if(!event.entityPlayer.worldObj.isRemote && event.entity instanceof EntityPlayer){
-			DataLogger.insertAnvil("DebugMode", 
-					event.entityPlayer.getDisplayName(),
-					event.entityPlayer.worldObj.provider.getDimensionName(),
+			DataLogger.insertAnvil("DebugMode", event.entityPlayer.getDisplayName(), 
 					event.left.getDisplayName(), event.left.stackSize,
 					event.right.getDisplayName(), event.right.stackSize,
 					event.output.getDisplayName(), event.output.stackSize,
@@ -125,49 +96,21 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onUsedItem(PlayerDestroyItemEvent event){
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer){
-			DataLogger.insertUsed("DebugMode", 
-					event.entityPlayer.getDisplayName(),
-					event.entityPlayer.worldObj.provider.getDimensionName(),
-					event.original.getDisplayName(), 
-					Util.getDate());
+			DataLogger.insertUsed("DebugMode", event.entityPlayer.getDisplayName(), event.original.getDisplayName(), Util.getDate());
 		}
 	}
 	
 	@SubscribeEvent
 	public void onServerChat(ServerChatEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertChat("DebugMode", 
-					event.player.getDisplayName(),
-					event.player.worldObj.provider.getDimensionName(),
-					event.message, 
-					Util.getDate());
+			DataLogger.insertChat("DebugMode", event.player.getDisplayName(),event.message, Util.getDate());
 		}
 	}
 	
 	@SubscribeEvent
 	public void onConsume(PlayerUseItemEvent.Finish event){
 		if(!event.entity.worldObj.isRemote  && event.entity instanceof EntityPlayer){
-			DataLogger.insertConsume("DebugMode", 
-					event.entityPlayer.getDisplayName(), 
-					event.entityPlayer.worldObj.provider.getDimensionName(),
-					event.item.getDisplayName(), 
-					Util.getDate());
-		}
-	}
-	
-	@SubscribeEvent
-	public void onPortal(LivingUpdateEvent event){
-		if(!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityPlayer){
-			EntityPlayer player = (EntityPlayer) event.entity;
-			ExtendedPlayer properties = ExtendedPlayer.get(player);
-			if(properties.world.compareTo(event.entityLiving.worldObj.provider.getDimensionName()) != 0){
-				DataLogger.insertPortal("DebugMode", 
-						player.getDisplayName(), 
-						properties.world, 
-						event.entityLiving.worldObj.provider.getDimensionName(),
-						Util.getDate());
-				properties.world = event.entityLiving.worldObj.provider.getDimensionName();
-			}
+			DataLogger.insertConsume("DebugMode", event.entityPlayer.getDisplayName(), event.item.getDisplayName(), Util.getDate());
 		}
 	}
 	
@@ -180,11 +123,7 @@ public class DataEvents {
 			int y = (int) event.entityLiving.posY;
 			int z = (int) event.entityLiving.posZ;
 			if(properties.posX != x || properties.posY != y || properties.posZ != z){
-				DataLogger.insertMove("DebugMode", 
-						player.getDisplayName(),
-						event.entityLiving.worldObj.provider.getDimensionName(),
-						x, y, z, 
-						Util.getDate());
+				DataLogger.insertMove("DebugMode", player.getDisplayName(), x, y, z, Util.getDate());
 				properties.posX = x;
 				properties.posY = y;
 				properties.posZ = z;

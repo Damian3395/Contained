@@ -15,10 +15,7 @@ public class FMLDataEvents {
 	@SubscribeEvent
 	public void onLeftServer(PlayerLoggedOutEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertLogOut("DebugMode", 
-					event.player.getDisplayName(), 
-					event.player.worldObj.provider.getDimensionName(),
-					Util.getDate());
+			DataLogger.insertLogOut("DebugMode", event.player.getDisplayName(), Util.getDate());
 			System.out.println("Inserting Logout: " + event.player.getDisplayName());
 		}
 	}
@@ -26,11 +23,7 @@ public class FMLDataEvents {
 	@SubscribeEvent
 	public void onSmeltItem(ItemSmeltedEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertSmelt("DebugMode", 
-					event.player.getDisplayName(), 
-					event.player.worldObj.provider.getDimensionName(),
-					event.smelting.getDisplayName(), 
-					Util.getDate());
+			DataLogger.insertSmelt("DebugMode", event.player.getDisplayName(), event.smelting.getDisplayName(), Util.getDate());
 			System.out.println("Inserting Smelt " + event.smelting.getDisplayName());
 		}
 	}
@@ -38,11 +31,7 @@ public class FMLDataEvents {
 	@SubscribeEvent
 	public void onCraftItem(ItemCraftedEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertCraft("DebugMode", 
-					event.player.getDisplayName(), 
-					event.player.worldObj.provider.getDimensionName(),
-					event.crafting.getDisplayName(), 
-					Util.getDate());
+			DataLogger.insertCraft("DebugMode", event.player.getDisplayName(), event.crafting.getDisplayName(), Util.getDate());
 			System.out.println("Inserting Craft " + event.crafting.getDisplayName());
 		}
 	}

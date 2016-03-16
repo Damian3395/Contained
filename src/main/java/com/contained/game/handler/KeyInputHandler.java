@@ -2,7 +2,6 @@ package com.contained.game.handler;
 
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
-import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.TerritoryRender;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -27,8 +26,6 @@ public class KeyInputHandler {
 			gui_data.guiRender = !gui_data.guiRender;
 		if (KeyBindings.toggleClassPerks.isPressed())
 			mc.displayGuiScreen(new ClassPerks());
-		if(KeyBindings.toggleGuild.isPressed())
-			mc.displayGuiScreen(new GuiGuild());
 		if (KeyBindings.toggleTerritoryRender.isPressed())
 			territory.doRender = !territory.doRender;
 	}

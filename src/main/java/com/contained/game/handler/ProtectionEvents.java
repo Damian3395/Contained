@@ -4,25 +4,37 @@ import java.awt.Point;
 import java.util.List;
 
 import com.contained.game.Contained;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.util.Util;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAnvil;
+import net.minecraft.block.BlockBrewingStand;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.block.BlockEnchantmentTable;
+import net.minecraft.block.BlockFurnace;
+import net.minecraft.block.BlockHopper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.item.EntityMinecartChest;
+import net.minecraft.entity.item.EntityMinecartFurnace;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerBrewingStand;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.ContainerDispenser;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.inventory.ContainerFurnace;
+import net.minecraft.inventory.ContainerHopper;
 import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.item.ItemStack;
@@ -51,11 +63,30 @@ public class ProtectionEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	//Break Protection
     public void onPlayerBreaksBlock(BlockEvent.BreakEvent ev) {
-		if (isExempt(ev.world, ev.getPlayer()))
-			return;
-		if (inProtectRange(ev.getPlayer(), ev.x, ev.y, ev.z) && Contained.configs.breakProtect) {
+		boolean shouldCancel = false;
+		if (getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).breakDisable) {
+			shouldCancel = true;
+		}
+		else {
+			Block b = ev.world.getBlock(ev.x, ev.y, ev.z);
+			// Even if break protection is disabled, if chest protection is enabled,
+			// don't allow chests to be broken.
+			if (b.equals(Blocks.chest)
+				&& getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).chestDisable) 
+			{
+				shouldCancel = true;
+			}
+			// Same for container protection.
+			else if (isProtectedContainerBlock(b)
+				&& getPermissions(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z).containerDisable) 
+			{
+				shouldCancel = true;
+			}
+		}
+		
+		if (shouldCancel) {
 			Util.debugMessage(ev.getPlayer(), "breakProtect");
-			ev.setCanceled(true);		
+			ev.setCanceled(true);
 		}
 	}
 	
@@ -74,8 +105,20 @@ public class ProtectionEvents {
 			else {
 				boolean foundAllowedPlayer = false;
 				for(EntityPlayer p : nearbyPlayers) {
-					if (!isExempt(m.worldObj, p) && inProtectRange(p, m.posX, m.posY, m.posZ)
-							&& Contained.configs.breakProtect) 
+					if (getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
+							.breakDisable) 
+					{
+						continue;
+					}
+					else if (m instanceof EntityMinecartChest
+							&& getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
+							.chestDisable) 
+					{
+						continue;
+					}
+					else if (m instanceof EntityMinecartFurnace
+							&& getPermissions(m.worldObj, p, m.posX, m.posY, m.posZ)
+							.containerDisable) 
 					{
 						continue;
 					}
@@ -103,9 +146,7 @@ public class ProtectionEvents {
     }
 	
 	public void placeProtection(EntityPlayer player, BlockEvent.PlaceEvent ev) {
-		if (isExempt(ev.world, player))
-			return;
-		if (inProtectRange(player, ev.x, ev.y, ev.z) && Contained.configs.buildProtect) {
+		if (getPermissions(ev.world, player, ev.x, ev.y, ev.z).buildDisable) {
 			Util.debugMessage(player, "placeProtect");
 			ev.setCanceled(true);
 		}
@@ -115,59 +156,83 @@ public class ProtectionEvents {
 	//Damage & Death Protection
 	public void onEntityDamaged(LivingHurtEvent event) {
 		Entity damageSource = event.source.getEntity();
-		if (!(damageSource instanceof EntityPlayer) 
-				|| isExempt(event.entity.worldObj, (EntityPlayer)damageSource))
+		if (!(damageSource instanceof EntityPlayer))
 			return;
 		EntityPlayer attacker = (EntityPlayer)damageSource;
-		if (inProtectRange(attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ))
-		{
-			if (event.entityLiving != null && event.entityLiving instanceof EntityMob && Contained.configs.mobProtect) {
-				Util.debugMessage(attacker, "monsterProtect");
-				event.setCanceled(true);
+		
+		if (event.entityLiving != null && event.entityLiving instanceof EntityMob 
+				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
+				.mobDisable) {
+			Util.debugMessage(attacker, "monsterProtect");
+			event.setCanceled(true);
+		}
+		else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer) {
+			// Player versus Player: Disable PvP in the following cases:
+			//    -Players cannot attack their own team mates.
+			//    -Players not in a team cannot be attacked nor can they attack
+			//      other players.
+			//    -Players cannot be attacked within their territory if the
+			//      territory is still in its "infancy" (determined by config file)
+			
+			EntityPlayer victim = (EntityPlayer)event.entityLiving;
+			String victimTeam = PlayerTeamIndividual.get(victim).teamID;
+			String attackerTeam = PlayerTeamIndividual.get(attacker).teamID;
+			Point check = new Point((int)event.entityLiving.posX, (int)event.entityLiving.posZ);
+			boolean shouldCancel = false;
+			
+			if (victimTeam == null || attackerTeam == null)
+				shouldCancel = true;
+			else if (victimTeam.equals(attackerTeam))
+				shouldCancel = true;
+			else if (Contained.territoryData.containsKey(check)) {
+				String territoryTeamID = Contained.territoryData.get(check);
+				if (victimTeam.equals(territoryTeamID)) {
+					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID);
+					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize)
+						shouldCancel = true;
+				}
 			}
-			else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer && Contained.configs.playerProtect) {
+			
+			if (shouldCancel) {
 				Util.debugMessage(attacker, "playerProtect");
 				event.setCanceled(true);
 			}
-			else if (event.entityLiving != null && (event.entityLiving instanceof EntityAnimal 
-					|| event.entityLiving instanceof IMerchant
-					|| event.entityLiving instanceof EntityGolem)
-						&& Contained.configs.animalProtect) {
-				Util.debugMessage(attacker, "passiveEntityProtect");
-				event.setCanceled(true);
-			}
+		}
+		else if (event.entityLiving != null && (event.entityLiving instanceof EntityAnimal 
+				|| event.entityLiving instanceof IMerchant
+				|| event.entityLiving instanceof EntityGolem)
+				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
+				.animalDisable) {
+			Util.debugMessage(attacker, "passiveEntityProtect");
+			event.setCanceled(true);
 		}
 	}
 	
 	@SubscribeEvent
 	//Container Protection
 	public void onContainerOpen(PlayerOpenContainerEvent ev) {
-		if (isExempt(ev.entity.worldObj, ev.entityPlayer))
-			return;
-		if (inProtectRange(ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				&& Contained.configs.containerProtect) {
-			Container c = ev.entityPlayer.openContainer;
-			if (c != null && (c instanceof ContainerDispenser
-				|| c instanceof ContainerBrewingStand
-				|| c instanceof ContainerHorseInventory
-				|| c instanceof ContainerFurnace
-				|| c instanceof ContainerChest
-				|| c instanceof ContainerRepair
-				|| c instanceof ContainerEnchantment)) 
-			{
-				Util.debugMessage(ev.entityPlayer, "containerProtect");
-				ev.setResult(Event.Result.DENY);
-			}
+		Container c = ev.entityPlayer.openContainer;
+		if (c != null && isProtectedContainer(c)
+				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.containerDisable) 
+		{
+			Util.debugMessage(ev.entityPlayer, "containerProtect");
+			ev.setResult(Event.Result.DENY);
+		}
+		else if (c != null && c instanceof ContainerChest
+				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.chestDisable) 
+		{
+			Util.debugMessage(ev.entityPlayer, "chestProtect");
+			ev.setResult(Event.Result.DENY);
 		}
 	}
 	
 	@SubscribeEvent
 	//Entity Interaction Protection
 	public void onEntityInteract(EntityInteractEvent ev) {
-		if (isExempt(ev.entity.worldObj, ev.entityPlayer))
-			return;
-		if (inProtectRange(ev.entityPlayer, ev.target.posX, ev.target.posY, ev.target.posZ)
-				&& Contained.configs.interactProtect) {
+		if (getPermissions(ev.entity.worldObj, ev.entityPlayer, ev.target.posX, ev.target.posY, ev.target.posZ)
+				.interactDisable) {
 			Util.debugMessage(ev.entityPlayer, "interactProtect");
 			ev.setCanceled(true);
 		}
@@ -176,10 +241,8 @@ public class ProtectionEvents {
 	@SubscribeEvent
 	//Bucket Protection
 	public void onBucketFill(FillBucketEvent ev) {
-		if (isExempt(ev.world, ev.entityPlayer))
-			return;
-		if (inProtectRange(ev.entityPlayer, ev.target.blockX, ev.target.blockY, ev.target.blockZ)
-				&& Contained.configs.bucketProtect) {
+		if (getPermissions(ev.world, ev.entityPlayer, ev.target.blockX, ev.target.blockY, ev.target.blockZ)
+				.bucketDisable) {
 			Util.debugMessage(ev.entityPlayer, "bucketProtect");
 			ev.setCanceled(true);
 		}
@@ -197,10 +260,8 @@ public class ProtectionEvents {
 	}
 	
 	public boolean pickupProtection(PlayerEvent ev) {
-		if (isExempt(ev.entity.worldObj, ev.entityPlayer))
-			return false;
-		if (inProtectRange(ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ) 
-				&& Contained.configs.itemProtect) {
+		if (getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.itemDisable) {
 			Util.debugMessage(ev.entityPlayer, "pickupProtect");
 			return true;
 		}
@@ -213,9 +274,8 @@ public class ProtectionEvents {
 		if (ev.action == Action.RIGHT_CLICK_BLOCK && !ev.world.isRemote) {
 			Block b = ev.world.getBlock(ev.x, ev.y, ev.z);
 			if (b != null && b instanceof BlockCrops) {
-				if (!isExempt(ev.world, ev.entityPlayer) 
-						&& inProtectRange(ev.entityPlayer, ev.x, ev.y, ev.z) 
-						&& Contained.configs.harvestProtect) {
+				if (getPermissions(ev.world, ev.entityPlayer, ev.x, ev.y, ev.z)
+						.harvestDisable) {
 					Util.debugMessage(ev.entityPlayer, "harvestProtect");
 					return;
 				}
@@ -234,8 +294,8 @@ public class ProtectionEvents {
 	}
 	
 	/**
-	 * Returns whether the current entity (the one performing the action) is currently
-	 * in a region of protected land.
+	 * Returns the territory permissions that the given entity has at the block of land they
+	 * are currently occupying.
 	 * 
 	 * @param ent The entity performing the action
 	 * @param x   The x coordinate of the block/entity being affected by the action
@@ -243,19 +303,21 @@ public class ProtectionEvents {
 	 * @param z   The z coordinate of the block/entity being affected by the action
 	 * @return
 	 */
-	public static boolean inProtectRange(EntityPlayer ent, double x, double y, double z) {
-		if (ent != null) {
+	public static PlayerTeamPermission getPermissions(World w, EntityPlayer ent, double x, double y, double z) {	
+		if (ent != null && !isExempt(w, ent)) {
 			Point check = new Point((int)x, (int)z);
 			if (Contained.territoryData.containsKey(check)) {
-				String teamOwner = Contained.territoryData.get(check);
+				//This player is in owned territory.
 				PlayerTeamIndividual entData = PlayerTeamIndividual.get(ent);
-				if (entData != null && teamOwner.equals(entData.teamID))
-					return false; //This player is in their own team's territory.
-				else
-					return true;  //This player is in another team's territory.
+				PlayerTeam team = PlayerTeam.get(Contained.territoryData.get(check));
+				return team.getPermissions(entData.teamID);  
 			}
 		}
-		return false; //This player is not inside claimed territory.
+		
+		//This player is not inside owned territory.
+		PlayerTeamPermission returnPerm = new PlayerTeamPermission();
+		returnPerm.setAllowAll();
+		return returnPerm; 
 	}
 	
 	/**
@@ -267,6 +329,34 @@ public class ProtectionEvents {
 		if (ent == null)
 			return true;
 		if (ent.capabilities.isCreativeMode && Contained.configs.creativeOverride)
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Does this constitute something that we consider to fall into the
+	 * category of containers that should be protected by the containerDisable
+	 * rule?
+	 */
+	public static boolean isProtectedContainer(Container c) {
+		if (c instanceof ContainerDispenser
+				|| c instanceof ContainerBrewingStand
+				|| c instanceof ContainerHorseInventory
+				|| c instanceof ContainerFurnace
+				|| c instanceof ContainerRepair
+				|| c instanceof ContainerEnchantment
+				|| c instanceof ContainerHopper)
+			return true;
+		return false;
+	}
+	
+	public static boolean isProtectedContainerBlock(Block b) {
+		if (b instanceof BlockDispenser
+				|| b instanceof BlockBrewingStand
+				|| b instanceof BlockFurnace
+				|| b instanceof BlockAnvil
+				|| b instanceof BlockEnchantmentTable
+				|| b instanceof BlockHopper)
 			return true;
 		return false;
 	}

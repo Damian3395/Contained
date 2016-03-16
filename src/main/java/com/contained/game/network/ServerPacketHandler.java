@@ -25,7 +25,6 @@ public class ServerPacketHandler {
 	public static final int OFFSET_XPLEVEL = 3;
 	public static final int INVENTORY_REMOVE = 4;
 	public static final int INVENTORY_ADD = 5;
-	public static final int UPDATE_GUILD_STATUS = 6;
 
 	protected String channelName;
 	protected EntityPlayerMP player;
@@ -61,9 +60,6 @@ public class ServerPacketHandler {
 					ItemStack toSpawn = packet.readItemStack();
 					player.worldObj.spawnEntityInWorld(new EntityItem(player.worldObj, player.posX, player.posY+1, player.posZ, toSpawn));
 				break;
-				
-				case UPDATE_GUILD_STATUS:
-					ExtendedPlayer.get(player).guild = packet.readInt();
 			}
 		}
 	}

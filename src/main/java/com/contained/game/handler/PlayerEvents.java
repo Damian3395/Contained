@@ -107,10 +107,6 @@ public class PlayerEvents {
 					if (stack != null)
 						processNewOwnership(player, stack);
 			}
-			
-			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_STATUS);
-			guildPacket.writeInt(ExtendedPlayer.get(player).guild);
-			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) player);
 		}
 	}
 	

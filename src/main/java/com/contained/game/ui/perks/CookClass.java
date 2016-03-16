@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.ui.ClassPerks;
-import com.contained.game.ui.components.IconButton;
-import com.contained.game.ui.components.ProgressBar;
+import com.contained.game.ui.IconButton;
 
 import net.minecraft.client.gui.GuiButton;
 
@@ -22,8 +21,6 @@ public class CookClass {
 	
 	private IconButton woodHoe, stoneHoe, seeds, ironHoe, fishingRod, apple, carrot;
 	private IconButton goldHoe, diamondHoe, fish, salmon, cake, goldenApple, cookie, goldenCarrot;
-	
-	private ProgressBar cook;
 
 	public CookClass(ClassPerks gui, int cookXP, int level){
 		this.gui = gui;
@@ -37,49 +34,45 @@ public class CookClass {
 		}else if(cookXP < levelThree){
 			nextLevel = levelThree;
 		}
-		
-		cook = new ProgressBar(this.gui.width/2-50, this.gui.height/2+30, ProgressBar.GREEN, cookXP, nextLevel, this.gui.mc);
 	}
 	
 	public List getButtonList(){
-		int x = this.gui.width/2;
-		int y = this.gui.height/2;
-		this.buttonList.add(woodHoe = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 32, "Test"));
+		this.buttonList.add(woodHoe = new IconButton(-1, this.gui.width/2-15, 30, 20, 20, "perkIcons.png", 0, 32));
 		
-		this.buttonList.add(stoneHoe = new IconButton(33, x-75, y-60, 20, 20, "perkIcons.png", 16, 32, "Test"));
-		this.buttonList.add(seeds = new IconButton(34, x+45,y-60, 20, 20, "perkIcons.png", 32, 32, "Test"));
+		this.buttonList.add(stoneHoe = new IconButton(33, this.gui.width/2-75, 60, 20, 20, "perkIcons.png", 16, 32));
+		this.buttonList.add(seeds = new IconButton(34, this.gui.width/2+45, 60, 20, 20, "perkIcons.png", 32, 32));
 		
-		this.buttonList.add(ironHoe = new IconButton(35, x-105, y-30, 20, 20, "perkIcons.png", 48, 32, "Test"));
-		this.buttonList.add(fishingRod = new IconButton(36, x-45, y-30, 20, 20, "perkIcons.png", 64, 32, "Test"));
+		this.buttonList.add(ironHoe = new IconButton(35, this.gui.width/2-105, 90, 20, 20, "perkIcons.png", 48, 32));
+		this.buttonList.add(fishingRod = new IconButton(36, this.gui.width/2-45, 90, 20, 20, "perkIcons.png", 64, 32));
 		
-		this.buttonList.add(apple = new IconButton(37, x+15, y-30, 20, 20, "perkIcons.png", 80, 32, "Test"));
-		this.buttonList.add(carrot = new IconButton(38, x+75, y-30, 20, 20, "perkIcons.png", 96, 32, "Test"));
+		this.buttonList.add(apple = new IconButton(37, this.gui.width/2+15, 90, 20, 20, "perkIcons.png", 80, 32));
+		this.buttonList.add(carrot = new IconButton(38, this.gui.width/2+75, 90, 20, 20, "perkIcons.png", 96, 32));
 
+		this.buttonList.add(goldHoe = new IconButton(39, this.gui.width/2-120, 120, 20, 20, "perkIcons.png", 112, 32));
+		this.buttonList.add(diamondHoe = new IconButton(40, this.gui.width/2-90, 120, 20, 20, "perkIcons.png", 128, 32));
+		this.buttonList.add(fish = new IconButton(41, this.gui.width/2-60, 120, 20, 20, "perkIcons.png", 144, 32));
+		this.buttonList.add(salmon = new IconButton(42, this.gui.width/2-30, 120, 20, 20, "perkIcons.png", 160, 32));
 		
-		this.buttonList.add(goldenCarrot = new IconButton(46, x+90, y, 20, 20, "perkIcons.png", 224, 32, "Test"));
-		this.buttonList.add(cookie = new IconButton(45, x+60, y, 20, 20, "perkIcons.png", 208, 32, "Test"));
-		this.buttonList.add(goldenApple = new IconButton(44, x+30, y, 20, 20, "perkIcons.png", 192, 32, "Test"));
-		this.buttonList.add(cake = new IconButton(43, x, y, 20, 20, "perkIcons.png", 176, 32, "Test"));
-		
-		this.buttonList.add(salmon = new IconButton(42, x-30, y, 20, 20, "perkIcons.png", 160, 32, "Test"));
-		this.buttonList.add(fish = new IconButton(41, x-60, y, 20, 20, "perkIcons.png", 144, 32, "Test"));
-		this.buttonList.add(diamondHoe = new IconButton(40, x-90, y, 20, 20, "perkIcons.png", 128, 32, "Test"));
-		this.buttonList.add(goldHoe = new IconButton(39, x-120, y, 20, 20, "perkIcons.png", 112, 32, "Test"));
-		
+		this.buttonList.add(cake = new IconButton(43, this.gui.width/2, 120, 20, 20, "perkIcons.png", 176, 32));
+		this.buttonList.add(goldenApple = new IconButton(44, this.gui.width/2+30, 120, 20, 20, "perkIcons.png", 192, 32));
+		this.buttonList.add(cookie = new IconButton(45, this.gui.width/2+60, 120, 20, 20, "perkIcons.png", 208, 32));
+		this.buttonList.add(goldenCarrot = new IconButton(46, this.gui.width/2+90, 120, 20, 20, "perkIcons.png", 224, 32));
 		return buttonList;
 	}
 	
 	public void render(){
 		this.gui.mc.fontRenderer.drawStringWithShadow("The Cook", 
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("The Cook")/2),
-				(this.gui.height/2)-100, Color.WHITE.hashCode());
+				20, Color.WHITE.hashCode());
 		this.gui.mc.fontRenderer.drawStringWithShadow("LeveL: " + this.level,
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("LeveL: " + this.level)/2) - 100,
-				gui.height/2+35, Color.WHITE.hashCode());
-		this.gui.mc.fontRenderer.drawStringWithShadow(cookXP + "/" + this.nextLevel,
-				((this.gui.width)/2) - this.gui.mc.fontRenderer.getStringWidth(cookXP + "/" + this.nextLevel)/2 + 80,
-				gui.height/2+35, Color.WHITE.hashCode());
-		cook.render();
+				155, Color.WHITE.hashCode());
+		drawXPBar(this.gui.width/2-55, 150, cookXP, Color.BLUE);
+	}
+	
+	private void drawXPBar(int x, int y, int xp, Color color){
+		this.gui.mc.fontRenderer.drawStringWithShadow(xp + "/" + this.nextLevel, x - this.gui.mc.fontRenderer.getStringWidth(xp + "/" + this.nextLevel) + 160, y+5, Color.WHITE.hashCode());
+		this.gui.mc.currentScreen.drawRect(x, y, x + ((int)(100.0 * ((double)xp/(double)this.nextLevel))), y + 20, color.hashCode());
 	}
 	
 	public void actionPerformed(GuiButton button){

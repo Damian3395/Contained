@@ -55,7 +55,21 @@ public class Contained{
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
 		event.registerServerCommand(new CommandDebugOreGen());
+		event.registerServerCommand(new CommandChangeColor());
+		event.registerServerCommand(new CommandChangeName());
+		event.registerServerCommand(new CommandCreateTeam());
+		event.registerServerCommand(new CommandInvitationAccept());
+		event.registerServerCommand(new CommandInvitationReject());
+		event.registerServerCommand(new CommandInvitationSend());
+		event.registerServerCommand(new CommandInvitationsView());
 		event.registerServerCommand(new CommandTeamChat());
+		event.registerServerCommand(new CommandViewColors());
+		event.registerServerCommand(new CommandViewTeamInfo());
+		event.registerServerCommand(new CommandViewTeams());
+		event.registerServerCommand(new CommandLeaveTeam());
+		event.registerServerCommand(new CommandDemote());
+		event.registerServerCommand(new CommandPromote());
+		event.registerServerCommand(new CommandKickPlayer());
 	}
 	
 	@EventHandler
