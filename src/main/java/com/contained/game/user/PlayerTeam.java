@@ -1,19 +1,25 @@
 package com.contained.game.user;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.contained.game.Contained;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.ui.GuiGuild;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.common.UsernameCache;
 
 /**
  * Represents a group of players which share a common territory.
@@ -23,7 +29,7 @@ public class PlayerTeam {
 	public String id;
 	public String displayName;
 	public HashMap<String, PlayerTeamPermission> permissions;
-	private int colorID; //Index for format codes below
+	public int colorID; //Index for format codes below
 	
 	/*
 	 *  http://minecraft.gamepedia.com/Formatting_codes
@@ -50,6 +56,24 @@ public class PlayerTeam {
 		0xFFFF55,
 		0xFFFFFF
 	};
+	public static final int[] rgbColors = {
+		Color.BLACK.hashCode(),
+		new Color(0,0, 170).hashCode(), //Dark Blue
+		new Color(0, 170, 0).hashCode(), //Dark Green
+		new Color(0, 170, 170).hashCode(), //Dark Aqua
+		new Color(170, 0, 0).hashCode(), //Dark Red
+		new Color(170, 0, 170).hashCode(), //Dark Purple
+		new Color(255, 170, 0).hashCode(), //Gold
+		new Color(170, 170, 170).hashCode(), //Gray
+		new Color(85, 85, 85).hashCode(), //Dark Gray
+		new Color(85, 85, 255).hashCode(), //Blue
+		new Color(85, 255, 85).hashCode(), //Green
+		new Color(85, 255, 255).hashCode(), //Aqua
+		new Color(255, 85, 85).hashCode(), //Red
+		new Color(255, 85, 255).hashCode(), //Light Purple
+		new Color(255, 255, 85).hashCode(), //Yellow
+		Color.WHITE.hashCode()
+	};
 	
 	public PlayerTeam() {
 		this(UUID.randomUUID().toString());
@@ -66,8 +90,6 @@ public class PlayerTeam {
 	public PlayerTeam(String id, String name, int color) {
 		this.id = id;
 		this.displayName = name;
-		this.permissions = new HashMap<String, PlayerTeamPermission>();
-		
 		setColor(color);
 	}
 	
@@ -106,8 +128,8 @@ public class PlayerTeam {
 			Contained.teamInvitations.remove(invite);
 		
 		//Remove any custom permissions involving this team.
-		for (PlayerTeam team : Contained.teamData)
-			team.permissions.remove(this.id);
+				for (PlayerTeam team : Contained.teamData)
+					team.permissions.remove(this.id);
 		
 		//Remove the team.
 		Contained.teamData.remove(this);	
@@ -131,6 +153,53 @@ public class PlayerTeam {
 			}
 		}
 		return ret;
+	}
+	
+	/*
+	 * Gets all of the players from this team both online/offline
+	 */
+	public List getTeamPlayers(String username){
+		List list = new ArrayList<String>();
+		Map<UUID, String> allplayers = UsernameCache.getMap();
+		
+		for(Map.Entry<UUID, String> entry : allplayers.entrySet()){
+			EntityPlayer p = (EntityPlayer) Minecraft.getMinecraft().theWorld.getPlayerEntityByName(entry.getValue());
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+			if(pdata.teamID != null && pdata.teamID.equals(this.id) && !p.getDisplayName().equals(username))
+				list.add(entry.getValue());
+		}
+		
+		return list;
+	}
+	
+	/*
+	 * Gets all of the players that have logged into the server
+	 */
+	public List getPlayersList(String username){
+		List list = new ArrayList<String>();
+		Map<UUID, String> allplayers = UsernameCache.getMap();
+		
+		for(Map.Entry<UUID, String> entry : allplayers.entrySet())
+			if(!entry.getValue().equals(username))
+				list.add(entry.getValue());
+		
+		return list;
+	}
+	
+	/*
+	 * Get all of the players that are not in a team
+	 */
+	public List getLonerList(String username){
+		List list = new ArrayList<String>();
+		Map<UUID, String> allpalyers = UsernameCache.getMap();
+		
+		for(Map.Entry<UUID, String> entry: allpalyers.entrySet()){
+			EntityPlayer p = (EntityPlayer) Minecraft.getMinecraft().theWorld.getPlayerEntityByName(entry.getValue());
+			ExtendedPlayer properties = ExtendedPlayer.get(p);
+			if(!entry.getValue().equals(username) && properties.guild == GuiGuild.LONER)
+				list.add(entry.getValue());
+		}
+		return list;
 	}
 	
 	/**
@@ -235,7 +304,7 @@ public class PlayerTeam {
 		else
 			return this.permissions.get(teamID);
 	}
-		
+	
 	public void writeToNBT(NBTTagCompound ntc) {
 		ntc.setString("id", this.id);
 		ntc.setInteger("color", this.colorID);

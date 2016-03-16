@@ -142,6 +142,13 @@ public class Util {
 	}
 	
 	/**
+	 * Outputs a local error message to the player, in red text.
+	 */
+	public static void displayError(EntityPlayer player, String msg) {
+		player.addChatComponentMessage(new ChatComponentText("§c"+msg));
+	}
+	
+	/**
 	 * Outputs a message to chat, if debug mode is enabled.
 	 */
 	public static void debugMessage(EntityPlayer player, String msg) {

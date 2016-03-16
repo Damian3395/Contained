@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
+import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
@@ -36,6 +38,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int SYNC_TEAMS = 6;
 	public static final int TE_PARTICLE = 7;
 	public static final int TMACHINE_STATE = 8;
+	public static final int GUILD_STATUS = 9;
+	public static final int UPDATE_PERMISSIONS = 10;
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
@@ -66,43 +70,45 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					
 				case FULL_TERRITORY_SYNC:
 					int numBlocks = packet.readInt();
-					render.teamBlocks.clear();
+					Contained.territoryData.clear();
 					for(int i=0; i<numBlocks; i++) {
 						bc = packet.readCoord();
-						render.teamBlocks.put(new Point(bc.x, bc.z), packet.readString());
+						Contained.territoryData.put(new Point(bc.x, bc.z), packet.readString());
 					}
 					render.regenerateEdges();
 				break;
 					
 				case ADD_TERRITORY_BLOCK:
 					bc = packet.readCoord();
-					render.teamBlocks.put(new Point(bc.x, bc.z), packet.readString());
+					Contained.territoryData.put(new Point(bc.x, bc.z), packet.readString());
 					render.regenerateEdges();
 				break;
 				
 				case REMOVE_TERRITORY_BLOCK:
 					bc = packet.readCoord();
-					render.teamBlocks.remove(new Point(bc.x, bc.z));
+					Contained.territoryData.remove(new Point(bc.x, bc.z));
 					render.regenerateEdges();
 				break;
 					
 				case SYNC_TEAMS:
-					int numTeamsBefore = render.teamData.size();
-					render.teamData.clear();
+					int numTeamsBefore = Contained.teamData.size();
+					Contained.teamData.clear();
 					int numTeams = packet.readInt();
-					for(int i=0; i<numTeams; i++)
-						render.teamData.add(new PlayerTeam(packet.readString(), packet.readString(),packet.readInt()));
-				
-					if (render.teamData.size() < numTeamsBefore) {
+					for(int i=0; i<numTeams; i++) {
+						PlayerTeam readTeam = new PlayerTeam(packet.readNBTTagCompound());
+						Contained.teamData.add(readTeam);
+					}
+						
+					if (Contained.teamData.size() < numTeamsBefore) {
 						//Some team got disbanded. Need to remove stale territory blocks.
 						ArrayList<Point> terrToRemove = new ArrayList<Point>();
-						for(Point p : render.teamBlocks.keySet()) {
-							String terrID = render.teamBlocks.get(p);
-							if (PlayerTeam.get(render.teamData, terrID) == null)
+						for(Point p : Contained.territoryData.keySet()) {
+							String terrID = Contained.territoryData.get(p);
+							if (PlayerTeam.get(terrID) == null)
 								terrToRemove.add(p);
 						}
 						for (Point p : terrToRemove)
-							render.teamBlocks.remove(p);
+							Contained.territoryData.remove(p);
 						render.regenerateEdges();
 					}
 				break;
@@ -127,6 +133,16 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						machine.shouldClaim = packet.readBoolean();
 						machine.refreshColor();
 					}
+				break;
+				
+				case GUILD_STATUS:
+					ExtendedPlayer.get(mc.thePlayer).guild = packet.readInt();
+				break;
+				
+				case UPDATE_PERMISSIONS:
+					PlayerTeam team = new PlayerTeam(packet.readNBTTagCompound());					
+					PlayerTeam toModify = PlayerTeam.get(team);
+					toModify.permissions = team.permissions;
 				break;
 			}
 		}
@@ -164,10 +180,18 @@ public class ClientPacketHandler extends ServerPacketHandler {
 		PacketCustom teamPacket = new PacketCustom(Resources.MOD_ID, SYNC_TEAMS);
 		teamPacket.writeInt(teams.size());
 		for(PlayerTeam team : teams) {
-			teamPacket.writeString(team.id);
-			teamPacket.writeString(team.displayName);
-			teamPacket.writeInt(team.getColorID());
+			NBTTagCompound ntc = new NBTTagCompound();
+			team.writeToNBT(ntc);
+			teamPacket.writeNBTTagCompound(ntc);
 		}
 		return teamPacket;
+	}
+	
+	public static PacketCustom packetUpdatePermissions(PlayerTeam toSync) {
+		PacketCustom permPacket = new PacketCustom(Resources.MOD_ID, UPDATE_PERMISSIONS);
+		NBTTagCompound teamData = new NBTTagCompound();
+		toSync.writeToNBT(teamData);
+		permPacket.writeNBTTagCompound(teamData);
+		return permPacket;
 	}
 }

@@ -8,10 +8,12 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.packet.PacketCustom;
 
+import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
 import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -40,22 +42,32 @@ public class GuiTownManage extends GuiContainer {
 	private RenderBlocks renderBlock = new RenderBlocks();
 	private TextureManager texMan;
 	private static final ResourceLocation bg = new ResourceLocation(Resources.MOD_ID, "textures/gui/townhall.png");
-	private int numTabs = 2;
+	private int numTabs = 4;
 	private int selectedTab = 0;
-	private String teamID;
+	private String blockTeamID;  //The ID of the territory this block is occupying.
+	private String playerTeamID; //The team of the player interacting with this block.
+	private int blockTeamInd;
 	
+	// We'll keep a local "offline" copy of the team list for this GUI, because if
+	// any team data changes (especially if a team is removed) on the "online" side,
+	// it can break things badly here.
+	private ArrayList<PlayerTeam> localTeams;
+	private int permTeamInd = -1; //Team to view the permissions on in the permissions tab.
+		
 	private int guiX;
 	private int guiY;
 	private int listX;
 	private int listY;
 	
-	private String[] tabTitles = {"Purchase Territory", "NPC Villagers"};
+	private String[] tabTitles = {"Purchase Territory", "NPC Villagers", "Permissions", "Marketplace"};
 	private ItemStack[] tabItems = {new ItemStack(TerritoryFlag.instance, 1)
-								  , new ItemStack(Items.emerald, 1)};
-	private int[] listCounts = {0, 0};
-	private ItemStack[][] listItems;
-	private int[][] xpCosts;
-	private ItemStack[][] itemCosts;
+								  , new ItemStack(Items.emerald, 1)
+								  , new ItemStack(Items.diamond_pickaxe, 1)
+								  , new ItemStack(Items.gold_ingot, 1)};
+	private int[] listCounts = {0, 0, 0, 0};
+	private ItemStack[][] listItems; //Items to be sold in the given tab.
+	private int[][] xpCosts;         //XP cost of items in the given tab.
+	private ItemStack[][] itemCosts; //Trade cost of the items in the given tab.
 	private ArrayList<String> availableAntiTeams;
 	
 	private float currentScroll = 0f;
@@ -76,13 +88,26 @@ public class GuiTownManage extends GuiContainer {
 	private Rectangle bScrollBg	   = new Rectangle(242, 0, 13, 96);
 	private Rectangle bDivider     = new Rectangle(200, 176, 2, 12);
 	
-	public GuiTownManage(InventoryPlayer inv, TownManageTE te, String teamID) {
+	private int tabTerritory = 0;
+	private int tabNPC = 1;
+	private int tabPermission = 2;
+	private int tabMarket = 3;
+	
+	public GuiTownManage(InventoryPlayer inv, TownManageTE te, String blockTeamID, String playerTeamID) {
 		super(new ContainerTownHall(inv, te));
 		
-		if (teamID == null)
-			this.teamID = "";
-		else
-			this.teamID = teamID;
+		this.blockTeamID = blockTeamID;
+		this.playerTeamID = playerTeamID;
+		this.localTeams = new ArrayList<PlayerTeam>(Contained.teamData);
+		
+		if (this.blockTeamID != null) {
+			for(int i=0; i<localTeams.size(); i++) {
+				if (localTeams.get(i).id.equals(this.blockTeamID)) {
+					this.blockTeamInd = i;
+					break;
+				}
+			}
+		}
 		
 		availableAntiTeams = new ArrayList<String>();
 		for(ItemStack item : inv.mainInventory) {
@@ -90,7 +115,7 @@ public class GuiTownManage extends GuiContainer {
 			if (!(item.getItem() instanceof ItemTerritory.AntiTerritoryGem)) continue;
 			NBTTagCompound itemData = Data.getTagCompound(item);	
 			String team = itemData.getString("teamOwner");
-			if (team != null && !team.equals("") && !availableAntiTeams.contains(team) && !team.equals(this.teamID))
+			if (team != null && this.blockTeamID != null && !team.equals("") && !availableAntiTeams.contains(team) && !team.equals(this.blockTeamID))
 				availableAntiTeams.add(team);
 		}
 	}
@@ -106,44 +131,61 @@ public class GuiTownManage extends GuiContainer {
 		this.xSize = bBg.width;
 		this.ySize = bBg.height;
 		
-		int maxLen = 0;
-		listCounts[0] = 4+availableAntiTeams.size();
-		for(int i : listCounts) {
-			if (i > maxLen)
-				maxLen = i;
-		}
-		listItems = new ItemStack[numTabs][maxLen];
-		xpCosts = new int[numTabs][maxLen];
-		itemCosts = new ItemStack[numTabs][maxLen];
-	
-		listItems[0][0] = new ItemStack(ItemTerritory.addTerritory, 1);
-		listItems[0][1] = new ItemStack(ItemTerritory.addTerritory, 10);
-		listItems[0][2] = new ItemStack(ItemTerritory.removeTerritory, 1);
-		NBTTagCompound itemData = Data.getTagCompound(listItems[0][2]);
-		itemData.setString("teamOwner", teamID);
-		listItems[0][2].setTagCompound(itemData);
-		listItems[0][3] = new ItemStack(TerritoryMachine.instance, 1);
+		if (blockTeamID == null || playerTeamID == null || 
+				!blockTeamID.equals(playerTeamID)) 
+		{
+			// This player is not a member of the team this town hall block
+			// belongs to. Just show permissions instead.
+			tabPermission = 0;
+			tabTerritory = 2;
+			numTabs = 1;
+		} else {
+			// This player is a member of the team this town hall block
+			// belongs to. Show everything.
+			int maxLen = 0;		
+			listCounts[tabTerritory] = 4+availableAntiTeams.size();
+			for(int i : listCounts) {
+				if (i > maxLen)
+					maxLen = i;
+			}
+			listItems = new ItemStack[numTabs][maxLen];
+			xpCosts = new int[numTabs][maxLen];
+			itemCosts = new ItemStack[numTabs][maxLen];
+			listCounts[tabPermission] = localTeams.size()-1;
 		
-		xpCosts[0][0] = 1;
-		xpCosts[0][1] = 8;
-		xpCosts[0][2] = -1;
-		xpCosts[0][3] = 30;
-		
-		itemCosts[0][0] = null;
-		itemCosts[0][1] = null;
-		itemCosts[0][2] = new ItemStack(Items.dye, 4, 4);
-		itemCosts[0][3] = null;
-		
-		for(int i=0; i<availableAntiTeams.size(); i++) {
-			listItems[0][4+i] = new ItemStack(AntiTerritoryMachine.instance, 1);
-			itemData = Data.getTagCompound(listItems[0][4+i]);
-			itemData.setString("teamOwner", availableAntiTeams.get(i));
-			listItems[0][4+i].setTagCompound(itemData);
-			xpCosts[0][4+i] = 30;
-			itemCosts[0][4+i] = new ItemStack(ItemTerritory.removeTerritory, 4);
-			itemData = Data.getTagCompound(itemCosts[0][4+i]);
-			itemData.setString("teamOwner", availableAntiTeams.get(i));
-			itemCosts[0][4+i].setTagCompound(itemData);
+			//Territory Purchase Declarations
+			listItems[tabTerritory][0] = new ItemStack(ItemTerritory.addTerritory, 1);
+			listItems[tabTerritory][1] = new ItemStack(ItemTerritory.addTerritory, 10);
+			listItems[tabTerritory][2] = new ItemStack(ItemTerritory.removeTerritory, 1);
+			NBTTagCompound itemData = Data.getTagCompound(listItems[tabTerritory][2]);
+			if (this.blockTeamID == null)
+				itemData.setString("teamOwner", "");
+			else
+				itemData.setString("teamOwner", this.blockTeamID);
+			listItems[tabTerritory][2].setTagCompound(itemData);
+			listItems[tabTerritory][3] = new ItemStack(TerritoryMachine.instance, 1);
+			
+			xpCosts[tabTerritory][0] = 1;
+			xpCosts[tabTerritory][1] = 8;
+			xpCosts[tabTerritory][2] = -1;
+			xpCosts[tabTerritory][3] = 30;
+			
+			itemCosts[tabTerritory][0] = null;
+			itemCosts[tabTerritory][1] = null;
+			itemCosts[tabTerritory][2] = new ItemStack(Items.dye, 4, 4);
+			itemCosts[tabTerritory][3] = null;
+			
+			for(int i=0; i<availableAntiTeams.size(); i++) {
+				listItems[tabTerritory][4+i] = new ItemStack(AntiTerritoryMachine.instance, 1);
+				itemData = Data.getTagCompound(listItems[tabTerritory][4+i]);
+				itemData.setString("teamOwner", availableAntiTeams.get(i));
+				listItems[tabTerritory][4+i].setTagCompound(itemData);
+				xpCosts[tabTerritory][4+i] = 30;
+				itemCosts[tabTerritory][4+i] = new ItemStack(ItemTerritory.removeTerritory, 4);
+				itemData = Data.getTagCompound(itemCosts[tabTerritory][4+i]);
+				itemData.setString("teamOwner", availableAntiTeams.get(i));
+				itemCosts[tabTerritory][4+i].setTagCompound(itemData);
+			}
 		}
 	}
 	
@@ -200,15 +242,156 @@ public class GuiTownManage extends GuiContainer {
 			String xpStr = ""+mc.thePlayer.experienceLevel;
 			fr.drawString(xpStr, guiX+bBg.width-22-fr.getStringWidth(xpStr), guiY+10, 0x000000);
 		}
-		fr.drawString(tabTitles[selectedTab], guiX+bBg.width/2-fr.getStringWidth(tabTitles[selectedTab])/2+titleXOff, guiY+10, 0x000000);
+		String title = tabTitles[selectedTab];
+		if (permTeamInd != -1)
+			title += " ("+localTeams.get(permTeamInd).displayName+")";
+		fr.drawString(title, guiX+bBg.width/2-fr.getStringWidth(title)/2+titleXOff, guiY+10, 0x000000);
 		
 		//Page Contents
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		if (selectedTab <= 1)
+		if (selectedTab != tabPermission)
 			shopList();
+		else {
+			if (permTeamInd == -1)
+				teamList();
+			else
+				permList(permTeamInd);
+		}
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_LIGHTING);
+	}
+	
+	/**
+	 * Display a list of trades.
+	 */
+	private void shopList() {	
+		FontRenderer fr = this.mc.fontRenderer;
+        int offset = scrollInd();
+        int priceX = calcPriceX();
+    
+		for(int i=offset; i<offset+Math.min(5, listCounts[selectedTab]); i++) {
+			//Hover Selection Highlight
+			int x = listX+4;
+			int y = listY+2+bSelRect.height*(i-offset);
+			texMan.bindTexture(bg);
+			if (!canAfford(i))
+				this.drawTexturedModalRect(listX, y-2, bUnselRect.x, bUnselRect.y, bUnselRect.width, bUnselRect.height);
+			else if (itemHovering == i-offset)
+				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
+			
+			//Item Icon
+			ItemStack stack = listItems[selectedTab][i];
+			if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, x, y)) {
+				texMan.bindTexture(TextureMap.locationItemsTexture);
+				GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, x, y);
+			}
+			GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, x, y);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_ALPHA_TEST);
+			
+			texMan.bindTexture(bg);
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			this.drawTexturedModalRect(priceX-24, y+1, bDivider.x, bDivider.y, bDivider.width, bDivider.height);
+			
+			int itemOff = -16;
+			if (xpCosts[selectedTab][i] == -1)
+				itemOff = 0;
+			else {
+				//XP cost
+				texMan.bindTexture(bg);
+				this.drawTexturedModalRect(priceX, y, bXPOrb.x, bXPOrb.y, bXPOrb.width, bXPOrb.height);
+				fr.drawStringWithShadow(""+xpCosts[selectedTab][i], priceX+8, y+8, 0xFFFFFF);
+			}
+			
+			if (itemCosts[selectedTab][i] != null) {
+				//Item Cost
+				stack = itemCosts[selectedTab][i];
+				if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, priceX+itemOff, y)) {
+					texMan.bindTexture(TextureMap.locationItemsTexture);
+					GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, priceX+itemOff, y);
+				}
+				GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, priceX+itemOff, y);
+				GL11.glDisable(GL11.GL_LIGHTING);
+				GL11.glEnable(GL11.GL_ALPHA_TEST);
+			}
+			
+		}
+        endList();
+	}
+	
+	private void shopHover(int mouseX, int mouseY) {
+		int offset = scrollInd();		
+		for(int i=offset; i<offset+Math.min(5,listCounts[selectedTab]); i++) {
+			int lx = listX+4;
+			int ly = listY+2+bSelRect.height*(i-offset);
+			if (mouseX >= lx && mouseX < lx+16 && mouseY >= ly && mouseY < ly+16) {
+				this.renderToolTip(listItems[selectedTab][i], mouseX, mouseY);
+				break;
+			}
+			
+			int px = calcPriceX();
+			if (mouseX >= px && mouseX < px+16 && mouseY >= ly && mouseY < ly+16) {
+				if (xpCosts[selectedTab][i] != -1)
+					this.drawCreativeTabHoveringText("Experience Level", mouseX, mouseY);
+				else if (itemCosts[selectedTab][i] != null)
+					this.renderToolTip(itemCosts[selectedTab][i], mouseX, mouseY);
+			}
+			if (mouseX >= px-16 && mouseX < px && mouseY >= ly && mouseY < ly+16) {
+				if (itemCosts[selectedTab][i] != null && xpCosts[selectedTab][i] != -1)
+					this.renderToolTip(itemCosts[selectedTab][i], mouseX, mouseY);
+			}
+		}
+	}
+	
+	private void shopClick(int mouseX, int mouseY) {
+		attemptPurchase(scrollInd()+itemHovering);
+	}
+	
+	/**
+	 * Display a list of all teams (excluding your own)
+	 */
+	private void teamList() {
+		FontRenderer fr = this.mc.fontRenderer;
+        int offset = scrollInd();
+        
+        for(int i=offset; i<offset+Math.min(5, listCounts[selectedTab]); i++) {
+			int x = listX+4;
+			int y = listY+2+bSelRect.height*(i-offset);
+        	int ind = i;
+        	if (ind >= this.blockTeamInd)
+        		ind++;
+        	
+			//Hover Selection Highlight
+			texMan.bindTexture(bg);
+			if (itemHovering == i-offset)
+				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
+        
+			//Team Name
+			PlayerTeam team = localTeams.get(ind);
+			fr.drawString(team.getFormatCode()+team.displayName, x, y+4, 0xFFFFFF);
+        }
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        endList();
+	}
+	
+	private void teamClick(int mouseX, int mouseY) {
+		int ind = scrollInd()+itemHovering;
+		if (ind >= this.blockTeamInd)
+			ind++;
+		
+		this.permTeamInd = ind;
+	}
+	
+	/**
+	 * Display a list of permissions for the given team
+	 */
+	private void permList(int teamInd) {
+		
+	}
+	
+	private void permClick(int mouseX, int mouseY) {
+		
 	}
 	
 	private int scrollInd() {
@@ -267,61 +450,6 @@ public class GuiTownManage extends GuiContainer {
 		}
 	}
 	
-	private void shopList() {	
-		FontRenderer fr = this.mc.fontRenderer;
-        int offset = scrollInd();
-        int priceX = calcPriceX();
-    
-		for(int i=offset; i<offset+Math.min(5, listCounts[selectedTab]); i++) {
-			//Hover Selection Highlight
-			int x = listX+4;
-			int y = listY+2+bSelRect.height*(i-offset);
-			texMan.bindTexture(bg);
-			if (!canAfford(i))
-				this.drawTexturedModalRect(listX, y-2, bUnselRect.x, bUnselRect.y, bUnselRect.width, bUnselRect.height);
-			else if (itemHovering == i-offset)
-				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
-			
-			//Item Icon
-			ItemStack stack = listItems[selectedTab][i];
-			if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, x, y)) {
-				texMan.bindTexture(TextureMap.locationItemsTexture);
-				GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, x, y);
-			}
-			GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, x, y);
-			GL11.glDisable(GL11.GL_LIGHTING);
-			GL11.glEnable(GL11.GL_ALPHA_TEST);
-			
-			texMan.bindTexture(bg);
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			this.drawTexturedModalRect(priceX-24, y+1, bDivider.x, bDivider.y, bDivider.width, bDivider.height);
-			
-			int itemOff = -16;
-			if (xpCosts[selectedTab][i] == -1)
-				itemOff = 0;
-			else {
-				//XP cost
-				texMan.bindTexture(bg);
-				this.drawTexturedModalRect(priceX, y, bXPOrb.x, bXPOrb.y, bXPOrb.width, bXPOrb.height);
-				fr.drawStringWithShadow(""+xpCosts[selectedTab][i], priceX+8, y+8, 0xFFFFFF);
-			}
-			
-			if (itemCosts[selectedTab][i] != null) {
-				//Item Cost
-				stack = itemCosts[selectedTab][i];
-				if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, priceX+itemOff, y)) {
-					texMan.bindTexture(TextureMap.locationItemsTexture);
-					GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, priceX+itemOff, y);
-				}
-				GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, priceX+itemOff, y);
-				GL11.glDisable(GL11.GL_LIGHTING);
-				GL11.glEnable(GL11.GL_ALPHA_TEST);
-			}
-			
-		}
-        endList();
-	}
-	
 	private void endList() {
 		if (needsScrollBars())
 			return;
@@ -353,8 +481,16 @@ public class GuiTownManage extends GuiContainer {
 		}
 		
 		//Purchase item
-		if (itemHovering != -1)
-			attemptPurchase(scrollInd()+itemHovering);
+		if (itemHovering != -1) {
+			if (selectedTab != tabPermission)
+				shopClick(x, y);
+			else {
+				if (permTeamInd == -1)
+					teamClick(x, y);
+				else
+					permClick(x, y);
+			}
+		}
 	}
 	
 	@Override 
@@ -371,28 +507,9 @@ public class GuiTownManage extends GuiContainer {
 			}
 		}
 		
-		// Hover tips (items & prices)
-		int offset = scrollInd();		
-		for(int i=offset; i<offset+Math.min(5,listCounts[selectedTab]); i++) {
-			int lx = listX+4;
-			int ly = listY+2+bSelRect.height*(i-offset);
-			if (mouseX >= lx && mouseX < lx+16 && mouseY >= ly && mouseY < ly+16) {
-				this.renderToolTip(listItems[selectedTab][i], mouseX, mouseY);
-				break;
-			}
-			
-			int px = calcPriceX();
-			if (mouseX >= px && mouseX < px+16 && mouseY >= ly && mouseY < ly+16) {
-				if (xpCosts[selectedTab][i] != -1)
-					this.drawCreativeTabHoveringText("Experience Level", mouseX, mouseY);
-				else if (itemCosts[selectedTab][i] != null)
-					this.renderToolTip(itemCosts[selectedTab][i], mouseX, mouseY);
-			}
-			if (mouseX >= px-16 && mouseX < px && mouseY >= ly && mouseY < ly+16) {
-				if (itemCosts[selectedTab][i] != null && xpCosts[selectedTab][i] != -1)
-					this.renderToolTip(itemCosts[selectedTab][i], mouseX, mouseY);
-			}
-		}
+		// Hover tips (list contents)
+		if (selectedTab != tabPermission)
+			shopHover(mouseX, mouseY);
 		
 		//Update hover status
 		itemHovering = -1;

@@ -14,6 +14,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineTE;
@@ -107,6 +108,10 @@ public class PlayerEvents {
 					if (stack != null)
 						processNewOwnership(player, stack);
 			}
+			
+			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_STATUS);
+			guildPacket.writeInt(ExtendedPlayer.get(player).guild);
+			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) player);
 		}
 	}
 	
@@ -170,8 +175,7 @@ public class PlayerEvents {
 				if (!Contained.territoryData.containsKey(probe)
 						|| !Contained.territoryData.get(probe).equals(playerData.teamID)) {
 					ev.result = EntityPlayer.EnumStatus.OTHER_PROBLEM;
-					ev.entityPlayer.addChatMessage(new ChatComponentText(
-						"§cYou can only sleep within your team's territory."));
+					Util.displayError(ev.entityPlayer, "You can only sleep within your team's territory.");
 				}
 			}
 		}
