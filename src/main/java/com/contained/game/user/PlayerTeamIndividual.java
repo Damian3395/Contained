@@ -3,10 +3,13 @@ package com.contained.game.user;
 import java.util.ArrayList;
 
 import com.contained.game.Contained;
+import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.util.ErrorCase;
+import com.contained.game.util.Util;
 import com.contained.game.util.ErrorCase.Error;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 
 /**
@@ -64,6 +67,9 @@ public class PlayerTeamIndividual {
 		
 		if (team.numMembers() == 0) {
 			this.isLeader = false;
+			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
+			if (playerServerEnt != null)
+				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 			team.disbandTeam();
 		}
 		
@@ -83,6 +89,10 @@ public class PlayerTeamIndividual {
 		PlayerTeam team = PlayerTeam.get(this.teamID);
 		this.isLeader = true;
 		team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+this.playerName+" is now a leader of this team.");
+		
+		EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
+		if (playerServerEnt != null)
+			Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		
 		return Error.NONE;
 	}
@@ -126,6 +136,10 @@ public class PlayerTeamIndividual {
 			
 			candidate.promote();
 		}
+		
+		EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
+		if (playerServerEnt != null)
+			Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		
 		return Error.NONE;
 	}

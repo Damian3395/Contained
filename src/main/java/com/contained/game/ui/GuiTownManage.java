@@ -14,6 +14,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
 import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -53,17 +54,15 @@ public class GuiTownManage extends GuiContainer {
 	// it can break things badly here.
 	private ArrayList<PlayerTeam> localTeams;
 	private int permTeamInd = -1; //Team to view the permissions on in the permissions tab.
+	private boolean permissionsModified = false;
 		
 	private int guiX;
 	private int guiY;
 	private int listX;
 	private int listY;
 	
-	private String[] tabTitles = {"Purchase Territory", "NPC Villagers", "Permissions", "Marketplace"};
-	private ItemStack[] tabItems = {new ItemStack(TerritoryFlag.instance, 1)
-								  , new ItemStack(Items.emerald, 1)
-								  , new ItemStack(Items.diamond_pickaxe, 1)
-								  , new ItemStack(Items.gold_ingot, 1)};
+	private String[] tabTitles;
+	private ItemStack[] tabItems;
 	private int[] listCounts = {0, 0, 0, 0};
 	private ItemStack[][] listItems; //Items to be sold in the given tab.
 	private int[][] xpCosts;         //XP cost of items in the given tab.
@@ -123,6 +122,7 @@ public class GuiTownManage extends GuiContainer {
 	@Override
 	public void initGui() {
 		super.initGui();
+		permissionsModified = false;
 		texMan = this.mc.getTextureManager();
 		guiX = (this.width-bBg.width)/2;
 		guiY = (int)((float)(this.height-bBg.height)*0.3f);
@@ -138,7 +138,16 @@ public class GuiTownManage extends GuiContainer {
 			// belongs to. Just show permissions instead.
 			tabPermission = 0;
 			tabTerritory = 2;
-			numTabs = 1;
+			if (playerTeamID == null)
+				this.permTeamInd = -2; //Default permissions
+			else {
+				for(int i=0; i<localTeams.size(); i++) {
+					if (localTeams.get(i).id.equals(this.playerTeamID)) {
+						this.permTeamInd = i;
+						break;
+					}
+				}
+			}
 		} else {
 			// This player is a member of the team this town hall block
 			// belongs to. Show everything.
@@ -187,6 +196,33 @@ public class GuiTownManage extends GuiContainer {
 				itemCosts[tabTerritory][4+i].setTagCompound(itemData);
 			}
 		}
+		
+		tabTitles = new String[numTabs];
+		tabTitles[tabTerritory] = "Purchase Territory";
+		tabTitles[tabNPC] = "NPC Villagers";
+		tabTitles[tabPermission] = "Permissions";
+		tabTitles[tabMarket] = "Marketplace";
+		
+		tabItems = new ItemStack[numTabs];
+		tabItems[tabTerritory] = new ItemStack(TerritoryFlag.instance, 1);
+		tabItems[tabNPC] = new ItemStack(Items.emerald, 1);
+		tabItems[tabPermission] = new ItemStack(Items.diamond_pickaxe, 1);
+		tabItems[tabMarket] = new ItemStack(Items.gold_ingot, 1);
+		
+		if (blockTeamID == null || playerTeamID == null || 
+				!blockTeamID.equals(playerTeamID)) 
+		{
+			numTabs = 1;
+		}
+	}
+	
+	@Override
+	public void onGuiClosed() {
+		super.onGuiClosed();
+		if (permissionsModified) {
+			PacketCustom packet = ServerPacketHandler.packetUpdatePermissions(localTeams.get(blockTeamInd));
+			ServerPacketHandler.sendToServer(packet.toPacket());
+		}
 	}
 	
 	@Override
@@ -224,27 +260,24 @@ public class GuiTownManage extends GuiContainer {
 			GuiScreen.itemRender.renderIcon(guiX-bound.width+iconOff, guiY+bound.height*i+6, tabItems[i].getIconIndex(), 16, 16);
 		}
 		
-		// Scrollbar
-		texMan.bindTexture(bg);
-		if (needsScrollBars()) {
-			int scrollX = guiX+155;
-			int scrollY1 = listY+1;
-			int scrollY2 = listY+bScrollBg.height-2;
-			this.drawTexturedModalRect(scrollX, listY-1, bScrollBg.x, bScrollBg.y, bScrollBg.width, bScrollBg.height);
-			this.drawTexturedModalRect(scrollX+1, listY+(int)((float)(scrollY2-scrollY1-bScrollSel.height)*this.currentScroll), bScrollSel.x, bScrollSel.y, bScrollSel.width, bScrollSel.height);
-		}
-		
 		// Title Caption
 		int titleXOff = 0;
-		if (selectedTab <= 1) {
+		if (selectedTab == tabTerritory || selectedTab == tabNPC) {
 			titleXOff = -16;	
+			texMan.bindTexture(bg);
 			this.drawTexturedModalRect(guiX+bBg.width-22, guiY+6, bXPOrb.x, bXPOrb.y, bXPOrb.width, bXPOrb.height);
 			String xpStr = ""+mc.thePlayer.experienceLevel;
 			fr.drawString(xpStr, guiX+bBg.width-22-fr.getStringWidth(xpStr), guiY+10, 0x000000);
 		}
 		String title = tabTitles[selectedTab];
-		if (permTeamInd != -1)
-			title += " ("+localTeams.get(permTeamInd).displayName+")";
+		if (permTeamInd != -1) {
+			if (permTeamInd >= 0) {
+				PlayerTeam permTeamTitle = localTeams.get(permTeamInd);
+				title += " ("+permTeamTitle.getFormatCode()+permTeamTitle.displayName+"§r)";
+			}
+			else
+				title += " (Defaults)";
+		}
 		fr.drawString(title, guiX+bBg.width/2-fr.getStringWidth(title)/2+titleXOff, guiY+10, 0x000000);
 		
 		//Page Contents
@@ -255,7 +288,17 @@ public class GuiTownManage extends GuiContainer {
 			if (permTeamInd == -1)
 				teamList();
 			else
-				permList(permTeamInd);
+				permList();
+		}
+		
+		// Scrollbar
+		texMan.bindTexture(bg);
+		if (needsScrollBars()) {
+			int scrollX = guiX+155;
+			int scrollY1 = listY+1;
+			int scrollY2 = listY+bScrollBg.height-2;
+			this.drawTexturedModalRect(scrollX, listY-1, bScrollBg.x, bScrollBg.y, bScrollBg.width, bScrollBg.height);
+			this.drawTexturedModalRect(scrollX+1, listY+(int)((float)(scrollY2-scrollY1-bScrollSel.height)*this.currentScroll), bScrollSel.x, bScrollSel.y, bScrollSel.width, bScrollSel.height);
 		}
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -348,50 +391,201 @@ public class GuiTownManage extends GuiContainer {
 		attemptPurchase(scrollInd()+itemHovering);
 	}
 	
+	private void attemptPurchase(int id) {
+		if (canAfford(id)) {
+			if (xpCosts[selectedTab][id] != -1) {
+				mc.thePlayer.experienceLevel -= xpCosts[selectedTab][id];
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.OFFSET_XPLEVEL);
+				packet.writeInt(-xpCosts[selectedTab][id]);
+				ServerPacketHandler.sendToServer(packet.toPacket());
+			}
+			if (itemCosts[selectedTab][id] != null) {
+				Util.removeItem(itemCosts[selectedTab][id], mc.thePlayer);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_REMOVE);
+				packet.writeItemStack(itemCosts[selectedTab][id]);
+				ServerPacketHandler.sendToServer(packet.toPacket());
+			}
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_ADD);
+			packet.writeItemStack(listItems[selectedTab][id]);
+			ServerPacketHandler.sendToServer(packet.toPacket());
+		}
+	}
+	
 	/**
 	 * Display a list of all teams (excluding your own)
 	 */
 	private void teamList() {
+		listCounts[tabPermission] = localTeams.size();
 		FontRenderer fr = this.mc.fontRenderer;
         int offset = scrollInd();
         
         for(int i=offset; i<offset+Math.min(5, listCounts[selectedTab]); i++) {
 			int x = listX+4;
 			int y = listY+2+bSelRect.height*(i-offset);
-        	int ind = i;
+        	int ind = i-1;
         	if (ind >= this.blockTeamInd)
         		ind++;
         	
 			//Hover Selection Highlight
+        	GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			texMan.bindTexture(bg);
 			if (itemHovering == i-offset)
 				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
         
 			//Team Name
-			PlayerTeam team = localTeams.get(ind);
-			fr.drawString(team.getFormatCode()+team.displayName, x, y+4, 0xFFFFFF);
+			if (ind == -1) {
+				fr.drawString("Defaults", x, y+4, 0x000000);
+			} else {
+				PlayerTeam team = localTeams.get(ind);
+				fr.drawString(team.getFormatCode()+team.displayName, x, y+4, 0xFFFFFF);
+			}
         }
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         endList();
 	}
 	
 	private void teamClick(int mouseX, int mouseY) {
-		int ind = scrollInd()+itemHovering;
-		if (ind >= this.blockTeamInd)
-			ind++;
-		
-		this.permTeamInd = ind;
+		int ind = scrollInd()+itemHovering-1;
+		if (ind == -1) {
+			this.permTeamInd = -2; //Default permissions
+			return;
+		} else {
+			if (ind >= this.blockTeamInd)
+				ind++;
+			
+			this.permTeamInd = ind;
+		}
 	}
 	
 	/**
 	 * Display a list of permissions for the given team
 	 */
-	private void permList(int teamInd) {
+	private void permList() {
+		listCounts[tabPermission] = 11;
+		PlayerTeam blockTeam = localTeams.get(blockTeamInd);
+		PlayerTeamPermission perm = null;
+		if (permTeamInd >= 0)
+			perm = blockTeam.permissions.get(localTeams.get(permTeamInd).displayName);
+		if (perm == null)
+			perm = blockTeam.getDefaultPermissions();
 		
+		int indOff = 0;
+		if (playerTeamID == null || !playerTeamID.equals(blockTeamID)) {
+			//Foreign Permission read-only mode: You don't belong to the same team as this
+			//town hall block, so you can only use it to view your permissions within the territory.
+			indOff = -1;
+			listCounts[tabPermission]--;
+		}
+			
+		//0 = back button (if not in foreign permission read-only mode)
+		if (indOff == 0)
+			displayString(0+indOff, "[Back]");		
+		displayPermItem(1+indOff, perm.breakDisable, "Break Blocks");
+		displayPermItem(2+indOff, perm.buildDisable, "Place Blocks");
+		displayPermItem(3+indOff, perm.chestDisable, "Open Chests");
+		displayPermItem(4+indOff, perm.containerDisable, "Interact Containers");
+		displayPermItem(5+indOff, perm.harvestDisable, "Harvest Crops");
+		displayPermItem(6+indOff, perm.bucketDisable, "Scoop Fluids");
+		displayPermItem(7+indOff, perm.itemDisable, "Loot Item Drops");
+		displayPermItem(8+indOff, perm.animalDisable, "Damage Passives");
+		displayPermItem(9+indOff, perm.mobDisable, "Damage Hostiles");
+		displayPermItem(10+indOff, perm.interactDisable, "Interact Entities");
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		endList();
+	}
+	
+	private void displayPermItem(int ind, boolean value, String caption) {
+		FontRenderer fr = this.mc.fontRenderer;
+		int offset = scrollInd();
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+		if (ind < offset || ind >= offset+Math.min(5, listCounts[selectedTab]))
+			return;
+
+		int x = listX+4;
+		int y = listY+2+bSelRect.height*(ind-offset);
+
+		//Hover Selection Highlight
+		if (playerTeamID != null && playerTeamID.equals(blockTeamID) && Contained.isLeader) {
+			texMan.bindTexture(bg);
+			if (itemHovering == ind-offset)
+				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
+		}
+
+		fr.drawString(caption, x, y+4, 0x000000);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		String valueCapt = "§2§lALLOW";
+		if (value)
+			valueCapt = "§4§lDENY";
+		fr.drawString(valueCapt, x+bSelRect.width-bScrollBg.width-fr.getStringWidth(valueCapt)-4, y+4, 0xFFFFFF);
+	}
+	
+	private void displayString(int ind, String caption) {
+		FontRenderer fr = this.mc.fontRenderer;
+		int offset = scrollInd();
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+		if (ind < offset || ind >= offset+Math.min(5, listCounts[selectedTab]))
+			return;
+
+		int x = listX+4;
+		int y = listY+2+bSelRect.height*(ind-offset);
+
+		//Hover Selection Highlight
+		texMan.bindTexture(bg);
+		if (itemHovering == ind-offset)
+			this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
+
+		fr.drawString(caption, x, y+4, 0x000000);	
 	}
 	
 	private void permClick(int mouseX, int mouseY) {
+		int ind = scrollInd()+itemHovering;
+		PlayerTeam blockTeam = localTeams.get(blockTeamInd);
+		PlayerTeamPermission perm = null;
+		if (permTeamInd >= 0) 
+			perm = blockTeam.permissions.get(localTeams.get(permTeamInd).displayName);
+		if (perm == null)
+			perm = blockTeam.getDefaultPermissions();
 		
+		perm = new PlayerTeamPermission(perm);
+		
+		int indOff = 0;
+		if (playerTeamID == null || !playerTeamID.equals(blockTeamID)) {
+			//Foreign Permission read-only mode: You don't belong to the same team as this
+			//town hall block, so you can only use it to view your permissions within the territory.
+			indOff = 1;
+		}
+		if (!Contained.isLeader) {
+			if (ind+indOff > 0)
+				return;
+		}
+		
+		switch(ind+indOff) {
+			case 0: permTeamInd = -1; return;
+			case 1: perm.breakDisable = !perm.breakDisable; break;
+			case 2: perm.buildDisable = !perm.buildDisable; break;
+			case 3: perm.chestDisable = !perm.chestDisable; break;
+			case 4: perm.containerDisable = !perm.containerDisable; break;
+			case 5: perm.harvestDisable = !perm.harvestDisable; break;
+			case 6: perm.bucketDisable = !perm.bucketDisable; break;
+			case 7: perm.itemDisable = !perm.itemDisable; break;
+			case 8: perm.animalDisable = !perm.animalDisable; break;
+			case 9: perm.mobDisable = !perm.mobDisable; break;
+			case 10: perm.interactDisable = !perm.interactDisable; break;
+		}
+		
+		permissionsModified = true;
+		
+		String teamName = null;
+		if (permTeamInd >= 0) 
+			teamName = localTeams.get(permTeamInd).displayName;
+		else
+			teamName = PlayerTeam.getDefaultPermissionsKey();
+		if (!perm.equals(blockTeam.getDefaultPermissions()))
+			blockTeam.permissions.put(teamName, perm);
+		else if (blockTeam.permissions.containsKey(teamName))
+			blockTeam.permissions.remove(teamName);
 	}
 	
 	private int scrollInd() {
@@ -428,26 +622,6 @@ public class GuiTownManage extends GuiContainer {
 				return false;
 		}
 		return true;
-	}
-	
-	private void attemptPurchase(int id) {
-		if (canAfford(id)) {
-			if (xpCosts[selectedTab][id] != -1) {
-				mc.thePlayer.experienceLevel -= xpCosts[selectedTab][id];
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.OFFSET_XPLEVEL);
-				packet.writeInt(-xpCosts[selectedTab][id]);
-				ServerPacketHandler.sendToServer(packet.toPacket());
-			}
-			if (itemCosts[selectedTab][id] != null) {
-				Util.removeItem(itemCosts[selectedTab][id], mc.thePlayer);
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_REMOVE);
-				packet.writeItemStack(itemCosts[selectedTab][id]);
-				ServerPacketHandler.sendToServer(packet.toPacket());
-			}
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_ADD);
-			packet.writeItemStack(listItems[selectedTab][id]);
-			ServerPacketHandler.sendToServer(packet.toPacket());
-		}
 	}
 	
 	private void endList() {
@@ -487,7 +661,7 @@ public class GuiTownManage extends GuiContainer {
 			else {
 				if (permTeamInd == -1)
 					teamClick(x, y);
-				else
+				else 
 					permClick(x, y);
 			}
 		}
@@ -512,9 +686,12 @@ public class GuiTownManage extends GuiContainer {
 			shopHover(mouseX, mouseY);
 		
 		//Update hover status
+		int hoverOffset = 0;
+		if (needsScrollBars())
+			hoverOffset = -bScrollBg.width;
 		itemHovering = -1;
 		for(int i=0; i<5; i++) {
-		if (mouseX >= listX && mouseX < listX+bSelRect.width
+		if (mouseX >= listX && mouseX < listX+bSelRect.width+hoverOffset
 				&& mouseY >= listY+i*bSelRect.height
 				&& mouseY < listY+(i+1)*bSelRect.height) 
 			{

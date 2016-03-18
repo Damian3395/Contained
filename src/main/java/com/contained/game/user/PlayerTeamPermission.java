@@ -27,6 +27,12 @@ public class PlayerTeamPermission {
 		readFromNBT(data);
 	}
 	
+	public PlayerTeamPermission(PlayerTeamPermission perm) {
+		NBTTagCompound ntc = new NBTTagCompound();
+		perm.writeToNBT(ntc);
+		readFromNBT(ntc);
+	}
+
 	//Default permissions.
 	public void setDefault() {
 		this.buildDisable = true;

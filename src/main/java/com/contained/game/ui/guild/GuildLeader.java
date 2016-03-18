@@ -255,6 +255,7 @@ public class GuildLeader {
 			ErrorCase.Error resultP = toPromote.promote();
 			
 			DataLogger.insertPromoteTeamPlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), team.displayName, teammate, Util.getDate());
+			
 			break;
 		case DEMOTE:
 			ErrorCase.Error result = pdata.demote();
@@ -268,7 +269,7 @@ public class GuildLeader {
 				this.gui.guildStatus = GuiGuild.TEAM_PLAYER;
 				this.gui.update = true;
 				
-				DataLogger.insertPromoteTeamPlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), team.displayName, pdata.playerName, Util.getDate());
+				DataLogger.insertDemoteTeamPlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), team.displayName, pdata.playerName, Util.getDate());
 			}
 			break;
 		}

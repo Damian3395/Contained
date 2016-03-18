@@ -47,15 +47,30 @@ public class Contained{
 	GenerateWorld world = new GenerateWorld();
 	ContainedRegistry registry = new ContainedRegistry();
 	
-	public static HashMap<Point, String> territoryData; //coordinates, teamID
-	public static ArrayList<PlayerTeam>  teamData;
-	public static ArrayList<PlayerTeamIndividual> teamMemberData;
-	public static ArrayList<PlayerTeamInvitation> teamInvitations;
+	public static HashMap<Point, String> territoryData; // [SERVER & CLIENT SIDE] coordinates, teamID. Locations of all blocks that are owned by a team.
+	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
+	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE ONLY] all tracked players, online and offline, even those not in teams.
+	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE ONLY] all pending team invitations.
+	public static boolean isLeader = false;             // [CLIENT SIDE ONLY] is the local mc.thePlayer a team leader on the server?
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
 		event.registerServerCommand(new CommandDebugOreGen());
+		event.registerServerCommand(new CommandChangeColor());
+		event.registerServerCommand(new CommandChangeName());
+		event.registerServerCommand(new CommandCreateTeam());
+		event.registerServerCommand(new CommandInvitationAccept());
+		event.registerServerCommand(new CommandInvitationReject());
+		event.registerServerCommand(new CommandInvitationSend());
+		event.registerServerCommand(new CommandInvitationsView());
 		event.registerServerCommand(new CommandTeamChat());
+		event.registerServerCommand(new CommandViewColors());
+		event.registerServerCommand(new CommandViewTeamInfo());
+		event.registerServerCommand(new CommandViewTeams());
+		event.registerServerCommand(new CommandLeaveTeam());
+		event.registerServerCommand(new CommandDemote());
+		event.registerServerCommand(new CommandPromote());
+		event.registerServerCommand(new CommandKickPlayer());
 	}
 	
 	@EventHandler

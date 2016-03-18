@@ -31,11 +31,11 @@ public class GuiHandler implements IGuiHandler {
 			Point check = new Point(x, z);
 			String blockTeam = Contained.territoryData.get(check);
 
-			if (blockTeam == null && !p.worldObj.isRemote) {
+			if (blockTeam == null) {
 				Util.displayError(p, "This block must be within a team's territory to use.");
 			} else {
-				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p); //TODO: Send player's team to town hall
-				return new GuiTownManage(p.inventory, (TownManageTE)te, blockTeam, blockTeam);
+				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
+				return new GuiTownManage(p.inventory, (TownManageTE)te, blockTeam, playerData.teamID);
 			}
 		}
 		return null;

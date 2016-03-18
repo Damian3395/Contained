@@ -90,6 +90,7 @@ public class PlayerTeam {
 	public PlayerTeam(String id, String name, int color) {
 		this.id = id;
 		this.displayName = name;
+		this.permissions = new HashMap<String, PlayerTeamPermission>();
 		setColor(color);
 	}
 	
@@ -158,8 +159,8 @@ public class PlayerTeam {
 	/*
 	 * Gets all of the players from this team both online/offline
 	 */
-	public List getTeamPlayers(String username){
-		List list = new ArrayList<String>();
+	public List<String> getTeamPlayers(String username){
+		List<String> list = new ArrayList<String>();
 		Map<UUID, String> allplayers = UsernameCache.getMap();
 		
 		for(Map.Entry<UUID, String> entry : allplayers.entrySet()){
@@ -175,8 +176,8 @@ public class PlayerTeam {
 	/*
 	 * Gets all of the players that have logged into the server
 	 */
-	public List getPlayersList(String username){
-		List list = new ArrayList<String>();
+	public List<String> getPlayersList(String username){
+		List<String> list = new ArrayList<String>();
 		Map<UUID, String> allplayers = UsernameCache.getMap();
 		
 		for(Map.Entry<UUID, String> entry : allplayers.entrySet())
@@ -189,8 +190,8 @@ public class PlayerTeam {
 	/*
 	 * Get all of the players that are not in a team
 	 */
-	public List getLonerList(String username){
-		List list = new ArrayList<String>();
+	public List<String> getLonerList(String username){
+		List<String> list = new ArrayList<String>();
 		Map<UUID, String> allpalyers = UsernameCache.getMap();
 		
 		for(Map.Entry<UUID, String> entry: allpalyers.entrySet()){
@@ -299,10 +300,25 @@ public class PlayerTeam {
 		}
 		else if (!this.permissions.containsKey(teamID)) {
 			//We don't have the requested team stored, return default permissions.
-			return (new PlayerTeamPermission());
+			if (teamID.equals(getDefaultPermissionsKey()))
+				return (new PlayerTeamPermission());
+			else
+				return getDefaultPermissions();
 		}
 		else
 			return this.permissions.get(teamID);
+	}
+	
+	public PlayerTeamPermission getDefaultPermissions() {
+		return getPermissions(getDefaultPermissionsKey());
+	}
+	
+	public void setDefaultPermissions(PlayerTeamPermission perm) {
+		this.permissions.put(getDefaultPermissionsKey(), perm);
+	}
+	
+	public static String getDefaultPermissionsKey() {
+		return "default";
 	}
 	
 	public void writeToNBT(NBTTagCompound ntc) {

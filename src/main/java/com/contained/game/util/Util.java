@@ -2,8 +2,11 @@ package com.contained.game.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import com.contained.game.data.Data;
+import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
@@ -13,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -89,6 +93,23 @@ public class Util {
 	}
 	
 	/**
+	 * Tries to get the given player based on their display name, but only if they're currently online.
+	 * If either the player doesn't exist, or is not currently online, this will return null.
+	 */
+	public static EntityPlayer getOnlinePlayer(String displayName) {
+		@SuppressWarnings("rawtypes")
+		List onlinePlayers = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+		for (Object o : onlinePlayers) {
+			if (o instanceof EntityPlayer) {
+				EntityPlayer onlinePlayer = (EntityPlayer)o;
+				if (onlinePlayer.getDisplayName().toLowerCase().equals(displayName.toLowerCase()))
+					return onlinePlayer;
+			}
+		}	
+		return null;
+	}
+	
+	/**
 	 * Makes the given entity invulnerable or not.
 	 */
 	public static void setEntityInvulnerability(Entity ent, boolean value) {
@@ -134,7 +155,7 @@ public class Util {
 		itemADup.setTagCompound(itemData);
 		
 		itemData = Data.getTagCompound(itemBDup);
-		itemData.removeTag("ower");
+		itemData.removeTag("owner");
 		itemBDup.setTagCompound(itemData);
 		
 		return itemADup.isItemEqual(itemBDup) 

@@ -23,6 +23,7 @@ import com.contained.game.util.Util;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 // TODO: Log Data Events For Creating or Joining Guild, Fix Create Team
 
@@ -270,6 +271,9 @@ public class GuildBase {
 						teamStatus = "Team Successfully Created";
 						teamColorStatus = Color.GREEN;
 						ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
+						EntityPlayer playerServerEnt = Util.getOnlinePlayer(pdata.playerName);
+						if (playerServerEnt != null)
+							Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 						
 						ExtendedPlayer properties = ExtendedPlayer.get(player);
 						properties.guild = GuiGuild.LEADER;

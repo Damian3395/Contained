@@ -71,6 +71,7 @@ public class PlayerEvents {
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
+				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 			}
 		}
 	}

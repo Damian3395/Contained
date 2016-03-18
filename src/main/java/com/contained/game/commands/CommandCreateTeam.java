@@ -9,10 +9,12 @@ import com.contained.game.Contained;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.Util;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 
 /**
@@ -64,6 +66,9 @@ public class CommandCreateTeam implements ICommand {
 							pdata.isLeader = true;
 							out = "You are now the leader of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+".";
 							Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
+							EntityPlayer playerServerEnt = Util.getOnlinePlayer(pdata.playerName);
+							if (playerServerEnt != null)
+								Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 						} else
 							out = "Another team is already using that name.";
 					} else

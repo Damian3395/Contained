@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
@@ -14,6 +15,7 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -40,6 +42,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int TMACHINE_STATE = 8;
 	public static final int GUILD_STATUS = 9;
 	public static final int UPDATE_PERMISSIONS = 10;
+	public static final int LEADER_STATUS = 11;
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
@@ -144,6 +147,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					PlayerTeam toModify = PlayerTeam.get(team);
 					toModify.permissions = team.permissions;
 				break;
+				
+				case LEADER_STATUS:
+					Contained.isLeader = packet.readBoolean();
+				break;
 			}
 		}
 	}
@@ -193,5 +200,11 @@ public class ClientPacketHandler extends ServerPacketHandler {
 		toSync.writeToNBT(teamData);
 		permPacket.writeNBTTagCompound(teamData);
 		return permPacket;
+	}
+
+	public static PacketCustom packetLeaderStatus(EntityPlayer joined) {
+		PacketCustom leaderPacket = new PacketCustom(Resources.MOD_ID, LEADER_STATUS);
+		leaderPacket.writeBoolean(PlayerTeamIndividual.isLeader(joined));
+		return leaderPacket;
 	}
 }
