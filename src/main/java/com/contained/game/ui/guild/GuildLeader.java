@@ -44,8 +44,8 @@ public class GuildLeader {
 	private int x, y;
 	private int selectedColor;
 	
-	private String teamUpdateStatus = "";
-	private Color teamUpdateColor = Color.WHITE;
+	public static String teamUpdateStatus = "";
+	public static Color teamUpdateColor = Color.WHITE;
 	
 	private GuiGuild gui;
 	private GuiTab tabPane;
@@ -84,6 +84,9 @@ public class GuildLeader {
         teamName.setMaxStringLength(50);
         teamName.setText(team.displayName);
         teamName.setFocused(false);
+        
+        teamUpdateStatus = "";
+        teamUpdateColor = Color.GREEN;
 	}
 	
 	public List getButtonList(){
@@ -155,122 +158,72 @@ public class GuildLeader {
 	
 	public void actionPerformed(GuiButton button){
 		String teammate;
+		PacketCustom packet;
+		
 		switch(button.id){
 		case SAVE:
 			String newName = teamName.getText();
 			boolean update = true;
 			if((!newName.isEmpty() && (newName.compareTo(team.displayName) != 0) 
 					|| (selectedColor != team.colorID && !newName.isEmpty()))){
-				for(PlayerTeam t : Contained.teamData) {
-					if (t.displayName.toLowerCase().equals(newName.toLowerCase())) {
-						update = false;
-						break;
-					}
-				}
 				
-				if(update){
-					team.displayName = teamName.getText();
-					team.colorID = selectedColor;
-					teamUpdateStatus = "Changes Saved";
-					teamUpdateColor = Color.GREEN;
-					team.sendMessageToTeam(team.getFormatCode() + "[NOTICE] Team Update: " + team.getFormatCode() + "§l" + team.displayName + team.getFormatCode() +".");
-					Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
-				}else{
-					teamUpdateStatus = "Team Name Taken";
-					teamUpdateColor = Color.RED;
-				}
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_UPDATE);
+				packet.writeString(newName);
+				packet.writeInt(selectedColor);
+				ServerPacketHandler.sendToServer(packet.toPacket());
 			}
 			
-			break;
+		break;
+			
 		case RESET:
 			teamName.setText(team.displayName);
 			teamColor.color = PlayerTeam.rgbColors[team.colorID];
-			break;
+		break;
+			
 		case TEAM_COLOR:
 			if(selectedColor < PlayerTeam.rgbColors.length -1)
 				selectedColor++;
 			else
 				selectedColor = 0;
 			teamColor.color = PlayerTeam.rgbColors[selectedColor];
-			break;
+		break;
+			
 		case DISBAND:
-			team.disbandTeam();
-			EntityPlayer player = (EntityPlayer) this.gui.mc.thePlayer;
-			ExtendedPlayer properties = ExtendedPlayer.get(player);
-			properties.guild = GuiGuild.LONER;
-			this.gui.guildStatus = GuiGuild.LONER;
-			this.gui.update = true;
-			
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.UPDATE_GUILD_STATUS);
-			packet.writeInt(GuiGuild.LONER);
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_DISBAND);
+			packet.writeString(team.id);
 			ServerPacketHandler.sendToServer(packet.toPacket());
-			
-			DataLogger.insertDisbandTeam("debugmod", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), team.displayName, Util.getDate());
-			break;
+		break;
+		
 		case INVITE:
 			String username = findPlayers.getText();
-			if(username.isEmpty())
-				return;
-		
-			PlayerTeamIndividual recipient = PlayerTeamIndividual.get(username);
-			PlayerTeamInvitation newInvite = new PlayerTeamInvitation(recipient.playerName, team.id, PlayerTeamInvitation.FROM);
-			
-			if (Contained.teamInvitations.indexOf(newInvite) == -1) {
-				Contained.teamInvitations.add(newInvite);
-
-				//Send message to invited player to let them know they got an invitation.
-				@SuppressWarnings("rawtypes")
-				List onlinePlayers = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-				for (Object o : onlinePlayers) {
-					if (o instanceof EntityPlayer) {
-						EntityPlayer onlinePlayer = (EntityPlayer)o;
-						PlayerTeamIndividual onlineData = PlayerTeamIndividual.get(onlinePlayer);
-						if (onlinePlayer.getDisplayName().toLowerCase().equals(newInvite.playerName.toLowerCase())) {
-							PlayerTeam teamData = PlayerTeam.get(newInvite.teamID);
-							onlinePlayer.addChatComponentMessage(new ChatComponentText("[*] "+teamData.getFormatCode()+"§l"+teamData.displayName+"§r would like you to join their group."));
-						}
-					}
-				}		
+			if(!username.isEmpty()){
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_INVITE);
+				packet.writeString(username);
+				ServerPacketHandler.sendToServer(packet.toPacket());
 			}
-			
-			DataLogger.insertInvitePlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), username, Util.getDate());
-			break;
+		break;
+		
 		case KICK:
 			teammate = teamPlayers.getText();
-			if(teammate.isEmpty())
-				return;
-			
-			PlayerTeamIndividual toKick = PlayerTeamIndividual.get(teammate);
-			team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+toKick.playerName+" has been kicked from the team.");
-			toKick.leaveTeam();
-			
-			DataLogger.insertKickPlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), toKick.playerName, Util.getDate());
-			break;
+			if(!teammate.isEmpty()){
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_KICK);
+				packet.writeString(teammate);
+				ServerPacketHandler.sendToServer(packet.toPacket());
+			}
+		break;
+		
 		case PROMOTE:
 			teammate = teamPlayers.getText();
-			if(teammate.isEmpty())
-				return;
-			
-			PlayerTeamIndividual toPromote = PlayerTeamIndividual.get(teammate);
-			ErrorCase.Error resultP = toPromote.promote();
-			
-			DataLogger.insertPromoteTeamPlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), team.displayName, teammate, Util.getDate());
+			if(!teammate.isEmpty()){
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_PROMOTE);
+				packet.writeString(teammate);
+				ServerPacketHandler.sendToServer(packet.toPacket());
+			}
 			
 			break;
 		case DEMOTE:
-			ErrorCase.Error result = pdata.demote();
-			if(result == ErrorCase.Error.CANNOT_DEMOTE)
-				System.out.println("You're the only member of this group... you must stay the leader."); //Render This
-			else{
-				team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" is no longer a team leader.");
-				ExtendedPlayer leader = ExtendedPlayer.get(this.gui.mc.thePlayer);
-				
-				leader.guild = GuiGuild.TEAM_PLAYER;
-				this.gui.guildStatus = GuiGuild.TEAM_PLAYER;
-				this.gui.update = true;
-				
-				DataLogger.insertDemoteTeamPlayer("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), team.displayName, pdata.playerName, Util.getDate());
-			}
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_DEMOTE);
+			ServerPacketHandler.sendToServer(packet.toPacket());
 			break;
 		}
 	}

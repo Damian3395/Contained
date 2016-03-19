@@ -28,6 +28,23 @@ public class DataLogger {
 		connectDataBase();
 	}
 	
+	public static void insertPerk(String server, String user, String world, int perkID, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO PERK VALUES (?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, user);
+			preparedStatement.setString(3, world);
+			preparedStatement.setInt(4, perkID);
+			preparedStatement.setString(5, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
 	public static void insertCreateTeam(String server, String user, String world, String team, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
@@ -62,34 +79,36 @@ public class DataLogger {
 		}
 	}
 	
-	public static void insertInvitePlayer(String server, String user, String world, String player, String date){
+	public static void insertInvitePlayer(String server, String user, String world, String player, String team, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO INVITEPLAYER VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO INVITEPLAYER VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
 			preparedStatement.setString(4, player);
-			preparedStatement.setString(5, date);
+			preparedStatement.setString(5, team);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertKickPlayer(String server, String user, String world, String player, String date){
+	public static void insertKickPlayer(String server, String user, String world, String player, String team, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO KICKPLAYER VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO KICKPLAYER VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
 			preparedStatement.setString(4, player);
-			preparedStatement.setString(5, date);
+			preparedStatement.setString(5, team);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();

@@ -73,6 +73,24 @@ public class PlayerEvents {
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
 				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 			}
+			
+			//Guild Status
+			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_INFO);
+			guildPacket.writeInt(ExtendedPlayer.get(joined).guild);
+			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) joined);
+			
+			//Class Perks
+			ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
+			PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PERK_INFO);
+			for(int i = 0; i < 5; i++){
+				if(i < perks.size())
+					perkPacket.writeInt(perks.get(i));
+				else
+					perkPacket.writeInt(-1);
+			}
+			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
+			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
+			Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 		}
 	}
 	
@@ -109,36 +127,6 @@ public class PlayerEvents {
 					if (stack != null)
 						processNewOwnership(player, stack);
 			}
-			
-			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_STATUS);
-			guildPacket.writeInt(ExtendedPlayer.get(player).guild);
-			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) player);
-		}
-	}
-	
-	@SubscribeEvent
-	public void onEntityHurt(LivingHurtEvent event){
-		String damage = event.source.damageType;
-		if(event.entity instanceof EntityPlayer){
-			int occupation = ExtendedPlayer.get((EntityPlayer) event.entity).getOccupationClass();
-			if(occupation == Data.FIGHTER && event.source.isFireDamage())
-				event.setCanceled(true);
-			if(occupation == Data.POTION && event.source.isMagicDamage())
-				event.setCanceled(true);
-			if(occupation == Data.MACHINE && event.source.isExplosion())
-				event.setCanceled(true);
-			if(occupation == Data.FARMING && damage.compareTo("thorns") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.BUILDING && damage.compareTo("fallingBlock") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.FISHING && damage.compareTo("drown") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.COOKING && damage.compareTo("starve") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.MINING && damage.compareTo("fall") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.LUMBER && damage.compareTo("lightingBolt") == 0)
-				event.setCanceled(true);
 		}
 	}
 	

@@ -4,9 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import codechicken.lib.packet.PacketCustom;
+
+import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,10 +56,11 @@ public class GuildPlayer {
 	}
 	
 	public void actionPerformed(GuiButton button){
+		PacketCustom packet;
 		switch(button.id){
 		case LEAVE:
-			pdata.leaveTeam();
-			team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" has left the team.");
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_LEAVE);
+			ServerPacketHandler.sendToServer(packet.toPacket());
 			break;
 		}
 	}

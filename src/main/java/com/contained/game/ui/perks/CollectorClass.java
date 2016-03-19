@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.components.IconButton;
 import com.contained.game.ui.components.ProgressBar;
@@ -13,7 +14,7 @@ import net.minecraft.client.gui.GuiButton;
 public class CollectorClass {
 	private ClassPerks gui;
 	private int collectorXP;
-	private int level;
+	public int level;
 	private int nextLevel;
 	private int levelOne = 2500;
 	private int levelTwo = 5000;
@@ -66,6 +67,8 @@ public class CollectorClass {
 		this.buttonList.add(diamondShovel = new IconButton(12, x-90, y, 20, 20, "perkIcons.png", 144, 0, "Test"));
 		this.buttonList.add(diamondPickAxe = new IconButton(11, x-120, y, 20, 20, "perkIcons.png", 112, 0, "Test"));
 		
+		renderTree();
+		
 		return buttonList;
 	}
 	
@@ -76,13 +79,65 @@ public class CollectorClass {
 		this.gui.mc.fontRenderer.drawStringWithShadow("LeveL: " + this.level,
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("LeveL: " + this.level)/2) - 100,
 				gui.height/2+35, Color.WHITE.hashCode());
-		this.gui.mc.fontRenderer.drawStringWithShadow(this.collectorXP + "/" + this.nextLevel, 
-				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth(this.collectorXP + "/" + this.nextLevel)/2) + 80, 
+		
+		String xp = (this.collectorXP < levelThree) ? this.collectorXP + "/" + this.nextLevel : "MAX";
+		this.gui.mc.fontRenderer.drawStringWithShadow(xp, 
+				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth(xp)/2) + 80, 
 				gui.height/2+35, Color.WHITE.hashCode());
 		collector.render();
 	}
 	
-	public void actionPerformed(GuiButton buton){
-		
+	private void renderTree(){
+		ArrayList<Integer> perks = ExtendedPlayer.get(this.gui.mc.thePlayer).perks;
+		woodenShovel.enabled = false;
+		if(perks.size() >= 2 || collectorXP < levelOne){
+			stonePickAxe.enabled = false;
+			stoneAxe.enabled = false;
+		}
+		if(perks.size() >= 3 || collectorXP < levelTwo){
+			ironPickAxe.enabled = false;
+			ironAxe.enabled = false;
+			goldPickAxe.enabled = false;
+			goldAxe.enabled = false;
+		}else{
+			if(!perks.contains(stonePickAxe.id)){
+				ironPickAxe.enabled = false;
+				ironAxe.enabled = false;
+			}
+			if(!perks.contains(stoneAxe.id)){
+				goldPickAxe.enabled = false;
+				goldAxe.enabled = false;
+			}
+		}
+		if(perks.size() >= 4 || collectorXP < levelThree){
+			diamondAxe.enabled = false;
+			goldShovel.enabled = false;
+			lamp.enabled = false;
+			tree.enabled = false;
+			ladder.enabled = false;
+			bucket.enabled = false;
+			diamondShovel.enabled = false;
+			diamondPickAxe.enabled = false;
+		}else{
+			if(!perks.contains(ironPickAxe.id)){
+				diamondPickAxe.enabled = false;
+				diamondShovel.enabled = false;
+			}
+			
+			if(!perks.contains(ironAxe.id)){
+				bucket.enabled = false;
+				ladder.enabled = false;
+			}
+			
+			if(!perks.contains(goldPickAxe.id)){
+				tree.enabled = false;
+				lamp.enabled = false;
+			}
+			
+			if(!perks.contains(goldAxe.id)){
+				goldShovel.enabled = false;
+				diamondAxe.enabled = false;
+			}
+		}
 	}
 }
