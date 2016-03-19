@@ -41,6 +41,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int SYNC_TEAMS = 6;
 	public static final int TE_PARTICLE = 7;
 	public static final int TMACHINE_STATE = 8;
+<<<<<<< HEAD
 
 	public static final int GUILD_JOIN = 20;
 	public static final int GUILD_LEAVE = 21;
@@ -57,6 +58,27 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int LEVEL_UP = 31;
 	public static final int SELECT_CLASS = 32;
 	public static final int PERK_INFO = 33;
+=======
+	
+	public static final int GUILD_JOIN = 9;
+	public static final int GUILD_LEAVE = 10;
+	public static final int GUILD_CREATE = 11;
+	public static final int GUILD_DISBAND = 12;
+	public static final int GUILD_UPDATE = 13;
+	public static final int PLAYER_INVITE = 14;
+	public static final int PLAYER_DECLINE = 15;
+	public static final int PLAYER_KICK = 16;
+	public static final int PLAYER_PROMOTE = 17;
+	public static final int PLAYER_DEMOTE = 18;
+	public static final int GUILD_INFO = 19;
+	
+	public static final int LEVEL_UP = 20;
+	public static final int SELECT_CLASS = 21;
+	public static final int PERK_INFO = 22;
+	
+	public static final int UPDATE_PERMISSIONS = 23;
+	public static final int LEADER_STATUS = 24;
+>>>>>>> UpdateUI
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
@@ -72,7 +94,11 @@ public class ClientPacketHandler extends ServerPacketHandler {
 		
 		if (channelName.equals(Resources.MOD_ID) && event.packet.getTarget() == Side.CLIENT) {
 			PacketCustom packet = new PacketCustom(event.packet.payload());
+<<<<<<< HEAD
 		
+=======
+			
+>>>>>>> UpdateUI
 			String status;
 			int color;
 			switch(packet.getType()) {
@@ -162,6 +188,108 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						GuildBase.statusInfo = status;
 						GuildBase.statusColor = new Color(color);
 					}
+<<<<<<< HEAD
+=======
+				break;
+				
+				case GUILD_LEAVE:
+					ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LONER;
+					if(mc.currentScreen instanceof GuiGuild)
+						mc.displayGuiScreen(new GuiGuild());
+				break;
+				
+				case GUILD_CREATE:
+					status = packet.readString();
+					color = packet.readInt();
+					if(status.equals("Team Successfully Created")){
+						ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LEADER;
+						mc.displayGuiScreen(new GuiGuild());
+					}else if(mc.currentScreen instanceof GuiGuild){
+						GuildBase.statusInfo = status;
+						GuildBase.statusColor = new Color(color);
+					}
+				break;
+				
+				case GUILD_DISBAND:
+					ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LONER;
+					if(mc.currentScreen instanceof GuiGuild)
+						mc.displayGuiScreen(new GuiGuild());
+				break;
+				
+				case GUILD_UPDATE:
+					status = packet.readString();
+					color = packet.readInt();
+					if(status.equals("Changed Saved")){
+						if(mc.currentScreen instanceof GuiGuild){
+							GuildLeader.teamUpdateStatus = status;
+							GuildLeader.teamUpdateColor = new Color(color);
+						}
+					}
+				break;
+				
+				case PLAYER_INVITE:
+					
+				break;
+				
+				case PLAYER_DECLINE:
+					status = packet.readString();
+					color = packet.readInt();
+					if(status.equals("Invitation has been removed")){
+						if(mc.currentScreen instanceof GuiGuild){
+							GuildBase.invites.remove(GuildBase.currentCol);
+							GuildBase.currentCol = (GuildBase.currentCol < GuildBase.invites.size()) ? GuildBase.currentCol++ : 0;
+						}
+					}else if(mc.currentScreen instanceof GuiGuild){
+						GuildBase.statusInfo = status;
+						GuildBase.statusColor = new Color(color);
+					}
+				break;
+				
+				case PLAYER_KICK:
+					ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LONER;
+					if(mc.currentScreen instanceof GuiGuild)
+						mc.displayGuiScreen(new GuiGuild());
+				break;
+				
+				case PLAYER_PROMOTE:
+					
+				break;
+				
+				case PLAYER_DEMOTE:
+					status = packet.readString();
+					color = packet.readInt();
+					if(status.equals("Successfully Demoted")){
+						ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.TEAM_PLAYER;
+						if(mc.currentScreen instanceof GuiGuild)
+							mc.displayGuiScreen(new GuiGuild());
+					}
+				break;
+				
+				case GUILD_INFO:
+					ExtendedPlayer.get(mc.thePlayer).guild = packet.readInt();
+>>>>>>> UpdateUI
+				break;
+					
+				case LEVEL_UP:
+					ExtendedPlayer.get(mc.thePlayer).occupationLevel = packet.readInt();
+					ExtendedPlayer.get(mc.thePlayer).addPerk(packet.readInt());
+					if(mc.currentScreen instanceof ClassPerks)
+						mc.displayGuiScreen(new ClassPerks());
+				break;
+					
+				case SELECT_CLASS:
+					ExtendedPlayer.get(mc.thePlayer).occupationClass = packet.readInt();
+					if(mc.currentScreen instanceof ClassPerks)
+						mc.displayGuiScreen(new ClassPerks());
+				break;
+				
+				case PERK_INFO:
+					int perkID;
+					for(int i = 0; i < 5; i++)
+						if((perkID = packet.readInt()) != -1)
+							ExtendedPlayer.get(mc.thePlayer).addPerk(perkID);
+					ExtendedPlayer.get(mc.thePlayer).occupationClass = packet.readInt();
+					ExtendedPlayer.get(mc.thePlayer).occupationLevel = packet.readInt();
 				break;
 				
 				case GUILD_LEAVE:

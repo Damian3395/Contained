@@ -39,6 +39,11 @@ public class ServerPacketHandler {
 	
 	public static final int LEVEL_UP = 16;
 	public static final int SELECT_CLASS = 17;
+<<<<<<< HEAD
+=======
+	
+	public static final int UPDATE_PERMISSIONS = 18;
+>>>>>>> UpdateUI
 
 	protected String channelName;
 	protected EntityPlayerMP player;
@@ -46,6 +51,9 @@ public class ServerPacketHandler {
 	private GuildHandler guild = new GuildHandler();
 	private PerkHandler perk = new PerkHandler();
 
+	private GuildHandler guild = new GuildHandler();
+	private PerkHandler perk = new PerkHandler();
+	
 	@SubscribeEvent
 	public void handlePacket(ServerCustomPacketEvent event) {		
 		channelName = event.packet.channel();
@@ -112,6 +120,21 @@ public class ServerPacketHandler {
 				
 				case PLAYER_PROMOTE:
 					guild.promotePlayer(player , packet.readString());
+<<<<<<< HEAD
+=======
+				break;
+				
+				case PLAYER_DEMOTE:
+					guild.demotePlayer(player);
+				break;
+				
+				case LEVEL_UP:
+					perk.levelUp(player, packet.readInt(), packet.readInt());
+				break;
+				
+				case SELECT_CLASS:
+					perk.selectClassOccupation(player, packet.readInt());
+>>>>>>> UpdateUI
 				break;
 				
 				case PLAYER_DEMOTE:

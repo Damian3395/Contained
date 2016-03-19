@@ -124,6 +124,7 @@ public class PlayerEvents {
 				for(ItemStack stack : inventory)
 					if (stack != null)
 						processNewOwnership(player, stack);
+<<<<<<< HEAD
 			}	
 		}
 	}
@@ -151,6 +152,9 @@ public class PlayerEvents {
 				event.setCanceled(true);
 			if(occupation == Data.LUMBER && damage.compareTo("lightingBolt") == 0)
 				event.setCanceled(true);
+=======
+			}
+>>>>>>> UpdateUI
 		}
 	}
 	
