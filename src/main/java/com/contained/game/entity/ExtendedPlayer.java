@@ -2,14 +2,9 @@ package com.contained.game.entity;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import scala.actors.threadpool.Arrays;
-
 import com.contained.game.data.Data;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.GuiGuild;
-import com.mysql.fabric.xmlrpc.base.Array;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -121,6 +116,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.posZ = load.getInteger("posZ");
 		
 		this.guild = load.getInteger("guild");
+		System.out.println("Load Guild Status " + this.guild);
 	}
 
 	@Override
@@ -151,5 +147,6 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("posZ", this.posZ);
 		
 		save.setInteger("guild", this.guild);
+		System.out.println("Save Guild Status " + this.guild);
 	}
 }

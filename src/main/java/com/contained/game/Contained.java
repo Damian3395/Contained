@@ -8,14 +8,10 @@ import com.contained.game.commands.*;
 import com.contained.game.data.DataLogger;
 import com.contained.game.handler.DataEvents;
 import com.contained.game.handler.FMLDataEvents;
+import com.contained.game.handler.PerkEvents;
 import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
 import com.contained.game.handler.WorldEvents;
-import com.contained.game.handler.perks.BuilderEvents;
-import com.contained.game.handler.perks.CollectorEvents;
-import com.contained.game.handler.perks.CookEvents;
-import com.contained.game.handler.perks.WarriorEvents;
-import com.contained.game.handler.perks.WizardEvents;
 import com.contained.game.network.CommonProxy;
 import com.contained.game.ui.GuiHandler;
 import com.contained.game.user.PlayerTeam;
@@ -51,10 +47,11 @@ public class Contained{
 	GenerateWorld world = new GenerateWorld();
 	ContainedRegistry registry = new ContainedRegistry();
 	
-	public static HashMap<Point, String> territoryData; //coordinates, teamID
-	public static ArrayList<PlayerTeam>  teamData;
-	public static ArrayList<PlayerTeamIndividual> teamMemberData;
-	public static ArrayList<PlayerTeamInvitation> teamInvitations;
+	public static HashMap<Point, String> territoryData; // [SERVER & CLIENT SIDE] coordinates, teamID. Locations of all blocks that are owned by a team.
+	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
+	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE ONLY] all tracked players, online and offline, even those not in teams.
+	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE ONLY] all pending team invitations.
+	public static boolean isLeader = false;             // [CLIENT SIDE ONLY] is the local mc.thePlayer a team leader on the server?
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
@@ -72,13 +69,8 @@ public class Contained{
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
 		MinecraftForge.EVENT_BUS.register(new DataEvents());
+		MinecraftForge.EVENT_BUS.register(new PerkEvents());
 		MinecraftForge.EVENT_BUS.register(new ProtectionEvents());
-		
-		MinecraftForge.EVENT_BUS.register(new WarriorEvents());
-		MinecraftForge.EVENT_BUS.register(new WizardEvents());
-		MinecraftForge.EVENT_BUS.register(new CookEvents());
-		MinecraftForge.EVENT_BUS.register(new BuilderEvents());
-		MinecraftForge.EVENT_BUS.register(new CollectorEvents());
 		
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
 		world.init();

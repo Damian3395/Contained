@@ -1,7 +1,11 @@
 package com.contained.game.network;
 
+import java.util.ArrayList;
+
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -13,6 +17,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 
 /**
@@ -39,17 +44,11 @@ public class ServerPacketHandler {
 	
 	public static final int LEVEL_UP = 16;
 	public static final int SELECT_CLASS = 17;
-<<<<<<< HEAD
-=======
 	
 	public static final int UPDATE_PERMISSIONS = 18;
->>>>>>> UpdateUI
 
 	protected String channelName;
 	protected EntityPlayerMP player;
-	
-	private GuildHandler guild = new GuildHandler();
-	private PerkHandler perk = new PerkHandler();
 
 	private GuildHandler guild = new GuildHandler();
 	private PerkHandler perk = new PerkHandler();
@@ -120,8 +119,6 @@ public class ServerPacketHandler {
 				
 				case PLAYER_PROMOTE:
 					guild.promotePlayer(player , packet.readString());
-<<<<<<< HEAD
-=======
 				break;
 				
 				case PLAYER_DEMOTE:
@@ -134,19 +131,26 @@ public class ServerPacketHandler {
 				
 				case SELECT_CLASS:
 					perk.selectClassOccupation(player, packet.readInt());
->>>>>>> UpdateUI
 				break;
 				
-				case PLAYER_DEMOTE:
-					guild.demotePlayer(player);
-				break;
-				
-				case LEVEL_UP:
-					perk.levelUp(player, packet.readInt(), packet.readInt());
-				break;
-				
-				case SELECT_CLASS:
-					perk.selectClassOccupation(player, packet.readInt());
+				case UPDATE_PERMISSIONS:
+					PlayerTeam team = new PlayerTeam(packet.readNBTTagCompound());
+					// Prune out any teams from the permission list that may have
+					// gone defunct between syncing.
+					ArrayList<String> teamPermsToRemove = new ArrayList<String>();
+					for (String teamID : team.permissions.keySet()) {
+						if (PlayerTeam.get(teamID) == null)
+							teamPermsToRemove.add(teamID);
+					}
+					for (String teamID : teamPermsToRemove)
+						team.permissions.remove(teamID);
+					
+					PlayerTeam toModify = PlayerTeam.get(team);
+					toModify.permissions = team.permissions;
+					
+					//Sync new permission data to all clients.
+					PacketCustom sync = ClientPacketHandler.packetUpdatePermissions(toModify);
+					Contained.channel.sendToAll(sync.toPacket());
 				break;
 			}
 		}
@@ -154,5 +158,18 @@ public class ServerPacketHandler {
 
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);
+	}
+	
+	/**
+	 * ====================================
+	 *   Packet Sending Util
+	 * ====================================
+	 */
+	public static PacketCustom packetUpdatePermissions(PlayerTeam toSync) {
+		PacketCustom permPacket = new PacketCustom(Resources.MOD_ID, UPDATE_PERMISSIONS);
+		NBTTagCompound teamData = new NBTTagCompound();
+		toSync.writeToNBT(teamData);
+		permPacket.writeNBTTagCompound(teamData);
+		return permPacket;
 	}
 }

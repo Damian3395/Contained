@@ -14,6 +14,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineTE;
@@ -70,6 +71,7 @@ public class PlayerEvents {
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
+				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 			}
 			
 			//Guild Status
@@ -124,37 +126,7 @@ public class PlayerEvents {
 				for(ItemStack stack : inventory)
 					if (stack != null)
 						processNewOwnership(player, stack);
-<<<<<<< HEAD
-			}	
-		}
-	}
-	
-	@SubscribeEvent
-	public void onEntityHurt(LivingHurtEvent event){
-		String damage = event.source.damageType;
-		if(event.entity instanceof EntityPlayer){
-			int occupation = ExtendedPlayer.get((EntityPlayer) event.entity).getOccupationClass();
-			if(occupation == Data.FIGHTER && event.source.isFireDamage())
-				event.setCanceled(true);
-			if(occupation == Data.POTION && event.source.isMagicDamage())
-				event.setCanceled(true);
-			if(occupation == Data.MACHINE && event.source.isExplosion())
-				event.setCanceled(true);
-			if(occupation == Data.FARMING && damage.compareTo("thorns") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.BUILDING && damage.compareTo("fallingBlock") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.FISHING && damage.compareTo("drown") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.COOKING && damage.compareTo("starve") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.MINING && damage.compareTo("fall") == 0)
-				event.setCanceled(true);
-			if(occupation == Data.LUMBER && damage.compareTo("lightingBolt") == 0)
-				event.setCanceled(true);
-=======
 			}
->>>>>>> UpdateUI
 		}
 	}
 	
@@ -192,8 +164,7 @@ public class PlayerEvents {
 				if (!Contained.territoryData.containsKey(probe)
 						|| !Contained.territoryData.get(probe).equals(playerData.teamID)) {
 					ev.result = EntityPlayer.EnumStatus.OTHER_PROBLEM;
-					ev.entityPlayer.addChatMessage(new ChatComponentText(
-						"§cYou can only sleep within your team's territory."));
+					Util.displayError(ev.entityPlayer, "You can only sleep within your team's territory.");
 				}
 			}
 		}

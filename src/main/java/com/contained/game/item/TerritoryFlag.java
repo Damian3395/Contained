@@ -7,6 +7,7 @@ import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -83,18 +84,15 @@ public class TerritoryFlag {
 				Point toClaim = new Point(x,z);
 				
 				if (playerData.teamID == null) {
-					p.addChatMessage(new ChatComponentText(
-							"§cYou must be in a team to use this item."));
+					Util.displayError(p, "You must be in a team to use this item.");
 					return;
 				} 
 				if (!playerData.isLeader) {
-					p.addChatMessage(new ChatComponentText(
-							"§cOnly team leaders can use this item to claim territory."));
+					Util.displayError(p, "Only team leaders can use this item to claim territory.");
 					return;
 				}
 				if (Contained.territoryData.containsKey(toClaim)) {
-					p.addChatMessage(new ChatComponentText(
-							"§cYou can't claim this area, it already belongs to a team."));
+					Util.displayError(p, "You can't claim this area, it already belongs to a team.");
 					return;
 				}
 				
@@ -104,8 +102,7 @@ public class TerritoryFlag {
 					flagXPCost = 0; //First usage of the flag should be free.
 				
 				if (p.experienceLevel < flagXPCost) {
-					p.addChatMessage(new ChatComponentText(
-							"§cYou need at least "+Contained.configs.flagXPCost+" XP levels to claim the territory."));
+					Util.displayError(p, "You need at least "+Contained.configs.flagXPCost+" XP levels to claim the territory.");
 					return;
 				}
 				
