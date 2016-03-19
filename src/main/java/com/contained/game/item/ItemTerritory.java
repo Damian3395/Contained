@@ -10,7 +10,6 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
 import net.minecraft.block.*;
 import net.minecraft.creativetab.*;
@@ -63,19 +62,22 @@ public class ItemTerritory {
 						canClaim(playerData.teamID, toClaim, probe);
 				
 				if (testClaim == ErrorCase.Error.TEAM_ONLY) {
-					Util.displayError(p, "You must be in a team to use this item.");
+					p.addChatMessage(new ChatComponentText(
+							"§cYou must be in a team to use this item."));
 					return;
 				} 
 				if (testClaim == ErrorCase.Error.ALREADY_OWNED) {
 					String ownedBy = Contained.territoryData.get(toClaim);
 					if (!ownedBy.equals(playerData.teamID)) {
-						Util.displayError(p, "You can't claim this area, it already belongs to a team.");
+						p.addChatMessage(new ChatComponentText(
+								"§cYou can't claim this area, it already belongs to a team."));
 					}
 					return;
 				}
 				if (testClaim == ErrorCase.Error.ADJACENT_ONLY) 
 				{
-					Util.displayError(p, "This item can only claim territory blocks directly adjacent to your team's current territory.");
+					p.addChatMessage(new ChatComponentText(
+							"§cThis item can only claim territory blocks directly adjacent to your team's current territory."));
 					return;
 				}
 				
@@ -117,11 +119,13 @@ public class ItemTerritory {
 							canRemove(teamToRemove, blockToRemove, probe);				
 					
 					if (testRemove == ErrorCase.Error.WRONG_TEAM) {
-						Util.displayError(p, "This item can only remove territory from the team it's linked to.");
+						p.addChatMessage(new ChatComponentText(
+								"§cThis item can only remove territory from the team it's linked to."));
 						return;
 					}
 					if (testRemove == ErrorCase.Error.ADJACENT_ONLY) {
-						Util.displayError(p, "This item can only remove territory at the edge of the team's claimed land.");
+						p.addChatMessage(new ChatComponentText(
+								"§cThis item can only remove territory at the edge of the team's claimed land."));
 						return;
 					}
 					

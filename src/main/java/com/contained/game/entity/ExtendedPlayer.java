@@ -2,9 +2,14 @@ package com.contained.game.entity;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import scala.actors.threadpool.Arrays;
+
 import com.contained.game.data.Data;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.GuiGuild;
+import com.mysql.fabric.xmlrpc.base.Array;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,7 +25,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	private int[] occupationValues = null;
 	public int occupationClass = ClassPerks.NONE;
 	public int occupationLevel = 0;
-	public ArrayList<String> perks = new ArrayList<String>();
+	public ArrayList<Integer> perks = new ArrayList<Integer>();
 	public ArrayList<String> achievements = new ArrayList<String>();
 	public int usedOwnItems = 0;	//# of times player used an item they owned themselves.
 	public int usedOthersItems = 0; //# of times player used an item owned by someone else.
@@ -79,6 +84,11 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.achievements.set(index, val);
 	}
 	
+	public void addPerk(int perkID){
+		if(!perks.contains(perkID))
+			perks.add(perkID);
+	}
+	
 	@Override
 	public void init(Entity entity, World w) {	
 		if(this.getOccupationClass() == 9)
@@ -102,19 +112,15 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 			this.achievements.add(nbt.getString(Integer.toString(i)));
 		}
 		
-		this.perks.clear();
-		list = load.getTagList("perks", Constants.NBT.TAG_COMPOUND);
-		for(int i = 0; i < list.tagCount(); i++){
-			NBTTagCompound nbt = list.getCompoundTagAt(i);
-			this.perks.add(nbt.getString(Integer.toString(i)));
-		}
+		int[] temp = load.getIntArray("perks");
+		for(int i = 0; i < temp.length; i++)
+			perks.add(temp[i]);
 		
 		this.posX = load.getInteger("posX");
 		this.posY = load.getInteger("posY");
 		this.posZ = load.getInteger("posZ");
 		
 		this.guild = load.getInteger("guild");
-		System.out.println("Load Guild Status " + this.guild);
 	}
 
 	@Override
@@ -135,19 +141,15 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		}
 		save.setTag("achievements", list);
 		
-		list = new NBTTagList();
-		for(int i = 0; i < this.perks.size(); i++){
-			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setString(Integer.toString(i), this.perks.get(i));
-			list.appendTag(nbt);
-		}
-		save.setTag("perks", list);
+		int[] temp = new int[perks.size()];
+		for(int i = 0; i < perks.size(); i++)
+			temp[i] = perks.get(i);
+		save.setIntArray("perks", temp);
 		
 		save.setInteger("posX", this.posX);
 		save.setInteger("posY", this.posY);
 		save.setInteger("posZ", this.posZ);
 		
 		save.setInteger("guild", this.guild);
-		System.out.println("Save Guild Status " + this.guild);
 	}
 }

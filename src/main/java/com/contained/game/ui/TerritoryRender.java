@@ -2,11 +2,11 @@ package com.contained.game.ui;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.lwjgl.opengl.GL11;
 
-import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.util.Util;
 
@@ -20,11 +20,15 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class TerritoryRender {
 
 	private final Minecraft mc = Minecraft.getMinecraft(); //Reference to client
+	public ArrayList<PlayerTeam> teamData;
+	public HashMap<Point, String> teamBlocks;
 	public HashMap<TerritoryEdge, String> teamEdges;
 	public PlayerTeam currentTerritory = null;
 	public boolean doRender = true;
 	
 	public TerritoryRender() {
+		this.teamData = new ArrayList<PlayerTeam>();
+		this.teamBlocks = new HashMap<Point, String>();
 		this.teamEdges = new HashMap<TerritoryEdge, String>();
 	}
 	
@@ -68,7 +72,7 @@ public class TerritoryRender {
 		Tessellator tes = Tessellator.instance;
 		
 		for (TerritoryEdge te : teamEdges.keySet()) {
-			PlayerTeam t = PlayerTeam.get(teamEdges.get(te));
+			PlayerTeam t = PlayerTeam.get(this.teamData, teamEdges.get(te));
 			float margin = 0.01f;
 			float alpha = 1f-(Util.euclidDist(te.blockX, te.blockZ, x, z)/128.0f);
 			if (alpha <= 0)
@@ -116,8 +120,8 @@ public class TerritoryRender {
 	 */
 	private PlayerTeam getTerritory(int x, int z) {
 		Point probe = new Point(x, z);
-		if (Contained.territoryData.containsKey(probe))
-			return PlayerTeam.get(Contained.territoryData.get(probe));
+		if (teamBlocks.containsKey(probe))
+			return PlayerTeam.get(this.teamData, teamBlocks.get(probe));
 		return null;
 	}
 	
@@ -128,30 +132,26 @@ public class TerritoryRender {
 	public void regenerateEdges() {
 		teamEdges.clear();
 		Point probe = new Point(0,0);		
-		for (Point p : Contained.territoryData.keySet()) {			
+		for (Point p : teamBlocks.keySet()) {			
 			probe.x = p.x; 
 			probe.y = p.y+1;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.NORTH, p.x, p.y), Contained.territoryData.get(p));
+			if (!teamBlocks.containsKey(probe) || !teamBlocks.get(probe).equals(teamBlocks.get(p)))
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.NORTH, p.x, p.y), teamBlocks.get(p));
 			
 			probe.x = p.x; 
 			probe.y = p.y-1;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.SOUTH, p.x, p.y), Contained.territoryData.get(p));
+			if (!teamBlocks.containsKey(probe) || !teamBlocks.get(probe).equals(teamBlocks.get(p)))
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.SOUTH, p.x, p.y), teamBlocks.get(p));
 			
 			probe.x = p.x-1; 
 			probe.y = p.y;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.WEST, p.x, p.y), Contained.territoryData.get(p));
+			if (!teamBlocks.containsKey(probe) || !teamBlocks.get(probe).equals(teamBlocks.get(p)))
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.WEST, p.x, p.y), teamBlocks.get(p));
 			
 			probe.x = p.x+1; 
 			probe.y = p.y;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.EAST, p.x, p.y), Contained.territoryData.get(p));
+			if (!teamBlocks.containsKey(probe) || !teamBlocks.get(probe).equals(teamBlocks.get(p)))
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.EAST, p.x, p.y), teamBlocks.get(p));
 		}
 	}
 }

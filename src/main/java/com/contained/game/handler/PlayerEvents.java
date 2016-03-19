@@ -14,7 +14,6 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineTE;
@@ -71,8 +70,25 @@ public class PlayerEvents {
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
-				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 			}
+			
+			//Guild Status
+			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_INFO);
+			guildPacket.writeInt(ExtendedPlayer.get(joined).guild);
+			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) joined);
+			
+			//Class Perks
+			ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
+			PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PERK_INFO);
+			for(int i = 0; i < 5; i++){
+				if(i < perks.size())
+					perkPacket.writeInt(perks.get(i));
+				else
+					perkPacket.writeInt(-1);
+			}
+			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
+			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
+			Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 		}
 	}
 	
@@ -108,11 +124,7 @@ public class PlayerEvents {
 				for(ItemStack stack : inventory)
 					if (stack != null)
 						processNewOwnership(player, stack);
-			}
-			
-			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_STATUS);
-			guildPacket.writeInt(ExtendedPlayer.get(player).guild);
-			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) player);
+			}	
 		}
 	}
 	
@@ -176,7 +188,8 @@ public class PlayerEvents {
 				if (!Contained.territoryData.containsKey(probe)
 						|| !Contained.territoryData.get(probe).equals(playerData.teamID)) {
 					ev.result = EntityPlayer.EnumStatus.OTHER_PROBLEM;
-					Util.displayError(ev.entityPlayer, "You can only sleep within your team's territory.");
+					ev.entityPlayer.addChatMessage(new ChatComponentText(
+						"§cYou can only sleep within your team's territory."));
 				}
 			}
 		}

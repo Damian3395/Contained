@@ -23,7 +23,6 @@ import com.contained.game.util.Util;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 // TODO: Log Data Events For Creating or Joining Guild, Fix Create Team
 
@@ -35,7 +34,7 @@ public class GuildBase {
 	private final int CREATE = 4;
 	private final int TEAM_COLOR = 5;
 	
-	private ArrayList<String> invites;
+	public static ArrayList<String> invites;
 	private int currentInvite = 0;
 	
 	private GuiGuild gui;
@@ -46,14 +45,14 @@ public class GuildBase {
 	
 	private GuiTextField teamName;
 	
-	private String statusInfo = "";
-	private Color statusColor = Color.WHITE;
+	public static String statusInfo = "";
+	public static Color statusColor = Color.WHITE;
 	
 	private String teamStatus = "";
 	private Color teamColorStatus = Color.WHITE;
 	
 	private PlayerTeam newTeam;
-	private int currentCol = 0;
+	public static int currentCol = 0;
 	
 	protected List buttonList = new ArrayList();
 	
@@ -73,6 +72,10 @@ public class GuildBase {
         
         newTeam = new PlayerTeam("", 0);
         newTeam.randomColor();
+        
+        statusInfo = "";
+        statusColor = Color.GREEN;
+        currentCol = 0;
 	}
 	
 	public List getButtonList(){
@@ -142,95 +145,17 @@ public class GuildBase {
 		switch(button.id){
 		case JOIN:
 			if(!invites.isEmpty()){
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(this.gui.mc.thePlayer);
-				ArrayList<PlayerTeamInvitation> myInvites
-								= PlayerTeamInvitation.getInvitations(pdata);
-				
-				PlayerTeam matchedTeam = null;
-				PlayerTeamIndividual matchedPlayer = null;
-				
-				String inviteName = invites.get(currentInvite);
-				for(PlayerTeamInvitation inv : myInvites) {
-					PlayerTeam teamData = PlayerTeam.get(inv.teamID);
-					if (teamData != null && ((pdata.isLeader && inv.playerName.toLowerCase().equals(inviteName))
-						|| (!pdata.isLeader && teamData.displayName.toLowerCase().equals(inviteName)))) 
-					{
-						matchedTeam = teamData;
-						matchedPlayer = PlayerTeamIndividual.get(inv.playerName);
-						break;
-					}
-				}
-				
-				//Try to join the player to the team.
-				ErrorCase.Error result = matchedPlayer.joinTeam(matchedTeam.id);
-				if (result == ErrorCase.Error.NOT_EXISTS){
-					statusInfo = "Team No Longer Exists";
-					statusColor = Color.RED;
-				}else if (result == ErrorCase.Error.TEAM_FULL){
-					statusInfo = "Team Is Already Full";
-					statusColor = Color.RED;
-				} else if (result == ErrorCase.Error.NONE) {
-					matchedTeam.sendMessageToTeam(matchedTeam.getFormatCode()
-							+ "[NOTICE] §l"+ matchedPlayer.playerName + "§r"
-							+ matchedTeam.getFormatCode() + " has joined the team!");
-						
-					//Accept successful, remove invitation.
-					ArrayList<PlayerTeamInvitation> toRemove = new ArrayList<PlayerTeamInvitation>();
-					toRemove.add(new PlayerTeamInvitation(matchedPlayer.playerName, matchedTeam.id, PlayerTeamInvitation.NEITHER));
-					Contained.teamInvitations.removeAll(toRemove);
-					
-					statusInfo = "Joined Team";
-					statusColor = Color.GREEN;
-					
-					ExtendedPlayer properties = ExtendedPlayer.get(this.gui.mc.thePlayer);
-					properties.guild = GuiGuild.TEAM_PLAYER;
-					
-					this.gui.guildStatus = GuiGuild.TEAM_PLAYER;
-					this.gui.update = true;
-					
-					PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.UPDATE_GUILD_STATUS);
-					packet.writeInt(GuiGuild.TEAM_PLAYER);
-					ServerPacketHandler.sendToServer(packet.toPacket());
-					
-					DataLogger.insertJoinTeam("debugmode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), matchedTeam.displayName, Util.getDate());
-				}
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_JOIN);
+				packet.writeString(invites.get(currentInvite));
+				ServerPacketHandler.sendToServer(packet.toPacket());
 			}
+			
 			break;
 		case DECLINE:
 			if(!invites.isEmpty()){
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(this.gui.mc.thePlayer);
-				ArrayList<PlayerTeamInvitation> myInvites
-								= PlayerTeamInvitation.getInvitations(pdata);
-				
-				String inviteName = invites.get(currentInvite);
-				PlayerTeamInvitation probe = null;
-				if (pdata.isLeader)
-					probe = new PlayerTeamInvitation(inviteName, "", PlayerTeamInvitation.TO);
-				else {
-					for (PlayerTeam t : Contained.teamData) {
-						if (t.displayName.toLowerCase().equals(inviteName)) {
-							probe = new PlayerTeamInvitation("", t.id, PlayerTeamInvitation.FROM);
-							break;
-						}
-					}
-				}
-				
-				//Try to remove the invitation(s) from the invitations list.
-				ArrayList<PlayerTeamInvitation> toRemove = new ArrayList<PlayerTeamInvitation>();
-				toRemove.add(probe);
-				int beforeSize = Contained.teamInvitations.size();
-				Contained.teamInvitations.removeAll(toRemove);
-				int afterSize = Contained.teamInvitations.size();
-				
-				if (beforeSize != afterSize){
-					statusInfo = "Invitation has been removed.";
-					statusColor = Color.GREEN;
-					if(currentInvite < invites.size()){
-						currentInvite++;
-					}else{
-						currentInvite = 0;
-					}
-				}
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_DECLINE);
+				packet.writeString(invites.get(currentInvite));
+				ServerPacketHandler.sendToServer(packet.toPacket());
 			}
 			break;
 		case NEXT:
@@ -249,47 +174,10 @@ public class GuildBase {
 			String name = teamName.getText();
 			if(!name.isEmpty() && 
 					name.compareTo("Team Name") != 0){
-				EntityPlayer player = (EntityPlayer) this.gui.mc.thePlayer;
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-				
-				if (pdata.teamID == null) {
-					boolean allowedName = true;
-					for(PlayerTeam t : Contained.teamData) {
-						if (t.displayName.toLowerCase().equals(name.toLowerCase())) {
-							allowedName = false;
-							break;
-						}
-					}
-					
-					if (allowedName) {
-						newTeam.displayName = name;
-						newTeam.colorID = currentCol;
-						Contained.teamData.add(newTeam);
-						System.out.println(pdata.joinTeam(newTeam.id).toString());
-						
-						pdata.isLeader = true;
-						teamStatus = "Team Successfully Created";
-						teamColorStatus = Color.GREEN;
-						ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
-						EntityPlayer playerServerEnt = Util.getOnlinePlayer(pdata.playerName);
-						if (playerServerEnt != null)
-							Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
-						
-						ExtendedPlayer properties = ExtendedPlayer.get(player);
-						properties.guild = GuiGuild.LEADER;
-						gui.update = true;
-						gui.guildStatus = GuiGuild.LEADER;
-						
-						PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.UPDATE_GUILD_STATUS);
-						packet.writeInt(GuiGuild.LEADER);
-						ServerPacketHandler.sendToServer(packet.toPacket());
-						
-						DataLogger.insertCreateTeam("debugMode", pdata.playerName, this.gui.mc.theWorld.provider.getDimensionName(), newTeam.displayName, Util.getDate());
-					} else {
-						teamStatus = "Team Name Already In-Use";
-						teamColorStatus = Color.RED;
-					}
-				}
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_CREATE);
+				packet.writeString(name);
+				packet.writeInt(currentCol);
+				ServerPacketHandler.sendToServer(packet.toPacket());
 			}else{
 				teamStatus = "Enter Team Name";
 				teamColorStatus = Color.RED;
@@ -323,24 +211,5 @@ public class GuildBase {
 				if (teamData != null)
 					invites.add(teamData.displayName);
 		}
-	}
-	
-	public void reset(){
-		this.gui.setButtonList(this.getButtonList());
-		
-		getInvites();
-		
-		currentCol = 0;
-		teamColor.color = PlayerTeam.rgbColors[currentCol];
-		
-		teamName.setText("Team Name");
-		newTeam = new PlayerTeam("", 0);
-        newTeam.randomColor();
-        
-        statusInfo = "";
-    	statusColor = Color.WHITE;
-    	
-    	teamStatus = "";
-    	teamColorStatus = Color.WHITE;
 	}
 }

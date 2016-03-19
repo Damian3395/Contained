@@ -1,7 +1,11 @@
 package com.contained.game.ui;
 
+import codechicken.lib.packet.PacketCustom;
+
 import com.contained.game.data.Data;
+import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.ui.components.Container;
 import com.contained.game.ui.perks.BaseClass;
 import com.contained.game.ui.perks.BuilderClass;
@@ -9,6 +13,8 @@ import com.contained.game.ui.perks.CollectorClass;
 import com.contained.game.ui.perks.CookClass;
 import com.contained.game.ui.perks.WarriorClass;
 import com.contained.game.ui.perks.WizardClass;
+import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -152,26 +158,18 @@ public class ClassPerks extends GuiScreen{
 	@Override
 	protected void actionPerformed(GuiButton button){
 		if(!this.update){
-			switch(selectedClass){
-			case NONE:
-				base.actionPerformed(button);
-				break;
-			case COLLECTOR:
-				collector.actionPerformed(button);
-				break;
-			case BUILDER:
-				builder.actionPerformed(button);
-				break;
-			case COOK:
-				cook.actionPerformed(button);
-				break;
-			case WIZARD:
-				wizard.actionPerformed(button);
-				break;
-			case WARRIOR:
-				warrior.actionPerformed(button);
-				break;
+			this.update = true;
+			
+			if(selectedClass == NONE){
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.SELECT_CLASS);
+				packet.writeInt(button.id);
+				ServerPacketHandler.sendToServer(packet.toPacket());
 			}
+			
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.LEVEL_UP);
+			packet.writeInt(button.id);
+			packet.writeInt((ExtendedPlayer.get(this.mc.thePlayer).occupationLevel) + 1);
+			ServerPacketHandler.sendToServer(packet.toPacket());
 		}	
 	}
 	

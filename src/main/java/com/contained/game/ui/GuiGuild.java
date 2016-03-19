@@ -30,7 +30,7 @@ public class GuiGuild extends GuiScreen{
 	private Container guild;
 	
 	public int guildStatus;
-	public boolean update = false;;
+	public static boolean update = false;;
 	
 	@Override
 	public void initGui(){
@@ -182,7 +182,7 @@ public class GuiGuild extends GuiScreen{
 	
 	@Override
 	public void onGuiClosed(){
-		
+
 	}
 	
 	@Override

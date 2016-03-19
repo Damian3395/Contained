@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.components.IconButton;
 import com.contained.game.ui.components.ProgressBar;
@@ -13,14 +14,14 @@ import net.minecraft.client.gui.GuiButton;
 public class BuilderClass {
 	private ClassPerks gui;
 	private int builderXP;
-	private int level;
+	public int level;
 	private int nextLevel;
 	private int levelOne = 2500;
 	private int levelTwo = 5000;
 	private int levelThree = 10000;
 	protected List buttonList = new ArrayList();
 	
-	private IconButton grass, sand, dirt, sandstone, standstoneCurved, cobble, stone;
+	private IconButton grass, sand, dirt, sandstone, sandstoneCurved, cobble, stone;
 	private IconButton iron, brick, stoneBrick, obsidian, furnace, gold, glass, diamond;
 	
 	private ProgressBar builder;
@@ -50,7 +51,7 @@ public class BuilderClass {
 		this.buttonList.add(dirt = new IconButton(20, x+45, y-60, 20, 20, "perkIcons.png", 32, 16, "Test"));
 		
 		this.buttonList.add(sandstone = new IconButton(21, x-105, y-30, 20, 20, "perkIcons.png", 48, 16, "Test"));
-		this.buttonList.add(standstoneCurved = new IconButton(22, x-45, y-30, 20, 20, "perkIcons.png", 64, 16, "Test"));
+		this.buttonList.add(sandstoneCurved = new IconButton(22, x-45, y-30, 20, 20, "perkIcons.png", 64, 16, "Test"));
 		
 		this.buttonList.add(cobble = new IconButton(23, x+15, y-30, 20, 20, "perkIcons.png", 80, 16, "Test"));
 		this.buttonList.add(stone = new IconButton(24, x+75, y-30, 20, 20, "perkIcons.png", 96, 16, "Test"));
@@ -65,6 +66,8 @@ public class BuilderClass {
 		this.buttonList.add(brick = new IconButton(26, x-90, y, 20, 20, "perkIcons.png", 128, 16, "Test"));
 		this.buttonList.add(iron = new IconButton(25, x-120, y, 20, 20, "perkIcons.png", 112, 16, "Test"));
 		
+		renderTree();
+		
 		return buttonList;
 	}
 	
@@ -75,13 +78,65 @@ public class BuilderClass {
 		this.gui.mc.fontRenderer.drawStringWithShadow("LeveL: " + this.level,
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("LeveL: " + this.level)/2) - 100,
 				gui.height/2+35, Color.WHITE.hashCode());
-		this.gui.mc.fontRenderer.drawStringWithShadow(builderXP + "/" + this.nextLevel, 
-				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth(builderXP + "/" + this.nextLevel)/2) + 80,
+		
+		String xp = (this.builderXP < levelThree) ? this.builderXP + "/" + this.nextLevel : "MAX";
+		this.gui.mc.fontRenderer.drawStringWithShadow(xp, 
+				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth(xp)/2) + 80,
 				gui.height/2+35, Color.WHITE.hashCode());
 		builder.render();
 	}
 	
-	public void actionPerformed(GuiButton button){
-		
+	private void renderTree(){
+		ArrayList<Integer> perks = ExtendedPlayer.get(this.gui.mc.thePlayer).perks;
+		grass.enabled = false;
+		if(perks.size() >= 2 || builderXP < levelOne){
+			sand.enabled = false;
+			dirt.enabled = false;
+		}
+		if(perks.size() >= 3 || builderXP < levelTwo){
+			sandstone.enabled = false;
+			sandstoneCurved.enabled = false;
+			cobble.enabled = false;
+			stone.enabled = false;
+		}else{
+			if(!perks.contains(sand.id)){
+				sandstone.enabled = false;
+				sandstoneCurved.enabled = false;
+			}
+			if(!perks.contains(dirt.id)){
+				cobble.enabled = false;
+				stone.enabled = false;
+			}
+		}
+		if(perks.size() >= 4 || builderXP < levelThree){
+			iron.enabled = false;
+			brick.enabled = false;
+			stoneBrick.enabled = false;
+			obsidian.enabled = false;
+			diamond.enabled = false;
+			glass.enabled = false;
+			gold.enabled = false;
+			furnace.enabled = false;
+		}else{
+			if(!perks.contains(sandstone.id)){
+				iron.enabled = false;
+				brick.enabled = false;
+			}
+			
+			if(!perks.contains(sandstoneCurved.id)){
+				stoneBrick.enabled = false;
+				obsidian.enabled = false;
+			}
+			
+			if(!perks.contains(cobble.id)){
+				diamond.enabled = false;
+				glass.enabled = false;
+			}
+			
+			if(!perks.contains(stone.id)){
+				gold.enabled = false;
+				furnace.enabled = false;
+			}
+		}
 	}
 }

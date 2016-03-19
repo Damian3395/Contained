@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.components.ProgressBar;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
 import net.minecraft.client.Minecraft;
@@ -33,7 +35,7 @@ public class BaseClass {
 		this.builderXP = builderXP;
 		this.cookXP = cookXP;
 		this.wizardXP = wizardXP;
-		this.warriorXP = wizardXP;
+		this.warriorXP = warriorXP;
 		
 		int x = gui.width/2-60;
 		int y = gui.height/2;
@@ -91,13 +93,6 @@ public class BaseClass {
 	}
 	
 	public void actionPerformed(GuiButton button){
-		ExtendedPlayer.get(this.gui.mc.thePlayer).setOccupationClass(button.id);
 		
-		PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.UPDATE_CLASS);
-		packet.writeInt(button.id);
-		ServerPacketHandler.sendToServer(packet.toPacket());
-			
-		this.gui.selectedClass = button.id;
-		this.gui.update = true;
 	}
 }
