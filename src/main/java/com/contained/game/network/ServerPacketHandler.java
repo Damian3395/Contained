@@ -46,6 +46,8 @@ public class ServerPacketHandler {
 	public static final int SELECT_CLASS = 17;
 	
 	public static final int UPDATE_PERMISSIONS = 18;
+	
+	public static final int PLAYER_TRADE = 19;
 
 	protected String channelName;
 	protected EntityPlayerMP player;
@@ -151,6 +153,10 @@ public class ServerPacketHandler {
 					//Sync new permission data to all clients.
 					PacketCustom sync = ClientPacketHandler.packetUpdatePermissions(toModify);
 					Contained.channel.sendToAll(sync.toPacket());
+				break;
+				
+				case PLAYER_TRADE:
+					
 				break;
 			}
 		}

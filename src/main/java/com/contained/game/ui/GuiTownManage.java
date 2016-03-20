@@ -15,6 +15,7 @@ import com.contained.game.item.TerritoryFlag;
 import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamPermission;
+import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -54,6 +55,7 @@ public class GuiTownManage extends GuiContainer {
 	// it can break things badly here.
 	private ArrayList<PlayerTeam> localTeams;
 	private int permTeamInd = -1; //Team to view the permissions on in the permissions tab.
+	private int marketInd = -1; //Team to view the market options in the markets tab
 	private boolean permissionsModified = false;
 		
 	private int guiX;
@@ -68,6 +70,8 @@ public class GuiTownManage extends GuiContainer {
 	private int[][] xpCosts;         //XP cost of items in the given tab.
 	private ItemStack[][] itemCosts; //Trade cost of the items in the given tab.
 	private ArrayList<String> availableAntiTeams;
+	private ArrayList<PlayerTrade> myTrades;
+	private ArrayList<PlayerTrade> marketTrades;
 	
 	private float currentScroll = 0f;
 	private boolean isScrolling = false;
@@ -214,6 +218,15 @@ public class GuiTownManage extends GuiContainer {
 		{
 			numTabs = 1;
 		}
+		
+		myTrades = Contained.trades;
+		marketTrades = myTrades;
+		for(PlayerTrade trade : myTrades){
+			if(trade.displayName.equals(this.mc.thePlayer.getDisplayName()))
+				myTrades.add(trade);
+			else
+				marketTrades.add(trade);
+		}
 	}
 	
 	@Override
@@ -270,25 +283,44 @@ public class GuiTownManage extends GuiContainer {
 			fr.drawString(xpStr, guiX+bBg.width-22-fr.getStringWidth(xpStr), guiY+10, 0x000000);
 		}
 		String title = tabTitles[selectedTab];
-		if (permTeamInd != -1) {
-			if (permTeamInd >= 0) {
+		if (permTeamInd != -1 && selectedTab == tabPermission) {
+			if (permTeamInd >= 0 && permTeamInd < this.localTeams.size()) {
 				PlayerTeam permTeamTitle = localTeams.get(permTeamInd);
 				title += " ("+permTeamTitle.getFormatCode()+permTeamTitle.displayName+"§r)";
 			}
 			else
 				title += " (Defaults)";
+		}else if (marketInd != -1 && selectedTab == tabMarket){
+			switch(marketInd){
+			case 0:
+				title += " (Market Offers)";
+				break;
+			case 1:
+				title += " (My Offers)";
+				break;
+			case 2:
+				title += " (Create Offer)";
+				break;
+			}
 		}
 		fr.drawString(title, guiX+bBg.width/2-fr.getStringWidth(title)/2+titleXOff, guiY+10, 0x000000);
 		
 		//Page Contents
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		if (selectedTab != tabPermission)
+		if (selectedTab == this.tabTerritory)
 			shopList();
-		else {
+		else if (selectedTab == tabPermission){
 			if (permTeamInd == -1)
 				teamList();
 			else
 				permList();
+		}else if (selectedTab == this.tabNPC){
+			npcList();
+		}else{
+			if (this.marketInd == -1)
+				marketList();
+			else
+				marketOption();
 		}
 		
 		// Scrollbar
@@ -303,6 +335,116 @@ public class GuiTownManage extends GuiContainer {
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_LIGHTING);
+	}
+	
+	private void npcList(){
+		
+	}
+	
+	private void npcClick(int mouseX, int mouseY){
+		
+	}
+	
+	private void marketList(){
+		listCounts[tabMarket] = 3;
+		
+		int indOff = 0;
+		displayMarketOption(0+indOff, "Find Trade");
+		displayMarketOption(1+indOff, "My Trade Offers");
+		displayMarketOption(2+indOff, "Create New Offer");
+		
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		endList();
+	}
+	
+	private void displayMarketOption(int ind, String caption){
+		FontRenderer fr = this.mc.fontRenderer;
+		int offset = scrollInd();
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		
+		if (ind < offset || ind >= offset+Math.min(5, listCounts[selectedTab]))
+			return;
+		
+		int x = listX+4;
+		int y = listY+2+bSelRect.height*(ind-offset);
+		
+		texMan.bindTexture(bg);
+		if (itemHovering == ind-offset)
+			this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
+		fr.drawString(caption, x, y+4, 0x000000);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+	}
+	
+	private void marketOption(){
+		int indOff = 0;
+		ArrayList<PlayerTrade> trades;
+		int i = 1;
+		switch(marketInd){
+		case 0:
+			listCounts[tabMarket] = marketTrades.size()+1;
+			if (indOff == 0)
+				displayString(0+indOff, "[Back]");
+			for(PlayerTrade trade : marketTrades){
+				displayTradeOffer(indOff+i, trade.offer, trade.request);
+				i++;
+			}
+			break;
+		case 1:
+			listCounts[tabMarket] = myTrades.size()+1;
+			if (indOff == 0)
+				displayString(0+indOff, "[Back]");
+			trades = Contained.trades;
+			for(PlayerTrade trade : trades){
+				displayTradeOffer(indOff+i, trade.offer, trade.request);
+				i++;
+			}
+			break;
+		case 2:
+			listCounts[tabMarket] = 1;
+			if (indOff == 0)
+				displayString(0+indOff, "[Back]");
+			break;
+		}
+		
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		endList();
+	}
+	
+	private void displayTradeOffer(int ind, ItemStack offer, ItemStack request){
+		
+	}
+	
+	private void marketClick(int mouseX, int mouseY){
+		int ind = scrollInd()+itemHovering;
+		int indOff = 0;
+		if(marketInd == -1){
+			switch(ind+indOff){
+			case 0:
+				marketInd = 0;
+				break;
+			case 1:
+				marketInd = 1;
+				break;
+			case 2:
+				marketInd = 2;
+				break;
+			}
+		}else{
+			switch(ind){
+			case 0:
+				if(indOff+ind == 0)
+					marketInd = -1;
+				break;
+			case 1:
+				if(indOff+ind == 0)
+					marketInd = -1;
+				break;
+			case 2:
+				if(indOff+ind == 0)
+					marketInd = -1;
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -450,7 +592,7 @@ public class GuiTownManage extends GuiContainer {
 			this.permTeamInd = -2; //Default permissions
 			return;
 		} else {
-			if (ind >= this.blockTeamInd)
+			if (ind >= this.blockTeamInd && ind < localTeams.size())
 				ind++;
 			
 			this.permTeamInd = ind;
@@ -464,7 +606,7 @@ public class GuiTownManage extends GuiContainer {
 		listCounts[tabPermission] = 11;
 		PlayerTeam blockTeam = localTeams.get(blockTeamInd);
 		PlayerTeamPermission perm = null;
-		if (permTeamInd >= 0)
+		if (permTeamInd >= 0 && permTeamInd < localTeams.size())
 			perm = blockTeam.permissions.get(localTeams.get(permTeamInd).displayName);
 		if (perm == null)
 			perm = blockTeam.getDefaultPermissions();
@@ -543,7 +685,7 @@ public class GuiTownManage extends GuiContainer {
 		int ind = scrollInd()+itemHovering;
 		PlayerTeam blockTeam = localTeams.get(blockTeamInd);
 		PlayerTeamPermission perm = null;
-		if (permTeamInd >= 0) 
+		if (permTeamInd >= 0 && permTeamInd < localTeams.size()) 
 			perm = blockTeam.permissions.get(localTeams.get(permTeamInd).displayName);
 		if (perm == null)
 			perm = blockTeam.getDefaultPermissions();
@@ -578,7 +720,7 @@ public class GuiTownManage extends GuiContainer {
 		permissionsModified = true;
 		
 		String teamName = null;
-		if (permTeamInd >= 0) 
+		if (permTeamInd >= 0 && permTeamInd < localTeams.size()) 
 			teamName = localTeams.get(permTeamInd).displayName;
 		else
 			teamName = PlayerTeam.getDefaultPermissionsKey();
@@ -656,14 +798,17 @@ public class GuiTownManage extends GuiContainer {
 		
 		//Purchase item
 		if (itemHovering != -1) {
-			if (selectedTab != tabPermission)
+			if (selectedTab == tabTerritory)
 				shopClick(x, y);
-			else {
+			else if (selectedTab == tabPermission)
 				if (permTeamInd == -1)
 					teamClick(x, y);
 				else 
 					permClick(x, y);
-			}
+			else if (selectedTab == tabNPC)
+				npcClick(x, y);
+			else
+				marketClick(x, y);
 		}
 	}
 	
@@ -682,7 +827,7 @@ public class GuiTownManage extends GuiContainer {
 		}
 		
 		// Hover tips (list contents)
-		if (selectedTab != tabPermission)
+		if (selectedTab == tabTerritory)
 			shopHover(mouseX, mouseY);
 		
 		//Update hover status

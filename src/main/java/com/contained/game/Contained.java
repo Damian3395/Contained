@@ -21,6 +21,7 @@ import com.contained.game.ui.GuiHandler;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
+import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
 import com.contained.game.world.GenerateWorld;
 
@@ -55,6 +56,7 @@ public class Contained{
 	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
 	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE ONLY] all tracked players, online and offline, even those not in teams.
 	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE ONLY] all pending team invitations.
+	public static ArrayList<PlayerTrade> trades;
 	public static boolean isLeader = false;             // [CLIENT SIDE ONLY] is the local mc.thePlayer a team leader on the server?
 	
 	@EventHandler
@@ -69,6 +71,7 @@ public class Contained{
 		teamData = new ArrayList<PlayerTeam>();
 		teamMemberData = new ArrayList<PlayerTeamIndividual>();
 		teamInvitations = new ArrayList<PlayerTeamInvitation>();
+		trades = new ArrayList<PlayerTrade>();
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());

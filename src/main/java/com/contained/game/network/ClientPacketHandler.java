@@ -65,6 +65,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int UPDATE_PERMISSIONS = 23;
 	public static final int LEADER_STATUS = 24;
 	
+	public static final int PLAYER_TRADE = 25;
+	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
 		this.render = render;
@@ -280,6 +282,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case LEADER_STATUS:
 					Contained.isLeader = packet.readBoolean();
+				break;
+				
+				case PLAYER_TRADE:
+					
 				break;
 			}
 		}
