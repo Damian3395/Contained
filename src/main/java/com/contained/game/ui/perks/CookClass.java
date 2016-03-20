@@ -58,7 +58,7 @@ public class CookClass {
 
 		this.buttonList.add(goldenCarrot = new IconButton(46, x+90, y, 20, 20, "perkIcons.png", 224, 32, "+10% Damage To Players"));
 		this.buttonList.add(cookie = new IconButton(45, x+60, y, 20, 20, "perkIcons.png", 208, 32, "Restore Health"));
-		this.buttonList.add(goldenApple = new IconButton(44, x+30, y, 20, 20, "perkIcons.png", 192, 32, "+10% Damate To Horses"));
+		this.buttonList.add(goldenApple = new IconButton(44, x+30, y, 20, 20, "perkIcons.png", 192, 32, "+10% Damage To Horses"));
 		this.buttonList.add(cake = new IconButton(43, x, y, 20, 20, "perkIcons.png", 176, 32, "Restore Health"));
 		
 		this.buttonList.add(salmon = new IconButton(42, x-30, y, 20, 20, "perkIcons.png", 160, 32, "Potion of Strength"));

@@ -13,6 +13,28 @@
  <icon>TerritoryFlag</icon>
  <jump>1</jump>
 </link>
+<link>
+ <text>Town Hall</text>
+ <icon>townHall</icon>
+ <jump>2</jump>
+</link>
+<link>
+ <text>Territory Gems/Machines</text>
+ <icon>ClaimTerritoryMachine</icon>
+ <jump>3</jump>
+</link>
+<link>
+ <text>Guilds</text>
+ <jump>4</jump>
+</link>
+<link>
+ <text>Occupational Classes</text>
+ <jump>5</jump>
+</link>
+<link>
+ <text>Perks</text>
+ <jump>7</jump>
+</link>
 </page>
 
 <page type="sectionpage">
@@ -33,8 +55,6 @@
 <text>This is an important block that every team should have. It enables the purchasing and managing of various things that will be essential for the growth and success of the players' town.
 
 §lTerritory Purchasing:§r This tab allows you to spend experience levels in order to purchase items that will allow you to expand your team's territory, as well as take over other teams' territories, if you so desire.
-
-§lNPC Management:§r [TODO]
 </text>
 </page>
 
@@ -76,6 +96,137 @@ a player from another team.
  <text>Anti-Territory Machine</text>
  <icon>RemoveTerritoryMachine</icon>
 </item>
+</page>
+
+<page type="sectionpage">
+<title>The Guilds</title>
+<text>§lPress 'G' To Access The Guild Interface§r
+
+Players can either join a guild or create their own. To create a guild, type in a unique name and select a color, then press the 'Create' button. The color you select will be used to highlight territories that you claim and highlight messages from your teammates. Guilds are allowed to have a maximum of 5 players on their teams and players are able to share a private chat log between each other. 
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Guild Leader Pt.1</title>
+<text>A leader of a guild can access three tabs in the guild interface: actions, teammates, and settings tabs.
+
+§lActions Tab:§r This tab allows the leader to access diplomacy actions with other guilds on the server. The leader can also use it to set tasks for the guild members to accomplish to earn experience points for the town hall. Earning experience points will help the your guild purchase NPCs, items, and blocks from the town hall, which can give you advantages over other guilds.
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Guild Leader Pt.2</title>
+<text>§lTeam-mate Tab:§r This tab allows the leader to promote or demote a player in the guild, but the leader can also use it to kick a player out of the guild. If the guild leader demotes himself/herself, then another guild member who was promoted will become the guild leader.
+
+§lSettings Tab:§r If the guild has not reached the maximum members limit, the leader can invite more players into the guild. The leader can also change the teams' name and color.    
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Guild Player</title>
+<text>Guild players have the option to leave the guild they are currently in. They can also accomplish tasks from the quest list that their leader posts to earn xp for their guild.
+§lQuests: TODO§r
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Occupational Classes Pt.1</title>
+<text>§lPress 'P' To Access The Occupations Class Interface§r
+You have the option of selecting a occupational class to specialize in: Collector, Builder, Cook, Wizard, and Warrior. By collecting specific items in the world, you can level up each one of the classes. You will be able to select a total of four different perks, but be wary of the perks you choose because when you select a perk, then you can only select that perks' child perks when leveling up again. It is highly recommended to select an occupation in order to gain advantages over other players and to give guild leaders an incentive to invite you into their guild.
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Occupational Classes Pt.2</title>
+<text>§lCollector Class:§r Mining ores and cutting down trees.
+§lBuilder Class:§r
+Crafting items for buildings, using redstone, pistons, and minecarts.
+§lCook Class:§r Farming, cooking, and fishing.
+§lWizard Class:§r 
+Brewing potions, collecting neither world items, and enchanting items.
+§lWarrior Class:§r Killing players or mobs.
+Symbols:
+(*) When Attacked by Player
+(#) When Attacking Player/Mob
+(~) When Mounted On A Horse
+(!) When Item Held
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Collector Class</title>
+<text>§lPerks:§r
+To Be Added
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Builder Class</title>
+<text>§lPerks:§r
+To be Added
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Cook Class</title>
+<text>§lPerks:§r
+(!) Wooden Hoe: -10% Damage 
+(!) Stone Hoe: -15% Damage
+Seeds: 2x Harvest
+(!) Iron Hoe: +15% Attackl
+(!) Fishing Rod: -15% Damage
+(~) Apple: -10% Damage To Horse
+Carrot: +10% Damage To Animals
+(#) Golden Carrot: +10% Damage
+Cookie: Restore Health
+Golden Apple: +10% Damage To Horse
+Cake: Restore Health
+Salmon: Potion of Strength
+Fish: Potion of Water Breathing
+(!) Diamond Hoe: +25% Damage
+(!) Golden Hoe: -25% Attack
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Wizard Class</title>
+<text>§lPerks:§r 
+Bone: -10% Skeleton Damage
+Enchantment Book: -10% Magical Damage
+(#) Potion: Potion of Swiftness
+Gun Powder: -10% Explosion Damage
+Cauldron: -10% Damage By Witch
+(*) Neither Brick: Potion of Fire Resistance
+(#) Potion Stand: Poton of Strength
+(#) Ender Pearl : Potion of Night Vision
+(*) Ender Eye: Potion of Luck
+(#) Fire: Potion of Invisibility
+(*) Slime: Potion of Leaping
+Spider: +10% Damage on Spiders
+Ghast: +10% Damage on Ghast
+Crystal: +10% Damage on Blaze
+magma: -10% Fire Damage
+</text>
+</page>
+
+<page type="sectionpage">
+<title>Warrior Class</title>
+<text>§lPerks:§r
+Wooden Sword: +10% Attack
+Leather Tunic: -10% Damage
+Stone Sword: +10% Attack
+(~) Iron Horse Armor: -20% Damage to Horse
+Arrow: +5% Damage With Projectiles
+(~) Diamond Horse Armor: -20% Damage To Horse
+(~) Golden Horse Armor: -20% Damage To Horse
+Diamond Sword: +10% Attack
+Diamond Chest Plate: -10% Damage
+Golden Sword: +10% Attack
+Golden Chest Plate: -10% Damage
+Iron Chest Plate: -10% Damage
+Bow: +10% Range
+(~) Saddle: +5% Speed To Horse
+</text>
 </page>
 
 </book>

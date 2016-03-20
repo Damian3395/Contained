@@ -8,10 +8,14 @@ import com.contained.game.commands.*;
 import com.contained.game.data.DataLogger;
 import com.contained.game.handler.DataEvents;
 import com.contained.game.handler.FMLDataEvents;
-import com.contained.game.handler.PerkEvents;
 import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
 import com.contained.game.handler.WorldEvents;
+import com.contained.game.handler.perks.BuilderEvents;
+import com.contained.game.handler.perks.CollectorEvents;
+import com.contained.game.handler.perks.CookEvents;
+import com.contained.game.handler.perks.WarriorEvents;
+import com.contained.game.handler.perks.WizardEvents;
 import com.contained.game.network.CommonProxy;
 import com.contained.game.ui.GuiHandler;
 import com.contained.game.user.PlayerTeam;
@@ -69,7 +73,11 @@ public class Contained{
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
 		MinecraftForge.EVENT_BUS.register(new DataEvents());
-		MinecraftForge.EVENT_BUS.register(new PerkEvents());
+		MinecraftForge.EVENT_BUS.register(new BuilderEvents());
+		MinecraftForge.EVENT_BUS.register(new CollectorEvents());
+		MinecraftForge.EVENT_BUS.register(new CookEvents());
+		MinecraftForge.EVENT_BUS.register(new WizardEvents());
+		MinecraftForge.EVENT_BUS.register(new WarriorEvents());
 		MinecraftForge.EVENT_BUS.register(new ProtectionEvents());
 		
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());

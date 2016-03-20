@@ -57,11 +57,11 @@ public class WizardEvents {
 			if(attacker instanceof EntitySkeleton && perks.contains(BONE))
 				damage -= (damage * 0.1f);
 			if(source.getEntity() instanceof EntityPlayer){
-				if(perks.contains(NEITHER_BRICK) && !player.isPotionActive(8195))
+				if(perks.contains(NEITHER_BRICK) && !player.isPotionActive(8195)) //Potion of Fire Resistance
 					player.addPotionEffect(new PotionEffect(8195, 50));
-				if(perks.contains(SLIME) && !player.isPotionActive(8203))
+				if(perks.contains(SLIME) && !player.isPotionActive(8203)) //Potion of Leaping
 					player.addPotionEffect(new PotionEffect(8203, 50));
-				if(perks.contains(ENDER_EYE) && !player.isPotionActive(8193))
+				if(perks.contains(ENDER_EYE) && !player.isPotionActive(8193)) //Potion of Luck
 					player.addPotionEffect(new PotionEffect(8193, 50));
 			}
 		}else if(source.getEntity() instanceof EntityPlayer){
@@ -76,13 +76,13 @@ public class WizardEvents {
 			if((event.entityLiving instanceof EntityCaveSpider || event.entityLiving instanceof EntitySpider) && perks.contains(SPIDER))
 				damage += (damage * 0.1f);
 			if(event.entityLiving instanceof EntityPlayer){
-				if(perks.contains(POTION) && !player.isPotionActive(8270))
+				if(perks.contains(POTION) && !player.isPotionActive(8270)) //Potion of Swiftness
 					player.addPotionEffect(new PotionEffect(8270, 50));
-				if(perks.contains(POTION_STAND) && !player.isPotionActive(8201))
+				if(perks.contains(POTION_STAND) && !player.isPotionActive(8201)) //Potion of Stength
 					player.addPotionEffect(new PotionEffect(8201, 50));
-				if(perks.contains(FIRE) && !player.isPotionActive(8206))
+				if(perks.contains(FIRE) && !player.isPotionActive(8206)) //Potion of Invisibilitiy
 					player.addPotionEffect(new PotionEffect(8206, 50));
-				if(perks.contains(ENDER_PEARL) && !player.isPotionActive(8198))
+				if(perks.contains(ENDER_PEARL) && !player.isPotionActive(8198)) //Potion of Night Vision
 					player.addPotionEffect(new PotionEffect(8198, 50));
 			}
 		}

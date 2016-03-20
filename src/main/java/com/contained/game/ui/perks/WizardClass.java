@@ -54,7 +54,7 @@ public class WizardClass {
 		this.buttonList.add(cauldron = new IconButton(50, x-45, y-30, 20, 20, "perkIcons.png", 64, 48, "+10% Damage On Witch"));
 		
 		this.buttonList.add(brick = new IconButton(51, x+15, y-30, 20, 20, "perkIcons.png", 80, 48, "Potion of Fire Resistance"));
-		this.buttonList.add(stand = new IconButton(52, x+75, y-30, 20, 20, "perkIcons.png", 96, 48, "Potin of Strength"));
+		this.buttonList.add(stand = new IconButton(52, x+75, y-30, 20, 20, "perkIcons.png", 96, 48, "Potion of Strength"));
 
 		this.buttonList.add(enderPearl = new IconButton(60, x+90, y, 20, 20, "perkIcons.png", 224, 48, "Potion of Night Vision"));
 		this.buttonList.add(enderEye = new IconButton(59, x+60, y, 20, 20, "perkIcons.png", 208, 48, "Potion of Luck"));

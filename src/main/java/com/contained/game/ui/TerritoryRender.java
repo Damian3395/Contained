@@ -69,39 +69,42 @@ public class TerritoryRender {
 		
 		for (TerritoryEdge te : teamEdges.keySet()) {
 			PlayerTeam t = PlayerTeam.get(teamEdges.get(te));
-			float margin = 0.01f;
-			float alpha = 1f-(Util.euclidDist(te.blockX, te.blockZ, x, z)/128.0f);
-			if (alpha <= 0)
-				continue;
 			
-			float x1 = te.blockX-x+margin;
-			float x2 = x1+1.0f-margin*2;
-			float y1 = 0-y;
-			float y2 = 255-y;
-			float z1 = te.blockZ-z+margin;
-			float z2 = z1+1.0f-margin*2;
+			if(t != null){
+				float margin = 0.01f;
+				float alpha = 1f-(Util.euclidDist(te.blockX, te.blockZ, x, z)/128.0f);
+				if (alpha <= 0)
+					continue;
 			
-			tes.startDrawing(GL11.GL_TRIANGLE_STRIP);
-			tes.setColorRGBA_I(t.getColor(), (int)(48f * alpha));
+				float x1 = te.blockX-x+margin;
+				float x2 = x1+1.0f-margin*2;
+				float y1 = 0-y;
+				float y2 = 255-y;
+				float z1 = te.blockZ-z+margin;
+				float z2 = z1+1.0f-margin*2;
+			
+				tes.startDrawing(GL11.GL_TRIANGLE_STRIP);
+				tes.setColorRGBA_I(t.getColor(), (int)(48f * alpha));
 
-			if (te.direction == TerritoryEdge.NORTH) {
-				tes.addVertex(x2, y2, z2); tes.addVertex(x1, y2, z2);
-				tes.addVertex(x2, y1, z2); tes.addVertex(x1, y1, z2);
-			}
-			else if (te.direction == TerritoryEdge.SOUTH) {
-				tes.addVertex(x2, y2, z1); tes.addVertex(x1, y2, z1);
-				tes.addVertex(x2, y1, z1); tes.addVertex(x1, y1, z1);
-			}
-			else if (te.direction == TerritoryEdge.WEST) {
-				tes.addVertex(x1, y2, z2); tes.addVertex(x1, y2, z1);
-				tes.addVertex(x1, y1, z2); tes.addVertex(x1, y1, z1);
-			}
-			else if (te.direction == TerritoryEdge.EAST) {
-				tes.addVertex(x2, y2, z2); tes.addVertex(x2, y2, z1);
-				tes.addVertex(x2, y1, z2); tes.addVertex(x2, y1, z1);
-			}
+				if (te.direction == TerritoryEdge.NORTH) {
+					tes.addVertex(x2, y2, z2); tes.addVertex(x1, y2, z2);
+					tes.addVertex(x2, y1, z2); tes.addVertex(x1, y1, z2);
+				}
+				else if (te.direction == TerritoryEdge.SOUTH) {
+					tes.addVertex(x2, y2, z1); tes.addVertex(x1, y2, z1);
+					tes.addVertex(x2, y1, z1); tes.addVertex(x1, y1, z1);
+				}
+				else if (te.direction == TerritoryEdge.WEST) {
+					tes.addVertex(x1, y2, z2); tes.addVertex(x1, y2, z1);
+					tes.addVertex(x1, y1, z2); tes.addVertex(x1, y1, z1);
+				}
+				else if (te.direction == TerritoryEdge.EAST) {
+					tes.addVertex(x2, y2, z2); tes.addVertex(x2, y2, z1);
+					tes.addVertex(x2, y1, z2); tes.addVertex(x2, y1, z1);
+				}
 
-			tes.draw();
+				tes.draw();
+			}
 		}
 		
 		GL11.glDepthMask(true);
