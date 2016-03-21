@@ -25,6 +25,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int usedOwnItems = 0;	//# of times player used an item they owned themselves.
 	public int usedOthersItems = 0; //# of times player used an item owned by someone else.
 	public int usedByOthers = 0;    //# of times another player used an item owned by this player.
+	public boolean isAdmin = false;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
@@ -84,6 +85,14 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 			perks.add(perkID);
 	}
 	
+	public boolean isAdmin(){
+		return this.isAdmin;
+	}
+	
+	public void setAdminRights(boolean rights){
+		this.isAdmin = rights;
+	}
+	
 	@Override
 	public void init(Entity entity, World w) {	
 		if(this.getOccupationClass() == 9)
@@ -110,6 +119,8 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		int[] temp = load.getIntArray("perks");
 		for(int i = 0; i < temp.length; i++)
 			perks.add(temp[i]);
+		
+		this.isAdmin = load.getBoolean("isAdmin");
 		
 		this.posX = load.getInteger("posX");
 		this.posY = load.getInteger("posY");
@@ -141,6 +152,8 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		for(int i = 0; i < perks.size(); i++)
 			temp[i] = perks.get(i);
 		save.setIntArray("perks", temp);
+		
+		save.setBoolean("isAdmin", this.isAdmin);
 		
 		save.setInteger("posX", this.posX);
 		save.setInteger("posY", this.posY);

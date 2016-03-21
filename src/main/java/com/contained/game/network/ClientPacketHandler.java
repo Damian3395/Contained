@@ -68,6 +68,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int PLAYER_TRADE = 25;
 	public static final int CREATE_TRADE = 26;
 	
+	public static final int PLAYER_ADMIN = 27;
+	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
 		this.render = render;
@@ -291,6 +293,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case CREATE_TRADE:
 					
+				break;
+				
+				case PLAYER_ADMIN:
+					mc.thePlayer.setInvisible(true);
+					mc.thePlayer.capabilities.allowFlying = true;
+					mc.thePlayer.capabilities.disableDamage = true;
+					ExtendedPlayer.get(mc.thePlayer).setAdminRights(true);
 				break;
 			}
 		}
