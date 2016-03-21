@@ -66,6 +66,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int LEADER_STATUS = 24;
 	
 	public static final int PLAYER_TRADE = 25;
+	public static final int CREATE_TRADE = 26;
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
@@ -285,6 +286,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case PLAYER_TRADE:
+					
+				break;
+				
+				case CREATE_TRADE:
 					
 				break;
 			}

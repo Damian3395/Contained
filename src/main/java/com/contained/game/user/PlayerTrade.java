@@ -1,6 +1,7 @@
 package com.contained.game.user;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import com.contained.game.Contained;
 
@@ -11,12 +12,14 @@ public class PlayerTrade {
 	public String displayName;
 	public String teamID;
 	public ItemStack offer, request;
+	public String id;
 	
 	public PlayerTrade(String playerName, String id, ItemStack offer, ItemStack request){
 		this.displayName = playerName;
 		this.teamID = id;
 		this.offer = offer;
 		this.request = request;
+		this.id = UUID.randomUUID().toString();
 	}
 	
 	public void writeToNBT(NBTTagCompound ntc) {

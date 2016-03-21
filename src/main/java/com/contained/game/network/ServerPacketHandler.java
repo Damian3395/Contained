@@ -48,6 +48,7 @@ public class ServerPacketHandler {
 	public static final int UPDATE_PERMISSIONS = 18;
 	
 	public static final int PLAYER_TRADE = 19;
+	public static final int CREATE_TRADE = 20;
 
 	protected String channelName;
 	protected EntityPlayerMP player;
@@ -157,6 +158,10 @@ public class ServerPacketHandler {
 				
 				case PLAYER_TRADE:
 					
+				break;
+				
+				case CREATE_TRADE:
+				
 				break;
 			}
 		}
