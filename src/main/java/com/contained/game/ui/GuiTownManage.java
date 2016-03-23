@@ -26,6 +26,7 @@ import com.contained.game.world.block.TownManageTE;
 
 import net.minecraft.potion.Potion;
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -120,6 +121,8 @@ public class GuiTownManage extends GuiContainer {
 	private int tabPermission = 2;
 	private int tabMarket = 3;
 	
+	private GuiTextField requestSize;
+	
 	public GuiTownManage(InventoryPlayer inv, TownManageTE te, String blockTeamID, String playerTeamID) {
 		super(new ContainerTownHall(inv, te));
 		
@@ -145,6 +148,8 @@ public class GuiTownManage extends GuiContainer {
 			if (team != null && this.blockTeamID != null && !team.equals("") && !availableAntiTeams.contains(team) && !team.equals(this.blockTeamID))
 				availableAntiTeams.add(team);
 		}
+		
+		//requestSize = new GuiTextField(this.mc.fontRenderer, this.width/2, this.height/2, 40, 20);
 	}
 	
 	@Override
@@ -717,12 +722,17 @@ public class GuiTownManage extends GuiContainer {
 	
 	private void renderCreateTrade(){
 		int indOff = 0;
-		listCounts[tabMarket] = 4;
+		listCounts[tabMarket] = 5;
 		if (indOff == 0)
 			displayString(0+indOff, "[Back]");
-		renderTradeItem(1+indOff);
-		selectRequest(2+indOff);
-		displayMarketOption(3+indOff, "Create Offer");
+		renderTradeItem(1+indOff); //
+		selectRequest(2+indOff); //
+		selectRequestSize(3+indOff); //GuiTextField For Stack Size
+		displayMarketOption(4+indOff, "Create Offer"); //Create Current Trade
+	}
+	
+	private void selectRequestSize(int ind){
+		
 	}
 	
 	private void selectRequest(int ind){
@@ -887,10 +897,15 @@ public class GuiTownManage extends GuiContainer {
 		switch(indOff+ind){
 		case 0: marketInd = -1;	break; //Back
 		case 1: 
-			System.out.println("Trade Offer"); //Offer Item
+			if(makeOffer != null){
+				
+			}
 		break;
 		case 2: marketInd = 3; break; //Select Item
-		case 3:
+		case 3: // Select Request Stack Size
+			
+		break;
+		case 4:
 			if(makeOffer != null && makeRequest != null){ //Create New Trade
 				System.out.println("Trade");
 			}
@@ -1009,33 +1024,122 @@ public class GuiTownManage extends GuiContainer {
 	private void selectTools(int mouseX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
-		
+		case 1: item = Items.bucket; break;
+		case 2: item = Items.fishing_rod; break;
+		case 3: item = Items.shears; break;
+		case 4: item = Items.flint_and_steel; break;
+		case 5: item = Items.book; break;
+		case 6: item = Items.clock; break;
+		case 7: item = Items.compass; break;
+		case 8: item = Items.map; break;
+		case 9: item = Items.brewing_stand; break;
+		case 10: item = Items.cauldron; break;
+		case 11: item = Items.flower_pot; break;
+		case 12: item = Items.item_frame; break;
+		case 13: item = Items.saddle; break;
+		case 14: item = Items.sign; break;
+		case 15: item = Items.wooden_shovel; break;
+		case 16: item = Items.wooden_hoe; break;
+		case 17: item = Items.wooden_axe; break;
+		case 18: item = Items.wooden_pickaxe; break;
+		case 19: item = Items.stone_shovel; break;
+		case 20: item = Items.stone_hoe; break;
+		case 21: item = Items.stone_axe; break;
+		case 22: item = Items.stone_pickaxe; break;
+		case 23: item = Items.iron_shovel; break;
+		case 24: item = Items.iron_hoe; break;
+		case 25: item = Items.iron_axe; break;
+		case 26: item = Items.iron_pickaxe; break;
+		case 27: item = Items.golden_shovel; break;
+		case 28: item = Items.golden_hoe; break;
+		case 29: item = Items.golden_axe; break;
+		case 30: item = Items.golden_pickaxe; break;
+		case 31: item = Items.diamond_shovel; break;
+		case 32: item = Items.diamond_hoe; break;
+		case 33: item = Items.diamond_axe; break;
+		case 34: item = Items.diamond_pickaxe; break;
+		case 35: item = Items.blaze_rod; break;
+		case 36: item = Items.repeater; break;
+		case 37: item = Items.comparator; break;
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	
 	private void selectWeapons(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
+		case 1: item = Items.wooden_sword; break;
+		case 2: item = Items.stone_sword; break;
+		case 3: item = Items.iron_sword; break;
+		case 4: item = Items.golden_sword; break;
+		case 5: item = Items.diamond_sword; break;
+		case 6: item = Items.bow; break;
+		case 7: item = Items.arrow; break;
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	
 	private void selectArmor(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
+		case 1: item = Items.leather_boots; break;
+		case 2: item = Items.leather_leggings; break;
+		case 3: item = Items.leather_chestplate; break;
+		case 4: item = Items.leather_helmet; break;
+		case 5: item = Items.iron_boots; break;
+		case 6: item = Items.iron_leggings; break;
+		case 7: item = Items.iron_chestplate; break;
+		case 8: item = Items.iron_helmet; break;
+		case 9: item = Items.golden_boots; break;
+		case 10: item = Items.golden_leggings; break;
+		case 11: item = Items.golden_chestplate; break;
+		case 12: item = Items.golden_helmet; break;
+		case 13: item = Items.diamond_boots; break;
+		case 14: item = Items.diamond_leggings; break;
+		case 15: item = Items.diamond_chestplate; break;
+		case 16: item = Items.diamond_helmet; break;
+		case 17: item = Items.iron_horse_armor; break;
+		case 18: item = Items.golden_horse_armor; break;
+		case 19: item = Items.diamond_horse_armor; break;
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	
 	private void selectTransportation(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
+		case 1: item = Items.minecart; break;
+		case 2: item = Items.chest_minecart; break;
+		case 3: item = Items.furnace_minecart; break;
+		case 4: item = Items.tnt_minecart; break;
+		case 5: item = Items.hopper_minecart; break;
+		case 6: item = Items.boat; break;
+		case 7: item = Items.carrot_on_a_stick; break;
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	
@@ -1050,24 +1154,55 @@ public class GuiTownManage extends GuiContainer {
 	private void selectMusicDiscs(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
+		case 1: item = Items.record_blocks; break;
+		case 2: item = Items.record_11; break;
+		case 3: item = Items.record_13; break;
+		case 4: item = Items.record_cat; break;
+		case 5: item = Items.record_chirp; break;
+		case 6: item = Items.record_far; break;
+		case 7: item = Items.record_mall; break;
+		case 8: item = Items.record_mellohi; break;
+		case 9: item = Items.record_stal; break;
+		case 10: item = Items.record_strad; break;
+		case 11: item = Items.record_wait; break;
+		case 12: item = Items.record_ward; break;
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	
 	private void selectNPC(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	
 	private void selectDecorational(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
+		Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
+		case 1: item = Items.bed; break;
+		case 2: item = Items.wooden_door; break;
+		case 3: item = Items.sign; break;
+		case 4: item = Items.painting; break;
+		}
+		if(item != null){
+			makeRequest = new ItemStack(item);
+			marketInd = 2;
 		}
 	}
 	

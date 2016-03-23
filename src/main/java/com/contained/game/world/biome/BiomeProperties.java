@@ -2,6 +2,7 @@ package com.contained.game.world.biome;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -10,7 +11,6 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Save;
 import com.contained.game.util.Util;
 
-import scala.actors.threadpool.Arrays;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
