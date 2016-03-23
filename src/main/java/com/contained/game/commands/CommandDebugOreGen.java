@@ -9,6 +9,7 @@ import com.contained.game.world.GenerateWorld;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public class CommandDebugOreGen implements ICommand{
@@ -61,6 +62,11 @@ public class CommandDebugOreGen implements ICommand{
 				else
 					out += ", "+GenerateWorld.oreSpawnProperties[i].type.getLocalizedName();
 			}
+		}
+		
+		if (sender instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer)sender;
+			player.capabilities.allowFlying = true;
 		}
 		
 		if (out.equals(""))

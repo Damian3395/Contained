@@ -2,14 +2,10 @@ package com.contained.game.commands;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.ChatComponentText;
 
 public class CommandChangeStatus implements ICommand {
@@ -33,13 +29,11 @@ public class CommandChangeStatus implements ICommand {
 			if (argString.length != 3) { // <player name> <-option> <percentage>
 				out = getCommandUsage(sender);
 			} else {
-				switch (argString[1]) {
-				case "-health": { // case1: change health
-
+				if (argString[1].equals("-health")) { // case1: change health
 					try {
 						EntityPlayer np = sender.getEntityWorld().getPlayerEntityByName(argString[0]);
 						float percentage = Float.parseFloat(argString[2])/100;
-						if(percentage>1 || percentage <=0){
+						if(percentage>1 || percentage <= 0){
 							throw new NumberFormatException();
 						}else{
 							np.setHealth(np.getMaxHealth()*percentage);
@@ -49,17 +43,14 @@ public class CommandChangeStatus implements ICommand {
 					} catch (NumberFormatException e) {
 						out = "System: The last parameter for command changestatus must be a number from 1 to 100";
 					}
-
 				}
-					break;
-				case "-hunger": { // case2: change hunger
-
+				else if (argString[1].equals("-hunger")) { // case2: change hunger
 					try {
-						
+
 						EntityPlayer np = sender.getEntityWorld().getPlayerEntityByName(argString[0]);
 						System.out.println("food level: "+np.getFoodStats().getFoodLevel());
 						float percentage = Float.parseFloat(argString[2])/100;
-						if(percentage>1 || percentage <=0){
+						if(percentage>1 || percentage <= 0){
 							throw new NumberFormatException();
 						}else{
 							np.getFoodStats().setFoodLevel((int)(percentage*20));
@@ -70,14 +61,9 @@ public class CommandChangeStatus implements ICommand {
 					} catch (NumberFormatException e) {
 						out = "System: The last parameter for command changestatus must be a number from 1 to 100";
 					}
-
 				}
-					break;
-				
-				default:
+				else
 					out = this.getCommandUsage(sender);
-				}
-
 			}
 			if (!out.equals("")) {
 				sender.addChatMessage(new ChatComponentText(out));

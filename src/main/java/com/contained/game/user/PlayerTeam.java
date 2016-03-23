@@ -129,8 +129,8 @@ public class PlayerTeam {
 			Contained.teamInvitations.remove(invite);
 		
 		//Remove any custom permissions involving this team.
-				for (PlayerTeam team : Contained.teamData)
-					team.permissions.remove(this.id);
+		for (PlayerTeam team : Contained.teamData)
+			team.permissions.remove(this.id);
 		
 		//Remove the team.
 		Contained.teamData.remove(this);	
@@ -161,13 +161,10 @@ public class PlayerTeam {
 	 */
 	public List<String> getTeamPlayers(String username){
 		List<String> list = new ArrayList<String>();
-		Map<UUID, String> allplayers = UsernameCache.getMap();
 		
-		for(Map.Entry<UUID, String> entry : allplayers.entrySet()){
-			EntityPlayer p = (EntityPlayer) Minecraft.getMinecraft().theWorld.getPlayerEntityByName(entry.getValue());
-			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
-			if(pdata.teamID != null && pdata.teamID.equals(this.id) && !p.getDisplayName().equals(username))
-				list.add(entry.getValue());
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
+			if(pdata.teamID != null && pdata.teamID.equals(this.id))
+				list.add(pdata.playerName);
 		}
 		
 		return list;
@@ -178,11 +175,9 @@ public class PlayerTeam {
 	 */
 	public List<String> getPlayersList(String username){
 		List<String> list = new ArrayList<String>();
-		Map<UUID, String> allplayers = UsernameCache.getMap();
 		
-		for(Map.Entry<UUID, String> entry : allplayers.entrySet())
-			if(!entry.getValue().equals(username))
-				list.add(entry.getValue());
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData)
+			list.add(pdata.playerName);
 		
 		return list;
 	}
@@ -192,14 +187,12 @@ public class PlayerTeam {
 	 */
 	public List<String> getLonerList(String username){
 		List<String> list = new ArrayList<String>();
-		Map<UUID, String> allpalyers = UsernameCache.getMap();
 		
-		for(Map.Entry<UUID, String> entry: allpalyers.entrySet()){
-			EntityPlayer p = (EntityPlayer) Minecraft.getMinecraft().theWorld.getPlayerEntityByName(entry.getValue());
-			ExtendedPlayer properties = ExtendedPlayer.get(p);
-			if(!entry.getValue().equals(username) && properties.guild == GuiGuild.LONER)
-				list.add(entry.getValue());
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
+			if(pdata.teamID == null)
+				list.add(pdata.playerName);
 		}
+		
 		return list;
 	}
 	

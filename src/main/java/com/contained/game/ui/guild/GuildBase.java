@@ -75,7 +75,7 @@ public class GuildBase {
         
         statusInfo = "";
         statusColor = Color.GREEN;
-        currentCol = 0;
+        currentCol = Util.randomRange(0, PlayerTeam.rgbColors.length);
 	}
 	
 	public List getButtonList(){
@@ -119,10 +119,12 @@ public class GuildBase {
 		teamName.mouseClicked(i, j, k);
 	}
 	
-	public void keyTyped(char c, int i){
+	public boolean keyTyped(char c, int i){
 		if(teamName.isFocused()){
 			teamName.textboxKeyTyped(c, i);
+			return true;
 		}
+		return false;
 	}
 	
 	public void render(){

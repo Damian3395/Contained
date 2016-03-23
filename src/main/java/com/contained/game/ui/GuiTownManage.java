@@ -15,6 +15,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
 import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
@@ -1279,7 +1280,8 @@ public class GuiTownManage extends GuiContainer {
 		int y = listY+2+bSelRect.height*(ind-offset);
 
 		//Hover Selection Highlight
-		if (playerTeamID != null && playerTeamID.equals(blockTeamID) && Contained.isLeader) {
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(this.mc.thePlayer);
+		if (playerTeamID != null && playerTeamID.equals(blockTeamID) && pdata != null && pdata.isLeader) {
 			texMan.bindTexture(bg);
 			if (itemHovering == ind-offset)
 				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
@@ -1329,7 +1331,9 @@ public class GuiTownManage extends GuiContainer {
 			//town hall block, so you can only use it to view your permissions within the territory.
 			indOff = 1;
 		}
-		if (!Contained.isLeader) {
+		
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(this.mc.thePlayer);
+		if (pdata == null || !pdata.isLeader) {
 			if (ind+indOff > 0)
 				return;
 		}

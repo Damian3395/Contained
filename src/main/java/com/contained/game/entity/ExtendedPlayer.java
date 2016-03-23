@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.contained.game.data.Data;
 import com.contained.game.ui.ClassPerks;
-import com.contained.game.ui.GuiGuild;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,7 +29,6 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int posY = 0;
 	public int posZ = 0;
 	public String world = "";
-	public int guild = GuiGuild.LONER;
 	
 	public ExtendedPlayer(EntityPlayer entity) {
 		this.entity = entity;
@@ -125,9 +123,6 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.posX = load.getInteger("posX");
 		this.posY = load.getInteger("posY");
 		this.posZ = load.getInteger("posZ");
-		
-		this.guild = load.getInteger("guild");
-		System.out.println("Load Guild Status " + this.guild);
 	}
 
 	@Override
@@ -158,8 +153,5 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("posX", this.posX);
 		save.setInteger("posY", this.posY);
 		save.setInteger("posZ", this.posZ);
-		
-		save.setInteger("guild", this.guild);
-		System.out.println("Save Guild Status " + this.guild);
 	}
 }

@@ -4,14 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
-import com.contained.game.data.DataLogger;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.components.GuiScrollPane;
@@ -19,16 +14,11 @@ import com.contained.game.ui.components.GuiTab;
 import com.contained.game.ui.components.IconButton;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
-import com.contained.game.user.PlayerTeamInvitation;
-import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
 
 public class GuildLeader {
 	private final int SAVE = 0;
@@ -60,7 +50,7 @@ public class GuildLeader {
 	private PlayerTeamIndividual pdata;
 	private PlayerTeam team;
 	
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	public GuildLeader(GuiGuild gui){
 		this.gui = gui;
@@ -89,7 +79,7 @@ public class GuildLeader {
         teamUpdateColor = Color.GREEN;
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		//Settings Buttons
 		buttonList.add(save = new GuiButton(SAVE, x+80, y+50, 30, 20, "Save"));
 		buttonList.add(reset = new GuiButton(RESET, x+30, y+50, 40, 20, "Reset"));
@@ -146,10 +136,12 @@ public class GuildLeader {
 		}
 	}
 	
-	public void keyTyped(char c, int i){
+	public boolean keyTyped(char c, int i){
 		if(teamName.isFocused()){
 			teamName.textboxKeyTyped(c, i);
+			return true;
 		}
+		return false;
 	}
 	
 	public void update(){
@@ -163,7 +155,6 @@ public class GuildLeader {
 		switch(button.id){
 		case SAVE:
 			String newName = teamName.getText();
-			boolean update = true;
 			if((!newName.isEmpty() && (newName.compareTo(team.displayName) != 0) 
 					|| (selectedColor != team.colorID && !newName.isEmpty()))){
 				

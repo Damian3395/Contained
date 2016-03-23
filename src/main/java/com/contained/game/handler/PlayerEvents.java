@@ -71,13 +71,8 @@ public class PlayerEvents {
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
-				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandler.packetSyncLocalPlayer((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 			}
-			
-			//Guild Status
-			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_INFO);
-			guildPacket.writeInt(ExtendedPlayer.get(joined).guild);
-			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) joined);
 			
 			//Class Perks
 			ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;

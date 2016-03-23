@@ -62,7 +62,7 @@ public class Util {
 	}
 	
 	/**
-	 * Returns random value between min and max
+	 * Returns random value between min (inclusive) and max (exclusive)
 	 */
 	public static int randomRange(int min, int max) {
 		return (int)(Math.random()*(double)(max-min))+min;

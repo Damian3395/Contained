@@ -40,8 +40,7 @@ public class CommandCreate implements ICommand {
 			if (argString.length < 2) {
 				out = getCommandUsage(sender);
 			} else {
-				switch(argString[1]){
-				case "-v":{	//case1: create near most vulnerable player
+				if (argString[1].equals("-v")) {	//case1: create near most vulnerable player
 					@SuppressWarnings("unchecked")
 					List<EntityPlayer> playerList=MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 					try{
@@ -58,7 +57,7 @@ public class CommandCreate implements ICommand {
 							}
 						}
 						if(argString.length == 2){	//para: object -v
-							
+
 							System.out.println("the most vulnerable player is: "+target.getDisplayName());
 							this.targetX = target.getPlayerCoordinates().posX;
 							this.targetY = target.getPlayerCoordinates().posY;
@@ -69,10 +68,9 @@ public class CommandCreate implements ICommand {
 					}catch(NullPointerException e){
 						out = "No player online!";
 					}	
-					
+
 				}
-					break;
-				case "-s":{	//case1: create near strongest player
+				else if (argString[1].equals("-s")) {	//case1: create near strongest player
 					@SuppressWarnings("unchecked")
 					List<EntityPlayer> playerList=MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 					EntityPlayer target=playerList.get(0);
@@ -83,9 +81,9 @@ public class CommandCreate implements ICommand {
 							target=playerList.get(i);
 						}
 					}
-					
+
 					if(argString.length == 2){	//para: object -v
-						
+
 						System.out.println("the strongest player is: "+target.getDisplayName());
 						this.targetX = target.getPlayerCoordinates().posX;
 						this.targetY = target.getPlayerCoordinates().posY;
@@ -94,8 +92,7 @@ public class CommandCreate implements ICommand {
 						out = this.getCommandUsage(sender);
 					}
 				}
-					break;
-				case "-c":{			//case2: create near closest player
+				else if (argString[1].equals("-c")) {			//case2: create near closest player
 					if(argString.length == 2){	//para: object -c
 						@SuppressWarnings("unchecked")
 						List<EntityPlayer> playerList=MinecraftServer.getServer().getConfigurationManager().playerEntityList;
@@ -110,7 +107,7 @@ public class CommandCreate implements ICommand {
 								target=playerList.get(i);
 							}
 						}
-						
+
 						System.out.println("The closest player to Admin is: "+target.getDisplayName());
 						this.targetX = target.getPlayerCoordinates().posX;
 						this.targetY = target.getPlayerCoordinates().posY;
@@ -120,8 +117,7 @@ public class CommandCreate implements ICommand {
 						out = this.getCommandUsage(sender);
 					}
 				}
-					break;
-				case "-f":{			//case2: create near farthest player
+				else if (argString[1].equals("-f")) {			//case2: create near farthest player
 					if(argString.length == 2){	//para: object -c
 						@SuppressWarnings("unchecked")
 						List<EntityPlayer> playerList=MinecraftServer.getServer().getConfigurationManager().playerEntityList;
@@ -133,7 +129,7 @@ public class CommandCreate implements ICommand {
 								target=playerList.get(i);
 							}
 						}
-						
+
 						System.out.println("The farthest player to Admin is: "+target.getDisplayName());
 						this.targetX = target.getPlayerCoordinates().posX;
 						this.targetY = target.getPlayerCoordinates().posY;
@@ -143,8 +139,7 @@ public class CommandCreate implements ICommand {
 						out = this.getCommandUsage(sender);
 					}
 				}
-					break;
-				case "-h":{	//case1: create near hungriest player
+				else if (argString[1].equals("-h")) {	//case1: create near hungriest player
 					@SuppressWarnings("unchecked")
 					List<EntityPlayer> playerList=MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 					try{
@@ -159,9 +154,9 @@ public class CommandCreate implements ICommand {
 								target=playerList.get(i);
 							}
 						}
-						
+
 						if(argString.length == 2){	//para: object -v
-							
+
 							System.out.println("the hungeriest player is: "+target.getDisplayName());
 							this.targetX = target.getPlayerCoordinates().posX;
 							this.targetY = target.getPlayerCoordinates().posY;
@@ -173,30 +168,25 @@ public class CommandCreate implements ICommand {
 						out = "No other player's online!";
 					}
 				}
-					break;
-				case "-n":{		//case3: create near specified player
+				else if (argString[1].equals("-n")) {		//case3: create near specified player
 					if(argString.length == 3){	//para: object -n playerName
 						try{
 							this.targetX = sender.getEntityWorld().getPlayerEntityByName(argString[2]).getPlayerCoordinates().posX;
 							this.targetY = sender.getEntityWorld().getPlayerEntityByName(argString[2]).getPlayerCoordinates().posY;
 							this.targetZ = sender.getEntityWorld().getPlayerEntityByName(argString[2]).getPlayerCoordinates().posZ;
 
-							
+
 						}catch(NullPointerException e){
 							out="Player: "+argString[2]+" does not exist.";
 						}
-						
+
 					}else{
 						out = "/" + getCommandName() + " <object> <-n> <playername>";
 					}
 				}	
-					break;
-				
-				default:
+				else
 					out = getCommandUsage(sender);
-						
-				
-				}
+
 				ObjectGenerator og=new ObjectGenerator();
 				if(!og.generate(argString[0], sender.getEntityWorld(), targetX, targetY, targetZ)){
 					out = this.getCommandUsage(sender);

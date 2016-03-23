@@ -54,10 +54,10 @@ public class Contained{
 	
 	public static HashMap<Point, String> territoryData; // [SERVER & CLIENT SIDE] coordinates, teamID. Locations of all blocks that are owned by a team.
 	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
-	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE ONLY] all tracked players, online and offline, even those not in teams.
+	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE] all tracked players, online and offline, even those not in teams.
+																   // [CLIENT SIDE] only the data on the local player.
 	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE ONLY] all pending team invitations.
 	public static ArrayList<PlayerTrade> trades;
-	public static boolean isLeader = false;             // [CLIENT SIDE ONLY] is the local mc.thePlayer a team leader on the server?
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){

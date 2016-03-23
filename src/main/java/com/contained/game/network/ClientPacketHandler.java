@@ -56,14 +56,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public static final int PLAYER_KICK = 16;
 	public static final int PLAYER_PROMOTE = 17;
 	public static final int PLAYER_DEMOTE = 18;
-	public static final int GUILD_INFO = 19;
 	
 	public static final int LEVEL_UP = 20;
 	public static final int SELECT_CLASS = 21;
 	public static final int PERK_INFO = 22;
 	
 	public static final int UPDATE_PERMISSIONS = 23;
-	public static final int LEADER_STATUS = 24;
+	public static final int SYNC_LOCAL_PLAYER = 24;
 	
 	public static final int PLAYER_TRADE = 25;
 	public static final int CREATE_TRADE = 26;
@@ -170,7 +169,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Joined Team")){
-						ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.TEAM_PLAYER;
 						mc.displayGuiScreen(new GuiGuild());
 					}else if(mc.currentScreen instanceof GuiGuild){
 						GuildBase.statusInfo = status;
@@ -179,7 +177,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case GUILD_LEAVE:
-					ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LONER;
 					if(mc.currentScreen instanceof GuiGuild)
 						mc.displayGuiScreen(new GuiGuild());
 				break;
@@ -188,7 +185,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Team Successfully Created")){
-						ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LEADER;
 						mc.displayGuiScreen(new GuiGuild());
 					}else if(mc.currentScreen instanceof GuiGuild){
 						GuildBase.statusInfo = status;
@@ -197,7 +193,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case GUILD_DISBAND:
-					ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LONER;
 					if(mc.currentScreen instanceof GuiGuild)
 						mc.displayGuiScreen(new GuiGuild());
 				break;
@@ -232,7 +227,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case PLAYER_KICK:
-					ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.LONER;
 					if(mc.currentScreen instanceof GuiGuild)
 						mc.displayGuiScreen(new GuiGuild());
 				break;
@@ -245,14 +239,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Successfully Demoted")){
-						ExtendedPlayer.get(mc.thePlayer).guild = GuiGuild.TEAM_PLAYER;
 						if(mc.currentScreen instanceof GuiGuild)
 							mc.displayGuiScreen(new GuiGuild());
 					}
-				break;
-				
-				case GUILD_INFO:
-					ExtendedPlayer.get(mc.thePlayer).guild = packet.readInt();
 				break;
 					
 				case LEVEL_UP:
@@ -283,8 +272,19 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					toModify.permissions = team.permissions;
 				break;
 				
-				case LEADER_STATUS:
-					Contained.isLeader = packet.readBoolean();
+				case SYNC_LOCAL_PLAYER:
+					NBTTagCompound ntc = packet.readNBTTagCompound();
+					PlayerTeamIndividual pdata = new PlayerTeamIndividual(ntc);
+					boolean found = false;
+					for(PlayerTeamIndividual player : Contained.teamMemberData) {
+						if (player.playerName.equals(pdata.playerName)) {
+							found = true;
+							player.readFromNBT(ntc);
+							break;
+						}
+					}
+					if (!found)
+						Contained.teamMemberData.add(pdata);
 				break;
 				
 				case PLAYER_TRADE:
@@ -352,9 +352,12 @@ public class ClientPacketHandler extends ServerPacketHandler {
 		return permPacket;
 	}
 
-	public static PacketCustom packetLeaderStatus(EntityPlayer joined) {
-		PacketCustom leaderPacket = new PacketCustom(Resources.MOD_ID, LEADER_STATUS);
-		leaderPacket.writeBoolean(PlayerTeamIndividual.isLeader(joined));
-		return leaderPacket;
+	public static PacketCustom packetSyncLocalPlayer(EntityPlayer joined) {
+		PacketCustom pdataPacket = new PacketCustom(Resources.MOD_ID, SYNC_LOCAL_PLAYER);
+		NBTTagCompound ntc = new NBTTagCompound();
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
+		pdata.writeToNBT(ntc);
+		pdataPacket.writeNBTTagCompound(ntc);
+		return pdataPacket;
 	}
 }
