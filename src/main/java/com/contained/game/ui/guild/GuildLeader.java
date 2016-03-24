@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
@@ -221,6 +223,8 @@ public class GuildLeader {
 	
 	public void render(){
 		this.gui.drawDefaultBackground();
+		GL11.glDisable(GL11.GL_LIGHTING);
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		tabPane.render();
 		
 		//Settings Buttons
@@ -245,6 +249,9 @@ public class GuildLeader {
 			renderSettings();
 			break;
 		}
+		
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
+		GL11.glEnable(GL11.GL_LIGHTING);
 	}
 	
 	private void renderActions(){

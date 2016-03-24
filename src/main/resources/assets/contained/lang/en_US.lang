@@ -3,6 +3,7 @@ tile.ClaimTerritoryMachine.name=Territory Machine
 tile.RemoveTerritoryMachine.name=Anti-Territory Machine
 tile.wasteland.name=Wasteland
 tile.wastelandBush.name=Dead Bush
+tile.harvestedOre.name=Harvested Ore
 
 item.ItemClaimTerritory.name=Territory Gem
 item.ItemRemoveTerritory.name=Anti-Territory Gem
@@ -13,3 +14,4 @@ key.categories.contained=Contained
 key.dataVisGUI=Toggle Data GUI
 key.territoryRender=Toggle Territory Render
 key.classPerkGUI=View Perks
+key.guildGUI=Manage Guild
