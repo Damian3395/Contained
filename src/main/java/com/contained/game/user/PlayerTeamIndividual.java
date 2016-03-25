@@ -24,16 +24,14 @@ public class PlayerTeamIndividual {
 	public String playerName;
 	public String teamID;
 	public boolean isLeader;
-	public int surveyProgress;
-	public int[] surveyResponses;
+	public SurveyData.SurveyResponse surveyResponses;
 	public long joinTime; //Timestamp of when this player first joined their team.  
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
 		this.teamID = null;
 		this.joinTime = 0;
-		this.surveyProgress = 0;
-		this.surveyResponses = new int[SurveyData.data.length];
+		this.surveyResponses = (new SurveyData()).new SurveyResponse();
 		this.isLeader = false;
 	}
 	
@@ -171,8 +169,9 @@ public class PlayerTeamIndividual {
 		ntc.setString("name", this.playerName);
 		ntc.setBoolean("isLeader", this.isLeader);
 		ntc.setLong("joined", joinTime);
-		ntc.setInteger("surveyPage", this.surveyProgress);
-		ntc.setIntArray("surveyResponses", this.surveyResponses);
+		NBTTagCompound surveyData = new NBTTagCompound();
+		this.surveyResponses.writeToNBT(surveyData);
+		ntc.setTag("surveyResponses", surveyData);
 		if (this.teamID != null)
 			ntc.setString("team", this.teamID);
 		else if (ntc.hasKey("team"))
@@ -183,8 +182,9 @@ public class PlayerTeamIndividual {
 		this.playerName = ntc.getString("name");
 		this.isLeader = ntc.getBoolean("isLeader");
 		this.joinTime = ntc.getLong("joined");
-		this.surveyProgress = ntc.getInteger("surveyPage");
-		this.surveyResponses = ntc.getIntArray("surveyResponses");
+		NBTTagCompound surveyData = ntc.getCompoundTag("surveyResponses");
+		this.surveyResponses = (new SurveyData()).new SurveyResponse();
+		this.surveyResponses.readFromNBT(surveyData);
 		if (ntc.hasKey("team"))
 			this.teamID = ntc.getString("team");
 		else

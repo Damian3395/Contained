@@ -168,9 +168,7 @@ public class ServerPacketHandler {
 				
 				case UPDATE_SURVEY:
 					PlayerTeamIndividual toUpdate = PlayerTeamIndividual.get(packet.readString());
-					toUpdate.surveyProgress = packet.readInt();
-					NBTTagCompound surveyData = packet.readNBTTagCompound();
-					toUpdate.surveyResponses = surveyData.getIntArray("surveyResponses");
+					toUpdate.surveyResponses.readFromNBT(packet.readNBTTagCompound());
 				break;
 			}
 		}
@@ -196,9 +194,8 @@ public class ServerPacketHandler {
 	public static PacketCustom packetUpdateSurvey(PlayerTeamIndividual pdata) {
 		PacketCustom surveyPacket = new PacketCustom(Resources.MOD_ID, UPDATE_SURVEY);
 		NBTTagCompound surveyData = new NBTTagCompound();
-		surveyData.setIntArray("surveyResponses", pdata.surveyResponses);
+		pdata.surveyResponses.writeToNBT(surveyData);
 		surveyPacket.writeString(pdata.playerName);
-		surveyPacket.writeInt(pdata.surveyProgress);
 		surveyPacket.writeNBTTagCompound(surveyData);
 		return surveyPacket;
 	}

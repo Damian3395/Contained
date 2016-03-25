@@ -72,7 +72,7 @@ public class PlayerEvents {
 			else {
 				//If player has not completed the survey, give them a reminder.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
-				if (pdata.surveyProgress <= SurveyData.data.length)
+				if (pdata.surveyResponses.progress <= SurveyData.getSurveyLength())
 					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out your §a§lsurvey)");
 				else
 					completedSurvey = true;

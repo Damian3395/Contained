@@ -1,5 +1,7 @@
 package com.contained.game.ui;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 /**
  * http://ipip.ori.org/BFASKeys.htm
  * http://ipip.ori.org/New_IPIP-50-item-scale.htm
@@ -75,6 +77,40 @@ public class SurveyData {
 			this.type = type;
 			this.amount = amount;
 		}
+	}
+	
+	public class SurveyResponse {
+		public int[] personality = new int[data.length];
+		public int age = -1;
+		public String ethnicity = "";
+		public int mcMonths = -1;
+		public int mcYears = -1;
+		public boolean isMale = false;
+		public int progress = 0;
+		
+		public void writeToNBT(NBTTagCompound ntc) {
+			ntc.setInteger("surveyPage", this.progress);
+			ntc.setIntArray("surveyResponses", this.personality);
+			ntc.setInteger("age", this.age);
+			ntc.setString("ethnicity", this.ethnicity);
+			ntc.setBoolean("gender", this.isMale);
+			ntc.setInteger("mcMonths", this.mcMonths);
+			ntc.setInteger("mcYears", this.mcYears);
+		}
+		
+		public void readFromNBT(NBTTagCompound ntc) {
+			this.personality = ntc.getIntArray("surveyResponses");
+			this.age = ntc.getInteger("age");
+			this.ethnicity = ntc.getString("ethnicity");
+			this.isMale = ntc.getBoolean("gender");
+			this.mcMonths = ntc.getInteger("mcMonths");
+			this.mcYears = ntc.getInteger("mcYears");
+			this.progress = ntc.getInteger("surveyPage");
+		}
+	}
+	
+	public static int getSurveyLength() {
+		return data.length+4;
 	}
 	
 	/**
