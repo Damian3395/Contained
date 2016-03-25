@@ -144,7 +144,6 @@ public class GuiSurvey extends GuiScreen {
     @Override
 	public void mouseClicked(int i , int j, int k){
     	super.mouseClicked(i, j, k);
-    	System.out.println("Clicked: "+i+","+j+","+k);
     	
     	if (isTextFieldAEnabled())
     		this.textResponseA.mouseClicked(i, j, k);
@@ -182,7 +181,7 @@ public class GuiSurvey extends GuiScreen {
     		this.buttonList.add(this.buttonOptionC);
     		this.buttonList.add(this.buttonOptionD);
     		this.buttonList.add(this.buttonOptionE);
-    	} else {
+    	} else if (playerCopy.surveyResponses.progress <= SurveyData.getSurveyLength()) {
     		this.buttonList.add(this.buttonNext);
     	}
     	
@@ -193,7 +192,6 @@ public class GuiSurvey extends GuiScreen {
     protected void actionPerformed(GuiButton b)
     {
     	super.actionPerformed(b);
-    	System.out.println("Action: "+b.id);
     	
     	if (b.enabled) {
     		if (b.id == 7) //Male Button
