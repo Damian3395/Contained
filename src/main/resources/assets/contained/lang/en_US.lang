@@ -8,6 +8,7 @@ tile.harvestedOre.name=Harvested Ore
 item.ItemClaimTerritory.name=Territory Gem
 item.ItemRemoveTerritory.name=Anti-Territory Gem
 item.TerritoryFlag.name=Territory Flag
+item.SurveyClipboard.name=Personality Survey
 item.contained.book.main.name=Contained Tutorial
 
 key.categories.contained=Contained

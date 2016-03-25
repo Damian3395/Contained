@@ -6,23 +6,17 @@ import java.util.List;
 
 import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.Contained;
-import com.contained.game.data.DataLogger;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandler;
 import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.components.IconButton;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
-import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.entity.player.EntityPlayer;
 
 // TODO: Log Data Events For Creating or Joining Guild, Fix Create Team
 
@@ -54,7 +48,7 @@ public class GuildBase {
 	private PlayerTeam newTeam;
 	public static int currentCol = 0;
 	
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	public GuildBase(GuiGuild gui){
 		this.gui = gui;
@@ -78,7 +72,7 @@ public class GuildBase {
         currentCol = Util.randomRange(0, PlayerTeam.rgbColors.length);
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		int x = (this.gui.width/2);
 		int y = this.gui.height/2;
 		
@@ -90,7 +84,7 @@ public class GuildBase {
 		this.buttonList.add(this.create = new GuiButton(CREATE, x+70, y+30, 40, 20, "Create"));
 		this.buttonList.add(this.teamColor = new IconButton(TEAM_COLOR, x-10, y-10, 20, 20, PlayerTeam.rgbColors[currentCol]));
 		
-		if(this.invites.isEmpty()){
+		if(GuildBase.invites.isEmpty()){
 			this.join.enabled = false;
 			this.decline.enabled = false;
 			this.next.enabled = false;
@@ -103,7 +97,7 @@ public class GuildBase {
 	public void update(){
 		getInvites();
 		
-		if(this.invites.isEmpty()){
+		if(GuildBase.invites.isEmpty()){
 			this.join.enabled = false;
 			this.decline.enabled = false;
 			this.next.enabled = false;
@@ -128,8 +122,6 @@ public class GuildBase {
 	}
 	
 	public void render(){
-		int x = this.gui.width/2;
-		int y = this.gui.height/2;
 		String invite = (invites.isEmpty()) ? "Zero Invites" : invites.get(currentInvite);
 		
 		renderFont(0, -100, "Guild", Color.WHITE);

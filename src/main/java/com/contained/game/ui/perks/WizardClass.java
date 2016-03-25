@@ -19,7 +19,7 @@ public class WizardClass {
 	private int levelOne = 2500;
 	private int levelTwo = 5000;
 	private int levelThree = 10000;
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	private IconButton bone, book, bottle, gun, cauldron, brick, stand;
 	private IconButton magma, crystal, ghast, spider, slime, fire, enderEye, enderPearl;
@@ -42,7 +42,7 @@ public class WizardClass {
 		wizard = new ProgressBar(this.gui.width/2-50, this.gui.height/2+30, ProgressBar.PINK, wizardXP, nextLevel, this.gui.mc);
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
 		this.buttonList.add(bone = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 48, "-10% Skeleton Damage"));

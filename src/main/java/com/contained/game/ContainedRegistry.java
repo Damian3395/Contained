@@ -23,6 +23,7 @@ public class ContainedRegistry {
 	
 	public static ItemTerritory territoryItems;
 	public static TerritoryFlag claimFlag;
+	public static SurveyClipboard surveyItem;
 	public static TutorialBook book;
 	
 	public void preInit(FMLPreInitializationEvent event) {
@@ -35,6 +36,7 @@ public class ContainedRegistry {
 		
 		territoryItems = new ItemTerritory();
 		claimFlag = new TerritoryFlag();
+		surveyItem = new SurveyClipboard();
 		book = new TutorialBook();
 		GameRegistry.registerItem(ContainedRegistry.book, "tutorialBook");
 	}

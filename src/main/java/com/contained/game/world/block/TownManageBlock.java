@@ -2,8 +2,6 @@ package com.contained.game.world.block;
 
 import com.contained.game.Contained;
 import com.contained.game.item.TerritoryFlag;
-import com.contained.game.ui.GuiTownManage;
-import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -15,12 +13,10 @@ import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;

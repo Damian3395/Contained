@@ -19,7 +19,7 @@ public class WarriorClass {
 	private int levelOne = 2500;
 	private int levelTwo = 5000;
 	private int levelThree = 10000;
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	private IconButton woodSword, chestPlate, stoneSword, arrow, ironHorse, goldHorse, diamondHorse;
 	private IconButton saddle, bow, ironPlate, ironSword, goldPlate, goldSword, diamondPlate, diamondSword;
@@ -42,7 +42,7 @@ public class WarriorClass {
 		warrior = new ProgressBar(this.gui.width/2-50, this.gui.height/2+30, ProgressBar.YELLOW, warriorXP, nextLevel, this.gui.mc);
 	}
 	
-	public List getButtonlist(){
+	public List<GuiButton> getButtonlist(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
 		

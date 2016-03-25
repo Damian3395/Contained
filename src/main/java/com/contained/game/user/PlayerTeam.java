@@ -5,21 +5,15 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.contained.game.Contained;
-import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandler;
-import com.contained.game.ui.GuiGuild;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.common.UsernameCache;
 
 /**
  * Represents a group of players which share a common territory.

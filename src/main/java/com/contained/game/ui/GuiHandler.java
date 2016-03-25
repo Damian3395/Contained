@@ -26,14 +26,17 @@ public class GuiHandler implements IGuiHandler {
 
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer p, World w, int x, int y, int z) {
+		if (id == 1)
+			return new GuiSurvey(PlayerTeamIndividual.get(p));
+		
 		TileEntity te = w.getTileEntity(x, y, z);
-		if (te instanceof TownManageTE) {
+		if (te != null && te instanceof TownManageTE) {
 			Point check = new Point(x, z);
 			String blockTeam = Contained.territoryData.get(check);
 
-			if (blockTeam == null) {
+			if (blockTeam == null)
 				Util.displayError(p, "This block must be within a team's territory to use.");
-			} else {
+			else {
 				PlayerTeamIndividual playerData = PlayerTeamIndividual.get(p);
 				return new GuiTownManage(p.inventory, (TownManageTE)te, blockTeam, playerData.teamID);
 			}

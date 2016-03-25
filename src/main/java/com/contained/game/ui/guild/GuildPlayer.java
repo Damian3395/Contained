@@ -27,7 +27,7 @@ public class GuildPlayer {
 	private PlayerTeamIndividual pdata;
 	private PlayerTeam team;
 	
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	public GuildPlayer(GuiGuild gui){
 		this.gui = gui;
@@ -41,7 +41,7 @@ public class GuildPlayer {
 		team = PlayerTeam.get(pdata.teamID);
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		this.buttonList.add(leave = new GuiButton(LEAVE, x+70, y+30, 40, 20, "Leave"));
 		
 		return buttonList;

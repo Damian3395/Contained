@@ -3,7 +3,6 @@ package com.contained.game.ui;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.data.Data;
-import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.KeyBindings;
 import com.contained.game.network.ServerPacketHandler;
@@ -14,9 +13,7 @@ import com.contained.game.ui.perks.CollectorClass;
 import com.contained.game.ui.perks.CookClass;
 import com.contained.game.ui.perks.WarriorClass;
 import com.contained.game.ui.perks.WizardClass;
-import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

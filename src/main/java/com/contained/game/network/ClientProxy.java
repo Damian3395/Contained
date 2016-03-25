@@ -5,14 +5,12 @@ import com.contained.game.handler.KeyBindings;
 import com.contained.game.handler.KeyInputHandler;
 import com.contained.game.item.AntiTerritoryRender;
 import com.contained.game.item.ItemTerritory;
-import com.contained.game.item.TutorialBook;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.world.block.TerritoryMachineRender;
 import com.contained.game.world.block.TerritoryMachineTE;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.minecraft.client.Minecraft;

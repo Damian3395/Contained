@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerTeam;
-import com.contained.game.user.PlayerTeamPermission;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -49,6 +49,8 @@ public class ServerPacketHandler {
 	
 	public static final int PLAYER_TRADE = 19;
 	public static final int CREATE_TRADE = 20;
+	
+	public static final int UPDATE_SURVEY = 21;
 
 	protected String channelName;
 	protected EntityPlayerMP player;
@@ -163,6 +165,13 @@ public class ServerPacketHandler {
 				case CREATE_TRADE:
 				
 				break;
+				
+				case UPDATE_SURVEY:
+					PlayerTeamIndividual toUpdate = PlayerTeamIndividual.get(packet.readString());
+					toUpdate.surveyProgress = packet.readInt();
+					NBTTagCompound surveyData = packet.readNBTTagCompound();
+					toUpdate.surveyResponses = surveyData.getIntArray("surveyResponses");
+				break;
 			}
 		}
 	}
@@ -182,5 +191,15 @@ public class ServerPacketHandler {
 		toSync.writeToNBT(teamData);
 		permPacket.writeNBTTagCompound(teamData);
 		return permPacket;
+	}
+
+	public static PacketCustom packetUpdateSurvey(PlayerTeamIndividual pdata) {
+		PacketCustom surveyPacket = new PacketCustom(Resources.MOD_ID, UPDATE_SURVEY);
+		NBTTagCompound surveyData = new NBTTagCompound();
+		surveyData.setIntArray("surveyResponses", pdata.surveyResponses);
+		surveyPacket.writeString(pdata.playerName);
+		surveyPacket.writeInt(pdata.surveyProgress);
+		surveyPacket.writeNBTTagCompound(surveyData);
+		return surveyPacket;
 	}
 }

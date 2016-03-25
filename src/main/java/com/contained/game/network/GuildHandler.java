@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -15,16 +14,12 @@ import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
 import com.contained.game.data.DataLogger;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.ui.GuiGuild;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 
 public class GuildHandler {
 	public GuildHandler(){}
@@ -112,7 +107,7 @@ public class GuildHandler {
 		PlayerTeam team = PlayerTeam.get(pdata.teamID);
 		
 		PlayerTeamIndividual toPromote = PlayerTeamIndividual.get(teammate);
-		ErrorCase.Error resultP = toPromote.promote();
+		toPromote.promote();
 		
 		String world = player.dimension == 0 ? "Normal" : "Nether";
 		DataLogger.insertPromoteTeamPlayer("debugmode", player.getDisplayName(), world, team.displayName, teammate, Util.getDate());

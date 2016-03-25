@@ -9,22 +9,22 @@
 <page type="contents">
 <text>Table of Contents</text>
 <link>
+ <text>Guilds</text>
+ <jump>1</jump>
+</link>
+<link>
  <text>Getting Started</text>
  <icon>TerritoryFlag</icon>
- <jump>1</jump>
+ <jump>2</jump>
 </link>
 <link>
  <text>Town Hall</text>
  <icon>townHall</icon>
- <jump>2</jump>
+ <jump>3</jump>
 </link>
 <link>
  <text>Territory Gems/Machines</text>
  <icon>ClaimTerritoryMachine</icon>
- <jump>3</jump>
-</link>
-<link>
- <text>Guilds</text>
  <jump>4</jump>
 </link>
 <link>
@@ -35,67 +35,6 @@
  <text>Perks</text>
  <jump>7</jump>
 </link>
-</page>
-
-<page type="sectionpage">
-<title>Territory Flag</title>
-<text>This is an item usable only by team leaders. It allows you to start a single block of land as your territory, which you and your team members can later expand off of. There are no restrictions on where you can use this, as long as the block is not already owned by another team. The first time use of the flag is free, but subsequent uses require a steep amount of experience levels. </text>
-</page>
-
-<page type="crafting">
-<text>Territory Flag</text>
-<recipe>
- <name>TerritoryFlag</name>
- <size>three</size>
-</recipe>
-</page>
-
-<page type="sectionpage">
-<title>Town Hall</title>
-<text>This is an important block that every team should have. It enables the purchasing and managing of various things that will be essential for the growth and success of the players' town.
-
-§lTerritory Purchasing:§r This tab allows you to spend experience levels in order to purchase items that will allow you to expand your team's territory, as well as take over other teams' territories, if you so desire.
-</text>
-</page>
-
-<page type="crafting">
-<text>Town Hall</text>
-<recipe>
- <name>townHall</name>
- <size>two</size>
-</recipe>
-</page>
-
-<page type="toolpage">
-<title>Territory Gems</title>
-<text>One-time use item that allows acquisition of a single extra block of territory… but it must be one that’s directly adjacent to the land your team already owns.
-
-The Anti-gem is similar, except it allows you to remove a block of another (specific) team’s territory. It must be territory at the very edge/perimeter of that team’s land. Using one on your own territory refunds you experience levels.
-
-Anti-gems drop when you kill
-a player from another team.
-</text>
-<item>
- <text>Territory Gem</text>
- <icon>ItemClaimTerritory</icon>
-</item>
-<item>
- <text>Anti-Territory Gem</text>
- <icon>ItemRemoveTerritory</icon>
-</item>
-</page>
-
-<page type="toolpage">
-<title>Territory Machines</title>
-<text>Unlimited use versions of the territory gems, that passively claim/remove land for you over time. You place the machine into the world, and it very slowly converts land within a small radius. The machines are confined to the same restrictions as the territory gems; for example, they can only claim land directly adjacent to your current territory.</text>
-<item>
- <text>Territory Machine</text>
- <icon>ClaimTerritoryMachine</icon>
-</item>
-<item>
- <text>Anti-Territory Machine</text>
- <icon>RemoveTerritoryMachine</icon>
-</item>
 </page>
 
 <page type="sectionpage">
@@ -118,7 +57,7 @@ Players can either join a guild or create their own. To create a guild, type in 
 <title>Guild Leader Pt.2</title>
 <text>§lTeam-mate Tab:§r This tab allows the leader to promote or demote a player in the guild, but the leader can also use it to kick a player out of the guild. If the guild leader demotes himself/herself, then another guild member who was promoted will become the guild leader.
 
-§lSettings Tab:§r If the guild has not reached the maximum members limit, the leader can invite more players into the guild. The leader can also change the teams' name and color.    
+§lSettings Tab:§r If the guild has not reached the maximum members limit, the leader can invite more players into the guild. The leader can also change the guilds' name and color.    
 </text>
 </page>
 
@@ -127,6 +66,67 @@ Players can either join a guild or create their own. To create a guild, type in 
 <text>Guild players have the option to leave the guild they are currently in. They can also accomplish tasks from the quest list that their leader posts to earn xp for their guild.
 §lQuests: TODO§r
 </text>
+</page>
+
+<page type="sectionpage">
+<title>Territory Flag</title>
+<text>This is an item usable only by guild leaders. It allows you to start a single block of land as your territory, which you and your guild members can later expand off of. There are no restrictions on where you can use this, as long as the block is not already owned by another guild. The first time use of the flag is free, but subsequent uses require a steep amount of experience levels. </text>
+</page>
+
+<page type="crafting">
+<text>Territory Flag</text>
+<recipe>
+ <name>TerritoryFlag</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="sectionpage">
+<title>Town Hall</title>
+<text>This is an important block that every guild should have. It enables the purchasing and managing of various things that will be essential for the growth and success of the players' town.
+
+§lTerritory Purchasing:§r This tab allows you to spend experience levels in order to purchase items that will allow you to expand your guild's territory, as well as take over other guilds' territories, if you so desire.
+</text>
+</page>
+
+<page type="crafting">
+<text>Town Hall</text>
+<recipe>
+ <name>townHall</name>
+ <size>two</size>
+</recipe>
+</page>
+
+<page type="toolpage">
+<title>Territory Gems</title>
+<text>One-time use item that allows acquisition of a single extra block of territory… but it must be one that’s directly adjacent to the land your guild already owns.
+
+The Anti-gem is similar, except it allows you to remove a block of another (specific) guild’s territory. It must be territory at the very edge/perimeter of that guild’s land. Using one on your own territory refunds you experience levels.
+
+Anti-gems drop when you kill
+a player from another guild.
+</text>
+<item>
+ <text>Territory Gem</text>
+ <icon>ItemClaimTerritory</icon>
+</item>
+<item>
+ <text>Anti-Territory Gem</text>
+ <icon>ItemRemoveTerritory</icon>
+</item>
+</page>
+
+<page type="toolpage">
+<title>Territory Machines</title>
+<text>Unlimited use versions of the territory gems, that passively claim/remove land for you over time. You place the machine into the world, and it very slowly converts land within a small radius. The machines are confined to the same restrictions as the territory gems; for example, they can only claim land directly adjacent to your current territory.</text>
+<item>
+ <text>Territory Machine</text>
+ <icon>ClaimTerritoryMachine</icon>
+</item>
+<item>
+ <text>Anti-Territory Machine</text>
+ <icon>RemoveTerritoryMachine</icon>
+</item>
 </page>
 
 <page type="sectionpage">

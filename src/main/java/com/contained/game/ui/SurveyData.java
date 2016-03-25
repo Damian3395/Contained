@@ -6,7 +6,7 @@ package com.contained.game.ui;
  */
 public class SurveyData {
 
-	public Q[] data = {
+	public static final Q[] data = {
 		new Q("I respect authority.", Q.AGREEABLENESS, 1),
 		new Q("I avoid philosophical discussions.", Q.OPENNESS, -1),
 		new Q("I need a creative outlet.", Q.OPENNESS, 1),
@@ -59,7 +59,7 @@ public class SurveyData {
 		new Q("I feel threatened easily.", Q.NEUROTICISM, 1)
 	};
 	
-	public class Q {
+	public static class Q {
 		public static final int EXTRAVERSION = 1;
 		public static final int AGREEABLENESS = 2;
 		public static final int CONSCIENTIOUSNESS = 3;
@@ -75,5 +75,37 @@ public class SurveyData {
 			this.type = type;
 			this.amount = amount;
 		}
+	}
+	
+	/**
+	 * @param type Personality factor to score
+	 * @return Value between -1.0 and +1.0
+	 */
+	public static float scoreResponses(int type, int[] responses) {
+		int SAGREE = 0;
+		int AGREE = 1;
+		int DISAGREE = 3;
+		int SDISAGREE = 4;
+		
+		float numOfType = 0;
+		float score = 0;
+		
+		for (int i=0; i<data.length; i++) {
+			if (data[i].type != type)
+				continue;
+			else {
+				numOfType++;
+				if (responses[i] == SAGREE)
+					score += 2*data[i].amount;
+				else if (responses[i] == AGREE)
+					score += 1*data[i].amount;
+				else if (responses[i] == SDISAGREE)
+					score += -2*data[i].amount;
+				else if (responses[i] == DISAGREE)
+					score += -1*data[i].amount;
+			}
+		}
+		
+		return score/(2*numOfType);
 	}
 }

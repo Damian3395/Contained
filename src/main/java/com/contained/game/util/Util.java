@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.contained.game.data.Data;
-import com.contained.game.user.PlayerTeam;
-import com.contained.game.user.PlayerTeamIndividual;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
@@ -167,6 +164,13 @@ public class Util {
 	 */
 	public static void displayError(EntityPlayer player, String msg) {
 		player.addChatComponentMessage(new ChatComponentText("§c"+msg));
+	}
+	
+	/**
+	 * Outputs a local message to the player.
+	 */
+	public static void displayMessage(EntityPlayer player, String msg) {
+		player.addChatComponentMessage(new ChatComponentText(msg));
 	}
 	
 	/**

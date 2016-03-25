@@ -11,7 +11,9 @@ import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.BlockInteractItem;
 import com.contained.game.item.ItemTerritory;
+import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.ui.SurveyData;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -28,14 +30,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -56,6 +56,8 @@ public class PlayerEvents {
 			//  -Notify the player on join if one of their invitations got accepted
 			//   since the last time they were online.
 			
+			boolean completedSurvey = false;
+			
 			if (PlayerTeamIndividual.get(joined) == null) {
 				// Server has no info about this player, this must be their first
 				// time joining. Initialize their custom data.
@@ -67,6 +69,20 @@ public class PlayerEvents {
 							joined.posX, joined.posY+1, joined.posZ, 
 							new ItemStack(ContainedRegistry.book, 1)));
 			}
+			else {
+				//If player has not completed the survey, give them a reminder.
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
+				if (pdata.surveyProgress <= SurveyData.data.length)
+					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out your §a§lsurvey)");
+				else
+					completedSurvey = true;
+			}			
+			
+			//If player does not have a survey in their inventory, give them one.
+			if (!completedSurvey && !joined.inventory.hasItem(SurveyClipboard.instance))
+				event.world.spawnEntityInWorld(new EntityItem(event.world, 
+						joined.posX, joined.posY+1, joined.posZ, 
+						new ItemStack(SurveyClipboard.instance, 1)));
 			
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);

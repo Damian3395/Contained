@@ -157,7 +157,7 @@ public class GuiGuild extends GuiScreen {
 	
 	@Override
 	protected void actionPerformed(GuiButton button){
-		if(!this.update){
+		if(!GuiGuild.update){
 			switch(guildStatus){
 			case PlayerTeamIndividual.LONER:
 				loner.actionPerformed(button);
@@ -186,7 +186,7 @@ public class GuiGuild extends GuiScreen {
 		this.buttonList.clear();
 	}
 	
-	public void setButtonList(List buttonlist){
+	public void setButtonList(List<GuiButton> buttonList){
 		this.buttonList = buttonList;
 	}
 }
