@@ -16,6 +16,7 @@ import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
+import com.contained.game.user.PlayerTrade;
 import com.contained.game.world.GenerateWorld;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -75,6 +76,15 @@ public class Save {
 			playerList.appendTag(playerNBT);
 		}
 		ntc.setTag("playerList", playerList);
+		
+		//Save trades
+		NBTTagList tradeList = new NBTTagList();
+		for(PlayerTrade trade : Contained.trades){
+			NBTTagCompound tradeNBT = new NBTTagCompound();
+			trade.writeToNBT(tradeNBT);
+			tradeList.appendTag(tradeNBT);
+		}
+		ntc.setTag("tradeList", tradeList);
 		
 		//Save invitations
 		NBTTagList invitationList = new NBTTagList();

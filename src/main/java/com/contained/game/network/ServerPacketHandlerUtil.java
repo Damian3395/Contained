@@ -35,8 +35,9 @@ public class ServerPacketHandlerUtil {
 	
 	public static final int PLAYER_TRADE = 19;
 	public static final int CREATE_TRADE = 20;
+	public static final int CANCEL_TRADE = 21;
 	
-	public static final int UPDATE_SURVEY = 21;
+	public static final int UPDATE_SURVEY = 22;
 	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);

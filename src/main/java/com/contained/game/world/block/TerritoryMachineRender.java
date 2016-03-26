@@ -103,7 +103,7 @@ public class TerritoryMachineRender extends TileEntitySpecialRenderer {
 			    tessellator.addVertexWithUV(1+margin, progress, 0, 0, progress);
 				tessellator.draw();
 		    }
-		    
+			
 		    // For a brief period of time during the machine's cycle,
 		    // draw an xray wireframe around it that can be seen through
 		    // blocks. This provides a window of opportunity for finding

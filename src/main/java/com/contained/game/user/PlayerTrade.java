@@ -22,9 +22,14 @@ public class PlayerTrade {
 		this.id = UUID.randomUUID().toString();
 	}
 	
+	public PlayerTrade(NBTTagCompound ntc) {
+		this.readFromNBT(ntc);
+	}
+	
 	public void writeToNBT(NBTTagCompound ntc) {
 		ntc.setString("displayName", this.displayName);
 		ntc.setString("teamID", this.teamID);
+		ntc.setString("id", this.id);
 
 		NBTTagCompound offerTag = new NBTTagCompound();
 		offer.writeToNBT(offerTag);
@@ -38,9 +43,10 @@ public class PlayerTrade {
 	public void readFromNBT(NBTTagCompound ntc) {
 		this.displayName = ntc.getString("displayName");
 		this.teamID = ntc.getString("teamID");
+		this.id = ntc.getString("id");
 		
 		this.offer = ItemStack.loadItemStackFromNBT(ntc.getCompoundTag("offer"));
-		this.request = ItemStack.loadItemStackFromNBT(ntc.getCompoundTag("reuset"));
+		this.request = ItemStack.loadItemStackFromNBT(ntc.getCompoundTag("request"));
 	}
 	
 	public static PlayerTrade get(ArrayList<PlayerTrade> trades, Object comp) {

@@ -27,6 +27,7 @@ public class ServerPacketHandler {
 
 	private GuildHandler guild = new GuildHandler();
 	private PerkHandler perk = new PerkHandler();
+	private TradeHandler trade = new TradeHandler();
 	
 	@SubscribeEvent
 	public void handlePacket(ServerCustomPacketEvent event) {		
@@ -129,11 +130,15 @@ public class ServerPacketHandler {
 				break;
 				
 				case ServerPacketHandlerUtil.PLAYER_TRADE:
-					
+					trade.transaction(player, packet.readNBTTagCompound());
 				break;
 				
 				case ServerPacketHandlerUtil.CREATE_TRADE:
+					trade.create(player, packet.readInt(), packet.readItemStack(), packet.readItemStack());
+				break;
 				
+				case ServerPacketHandlerUtil.CANCEL_TRADE:
+					trade.cancel(player, packet.readString());
 				break;
 				
 				case ServerPacketHandlerUtil.UPDATE_SURVEY:

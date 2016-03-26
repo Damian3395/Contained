@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
@@ -14,12 +15,14 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiGuild;
+import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
+import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -256,12 +259,81 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						Contained.teamMemberData.add(pdata);
 				break;
 				
-				case ClientPacketHandlerUtil.PLAYER_TRADE:
-					
+				case ClientPacketHandlerUtil.REMOVE_ITEM:
+					player.inventory.setInventorySlotContents(packet.readInt(), null);
 				break;
 				
 				case ClientPacketHandlerUtil.CREATE_TRADE:
+					PlayerTrade addTrade = new PlayerTrade(packet.readNBTTagCompound());
+					if(addTrade.offer != null && addTrade.request != null)
+						Contained.trades.add(addTrade);
 					
+					if(mc.currentScreen instanceof GuiTownManage)
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+				break;
+				
+				case ClientPacketHandlerUtil.REMOVE_TRADE:
+					String UUID = packet.readString();
+					if(UUID.isEmpty())
+						return;
+					
+					for(PlayerTrade remTrade : Contained.trades)
+						if(remTrade.id.equals(UUID))
+							Contained.trades.remove(remTrade);
+					
+					if(mc.currentScreen instanceof GuiTownManage)
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+				break;
+				
+				case ClientPacketHandlerUtil.TRADE_TRANS:
+					boolean trans = packet.readBoolean();
+					ItemStack offer = packet.readItemStack();
+					ItemStack request = packet.readItemStack();
+					
+					if(trans) { //Trade Creator -Remove Offer -Add Request
+						int count = 0;
+						for(int i = 0; i < player.inventory.getSizeInventory(); i++){
+							ItemStack curSlot = player.inventory.getStackInSlot(i);
+							if(curSlot.equals(offer)){
+								if((curSlot.stackSize + count) <= offer.stackSize){
+									count += curSlot.stackSize;
+									player.inventory.setInventorySlotContents(i, null);
+								}else{
+									player.inventory.decrStackSize(i, offer.stackSize-count);
+									i = player.inventory.getSizeInventory();
+								}
+							}
+						}
+						player.inventory.addItemStackToInventory(request);
+					}else{ //Trade Acceptor -Remove Request -Add Offer
+						int count = 0;
+						for(int i = 0; i < player.inventory.getSizeInventory(); i++){
+							ItemStack curSlot = player.inventory.getStackInSlot(i);
+							if(curSlot.equals(request)){
+								if((curSlot.stackSize + count) <= request.stackSize){
+									count += curSlot.stackSize;
+									player.inventory.setInventorySlotContents(i, null);
+								}else{
+									player.inventory.decrStackSize(i, request.stackSize-count);
+									i = player.inventory.getSizeInventory();
+								}
+							}
+						}
+						player.inventory.addItemStackToInventory(offer);
+					}
+					
+					if(mc.currentScreen instanceof GuiTownManage)
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+				break;
+				
+				case ClientPacketHandlerUtil.SYNC_TRADE:
+					Contained.trades.clear();
+					int numTrades = packet.readInt();
+					for(int i=0; i<numTrades; i++) {
+						PlayerTrade readTrade = new PlayerTrade(packet.readNBTTagCompound());
+						if(readTrade.offer != null && readTrade.request != null)
+							Contained.trades.add(readTrade);
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.PLAYER_ADMIN:

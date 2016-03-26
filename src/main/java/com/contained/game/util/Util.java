@@ -193,7 +193,7 @@ public class Util {
 		if (Resources.DEBUG_ENABLED)
 			player.addChatComponentMessage(new ChatComponentText(msg));
 	}
-
+	
 	public static float clamp(float val, float min, float max) {
 		return Math.max(Math.min(max, val), min);
 	}

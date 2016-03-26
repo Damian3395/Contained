@@ -12,6 +12,7 @@ import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
+import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
 
 public class ClientPacketHandlerUtil {
@@ -42,14 +43,17 @@ public class ClientPacketHandlerUtil {
 	public static final int UPDATE_PERMISSIONS = 23;
 	public static final int SYNC_LOCAL_PLAYER = 24;
 	
-	public static final int PLAYER_TRADE = 25;
+	public static final int REMOVE_ITEM = 25;
 	public static final int CREATE_TRADE = 26;
+	public static final int REMOVE_TRADE = 27;
+	public static final int TRADE_TRANS = 28;
+	public static final int SYNC_TRADE = 29;
 	
-	public static final int PLAYER_ADMIN = 27;
-	public static final int NEW_PLAYER = 28;
-	public static final int UPDATE_PLAYER = 29;
-	public static final int PLAYER_LIST = 30;
-	public static final int SYNC_INVITATIONS = 31;
+	public static final int PLAYER_ADMIN = 30;
+	public static final int NEW_PLAYER = 31;
+	public static final int UPDATE_PLAYER = 32;
+	public static final int PLAYER_LIST = 33;
+	public static final int SYNC_INVITATIONS = 34;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
@@ -151,4 +155,30 @@ public class ClientPacketHandlerUtil {
 		return packet;
 	}
 	
+	public static PacketCustom packetSyncTrades(PlayerTrade trade, boolean type) {
+		PacketCustom teamPacket;
+		if(type){ //Create New Trade
+			teamPacket = new PacketCustom(Resources.MOD_ID, CREATE_TRADE);
+			NBTTagCompound tradeData = new NBTTagCompound();
+			trade.writeToNBT(tradeData);
+			teamPacket.writeNBTTagCompound(tradeData);
+			return teamPacket;
+		}
+		
+		// Remove Existing Trade
+		teamPacket = new PacketCustom(Resources.MOD_ID, REMOVE_TRADE);
+		teamPacket.writeString(trade.id);
+		return teamPacket;
+	}
+	
+	public static PacketCustom packetSyncTrades(ArrayList<PlayerTrade> trades){
+		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, SYNC_TRADE);
+		tradePacket.writeInt(trades.size());
+		for(PlayerTrade trade : trades){
+			NBTTagCompound ntc = new NBTTagCompound();
+			trade.writeToNBT(ntc);
+			tradePacket.writeNBTTagCompound(ntc);
+		}
+		return tradePacket;
+	}
 }

@@ -72,19 +72,19 @@ public class PlayerEvents {
 				//If player has not completed the survey, give them a reminder.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
 				if (pdata.surveyResponses.progress <= SurveyData.getSurveyLength())
-					Util.displayMessage(joined, "Â§aÂ§l(Reminder: Please take a moment to fill out Â§aÂ§lyour Â§aÂ§lsurvey)");
+					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out §a§lyour §a§lsurvey)");
 				else
 					completedSurvey = true;
 				
 				//If the player has pending invitations, let them know.
 				if (PlayerTeamInvitation.getInvitations(pdata).size() > 0)
-					Util.displayMessage(joined, "Â§dÂ§lYou have pending inviations in your guild Â§dÂ§lmenu!");
+					Util.displayMessage(joined, "§d§lYou have pending inviations in your guild §d§lmenu!");
 			
 				// If the player got accepted into a team since last time they 
 				// were online, let them know.
 				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
 					PlayerTeam newTeam = PlayerTeam.get(pdata);
-					Util.displayMessage(joined, "Â§dÂ§lYou are now a member of "+newTeam.getFormatCode()+"Â§l"+newTeam.displayName+"Â§dÂ§l!");
+					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
 					pdata.lastOnline = System.currentTimeMillis();
 				}
 			}			
@@ -101,20 +101,21 @@ public class PlayerEvents {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetPlayerList(Contained.teamMemberData).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.trades).toPacket(), (EntityPlayerMP) joined);
+				
+				//Class Perks
+				ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
+				PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PERK_INFO);
+				for(int i = 0; i < 5; i++){
+					if(i < perks.size())
+						perkPacket.writeInt(perks.get(i));
+					else
+						perkPacket.writeInt(-1);
+				}
+				perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
+				perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
+				Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 			}
-			
-			//Class Perks
-			ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
-			PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PERK_INFO);
-			for(int i = 0; i < 5; i++){
-				if(i < perks.size())
-					perkPacket.writeInt(perks.get(i));
-				else
-					perkPacket.writeInt(-1);
-			}
-			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
-			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
-			Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 		}
 	}
 	

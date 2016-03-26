@@ -9,6 +9,7 @@ import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
+import com.contained.game.user.PlayerTrade;
 import com.contained.game.world.GenerateWorld;
 
 import net.minecraft.nbt.CompressedStreamTools;
@@ -76,6 +77,12 @@ public class Load {
 				NBTTagCompound data = invitationList.getCompoundTagAt(i);
 				PlayerTeamInvitation invite = new PlayerTeamInvitation(data);
 				Contained.teamInvitations.add(invite);
+			}
+			NBTTagList tradeList = ntc.getTagList("tradeList", (byte)10);
+			for(int i=0; i<tradeList.tagCount(); i++){
+				NBTTagCompound data = tradeList.getCompoundTagAt(i);
+				PlayerTrade trade = new PlayerTrade(data);
+				Contained.trades.add(trade);
 			}
 		}
 	}
