@@ -24,7 +24,9 @@ public class Resources {
 	public static final int REDSTONE = 4;
 	public static final int DIAMOND = 5;
 	public static final int EMERALD = 6;
-	public static final int NUM_MINERALS = 7;
+	public static final int QUARTZ = 7;
+	public static final int GLOWSTONE = 8;
+	public static final int NUM_MINERALS = 9;
 	
 	public static Block[] oreTypes = {
 		Blocks.iron_ore,

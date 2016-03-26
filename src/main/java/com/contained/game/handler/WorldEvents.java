@@ -2,6 +2,9 @@ package com.contained.game.handler;
 
 import java.awt.Point;
 
+import com.contained.game.entity.DeepBlaze;
+import com.contained.game.entity.DeepLavaSlime;
+import com.contained.game.entity.DeepWitherSkeleton;
 import com.contained.game.util.Load;
 import com.contained.game.util.Save;
 import com.contained.game.util.Util;
@@ -12,7 +15,10 @@ import com.contained.game.world.block.WastelandBlock;
 import com.contained.game.world.block.WastelandBush;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -43,9 +49,21 @@ public class WorldEvents {
 				else
 					biomeOverride = WastelandBiome.biome;
 			}
-				
+			
+			//Override biomes based on finite world configurations
 			for(int i=0; i<event.biomeArray.length; i++)
 				event.biomeArray[i] = biomeOverride;
+			
+			//Low areas of map should use netherrack instead of stone.
+			for(int i=0;i<16;i++) {
+				for(int j=0;j<16;j++) {
+					for(int k=0;k<16;k++) {
+						int val = i << 12 | j << 8 | k;
+						if (event.blockArray[val] == Blocks.stone && Math.random() <= (17f-k)/8f)
+							event.blockArray[val] = Blocks.netherrack;
+					}
+				}
+			}
 		}
 	}
 	

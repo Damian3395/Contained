@@ -7,6 +7,8 @@ import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.feature.WorldGenerator;
@@ -20,6 +22,18 @@ public class ResourceGen {
 		if (event.type == EventType.COAL) {
 			oreGenFromProperties(event.world, event.rand, event.worldX
 					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.COAL]);
+			oreGenFromProperties(event.world, event.rand, event.worldX
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.QUARTZ]);
+			oreGenFromProperties(event.world, event.rand, event.worldX
+					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.GLOWSTONE]);
+			
+			// Generate clumps of soulsand at the bottom of the map in the
+			// netherrack region.
+			WorldGenMinable generator = new WorldGenMinable(Blocks.soul_sand, 
+					Util.randomRange(8, 32), Blocks.netherrack);
+			generateVeins(event.world, event.rand, generator, 
+					1, event.worldX, event.worldZ, 1, 16);
+			
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.IRON) {
@@ -65,6 +79,11 @@ public class ResourceGen {
 		if (canGenerate) {
 			WorldGenMinable generator = new WorldGenMinable(p.type, 
 					Util.randomRange(p.veinSize.min(), p.veinSize.max()));
+			generateVeins(w, r, generator, 
+					Util.randomRange(p.veinCount.min(), p.veinCount.max()),
+					x, z, p.spawnHeight.min(), p.spawnHeight.max());
+			generator = new WorldGenMinable(p.type, 
+					Util.randomRange(p.veinSize.min(), p.veinSize.max()), Blocks.netherrack);
 			generateVeins(w, r, generator, 
 					Util.randomRange(p.veinCount.min(), p.veinCount.max()),
 					x, z, p.spawnHeight.min(), p.spawnHeight.max());

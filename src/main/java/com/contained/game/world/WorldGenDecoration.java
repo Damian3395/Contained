@@ -15,7 +15,7 @@ public class WorldGenDecoration extends WorldGenerator{
         this.block = b;
     }
 
-    public boolean generate(World w, Random rand, int x, int y, int z){
+    public boolean generate(World w, Random rand, int x, int y, int z) {
         Block b;
 
         do {

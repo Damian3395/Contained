@@ -1,10 +1,12 @@
 package com.contained.game.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.contained.game.data.Data;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
@@ -16,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 
 public class Util {	
 	/**
@@ -157,6 +160,16 @@ public class Util {
 		
 		return itemADup.isItemEqual(itemBDup) 
 				&& ItemStack.areItemStackTagsEqual(itemADup, itemBDup);
+	}
+	
+	public static BiomeGenBase[] getBiomesArray() {
+		ArrayList<BiomeGenBase> all_biomesList = new ArrayList<BiomeGenBase>();
+		for( BiomeGenBase biome : BiomeGenBase.getBiomeGenArray() ) {
+			if( biome != null )
+				all_biomesList.add(biome);
+		}
+		BiomeGenBase[] all_biomes_array = new BiomeGenBase[all_biomesList.size()];
+		return all_biomesList.toArray(all_biomes_array);
 	}
 	
 	/**
