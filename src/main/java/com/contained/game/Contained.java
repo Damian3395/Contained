@@ -10,6 +10,7 @@ import com.contained.game.handler.DataEvents;
 import com.contained.game.handler.FMLDataEvents;
 import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
+import com.contained.game.handler.RenderEvents;
 import com.contained.game.handler.WorldEvents;
 import com.contained.game.handler.perks.BuilderEvents;
 import com.contained.game.handler.perks.CollectorEvents;
@@ -36,6 +37,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = Resources.MOD_ID, name=Resources.NAME, version=Resources.VERSION)
@@ -86,6 +88,10 @@ public class Contained{
 		MinecraftForge.EVENT_BUS.register(new WizardEvents());
 		MinecraftForge.EVENT_BUS.register(new WarriorEvents());
 		MinecraftForge.EVENT_BUS.register(new ProtectionEvents());
+		
+		if (event.getSide() == Side.CLIENT) {
+			MinecraftForge.EVENT_BUS.register(new RenderEvents());
+		}
 		
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
 		world.init();

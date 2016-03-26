@@ -41,7 +41,6 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
@@ -144,20 +143,6 @@ public class PlayerEvents {
 				for(ItemStack stack : inventory)
 					if (stack != null)
 						processNewOwnership(player, stack);
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public void onEntityRender(RenderLivingEvent.Pre event) {
-		// Players in teams will have their team name rendered above
-		// their head in-game.
-		if (event.entity instanceof EntityPlayer) {
-			EntityPlayer p = (EntityPlayer)event.entity;
-			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
-			if (pdata != null && pdata.teamID != null) {
-				PlayerTeam team = PlayerTeam.get(pdata.teamID);
-				RenderUtil.drawNameTag(p, team.getFormatCode()+"§l["+team.displayName+"]", event.x, event.y+0.5, event.z, 64);
 			}
 		}
 	}
