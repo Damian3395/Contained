@@ -64,7 +64,7 @@ public class Contained{
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
-		event.registerServerCommand(new CommandDebugOreGen());
+		//event.registerServerCommand(new CommandDebugOreGen());
 		event.registerServerCommand(new CommandTeamChat());
 		event.registerServerCommand(new CommandBecomeAdmin());
 		event.registerServerCommand(new CommandCreate());
