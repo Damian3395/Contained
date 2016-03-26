@@ -260,9 +260,18 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.REMOVE_ITEM:
-					int slotId = packet.readInt();
-					if(slotId > -1 && mc.thePlayer.inventory.getStackInSlot(slotId) != null)
+					int slotId = packet.readInt() + 9;
+					if(slotId >= mc.thePlayer.inventory.mainInventory.length)
+						slotId -= mc.thePlayer.inventory.mainInventory.length;
+					
+					if(mc.thePlayer.inventory.getStackInSlot(slotId) != null)
 						mc.thePlayer.inventory.setInventorySlotContents(slotId, null);
+				break;
+				
+				case ClientPacketHandlerUtil.ADD_ITEM:
+					ItemStack item = packet.readItemStack();
+					if(mc.thePlayer.inventory.getFirstEmptyStack() > -1 && item != null)
+						mc.thePlayer.inventory.addItemStackToInventory(item);
 				break;
 				
 				case ClientPacketHandlerUtil.CREATE_TRADE:
@@ -292,37 +301,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ItemStack offer = packet.readItemStack();
 					ItemStack request = packet.readItemStack();
 					
-					if(trans) { //Trade Creator -Remove Offer -Add Request
-						int count = 0;
-						for(int i = 0; i < mc.thePlayer.inventory.getSizeInventory(); i++){
-							ItemStack curSlot = mc.thePlayer.inventory.getStackInSlot(i);
-							if(curSlot.equals(offer)){
-								if((curSlot.stackSize + count) <= offer.stackSize){
-									count += curSlot.stackSize;
-									mc.thePlayer.inventory.setInventorySlotContents(i, null);
-								}else{
-									mc.thePlayer.inventory.decrStackSize(i, offer.stackSize-count);
-									i = player.inventory.getSizeInventory();
-								}
-							}
-						}
+					if(trans) //Trade Creator -Remove Offer -Add Request
 						player.inventory.addItemStackToInventory(request);
-					}else{ //Trade Acceptor -Remove Request -Add Offer
-						int count = 0;
-						for(int i = 0; i < player.inventory.getSizeInventory(); i++){
-							ItemStack curSlot = mc.thePlayer.inventory.getStackInSlot(i);
-							if(curSlot.equals(request)){
-								if((curSlot.stackSize + count) <= request.stackSize){
-									count += curSlot.stackSize;
-									mc.thePlayer.inventory.setInventorySlotContents(i, null);
-								}else{
-									mc.thePlayer.inventory.setInventorySlotContents(i, null);
-									i = player.inventory.getSizeInventory();
-								}
-							}
-						}
+					else //Trade Acceptor -Remove Request -Add Offer
 						player.inventory.addItemStackToInventory(offer);
-					}
 					
 					if(mc.currentScreen instanceof GuiTownManage)
 						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));

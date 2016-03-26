@@ -45,17 +45,18 @@ public class ClientPacketHandlerUtil {
 	public static final int UPDATE_PERMISSIONS = 23;
 	public static final int SYNC_LOCAL_PLAYER = 24;
 	
-	public static final int REMOVE_ITEM = 25;
-	public static final int CREATE_TRADE = 26;
-	public static final int REMOVE_TRADE = 27;
-	public static final int TRADE_TRANS = 28;
-	public static final int SYNC_TRADE = 29;
+	public static final int ADD_ITEM = 25;
+	public static final int REMOVE_ITEM = 26;
+	public static final int CREATE_TRADE = 27;
+	public static final int REMOVE_TRADE = 28;
+	public static final int TRADE_TRANS = 29;
+	public static final int SYNC_TRADE = 30;
 	
-	public static final int PLAYER_ADMIN = 30;
-	public static final int NEW_PLAYER = 31;
-	public static final int UPDATE_PLAYER = 32;
-	public static final int PLAYER_LIST = 33;
-	public static final int SYNC_INVITATIONS = 34;
+	public static final int PLAYER_ADMIN = 31;
+	public static final int NEW_PLAYER = 32;
+	public static final int UPDATE_PLAYER = 33;
+	public static final int PLAYER_LIST = 34;
+	public static final int SYNC_INVITATIONS = 35;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);

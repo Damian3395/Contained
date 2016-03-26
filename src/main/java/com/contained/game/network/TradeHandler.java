@@ -106,8 +106,7 @@ public class TradeHandler {
 		if(offer == null || request == null && slotId != -1)
 			return;
 		
-		if(player.inventory.getStackInSlot(slotId) != null)
-			player.inventory.getStackInSlot(slotId).stackSize = 0;
+		player.inventory.setInventorySlotContents(slotId, null);
 		
 		//Remove Items From Player
 		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_ITEM);
@@ -124,6 +123,9 @@ public class TradeHandler {
 		if(uuid.isEmpty())
 			return;
 		
+		if(player.inventory.getFirstEmptyStack() < 0)
+			return;
+		
 		PlayerTrade removeTrade = null;
 		for(int i = 0; i < Contained.trades.size(); i++)
 			if(Contained.trades.get(i).id.equals(uuid)){
@@ -131,6 +133,12 @@ public class TradeHandler {
 				Contained.trades.remove(removeTrade);
 			}
 		
+		////Add Item Back To Player
+		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+		tradePacket.writeItemStack(removeTrade.offer);
+		Contained.channel.sendTo(tradePacket.toPacket(), player);
+		
+		//Update All Players
 		if(removeTrade != null){
 			PacketCustom removeTrades = ClientPacketHandlerUtil.packetSyncTrades(removeTrade, false);
 			Contained.channel.sendToAll(removeTrades.toPacket());

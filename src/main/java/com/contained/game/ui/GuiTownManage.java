@@ -433,7 +433,7 @@ public class GuiTownManage extends GuiContainer {
 	}
 	
 	private void renderSelectOption(){
-		listCounts[tabMarket] = 13;
+		listCounts[tabMarket] = 12;
 		int indOff = 0;
 		
 		displayString(0+indOff, "[Back]");
@@ -634,12 +634,14 @@ public class GuiTownManage extends GuiContainer {
 		if (itemHovering == ind-offset)
 			this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
 		
-		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), offer, x+30, y);
-		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), request, x+110, y);
+		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), offer, x+35, y);
+		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), request, x+115, y);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		fr.drawString("Offer: ", x, y+4, 0x000000);
+		fr.drawString(Integer.toString(offer.stackSize), x+55, y+4, 0x000000);
 		fr.drawString("Request: ", x+70, y+4, 0x000000);
+		fr.drawString(Integer.toString(request.stackSize), x+135, y+4, 0x000000);
 		
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
@@ -697,7 +699,7 @@ public class GuiTownManage extends GuiContainer {
 		
 		if(button == 0 && indOff+ind == 0)
 			marketInd = NONE;
-		else if(button == 1){
+		else if(button == 1 && marketInd == MY_TRADES){
 			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.CANCEL_TRADE);
 			packet.writeString(myTrades.get((indOff+ind)-1).id);
 			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
@@ -714,6 +716,7 @@ public class GuiTownManage extends GuiContainer {
 		case 3: break; //Select Stack Size
 		case 4:
 			if(makeOffer != null && makeRequest != null && selectedSlot != -1){ //Create New Trade
+				makeRequest.stackSize = requestSize;
 				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.CREATE_TRADE);
 				packet.writeInt(selectedSlot);
 				packet.writeItemStack(this.makeOffer);
@@ -738,13 +741,13 @@ public class GuiTownManage extends GuiContainer {
 		case 2: marketInd = FOODS; break; 
 		case 3: marketInd = TOOLS; break; 
 		case 4: marketInd = COMBAT; break; 
-		case 6: marketInd = TRANSPORTATION; break; 
-		case 7: marketInd = POTIONS; break; 
-		case 8: marketInd = MISC; break; 
-		case 9: marketInd = NPC; break; 
-		case 10: marketInd = DECORATIONAL; break; 
-		case 11: marketInd = BLOCKS; break;
-		case 12: marketInd = REDSTONE; break;
+		case 5: marketInd = TRANSPORTATION; break; 
+		case 6: marketInd = POTIONS; break; 
+		case 7: marketInd = MISC; break; 
+		case 8: marketInd = NPC; break; 
+		case 9: marketInd = DECORATIONAL; break; 
+		case 10: marketInd = BLOCKS; break;
+		case 11: marketInd = REDSTONE; break;
 		}
 	}
 	

@@ -14,7 +14,7 @@ public class Resources {
 	public static int minOreRegen = 7200;   //Min amount of time in seconds before ores regenerate.
 	public static int maxOreRegen = 28000;  //Max amount of time in seconds before ores regenerate.
 	
-	public static final boolean DEBUG_ENABLED = false;
+	public static final boolean DEBUG_ENABLED = true;
 	public static final boolean LOGGING_ENABLED = true; //Should log to the SQL database?
 	
 	public static final int COAL = 0;
