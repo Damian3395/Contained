@@ -25,12 +25,14 @@ public class PlayerTeamIndividual {
 	public String teamID;
 	public boolean isLeader;
 	public SurveyData.SurveyResponse surveyResponses;
-	public long joinTime; //Timestamp of when this player first joined their team.  
+	public long joinTime; //Timestamp of when this player first joined their team. 
+	public long lastOnline; //Timestamp of when this player was last online.
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
 		this.teamID = null;
 		this.joinTime = 0;
+		this.lastOnline = 0;
 		this.surveyResponses = (new SurveyData()).new SurveyResponse();
 		this.isLeader = false;
 	}
@@ -171,6 +173,7 @@ public class PlayerTeamIndividual {
 		ntc.setString("name", this.playerName);
 		ntc.setBoolean("isLeader", this.isLeader);
 		ntc.setLong("joined", joinTime);
+		ntc.setLong("lastOnline", lastOnline);
 		NBTTagCompound surveyData = new NBTTagCompound();
 		this.surveyResponses.writeToNBT(surveyData);
 		ntc.setTag("surveyResponses", surveyData);
@@ -184,6 +187,7 @@ public class PlayerTeamIndividual {
 		this.playerName = ntc.getString("name");
 		this.isLeader = ntc.getBoolean("isLeader");
 		this.joinTime = ntc.getLong("joined");
+		this.lastOnline = ntc.getLong("lastOnline");
 		NBTTagCompound surveyData = ntc.getCompoundTag("surveyResponses");
 		this.surveyResponses = (new SurveyData()).new SurveyResponse();
 		this.surveyResponses.readFromNBT(surveyData);

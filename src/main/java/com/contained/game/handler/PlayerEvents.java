@@ -14,7 +14,9 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.SurveyData;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -23,6 +25,7 @@ import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -51,11 +54,6 @@ public class PlayerEvents {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
 			
-			//Future TODO:
-			//  -Remind the player on join if they have pending invitations.
-			//  -Notify the player on join if one of their invitations got accepted
-			//   since the last time they were online.
-			
 			boolean completedSurvey = false;
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
@@ -77,6 +75,18 @@ public class PlayerEvents {
 					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out §a§lyour §a§lsurvey)");
 				else
 					completedSurvey = true;
+				
+				//If the player has pending invitations, let them know.
+				if (PlayerTeamInvitation.getInvitations(pdata).size() > 0)
+					Util.displayMessage(joined, "§d§lYou have pending inviations in your guild §d§lmenu!");
+			
+				// If the player got accepted into a team since last time they 
+				// were online, let them know.
+				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
+					PlayerTeam newTeam = PlayerTeam.get(pdata);
+					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
+					pdata.lastOnline = System.currentTimeMillis();
+				}
 			}			
 			
 			//If player does not have a survey in their inventory, give them one.
@@ -106,6 +116,12 @@ public class PlayerEvents {
 			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
 			Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 		}
+	}
+	
+	@SubscribeEvent
+	public void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(event.player);
+		pdata.lastOnline = System.currentTimeMillis();
 	}
 	
 	@SubscribeEvent
