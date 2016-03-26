@@ -518,7 +518,6 @@ public class GuiTownManage extends GuiContainer {
 		listCounts[tabMarket] = index;
 	}
 
-	//TODO:
 	private void renderItem(int ind, Object o){
 		ItemStack itemStack = null;
 		if(o == null)
@@ -798,7 +797,6 @@ public class GuiTownManage extends GuiContainer {
 	/**
 	 * Display a list of trades.
 	 */
-	//TODO:
 	private void shopList() {	
 		FontRenderer fr = this.mc.fontRenderer;
         int offset = scrollInd();

@@ -28,6 +28,27 @@ public class DataLogger {
 		connectDataBase();
 	}
 	
+	public static void insertTrade(String server, String creator, String world, String acceptor, String offer, int offerSize, String request, int requestSize, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TRADE VALUES (?,?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, creator);
+			preparedStatement.setString(3, world);
+			preparedStatement.setString(4, acceptor);
+			preparedStatement.setString(5, offer);
+			preparedStatement.setInt(6, offerSize);
+			preparedStatement.setString(7, request);
+			preparedStatement.setInt(8, requestSize);
+			preparedStatement.setString(9, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
 	public static void insertPerk(String server, String user, String world, int perkID, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;

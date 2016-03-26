@@ -5,10 +5,12 @@ import java.util.List;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.data.DataLogger;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -84,6 +86,17 @@ public class TradeHandler {
 		tradePacket.writeItemStack(trade.offer);
 		tradePacket.writeItemStack(trade.request);
 		Contained.channel.sendTo(tradePacket.toPacket(), creator);
+		
+		//DataLog Trade
+		String world = player.dimension == 0 ? "Normal" : "Nether";
+		DataLogger.insertTrade("debug", creator.getDisplayName()
+				, world
+				, player.getDisplayName()
+				, trade.offer.getDisplayName()
+				, trade.offer.stackSize
+				, trade.request.getDisplayName()
+				, trade.request.stackSize
+				, Util.getDate());
 	}
 	
 	public void create(EntityPlayerMP player, int slotId, ItemStack offer, ItemStack request){
