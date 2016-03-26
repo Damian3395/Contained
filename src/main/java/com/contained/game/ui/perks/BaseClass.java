@@ -4,16 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.contained.game.data.DataLogger;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.components.ProgressBar;
-import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
-import codechicken.lib.packet.PacketCustom;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
 public class BaseClass {
@@ -25,7 +18,7 @@ public class BaseClass {
 	private GuiButton wizard;
 	private GuiButton warrior;
 	private int collectorXP, cookXP, builderXP, wizardXP, warriorXP;
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	private ProgressBar collectorBar, builderBar, cookBar, wizardBar, warriorBar;
 	
@@ -46,7 +39,7 @@ public class BaseClass {
 		warriorBar = new ProgressBar(x, y+30, ProgressBar.YELLOW, warriorXP, level, this.gui.mc);
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		int x = (this.gui.width/2)+50;
 		int y = this.gui.height/2;
 		this.buttonList.add(this.collector = new GuiButton(ClassPerks.COLLECTOR, x, y-90, 60, 20, "Collector"));

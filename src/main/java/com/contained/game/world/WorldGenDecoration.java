@@ -3,8 +3,10 @@ package com.contained.game.world;
 import java.util.Random;
 
 import com.contained.game.util.Util;
+import com.contained.game.world.block.WastelandBush;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
@@ -15,7 +17,7 @@ public class WorldGenDecoration extends WorldGenerator{
         this.block = b;
     }
 
-    public boolean generate(World w, Random rand, int x, int y, int z){
+    public boolean generate(World w, Random rand, int x, int y, int z) {
         Block b;
 
         do {
@@ -33,6 +35,12 @@ public class WorldGenDecoration extends WorldGenerator{
             if (w.isAirBlock(x1, y1, z1) && 
             		Util.isSolidBlock(w.getBlock(x1, y1-1, z1))) {
                 w.setBlock(x1, y1, z1, this.block, 0, 2);
+                if (this.block == WastelandBush.instance) {
+                	if (Math.random() <= 0.02) {
+                		w.setBlock(x1, y1, z1, Blocks.nether_wart);
+                		w.setBlock(x1, y1-1, z1, Blocks.soul_sand);
+                	}
+                }
             }
         }
 

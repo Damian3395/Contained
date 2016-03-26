@@ -6,7 +6,7 @@ import java.util.List;
 
 import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -27,7 +27,7 @@ public class GuildPlayer {
 	private PlayerTeamIndividual pdata;
 	private PlayerTeam team;
 	
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	public GuildPlayer(GuiGuild gui){
 		this.gui = gui;
@@ -41,7 +41,7 @@ public class GuildPlayer {
 		team = PlayerTeam.get(pdata.teamID);
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		this.buttonList.add(leave = new GuiButton(LEAVE, x+70, y+30, 40, 20, "Leave"));
 		
 		return buttonList;
@@ -59,8 +59,8 @@ public class GuildPlayer {
 		PacketCustom packet;
 		switch(button.id){
 		case LEAVE:
-			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_LEAVE);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_LEAVE);
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			break;
 		}
 	}

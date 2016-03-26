@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import com.contained.game.entity.ExtendedPlayer;
 
 import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class WarriorEvents {

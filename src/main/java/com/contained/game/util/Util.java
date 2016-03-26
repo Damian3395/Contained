@@ -1,12 +1,11 @@
 package com.contained.game.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.contained.game.data.Data;
-import com.contained.game.user.PlayerTeam;
-import com.contained.game.user.PlayerTeamIndividual;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
@@ -19,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 
 public class Util {	
 	/**
@@ -62,7 +62,7 @@ public class Util {
 	}
 	
 	/**
-	 * Returns random value between min and max
+	 * Returns random value between min (inclusive) and max (exclusive)
 	 */
 	public static int randomRange(int min, int max) {
 		return (int)(Math.random()*(double)(max-min))+min;
@@ -162,6 +162,16 @@ public class Util {
 				&& ItemStack.areItemStackTagsEqual(itemADup, itemBDup);
 	}
 	
+	public static BiomeGenBase[] getBiomesArray() {
+		ArrayList<BiomeGenBase> all_biomesList = new ArrayList<BiomeGenBase>();
+		for( BiomeGenBase biome : BiomeGenBase.getBiomeGenArray() ) {
+			if( biome != null )
+				all_biomesList.add(biome);
+		}
+		BiomeGenBase[] all_biomes_array = new BiomeGenBase[all_biomesList.size()];
+		return all_biomesList.toArray(all_biomes_array);
+	}
+	
 	/**
 	 * Outputs a local error message to the player, in red text.
 	 */
@@ -170,10 +180,21 @@ public class Util {
 	}
 	
 	/**
+	 * Outputs a local message to the player.
+	 */
+	public static void displayMessage(EntityPlayer player, String msg) {
+		player.addChatComponentMessage(new ChatComponentText(msg));
+	}
+	
+	/**
 	 * Outputs a message to chat, if debug mode is enabled.
 	 */
 	public static void debugMessage(EntityPlayer player, String msg) {
 		if (Resources.DEBUG_ENABLED)
 			player.addChatComponentMessage(new ChatComponentText(msg));
+	}
+	
+	public static float clamp(float val, float min, float max) {
+		return Math.max(Math.min(max, val), min);
 	}
 }

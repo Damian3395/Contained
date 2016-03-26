@@ -14,12 +14,12 @@ import net.minecraft.util.ResourceLocation;
 public class GuiScrollPane {
 	private GuiScreen gui;
 	private int x, y, scroll_x, scroll_y, scrollSect, scrollCap;
-	private List list;
+	private List<String> list;
 	private ResourceLocation img;
 	private int selected = -1;
 	private int index = -1;
 	
-	public GuiScrollPane(GuiScreen gui, int x, int y, List list){
+	public GuiScrollPane(GuiScreen gui, int x, int y, List<String> list){
 		this.gui = gui;
 		this.x = x;
 		this.y = y;

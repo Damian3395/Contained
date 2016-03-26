@@ -19,7 +19,7 @@ public class CookClass {
 	private int levelOne = 2500;
 	private int levelTwo = 5000;
 	private int levelThree = 10000;
-	protected List buttonList = new ArrayList();
+	protected List<GuiButton> buttonList = new ArrayList<GuiButton>();
 	
 	private IconButton woodHoe, stoneHoe, seeds, ironHoe, fishingRod, apple, carrot;
 	private IconButton goldHoe, diamondHoe, fish, salmon, cake, goldenApple, cookie, goldenCarrot;
@@ -42,7 +42,7 @@ public class CookClass {
 		cook = new ProgressBar(this.gui.width/2-50, this.gui.height/2+30, ProgressBar.GREEN, cookXP, nextLevel, this.gui.mc);
 	}
 	
-	public List getButtonList(){
+	public List<GuiButton> getButtonList(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
 		this.buttonList.add(woodHoe = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 32, "-10% Damage When Held"));

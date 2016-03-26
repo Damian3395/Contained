@@ -1,5 +1,8 @@
 package com.contained.game.util;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+
 public class Resources {
 	public static final String MOD_ID = "contained";
 	public static final String NAME = "Contained";
@@ -8,6 +11,8 @@ public class Resources {
 	public static int worldRadius;
 	public static int numWorldChunks = 0; //Total number of chunks in the finite world.
 	public static int wastelandPadding = 5; //Number of "transition" chunks between world and wasteland.
+	public static int minOreRegen = 7200;   //Min amount of time in seconds before ores regenerate.
+	public static int maxOreRegen = 28000;  //Max amount of time in seconds before ores regenerate.
 	
 	public static final boolean DEBUG_ENABLED = false;
 	public static final boolean LOGGING_ENABLED = false; //Should log to the SQL database?
@@ -19,5 +24,17 @@ public class Resources {
 	public static final int REDSTONE = 4;
 	public static final int DIAMOND = 5;
 	public static final int EMERALD = 6;
-	public static final int NUM_MINERALS = 7;
+	public static final int QUARTZ = 7;
+	public static final int GLOWSTONE = 8;
+	public static final int NUM_MINERALS = 9;
+	
+	public static Block[] oreTypes = {
+		Blocks.iron_ore,
+		Blocks.gold_ore,
+		Blocks.coal_ore,
+		Blocks.diamond_ore,
+		Blocks.redstone_ore,
+		Blocks.emerald_ore,
+		Blocks.lapis_ore
+	};
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.Resources;
 
 import codechicken.lib.packet.PacketCustom;
@@ -42,7 +42,7 @@ public class CommandBecomeAdmin implements ICommand{
 				player.capabilities.disableDamage = true;
 				player.capabilities.allowFlying = true;
 				ExtendedPlayer.get(player).setAdminRights(true);
-				PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PLAYER_ADMIN);
+				PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_ADMIN);
 				Contained.channel.sendTo(adminPacket.toPacket(), (EntityPlayerMP)player);
 			}
 			if (!out.equals("")){
@@ -56,10 +56,12 @@ public class CommandBecomeAdmin implements ICommand{
 		return "/"+getCommandName()+" <password>"; 
 	} 
 	
-	
-	
 	@Override 
-	public int compareTo(Object o) { return 0; } 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
+		return 0; 
+	} 
 
 	@Override 
 	public List<String> getCommandAliases() { return this.aliases; } 

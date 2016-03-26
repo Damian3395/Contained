@@ -25,10 +25,18 @@ public class KeyInputHandler {
 	public void onKeyInput(InputEvent.KeyInputEvent event) {
 		if (KeyBindings.toggleVisualizerGUI.isPressed())
 			gui_data.guiRender = !gui_data.guiRender;
-		if (KeyBindings.toggleClassPerks.isPressed())
-			mc.displayGuiScreen(new ClassPerks());
-		if(KeyBindings.toggleGuild.isPressed())
-			mc.displayGuiScreen(new GuiGuild());
+		if (KeyBindings.toggleClassPerks.isPressed()) {
+			if (mc.currentScreen == null)
+				mc.displayGuiScreen(new ClassPerks());
+			else
+				mc.thePlayer.closeScreen();
+		}
+		if(KeyBindings.toggleGuild.isPressed()) {
+			if (mc.currentScreen == null)
+				mc.displayGuiScreen(new GuiGuild());
+			else
+				mc.thePlayer.closeScreen();
+		}
 		if (KeyBindings.toggleTerritoryRender.isPressed())
 			territory.doRender = !territory.doRender;
 	}

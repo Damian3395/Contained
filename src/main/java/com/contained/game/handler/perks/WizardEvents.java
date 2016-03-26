@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.contained.game.entity.ExtendedPlayer;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityGhast;
@@ -45,7 +45,7 @@ public class WizardEvents {
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			ArrayList<Integer> perks = properties.perks;
 			
-			EntityLiving attacker = (EntityLiving) source.getEntity();
+			EntityLivingBase attacker = (EntityLivingBase) source.getEntity();
 			if(perks.contains(BOOK) && source.isMagicDamage())
 				damage -= (damage * 0.1f);
 			if(source.isExplosion() && perks.contains(GUNPOWDER))

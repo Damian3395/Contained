@@ -3,9 +3,9 @@ package com.contained.game.ui;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.data.Data;
-import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.handler.KeyBindings;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.components.Container;
 import com.contained.game.ui.perks.BaseClass;
 import com.contained.game.ui.perks.BuilderClass;
@@ -14,7 +14,6 @@ import com.contained.game.ui.perks.CookClass;
 import com.contained.game.ui.perks.WarriorClass;
 import com.contained.game.ui.perks.WizardClass;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -156,20 +155,28 @@ public class ClassPerks extends GuiScreen{
 	}
 	
 	@Override
+	protected void keyTyped(char c, int i){		
+		if(i == 1 || i == KeyBindings.toggleClassPerks.getKeyCode())
+			this.mc.thePlayer.closeScreen();
+		
+		super.keyTyped(c, i);
+	}
+	
+	@Override
 	protected void actionPerformed(GuiButton button){
 		if(!this.update){
 			this.update = true;
 			
 			if(selectedClass == NONE){
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.SELECT_CLASS);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.SELECT_CLASS);
 				packet.writeInt(button.id);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.LEVEL_UP);
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LEVEL_UP);
 			packet.writeInt(button.id);
 			packet.writeInt((ExtendedPlayer.get(this.mc.thePlayer).occupationLevel) + 1);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}	
 	}
 	

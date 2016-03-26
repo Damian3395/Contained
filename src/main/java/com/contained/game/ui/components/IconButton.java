@@ -8,6 +8,7 @@ import com.contained.game.util.Resources;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
@@ -62,10 +63,10 @@ public class IconButton extends GuiButton {
             }
             
             if(this.color != -1)
-            	this.drawRect(this.xPosition+4, this.yPosition+4, this.xPosition+16, this.yPosition+16, color);
+            	Gui.drawRect(this.xPosition+4, this.yPosition+4, this.xPosition+16, this.yPosition+16, color);
             
             if(!this.description.isEmpty() && this.getHoverState(this.field_146123_n) == 2){
-            	this.drawRect(this.xPosition + 20, this.yPosition + 5, 
+            	Gui.drawRect(this.xPosition + 20, this.yPosition + 5, 
             			this.xPosition + fontrenderer.getStringWidth(this.description) + 30, 
             			this.yPosition + fontrenderer.FONT_HEIGHT + 10, Color.DARK_GRAY.hashCode());
             	fontrenderer.drawStringWithShadow(this.description, this.xPosition + 23, this.yPosition + 7, Color.WHITE.hashCode());

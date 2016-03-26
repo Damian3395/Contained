@@ -11,8 +11,12 @@ import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.BlockInteractItem;
 import com.contained.game.item.ItemTerritory;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.item.SurveyClipboard;
+import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.ui.SurveyData;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -21,6 +25,7 @@ import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,14 +33,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -51,47 +54,75 @@ public class PlayerEvents {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
 			
-			//Future TODO:
-			//  -Remind the player on join if they have pending invitations.
-			//  -Notify the player on join if one of their invitations got accepted
-			//   since the last time they were online.
+			boolean completedSurvey = false;
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
 				// Server has no info about this player, this must be their first
 				// time joining. Initialize their custom data.
 				Contained.teamMemberData.add(new PlayerTeamIndividual(joined.getDisplayName()));
-			
+				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetNewPlayer(joined.getDisplayName()).toPacket());
+				
 				//Give first time players a tutorial book.
 				if (!joined.inventory.hasItem(ContainedRegistry.book))
 					event.world.spawnEntityInWorld(new EntityItem(event.world, 
 							joined.posX, joined.posY+1, joined.posZ, 
 							new ItemStack(ContainedRegistry.book, 1)));
 			}
+			else {
+				//If player has not completed the survey, give them a reminder.
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
+				if (pdata.surveyResponses.progress <= SurveyData.getSurveyLength())
+					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out §a§lyour §a§lsurvey)");
+				else
+					completedSurvey = true;
+				
+				//If the player has pending invitations, let them know.
+				if (PlayerTeamInvitation.getInvitations(pdata).size() > 0)
+					Util.displayMessage(joined, "§d§lYou have pending inviations in your guild §d§lmenu!");
+			
+				// If the player got accepted into a team since last time they 
+				// were online, let them know.
+				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
+					PlayerTeam newTeam = PlayerTeam.get(pdata);
+					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
+					pdata.lastOnline = System.currentTimeMillis();
+				}
+			}			
+			
+			//If player does not have a survey in their inventory, give them one.
+			if (!completedSurvey && !joined.inventory.hasItem(SurveyClipboard.instance))
+				event.world.spawnEntityInWorld(new EntityItem(event.world, 
+						joined.posX, joined.posY+1, joined.posZ, 
+						new ItemStack(SurveyClipboard.instance, 1)));
 			
 			if (joined instanceof EntityPlayerMP) {
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
-				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetPlayerList(Contained.teamMemberData).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.trades).toPacket(), (EntityPlayerMP) joined);
+				
+				//Class Perks
+				ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
+				PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PERK_INFO);
+				for(int i = 0; i < 5; i++){
+					if(i < perks.size())
+						perkPacket.writeInt(perks.get(i));
+					else
+						perkPacket.writeInt(-1);
+				}
+				perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
+				perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
+				Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 			}
-			
-			//Guild Status
-			PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_INFO);
-			guildPacket.writeInt(ExtendedPlayer.get(joined).guild);
-			Contained.channel.sendTo(guildPacket.toPacket(), (EntityPlayerMP) joined);
-			
-			//Class Perks
-			ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
-			PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PERK_INFO);
-			for(int i = 0; i < 5; i++){
-				if(i < perks.size())
-					perkPacket.writeInt(perks.get(i));
-				else
-					perkPacket.writeInt(-1);
-			}
-			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
-			perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
-			Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
 		}
+	}
+	
+	@SubscribeEvent
+	public void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(event.player);
+		pdata.lastOnline = System.currentTimeMillis();
 	}
 	
 	@SubscribeEvent
@@ -106,12 +137,12 @@ public class PlayerEvents {
 				int[] occupationData = ExtendedPlayer.get(player).getOccupationValues();
 				
 				if (player instanceof EntityPlayerMP) {
-					PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.OCCUPATIONAL_DATA);
+					PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.OCCUPATIONAL_DATA);
 					for(int i=0; i<occupationData.length; i++)
 						occPacket.writeInt(occupationData[i]);
 					Contained.channel.sendTo(occPacket.toPacket(), (EntityPlayerMP)player);
 					
-					PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.ITEM_USAGE_DATA);
+					PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ITEM_USAGE_DATA);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedOwnItems);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);

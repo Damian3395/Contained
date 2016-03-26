@@ -5,21 +5,16 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.contained.game.Contained;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandler;
-import com.contained.game.ui.GuiGuild;
+import com.contained.game.network.ClientPacketHandlerUtil;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.common.UsernameCache;
 
 /**
  * Represents a group of players which share a common territory.
@@ -129,13 +124,13 @@ public class PlayerTeam {
 			Contained.teamInvitations.remove(invite);
 		
 		//Remove any custom permissions involving this team.
-				for (PlayerTeam team : Contained.teamData)
-					team.permissions.remove(this.id);
+		for (PlayerTeam team : Contained.teamData)
+			team.permissions.remove(this.id);
 		
 		//Remove the team.
 		Contained.teamData.remove(this);	
 		
-		Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket());
 	}
 	
 	/**
@@ -161,13 +156,10 @@ public class PlayerTeam {
 	 */
 	public List<String> getTeamPlayers(String username){
 		List<String> list = new ArrayList<String>();
-		Map<UUID, String> allplayers = UsernameCache.getMap();
 		
-		for(Map.Entry<UUID, String> entry : allplayers.entrySet()){
-			EntityPlayer p = (EntityPlayer) Minecraft.getMinecraft().theWorld.getPlayerEntityByName(entry.getValue());
-			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
-			if(pdata.teamID != null && pdata.teamID.equals(this.id) && !p.getDisplayName().equals(username))
-				list.add(entry.getValue());
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
+			if(pdata.teamID != null && pdata.teamID.equals(this.id))
+				list.add(pdata.playerName);
 		}
 		
 		return list;
@@ -178,11 +170,9 @@ public class PlayerTeam {
 	 */
 	public List<String> getPlayersList(String username){
 		List<String> list = new ArrayList<String>();
-		Map<UUID, String> allplayers = UsernameCache.getMap();
 		
-		for(Map.Entry<UUID, String> entry : allplayers.entrySet())
-			if(!entry.getValue().equals(username))
-				list.add(entry.getValue());
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData)
+			list.add(pdata.playerName);
 		
 		return list;
 	}
@@ -192,14 +182,12 @@ public class PlayerTeam {
 	 */
 	public List<String> getLonerList(String username){
 		List<String> list = new ArrayList<String>();
-		Map<UUID, String> allpalyers = UsernameCache.getMap();
 		
-		for(Map.Entry<UUID, String> entry: allpalyers.entrySet()){
-			EntityPlayer p = (EntityPlayer) Minecraft.getMinecraft().theWorld.getPlayerEntityByName(entry.getValue());
-			ExtendedPlayer properties = ExtendedPlayer.get(p);
-			if(!entry.getValue().equals(username) && properties.guild == GuiGuild.LONER)
-				list.add(entry.getValue());
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
+			if(pdata.teamID == null)
+				list.add(pdata.playerName);
 		}
+		
 		return list;
 	}
 	

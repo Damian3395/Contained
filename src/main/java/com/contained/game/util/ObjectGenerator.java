@@ -18,225 +18,224 @@ public class ObjectGenerator {
 		Entity entityTarget = null;
 		Block blockTarget=null;
 		Random r=new Random();
-		
-		switch (target.toLowerCase()) {
-		
+
 		/*===========================
 		 * passive mobs
 		 * ==========================
 		 */
-		case "bat":
+		if (target.toLowerCase().equals("bat")) {
 			entityTarget = new EntityBat(world);
 			isEntity=true;
-			break;
-		case "chicken":
+		}
+		else if (target.toLowerCase().equals("chicken")) {
 			entityTarget = new EntityChicken(world);
 			isEntity=true;
-			break;
-		case "cow":
+		}
+		else if (target.toLowerCase().equals("cow")) {
 			entityTarget = new EntityCow(world);
 			isEntity=true;
-			break;
-		case "mooshroom":
+		}
+		else if (target.toLowerCase().equals("mooshroom")) {
 			entityTarget = new EntityMooshroom(world);
 			isEntity=true;
-			break;
-		case "pig":
+		}
+		else if (target.toLowerCase().equals("pig")) {
 			entityTarget = new EntityPig(world);
 			isEntity=true;
-			break;
-		case "sheep":
+		}
+		else if (target.toLowerCase().equals("sheep")) {
 			entityTarget = new EntitySheep(world);
 			isEntity=true;
-			break;
-		case "squid":
+		}
+		else if (target.toLowerCase().equals("squid")) {
 			entityTarget = new EntitySquid(world);
 			isEntity=true;
-			break;
-		case "villager":
+		}
+		else if (target.toLowerCase().equals("villager")) {
 			entityTarget = new EntityVillager(world);
 			isEntity=true;
-			break;
+		}
 
 
-			
-			/*===========================
-			 * neutral mobs
-			 * ==========================
-			 */
-		case "cavespider":
+
+		/*===========================
+		 * neutral mobs
+		 * ==========================
+		 */
+		else if (target.toLowerCase().equals("cavespider")) {
 			entityTarget = new EntityCaveSpider(world);
 			isEntity=true;
-			break;
-		case "enderman":
+		}
+		else if (target.toLowerCase().equals("enderman")) {
 			entityTarget = new EntityEnderman(world);
 			isEntity=true;
-			break;
-		case "spider":
+		}
+		else if (target.toLowerCase().equals("spider")) {
 			entityTarget = new EntitySpider(world);
 			isEntity=true;
-			break;
-		case "zombiepigman":
+		}
+		else if (target.toLowerCase().equals("zombiepigman")) {
 			entityTarget = new EntityPigZombie(world);
 			isEntity=true;
-			break;
-		case "pigzombie":
+		}
+		else if (target.toLowerCase().equals("pigzombie")) {
 			entityTarget = new EntityPigZombie(world);
 			isEntity=true;
-			break;
-			
-			
-			
-			/*===========================
-			 * hostile mobs
-			 * ==========================
-			 */
-		case "blaze":
+		}
+
+
+
+		/*===========================
+		 * hostile mobs
+		 * ==========================
+		 */
+		else if (target.toLowerCase().equals("blaze")) {
 			entityTarget = new EntityBlaze(world);
 			isEntity=true;
-			break;
-		case "creeper":
+		}
+		else if (target.toLowerCase().equals("creeper")) {
 			entityTarget = new EntityCreeper(world);
 			isEntity=true;
-			break;
-		case "ghast":
+		}
+		else if (target.toLowerCase().equals("ghast")) {
 			entityTarget = new EntityGhast(world);
 			isEntity=true;
-			break;
-		case "skeleton":
+		}
+		else if (target.toLowerCase().equals("skeleton")) {
 			entityTarget = new EntitySkeleton(world);
 			isEntity=true;
-			break;
-		case "slime":
+		}
+		else if (target.toLowerCase().equals("slime")) {
 			entityTarget = new EntitySlime(world);
 			isEntity=true;
-			break;
-		case "witch":
+		}
+		else if (target.toLowerCase().equals("witch")) {
 			entityTarget = new EntityWitch(world);
 			isEntity=true;
-			break;
-		case "zombie":
+		}
+		else if (target.toLowerCase().equals("zombie")) {
 			entityTarget = new EntityZombie(world);
 			isEntity=true;
-			break;
-		
-			
-			
-			
-			/*===========================
-			 * tameable mobs
-			 * ==========================
-			 */
-		case "horse":
+		}
+
+
+
+
+		/*===========================
+		 * tameable mobs
+		 * ==========================
+		 */
+		else if (target.toLowerCase().equals("horse")) {
 			entityTarget = new EntityHorse(world);
 			isEntity=true;
-			break;
-		case "ocelot":
+		}
+		else if (target.toLowerCase().equals("ocelot")) {
 			entityTarget = new EntityOcelot(world);
 			isEntity=true;
-			break;
-		case "wolf":
+		}
+		else if (target.toLowerCase().equals("wolf")) {
 			entityTarget = new EntityWolf(world);
 			isEntity=true;
-			break;
-			
+		}
 
-			/*===========================
-			 * other mobs
-			 * ==========================
-			 */
-			
-		case "irongolem":
+
+		/*===========================
+		 * other mobs
+		 * ==========================
+		 */
+
+		else if (target.toLowerCase().equals("irongolem")) {
 			entityTarget = new EntityIronGolem(world);
 			isEntity=true;
-			break;
-				
-		case "snowman":
+		}
+
+		else if (target.toLowerCase().equals("snowman")) {
 			entityTarget = new EntitySnowman(world);
 			isEntity=true;
-			break;
-			
-			
-		
-			/*===========================
-			 * boss
-			 * ==========================
-			 */
-		case "dragon":
+		}
+
+
+
+		/*===========================
+		 * boss
+		 * ==========================
+		 */
+		else if (target.toLowerCase().equals("dragon")) {
 			entityTarget = new EntityDragon(world);
 			isEntity=true;
-			break;
-		case "wither":
+		}
+		else if (target.toLowerCase().equals("wither")) {
 			entityTarget = new EntityWither(world);
 			isEntity=true;
-			break;
-			
-			
-			
-			
-			/*===========================
-			 * blocks
-			 * ==========================
-			 */
-		
-		
-		case "stone":
+		}
+
+
+
+
+		/*===========================
+		 * blocks
+		 * ==========================
+		 */
+
+
+		else if (target.toLowerCase().equals("stone")) {
 			blockTarget = Blocks.stone;
 			isBlock=true;
-			break;
-		case "grass":
+		}
+		else if (target.toLowerCase().equals("grass")) {
 			blockTarget = Blocks.grass;
 			isBlock=true;
-			break;
-		case "dirt":
+		}
+		else if (target.toLowerCase().equals("dirt")) {
 			blockTarget = Blocks.dirt;
 			isBlock=true;
-			break;
-		case "water":
+		}
+		else if (target.toLowerCase().equals("water")) {
 			blockTarget = Blocks.water;
 			isBlock=true;
-			break;
-		case "flowingwater":
+		}
+		else if (target.toLowerCase().equals("flowingwater")) {
 			blockTarget = Blocks.flowing_water;
 			isBlock=true;
-			break;
-		case "lava":
+		}
+		else if (target.toLowerCase().equals("lava")) {
 			blockTarget = Blocks.lava;
 			isBlock=true;
-			break;
-		case "sand":
+		}
+		else if (target.toLowerCase().equals("sand")) {
 			blockTarget = Blocks.sand;
 			isBlock=true;
-			break;
-		case "gravel":
+		}
+		else if (target.toLowerCase().equals("gravel")) {
 			blockTarget = Blocks.gravel;
 			isBlock=true;
-			break;
-		case "log":
+		}
+		else if (target.toLowerCase().equals("log")) {
 			blockTarget = Blocks.log;
 			isBlock=true;
-			break;
-		case "ice":
+		}
+		else if (target.toLowerCase().equals("ice")) {
 			blockTarget = Blocks.ice;
 			isBlock=true;
-			break;
-		case "cactus":
+		}
+		else if (target.toLowerCase().equals("cactus")) {
 			blockTarget = Blocks.cactus;
 			isBlock=true;
-			break;
-		case "goldore":
+		}
+		else if (target.toLowerCase().equals("goldore")) {
 			blockTarget = Blocks.gold_ore;
 			isBlock=true;
-			break;
-		case "ironore":
+		}
+		else if (target.toLowerCase().equals("ironore")) {
 			blockTarget = Blocks.iron_ore;
 			isBlock=true;
-			break;
-		default:
+		}
+		else {
 			isEntity=false;
 			isBlock=false;
 			return false;
 		}
+
 		if(isEntity){
 			entityTarget.setLocationAndAngles(x + r.nextInt(3),
 					y, z + r.nextInt(3), 0.0F, 0.0F);
@@ -261,6 +260,6 @@ public class ObjectGenerator {
 			isBlock=false;
 			return false;
 		}
-		
+
 	}
 }

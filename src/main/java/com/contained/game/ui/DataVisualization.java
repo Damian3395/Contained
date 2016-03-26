@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.util.ColorUtil;
+import com.contained.game.util.RenderUtil;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -139,7 +139,7 @@ public class DataVisualization extends Gui{
         	double percent = (values[l]/maxValue)*100.0D;
             int i1 = MathHelper.floor_double(percent / 4.0D) + 1;
             tessellator.startDrawing(6);
-            tessellator.setColorOpaque_I(ColorUtil.hueGrad(l, values.length).hashCode());
+            tessellator.setColorOpaque_I(RenderUtil.hueGrad(l, values.length).hashCode());
             tessellator.addVertex((double)xx, (double)yy, 0.0D);
             float f, f1, f2;
 
@@ -153,7 +153,7 @@ public class DataVisualization extends Gui{
 
             tessellator.draw();
             tessellator.startDrawing(5);
-            tessellator.setColorOpaque_I((ColorUtil.hueGrad(l, values.length).hashCode() & 16711422) >> 1);
+            tessellator.setColorOpaque_I((RenderUtil.hueGrad(l, values.length).hashCode() & 16711422) >> 1);
 
             for (int j1 = i1; j1 >= 0; --j1){
                 f = (float)((d0 + percent * (double)j1 / (double)i1) * Math.PI * 2.0D / 100.0D);
@@ -171,7 +171,7 @@ public class DataVisualization extends Gui{
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         for (int i = 0; i < values.length; i++){
             mc.fontRenderer.drawStringWithShadow(captions[i] + ": " + values[i],
-            		xx+diameter+10, y+i*8, ColorUtil.hueGrad(i, values.length).hashCode());
+            		xx+diameter+10, y+i*8, RenderUtil.hueGrad(i, values.length).hashCode());
         }
 	}
 	
@@ -229,7 +229,7 @@ public class DataVisualization extends Gui{
 		for (int i=0; i<values.length; i++) {
 			Tessellator t = Tessellator.instance;
 			t.startDrawing(GL11.GL_LINE_STRIP);
-			Color lineCol = ColorUtil.hueGrad(i, values.length);
+			Color lineCol = RenderUtil.hueGrad(i, values.length);
 			t.setColorOpaque(lineCol.getRed(),lineCol.getGreen(),lineCol.getBlue());
 			GL11.glLineWidth(2.0f);
 			

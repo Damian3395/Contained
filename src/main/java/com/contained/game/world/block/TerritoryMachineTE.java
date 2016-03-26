@@ -8,7 +8,7 @@ import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
 import com.contained.game.item.ItemTerritory;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -85,7 +85,7 @@ public class TerritoryMachineTE extends TileEntity {
 						Collections.shuffle(candidates);
 						Point toRemove = candidates.get(0);
 						Contained.territoryData.remove(toRemove);
-						Contained.channel.sendToAll(ClientPacketHandler.packetRemoveTerrBlock(toRemove.x, toRemove.y).toPacket());
+						Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(toRemove.x, toRemove.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail
 				} else {
@@ -109,7 +109,7 @@ public class TerritoryMachineTE extends TileEntity {
 						Collections.shuffle(candidates);
 						Point toClaim = candidates.get(0);
 						Contained.territoryData.put(toClaim, this.teamID);
-						Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(this.teamID, toClaim.x, toClaim.y).toPacket());
+						Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(this.teamID, toClaim.x, toClaim.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail
 				}
@@ -148,7 +148,7 @@ public class TerritoryMachineTE extends TileEntity {
 	}
 	
 	public void sendInfoPacket() {
-		PacketCustom packet = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.TMACHINE_STATE);
+		PacketCustom packet = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.TMACHINE_STATE);
 		packet.writeInt(this.xCoord);
 		packet.writeInt(this.yCoord);
 		packet.writeInt(this.zCoord);
@@ -166,7 +166,7 @@ public class TerritoryMachineTE extends TileEntity {
 	}
 	
 	public void sendParticlePacket(String type) {
-		PacketCustom packet = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.TE_PARTICLE);
+		PacketCustom packet = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.TE_PARTICLE);
 		packet.writeInt(this.xCoord);
 		packet.writeInt(this.yCoord);
 		packet.writeInt(this.zCoord);

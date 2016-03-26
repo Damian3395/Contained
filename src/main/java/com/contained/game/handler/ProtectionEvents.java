@@ -7,7 +7,10 @@ import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
+import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
+import com.contained.game.world.block.HarvestedOre;
+import com.contained.game.world.block.HarvestedOreTE;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
@@ -38,6 +41,7 @@ import net.minecraft.inventory.ContainerHopper;
 import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -59,6 +63,22 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
  * Event handlers
  */
 public class ProtectionEvents {	
+	
+	// Blocks that should not be able to be harvested if not within a team's
+	// territory (ie: you cannot harvest them if you're not in a team, and you
+	// cannot harvest them if you are in a team, but the block is not in your
+	// territory)
+	public static Block[] bannedWildernessHarvest = {
+		Blocks.iron_ore,
+		Blocks.gold_ore,
+		Blocks.coal_ore,
+		Blocks.diamond_ore,
+		Blocks.redstone_ore,
+		Blocks.emerald_ore,
+		Blocks.lapis_ore,
+		Blocks.quartz_block,
+		Blocks.glowstone
+	};
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	//Break Protection
@@ -87,6 +107,60 @@ public class ProtectionEvents {
 		if (shouldCancel) {
 			Util.debugMessage(ev.getPlayer(), "breakProtect");
 			ev.setCanceled(true);
+		} else {
+			//Is this a wilderness protected block?
+			Block check = ev.world.getBlock(ev.x, ev.y, ev.z);
+			boolean isSpecial = false;
+			for(Block b : bannedWildernessHarvest) {
+				if (b.equals(check)) {
+					isSpecial = true;
+					break;
+				}
+			}
+			
+			if (isSpecial) {
+				//This block type needs additional special permission checks.
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(ev.getPlayer());
+				boolean canHarvest = true;
+				if (pdata.teamID == null)
+					canHarvest = false;
+				else {
+					String ownedTeam = Contained.territoryData.get(new Point(ev.x, ev.z));
+					if (ownedTeam == null || !ownedTeam.equals(pdata.teamID))
+						canHarvest = false;
+				}
+				
+				if (!canHarvest) {
+					Util.displayError(ev.getPlayer(), "This block must be in team-owned territory to be harvested.");
+					ev.setCanceled(true);
+				}
+			}
+		}
+		
+		if (!ev.isCanceled() && !ev.world.isRemote) {
+			//Handle special ore harvesting behavior
+			Block check = ev.world.getBlock(ev.x, ev.y, ev.z);
+			for(Block b : Resources.oreTypes) {
+				if (b.equals(check)) {
+					ItemStack itemstack = ev.getPlayer().getCurrentEquippedItem();
+					if (itemstack != null) {
+	                    itemstack.func_150999_a(ev.world, check, ev.x, ev.y, ev.z, ev.getPlayer());
+	                    if (itemstack.stackSize == 0)
+	                        ev.getPlayer().destroyCurrentEquippedItem();
+	                }
+					check.harvestBlock(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z, ev.world.getBlockMetadata(ev.x, ev.y, ev.z));
+					check.dropXpOnBlockBreak(ev.world, ev.x, ev.y, ev.z, ev.getExpToDrop());
+					
+					ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
+					TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
+					if (te != null && te instanceof HarvestedOreTE) {
+						HarvestedOreTE harvestTE = (HarvestedOreTE)te;
+						harvestTE.blockToRespawn = b;
+					}
+					ev.setCanceled(true);
+					break;
+				}
+			}
 		}
 	}
 	

@@ -10,6 +10,7 @@ import com.contained.game.handler.DataEvents;
 import com.contained.game.handler.FMLDataEvents;
 import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
+import com.contained.game.handler.RenderEvents;
 import com.contained.game.handler.WorldEvents;
 import com.contained.game.handler.perks.BuilderEvents;
 import com.contained.game.handler.perks.CollectorEvents;
@@ -36,6 +37,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = Resources.MOD_ID, name=Resources.NAME, version=Resources.VERSION)
@@ -54,14 +56,15 @@ public class Contained{
 	
 	public static HashMap<Point, String> territoryData; // [SERVER & CLIENT SIDE] coordinates, teamID. Locations of all blocks that are owned by a team.
 	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
-	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE ONLY] all tracked players, online and offline, even those not in teams.
-	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE ONLY] all pending team invitations.
+	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE] all tracked players, online and offline, even those not in teams.
+																   // [CLIENT SIDE] only the data on the local player, as well as display names and team IDs of others.
+	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE] all pending team invitations.
+																   // [CLIENT SIDE] all invitations pertaining to the local player.
 	public static ArrayList<PlayerTrade> trades;
-	public static boolean isLeader = false;             // [CLIENT SIDE ONLY] is the local mc.thePlayer a team leader on the server?
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
-		event.registerServerCommand(new CommandDebugOreGen());
+		//event.registerServerCommand(new CommandDebugOreGen());
 		event.registerServerCommand(new CommandTeamChat());
 		event.registerServerCommand(new CommandBecomeAdmin());
 		event.registerServerCommand(new CommandCreate());
@@ -85,6 +88,10 @@ public class Contained{
 		MinecraftForge.EVENT_BUS.register(new WizardEvents());
 		MinecraftForge.EVENT_BUS.register(new WarriorEvents());
 		MinecraftForge.EVENT_BUS.register(new ProtectionEvents());
+		
+		if (event.getSide() == Side.CLIENT) {
+			MinecraftForge.EVENT_BUS.register(new RenderEvents());
+		}
 		
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
 		world.init();

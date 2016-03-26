@@ -2,8 +2,9 @@ package com.contained.game.ui;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -14,7 +15,9 @@ import com.contained.game.data.Data;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
 import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
@@ -24,21 +27,23 @@ import com.contained.game.world.block.ContainerTownHall;
 import com.contained.game.world.block.TerritoryMachine;
 import com.contained.game.world.block.TownManageTE;
 
+import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.potion.Potion;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -47,32 +52,33 @@ import net.minecraftforge.client.ForgeHooksClient;
  * GUI that is displayed after interacting with the Town Hall block.
  */
 public class GuiTownManage extends GuiContainer {
-
+	// marketInd ID # For Rendering Pages
+		public static final int NONE = -1;
+		public static final int MARKET = 0;
+		public static final int MY_TRADES = 1;
+		public static final int CREATE_TRADE = 2;
+		public static final int SELECTION = 3;
+		public static final int MATERIALS = 4;
+		public static final int FOODS = 5;
+		public static final int TOOLS = 6;
+		public static final int COMBAT = 7;
+		public static final int TRANSPORTATION = 8;
+		public static final int POTIONS = 9;
+		public static final int MISC = 10;
+		public static final int NPC = 11;
+		public static final int DECORATIONAL = 12;
+		public static final int BLOCKS = 13;
+		public static final int REDSTONE = 14;
+	
 	private RenderBlocks renderBlock = new RenderBlocks();
 	private TextureManager texMan;
 	private static final ResourceLocation bg = new ResourceLocation(Resources.MOD_ID, "textures/gui/townhall.png");
 	private int numTabs = 4;
 	private int selectedTab = 0;
-	private String blockTeamID;  //The ID of the territory this block is occupying.
-	private String playerTeamID; //The team of the player interacting with this block.
+	public static String blockTeamID;  //The ID of the territory this block is occupying.
+	public static String playerTeamID; //The team of the player interacting with this block.
+	public static TownManageTE te;
 	private int blockTeamInd;
-	
-	// marketInd ID # For Rendering Pages
-	private final int MARKET = 0;
-	private final int MY_TRADES = 1;
-	private final int CREATE_TRADE = 2;
-	private final int SELECTION = 3;
-	private final int MATERIALS = 4;
-	private final int FOODS = 5;
-	private final int TOOLS = 6;
-	private final int WEAPONS = 7;
-	private final int ARMOR = 8;
-	private final int TRANSPORTATION = 9;
-	private final int POTIONS = 10;
-	private final int MUSIC_DISCS = 11;
-	private final int NPC = 12;
-	private final int DECORATIONAL = 13;
-	private final int BLOCKS = 14;
 	
 	// We'll keep a local "offline" copy of the team list for this GUI, because if
 	// any team data changes (especially if a team is removed) on the "online" side,
@@ -97,6 +103,9 @@ public class GuiTownManage extends GuiContainer {
 	private ArrayList<PlayerTrade> myTrades;
 	private ArrayList<PlayerTrade> marketTrades;
 	private ItemStack makeOffer, makeRequest;
+	public static int requestSize = 0;
+	private int stackLimit = 1;
+	private int selectedSlot = -1;
 	
 	private float currentScroll = 0f;
 	private boolean isScrolling = false;
@@ -121,13 +130,12 @@ public class GuiTownManage extends GuiContainer {
 	private int tabPermission = 2;
 	private int tabMarket = 3;
 	
-	private GuiTextField requestSize;
-	
 	public GuiTownManage(InventoryPlayer inv, TownManageTE te, String blockTeamID, String playerTeamID) {
 		super(new ContainerTownHall(inv, te));
 		
 		this.blockTeamID = blockTeamID;
 		this.playerTeamID = playerTeamID;
+		this.te = te;
 		this.localTeams = new ArrayList<PlayerTeam>(Contained.teamData);
 		
 		if (this.blockTeamID != null) {
@@ -148,8 +156,6 @@ public class GuiTownManage extends GuiContainer {
 			if (team != null && this.blockTeamID != null && !team.equals("") && !availableAntiTeams.contains(team) && !team.equals(this.blockTeamID))
 				availableAntiTeams.add(team);
 		}
-		
-		//requestSize = new GuiTextField(this.mc.fontRenderer, this.width/2, this.height/2, 40, 20);
 	}
 	
 	@Override
@@ -248,13 +254,17 @@ public class GuiTownManage extends GuiContainer {
 			numTabs = 1;
 		}
 		
-		myTrades = Contained.trades;
-		marketTrades = myTrades;
-		for(PlayerTrade trade : myTrades){
+		myTrades = new ArrayList<PlayerTrade>();
+		marketTrades = new ArrayList<PlayerTrade>();
+		String[] users = MinecraftServer.getServer().getConfigurationManager().getAllUsernames();
+		for(PlayerTrade trade : Contained.trades){
 			if(trade.displayName.equals(this.mc.thePlayer.getDisplayName()))
 				myTrades.add(trade);
-			else
-				marketTrades.add(trade);
+			else{
+				for(int i = 0; i < users.length; i++)
+					if(users[i].equals(trade.displayName))
+						marketTrades.add(trade);
+			}
 		}
 		
 		makeOffer = null;
@@ -265,8 +275,8 @@ public class GuiTownManage extends GuiContainer {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		if (permissionsModified) {
-			PacketCustom packet = ServerPacketHandler.packetUpdatePermissions(localTeams.get(blockTeamInd));
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			PacketCustom packet = ServerPacketHandlerUtil.packetUpdatePermissions(localTeams.get(blockTeamInd));
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	
@@ -331,14 +341,14 @@ public class GuiTownManage extends GuiContainer {
 			case MATERIALS: title += " (Materials)"; break;
 			case FOODS: title += " (Foods)"; break;
 			case TOOLS: title += " (Tools)"; break;
-			case WEAPONS: title += " (Weapons)"; break;
-			case ARMOR: title += " (Armor)"; break;
+			case COMBAT: title += " (Weapons)"; break;
 			case TRANSPORTATION: title += " (Transportation)"; break;
 			case POTIONS: title += " (Potions)"; break;
-			case MUSIC_DISCS: title += " (Music Discs)"; break;
+			case MISC: title += " (Misc)"; break;
 			case NPC: title += " (NPC)"; break;
 			case DECORATIONAL: title += " (Decorational)"; break;
 			case BLOCKS: title += " (Blocks)"; break;
+			case REDSTONE: title += " (Redstone)"; break;
 			}
 		}
 		fr.drawString(title, guiX+bBg.width/2-fr.getStringWidth(title)/2+titleXOff, guiY+10, 0x000000);
@@ -384,15 +394,91 @@ public class GuiTownManage extends GuiContainer {
 	}
 	
 	private void marketList(){
-		listCounts[tabMarket] = 3;
+		listCounts[tabMarket] = 4;
 		
 		int indOff = 0;
-		displayMarketOption(0+indOff, "Find Trade");
-		displayMarketOption(1+indOff, "My Trade Offers");
-		displayMarketOption(2+indOff, "Create New Offer");
+		displayMarketOption(1+indOff, "Find Trade");
+		displayMarketOption(2+indOff, "My Trade Offers");
+		displayMarketOption(3+indOff, "Create New Offer");
 		
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		endList();
+	}
+	
+	private void renderMarketTrades(){
+		int indOff = 0;
+		int i = 1;
+		listCounts[tabMarket] = marketTrades.size()+1;
+		displayString(0+indOff, "[Back]");
+		for(PlayerTrade trade : marketTrades){
+			displayTradeOffer(indOff+i, trade.offer, trade.request);
+			i++;
+		}
+	}
+	
+	private void renderMyTrades(){
+		int indOff = 0;
+		listCounts[tabMarket] = myTrades.size()+1;
+		
+		displayString(0+indOff, "[Back]");
+		for(int i = 0; i < myTrades.size(); i++)
+			displayTradeOffer((i+1)+indOff, myTrades.get(i).offer, myTrades.get(i).request);
+	}
+	
+	private void renderCreateTrade(){
+		int indOff = 0;
+		listCounts[tabMarket] = 5;
+		displayString(0+indOff, "[Back]");
+		renderTradeItem(1+indOff); // Offer Trade Item
+		selectRequest(2+indOff); // Request Trade Item
+		selectSize(3+indOff); // Request Trade Item Stack Size
+		displayMarketOption(4+indOff, "Create Offer"); //Create Current Trade
+	}
+	
+	private void renderSelectOption(){
+		listCounts[tabMarket] = 13;
+		int indOff = 0;
+		
+		displayString(0+indOff, "[Back]");
+		displayMarketOption(1+indOff, "Materials");
+		displayMarketOption(2+indOff, "Foods");
+		displayMarketOption(3+indOff, "Tools");
+		displayMarketOption(4+indOff, "Combat");
+		displayMarketOption(5+indOff, "Transportation");
+		displayMarketOption(6+indOff, "Potions");
+		displayMarketOption(7+indOff, "Misc");
+		displayMarketOption(8+indOff, "NPC");
+		displayMarketOption(9+indOff, "Decorations");
+		displayMarketOption(10+indOff, "Blocks");
+		displayMarketOption(11+indOff, "Redstone");
+	}
+	
+	private void marketOption(){
+		switch(marketInd){
+		case MARKET: renderMarketTrades(); break;
+		case MY_TRADES: renderMyTrades();break;
+		case CREATE_TRADE: renderCreateTrade(); break;
+		case SELECTION: renderSelectOption(); break;
+		case MATERIALS: renderSelectionType(CreativeTabs.tabMaterials); break;
+		case FOODS: renderSelectionType(CreativeTabs.tabFood); break;
+		case TOOLS: renderSelectionType(CreativeTabs.tabTools); break;
+		case COMBAT: renderSelectionType(CreativeTabs.tabCombat); break;
+		case TRANSPORTATION: renderSelectionType(CreativeTabs.tabTransport); break;
+		case POTIONS: renderSelectionType(CreativeTabs.tabBrewing); break;
+		case MISC: renderSelectionType(CreativeTabs.tabMisc); break;
+		case NPC: renderNPC(); break;
+		case DECORATIONAL: renderSelectionType(CreativeTabs.tabDecorations); break;
+		case BLOCKS: renderSelectionType(CreativeTabs.tabBlock); break;
+		}
+		
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		endList();
+	}
+	private void renderNPC(){
+		listCounts[tabMarket] = 1;
+		int indOff = 0;
+		
+		displayString(0+indOff, "[Back]");
 	}
 	
 	private void displayMarketOption(int ind, String caption){
@@ -413,286 +499,35 @@ public class GuiTownManage extends GuiContainer {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
-	private void marketOption(){
-		switch(marketInd){
-		case MARKET: renderMarketTrades(); break;
-		case MY_TRADES: renderMyTrades();break;
-		case CREATE_TRADE: renderCreateTrade(); break;
-		case SELECTION: renderSelectOption(); break;
-		case MATERIALS: renderMaterials(); break;
-		case FOODS: renderFoods(); break;
-		case TOOLS: renderTools(); break;
-		case WEAPONS: renderWeapons(); break;
-		case ARMOR: renderArmor(); break;
-		case TRANSPORTATION: renderTransportation(); break;
-		case POTIONS: renderPotions(); break;
-		case MUSIC_DISCS: renderMusicDiscs(); break;
-		case NPC: renderNPC(); break;
-		case DECORATIONAL: renderDecorational(); break;
-		case BLOCKS: renderBlocks(); break;
+	private void renderSelectionType(CreativeTabs tab){
+		int indOff = 0;
+		
+		displayString(0+indOff, "[Back]");
+		Iterator items = GameData.getItemRegistry().iterator();
+		int index = 1;
+		while(items.hasNext()){
+			Item item = (Item) items.next();
+			if(item != null && item.getCreativeTab() != null){
+				if(item.getCreativeTab().equals(tab)){
+					renderItem(index+indOff, item);
+					index++;
+				}
+			}
 		}
 		
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		endList();
-	}
-	
-	private void renderSelectOption(){
-		listCounts[tabMarket] = 12;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		displayMarketOption(1+indOff, "Materials");
-		displayMarketOption(2+indOff, "Foods");
-		displayMarketOption(3+indOff, "Tools");
-		displayMarketOption(4+indOff, "Weapons");
-		displayMarketOption(5+indOff, "Armor");
-		displayMarketOption(6+indOff, "Transportation");
-		displayMarketOption(7+indOff, "Potions");
-		displayMarketOption(8+indOff, "Music Discs");
-		displayMarketOption(9+indOff, "NPC");
-		displayMarketOption(10+indOff, "Decorations");
-		displayMarketOption(11+indOff, "Blocks");
-	}
-	
-	private void renderMaterials(){
-		listCounts[tabMarket] = 33;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.stick, null, null);
-		renderItem(2+indOff, Items.flint, null, null);
-		renderItem(3+indOff, Items.string, null, null);
-		renderItem(4+indOff, Items.dye, null, null);
-		renderItem(5+indOff, Items.paper, null, null);
-		renderItem(6+indOff, Items.feather, null, null);
-		renderItem(7+indOff, Items.leather, null, null);
-		renderItem(8+indOff, Items.clay_ball, null, null);
-		renderItem(9+indOff, Items.brick, null, null);
-		renderItem(10+indOff, Items.snowball, null, null);
-		renderItem(11+indOff, Items.slime_ball, null, null);
-		renderItem(12+indOff, Items.glowstone_dust, null, null);
-		renderItem(13+indOff, Items.redstone, null, null);
-		renderItem(14+indOff, Items.gunpowder, null, null);
-		renderItem(15+indOff, Items.gold_nugget, null, null);
-		renderItem(16+indOff, Items.bone, null, null);
-		renderItem(17+indOff, Items.skull, null, null);
-		renderItem(18+indOff, Items.glass_bottle, null, null);
-		renderItem(19+indOff, Items.fireworks, null, null);
-		renderItem(20+indOff, Items.lead, null, null);
-		renderItem(21+indOff, Items.coal, null, null);
-		renderItem(22+indOff, Items.iron_ingot, null, null);
-		renderItem(23+indOff, Items.gold_ingot, null, null);
-		renderItem(24+indOff, Items.emerald, null, null);
-		renderItem(25+indOff, Items.quartz, null, null);
-		renderItem(26+indOff, Items.diamond, null, null);
-		renderItem(27+indOff, Items.ender_pearl, null, null);
-		renderItem(28+indOff, Items.ghast_tear, null, null);
-		renderItem(29+indOff, Items.magma_cream, null, null);
-		renderItem(30+indOff, Items.netherbrick, null, null);
-		renderItem(31+indOff, Items.nether_wart, null, null);
-		renderItem(32+indOff, Items.nether_star, null, null);
-	}
-	
-	private void renderFoods(){
-		listCounts[tabMarket] = 32;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.bread, null, null);
-		renderItem(2+indOff, Items.cake, null, null);
-		renderItem(3+indOff, Items.cookie, null, null);
-		renderItem(4+indOff, Items.pumpkin_pie, null, null);
-		renderItem(5+indOff, Items.apple, null, null);
-		renderItem(6+indOff, Items.melon, null, null);
-		renderItem(7+indOff, Items.potato, null, null);
-		renderItem(8+indOff, Items.carrot, null, null);
-		renderItem(9+indOff, Items.baked_potato, null, null);
-		renderItem(10+indOff, Items.fish, null, null);
-		renderItem(11+indOff, Items.beef, null, null);
-		renderItem(12+indOff, Items.porkchop, null, null);
-		renderItem(13+indOff, Items.chicken, null, null);
-		renderItem(14+indOff, Items.cooked_fished, null, null);
-		renderItem(15+indOff, Items.cooked_beef, null, null);
-		renderItem(16+indOff, Items.cooked_porkchop, null, null);
-		renderItem(17+indOff, Items.cooked_chicken, null, null);
-		renderItem(18+indOff, Items.mushroom_stew, null, null);
-		renderItem(19+indOff, Items.spider_eye, null, null);
-		renderItem(20+indOff, Items.golden_carrot, null, null);
-		renderItem(21+indOff, Items.golden_apple, null, null);
-		renderItem(22+indOff, Items.wheat_seeds, null, null);
-		renderItem(23+indOff, Items.pumpkin_seeds, null, null);
-		renderItem(24+indOff, Items.melon_seeds, null, null);
-		renderItem(25+indOff, Items.sugar, null, null);
-		renderItem(26+indOff, Items.egg, null, null);
-		renderItem(27+indOff, Items.milk_bucket, null, null);
-		renderItem(28+indOff, Items.speckled_melon, null, null);
-		renderItem(29+indOff, Items.wheat, null, null);
-		renderItem(30+indOff, Items.reeds, null, null);
-		renderItem(31+indOff, Items.bowl, null, null);
-	}
-	
-	private void renderTools(){
-		listCounts[tabMarket] = 38;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.bucket, null, null);
-		renderItem(2+indOff, Items.fishing_rod, null, null);
-		renderItem(3+indOff, Items.shears, null, null);
-		renderItem(4+indOff, Items.flint_and_steel, null, null);
-		renderItem(5+indOff, Items.book, null, null);
-		renderItem(6+indOff, Items.clock, null, null);
-		renderItem(7+indOff, Items.compass, null, null);
-		renderItem(8+indOff, Items.map, null, null);
-		renderItem(9+indOff, Items.brewing_stand, null, null);
-		renderItem(10+indOff, Items.cauldron, null, null);
-		renderItem(11+indOff, Items.flower_pot, null, null);
-		renderItem(12+indOff, Items.item_frame, null, null);
-		renderItem(13+indOff, Items.saddle, null, null);
-		renderItem(14+indOff, Items.sign, null, null);
-		renderItem(15+indOff, Items.wooden_shovel, null, null);
-		renderItem(16+indOff, Items.wooden_hoe, null, null);
-		renderItem(17+indOff, Items.wooden_axe, null, null);
-		renderItem(18+indOff, Items.wooden_pickaxe, null, null);
-		renderItem(19+indOff, Items.stone_shovel, null, null);
-		renderItem(20+indOff, Items.stone_hoe, null, null);
-		renderItem(21+indOff, Items.stone_axe, null, null);
-		renderItem(22+indOff, Items.stone_pickaxe, null, null);
-		renderItem(23+indOff, Items.iron_shovel, null, null);
-		renderItem(24+indOff, Items.iron_hoe, null, null);
-		renderItem(25+indOff, Items.iron_axe, null, null);
-		renderItem(26+indOff, Items.iron_pickaxe, null, null);
-		renderItem(27+indOff, Items.golden_shovel, null, null);
-		renderItem(28+indOff, Items.golden_hoe, null, null);
-		renderItem(29+indOff, Items.golden_axe, null, null);
-		renderItem(30+indOff, Items.golden_pickaxe, null, null);
-		renderItem(31+indOff, Items.diamond_shovel, null, null);
-		renderItem(32+indOff, Items.diamond_hoe, null, null);
-		renderItem(33+indOff, Items.diamond_axe, null, null);
-		renderItem(34+indOff, Items.diamond_pickaxe, null, null);
-		renderItem(35+indOff, Items.blaze_rod, null, null);
-		renderItem(36+indOff, Items.repeater, null, null);
-		renderItem(37+indOff, Items.comparator, null, null);
-	}
-	
-	private void renderWeapons(){
-		listCounts[tabMarket] = 8;
-		int indOff = 0;
-		
-		//renderItem(+indOff, Items.);
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.wooden_sword, null, null);
-		renderItem(2+indOff, Items.stone_sword, null, null);
-		renderItem(3+indOff, Items.iron_sword, null, null);
-		renderItem(4+indOff, Items.golden_sword, null, null);
-		renderItem(5+indOff, Items.diamond_sword, null, null);
-		renderItem(6+indOff, Items.bow, null, null);
-		renderItem(7+indOff, Items.arrow, null, null);
-	}
-	
-	private void renderArmor(){
-		listCounts[tabMarket] = 20;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.leather_boots, null, null);
-		renderItem(2+indOff, Items.leather_leggings, null, null);
-		renderItem(3+indOff, Items.leather_chestplate, null, null);
-		renderItem(4+indOff, Items.leather_helmet, null, null);
-		renderItem(5+indOff, Items.iron_boots, null, null);
-		renderItem(6+indOff, Items.iron_leggings, null, null);
-		renderItem(7+indOff, Items.iron_chestplate, null, null);
-		renderItem(8+indOff, Items.iron_helmet, null, null);
-		renderItem(9+indOff, Items.golden_boots, null, null);
-		renderItem(10+indOff, Items.golden_leggings, null, null);
-		renderItem(11+indOff, Items.golden_chestplate, null, null);
-		renderItem(12+indOff, Items.golden_helmet, null, null);
-		renderItem(13+indOff, Items.diamond_boots, null, null);
-		renderItem(14+indOff, Items.diamond_leggings, null, null);
-		renderItem(15+indOff, Items.diamond_chestplate, null, null);
-		renderItem(16+indOff, Items.diamond_helmet, null, null);
-		renderItem(17+indOff, Items.iron_horse_armor, null, null);
-		renderItem(18+indOff, Items.golden_horse_armor, null, null);
-		renderItem(19+indOff, Items.diamond_horse_armor, null, null);
-	}
-	
-	private void renderTransportation(){
-		listCounts[tabMarket] = 8;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		//renderItem(1+indOff, null, Blocks.rail, null);
-		//renderItem(2+indOff, null, Blocks.detector_rail, null);
-		//renderItem(3+indOff, null, Blocks.activator_rail, null);
-		//renderItem(4+indOff, null, Blocks.golden_rail, null);
-		renderItem(1+indOff, Items.minecart, null, null);
-		renderItem(2+indOff, Items.chest_minecart, null, null);
-		renderItem(3+indOff, Items.furnace_minecart, null, null);
-		renderItem(4+indOff, Items.tnt_minecart, null, null);
-		renderItem(5+indOff, Items.hopper_minecart, null, null);
-		renderItem(6+indOff, Items.boat, null, null);
-		renderItem(7+indOff, Items.carrot_on_a_stick, null, null);
-	}
-	
-	private void renderPotions(){
-		listCounts[tabMarket] = 1;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-	}
-	
-	private void renderMusicDiscs(){
-		listCounts[tabMarket] = 13;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.record_blocks, null, null);
-		renderItem(2+indOff, Items.record_11, null, null);
-		renderItem(3+indOff, Items.record_13, null, null);
-		renderItem(4+indOff, Items.record_cat, null, null);
-		renderItem(5+indOff, Items.record_chirp, null, null);
-		renderItem(6+indOff, Items.record_far, null, null);
-		renderItem(7+indOff, Items.record_mall, null, null);
-		renderItem(8+indOff, Items.record_mellohi, null, null);
-		renderItem(9+indOff, Items.record_stal, null, null);
-		renderItem(10+indOff, Items.record_strad, null, null);
-		renderItem(11+indOff, Items.record_wait, null, null);
-		renderItem(12+indOff, Items.record_ward, null, null);
-	}
-	
-	private void renderNPC(){
-		listCounts[tabMarket] = 1;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-	}
-	
-	private void renderDecorational(){
-		listCounts[tabMarket] = 5;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
-		renderItem(1+indOff, Items.bed, null, null);
-		renderItem(2+indOff, Items.wooden_door, null, null);
-		renderItem(3+indOff, Items.sign, null, null);
-		renderItem(4+indOff, Items.painting, null, null);
-	}
-	
-	private void renderBlocks(){
-		listCounts[tabMarket] = 1;
-		int indOff = 0;
-		
-		displayString(0+indOff, "[Back]");
+		listCounts[tabMarket] = index;
 	}
 
-	private void renderItem(int ind, Item item, Block block, Potion potion){
+	private void renderItem(int ind, Object o){
 		ItemStack itemStack = null;
-		if(item != null)
-			itemStack = new ItemStack(item);
-		if(block != null)
-			itemStack = new ItemStack(block);
-		if(potion != null);
-		if(itemStack == null)
+		if(o == null)
+			return;
+		
+		if(o instanceof Item)
+			itemStack = new ItemStack((Item)o);
+		else if(o instanceof Block)
+			itemStack = new ItemStack((Block)o);
+		else if(o instanceof Potion)
 			return;
 		
 		FontRenderer fr = this.mc.fontRenderer;
@@ -720,19 +555,20 @@ public class GuiTownManage extends GuiContainer {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
-	private void renderCreateTrade(){
-		int indOff = 0;
-		listCounts[tabMarket] = 5;
-		if (indOff == 0)
-			displayString(0+indOff, "[Back]");
-		renderTradeItem(1+indOff); //
-		selectRequest(2+indOff); //
-		selectRequestSize(3+indOff); //GuiTextField For Stack Size
-		displayMarketOption(4+indOff, "Create Offer"); //Create Current Trade
-	}
-	
-	private void selectRequestSize(int ind){
+	private void selectSize(int ind){
+		FontRenderer fr = this.mc.fontRenderer;
+		int offset = scrollInd();
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
+		if (ind < offset || ind >= offset+Math.min(5, listCounts[selectedTab]))
+			return;
+		
+		int x = listX+4;
+		int y = listY+2+bSelRect.height*(ind-offset);
+		
+		fr.drawString("(+/-)Stack Size[1-" + stackLimit + "]: " + requestSize, x, y+4, 0x000000);
+		
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
 	private void selectRequest(int ind){
@@ -775,7 +611,7 @@ public class GuiTownManage extends GuiContainer {
 		int y = listY+2+bSelRect.height*(ind-offset);
 		
 		if(makeOffer == null)
-			fr.drawString("Drag Item Here", x, y+4, 0x000000);
+			fr.drawString("Shift-Click: ", x, y+4, 0x000000);
 		else{
 			GL11.glPushMatrix();
 			IIcon iicon1 = makeOffer.getIconIndex();
@@ -788,31 +624,7 @@ public class GuiTownManage extends GuiContainer {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
-	private void renderMyTrades(){
-		int indOff = 0;
-		int i = 1;
-		listCounts[tabMarket] = myTrades.size()+1;
-		
-		displayString(0+indOff, "[Back]");
-		for(PlayerTrade trade : myTrades){
-			displayTradeOffer(indOff+i, trade.offer, trade.request);
-			i++;
-		}
-	}
-	
-	private void renderMarketTrades(){
-		int indOff = 0;
-		int i = 1;
-		listCounts[tabMarket] = marketTrades.size()+1;
-		if (indOff == 0)
-			displayString(0+indOff, "[Back]");
-		for(PlayerTrade trade : marketTrades){
-			displayTradeOffer(indOff+i, trade.offer, trade.request);
-			i++;
-		}
-	}
-	
-	private void displayTradeOffer(int ind, ItemStack offer, ItemStack request){
+	private void displayTradeOffer(int ind, ItemStack offer, ItemStack request){		
 		FontRenderer fr = this.mc.fontRenderer;
 		int offset = scrollInd();
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -823,15 +635,25 @@ public class GuiTownManage extends GuiContainer {
 		int x = listX+4;
 		int y = listY+2+bSelRect.height*(ind-offset);
 		
+		if(offer == null || request == null){
+			fr.drawString("Error: null offer/request", x, y+4, 0x000000);
+			return;
+		}
+		
+		texMan.bindTexture(bg);
+		if (itemHovering == ind-offset)
+			this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
+		
+		IIcon iicon1 = offer.getIconIndex();
+		IIcon iicon2 = request.getIconIndex();
+		
 		GL11.glPushMatrix();
-		IIcon iicon1 = makeOffer.getIconIndex();
-		IIcon iicon2 = makeRequest.getIconIndex();
 		this.mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
-		this.drawTexturedModelRectFromIcon(x+50, y, iicon1, 16, 16);
-		this.drawTexturedModelRectFromIcon(x+150, y, iicon2, 16, 16);
+		this.drawTexturedModelRectFromIcon(x+30, y, iicon1, 16, 16);
+		this.drawTexturedModelRectFromIcon(x+110, y, iicon2, 16, 16);
 		GL11.glPopMatrix();
 		fr.drawString("Offer: ", x, y+4, 0x000000);
-		fr.drawString("Request: ", x+100, y+4, 0x000000);
+		fr.drawString("Request: ", x+70, y+4, 0x000000);
 		
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
@@ -841,33 +663,32 @@ public class GuiTownManage extends GuiContainer {
 		int indOff = 0;
 		if(marketInd == -1){
 			switch(ind+indOff){
-			case 0:
-				marketInd = 0;
-				break;
 			case 1:
-				marketInd = 1;
+				marketInd = MARKET;
 				break;
 			case 2:
-				marketInd = 2;
+				marketInd = MY_TRADES;
+				break;
+			case 3:
+				marketInd = CREATE_TRADE;
 				break;
 			}
 		}else{
 			switch(marketInd){
 			case MARKET: marketTradeClick(mouseX, mouseY); break;
-			case MY_TRADES: myTradeClick(mouseX, mouseY); break;
 			case CREATE_TRADE: createTradeClick(mouseX, mouseY); break;
 			case SELECTION: selectTradeTypeClick(mouseX, mouseY); break;
-			case MATERIALS: selectMaterial(mouseX, mouseY); break;
-			case FOODS: selectFoods(mouseX, mouseY); break;
-			case TOOLS: selectTools(mouseX, mouseY); break;
-			case WEAPONS: selectWeapons(mouseX, mouseY); break;
-			case ARMOR: selectArmor(mouseX, mouseY); break;
-			case TRANSPORTATION: selectTransportation(mouseX, mouseY); break;
-			case POTIONS: selectPotions(mouseX, mouseY); break;
-			case MUSIC_DISCS: selectMusicDiscs(mouseX, mouseY); break;
+			case MATERIALS: selectType(CreativeTabs.tabMaterials); break;
+			case FOODS: selectType(CreativeTabs.tabFood); break;
+			case TOOLS: selectType(CreativeTabs.tabTools); break;
+			case COMBAT: selectType(CreativeTabs.tabCombat); break;
+			case TRANSPORTATION: selectType(CreativeTabs.tabTransport); break;
+			case POTIONS: selectType(CreativeTabs.tabBrewing); break;
+			case MISC: selectType(CreativeTabs.tabMisc); break;
 			case NPC: selectNPC(mouseX, mouseY); break;
-			case DECORATIONAL: selectDecorational(mouseX, mouseY); break;
-			case BLOCKS: selectBlocks(mouseX, mouseY); break;
+			case DECORATIONAL: selectType(CreativeTabs.tabDecorations); break;
+			case BLOCKS: selectType(CreativeTabs.tabBlock); break;
+			case REDSTONE: selectType(CreativeTabs.tabRedstone); break;
 			}
 		}
 	}
@@ -876,38 +697,47 @@ public class GuiTownManage extends GuiContainer {
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
 		if(indOff+ind == 0)
-			marketInd = -1;
-		else{
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_TRADE);
+			System.out.println("Back");
+			//marketInd = NONE;
+		else if ((marketTrades.get(indOff+ind-1)) != null){
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_TRADE);
 			packet.writeString(marketTrades.get((indOff+ind)-1).id);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
-	
-	private void myTradeClick(int mouseX, int mouseY){
+	private void myTradeClick(int mouseX, int mouseY, int button){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
-		if(indOff+ind == 0)
-			marketInd = -1;
+		
+		if(button == 0 && indOff+ind == 0)
+			marketInd = NONE;
+		else if(button == 1){
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.CANCEL_TRADE);
+			packet.writeString(myTrades.get((indOff+ind)-1).id);
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
+		}
 	}
 	
 	private void createTradeClick(int mouseX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
 		switch(indOff+ind){
-		case 0: marketInd = -1;	break; //Back
-		case 1: 
-			if(makeOffer != null){
-				
-			}
-		break;
-		case 2: marketInd = 3; break; //Select Item
-		case 3: // Select Request Stack Size
-			
-		break;
+		case 0: marketInd = NONE;	break; //Back
+		case 1: break;
+		case 2: marketInd = SELECTION; break; //Select Item
+		case 3: break; //Select Stack Size
 		case 4:
-			if(makeOffer != null && makeRequest != null){ //Create New Trade
-				System.out.println("Trade");
+			if(makeOffer != null && makeRequest != null && selectedSlot != -1){ //Create New Trade
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.CREATE_TRADE);
+				packet.writeInt(selectedSlot);
+				packet.writeItemStack(this.makeOffer);
+				packet.writeItemStack(this.makeRequest);
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
+				marketInd = NONE;
+				makeOffer = null;
+				makeRequest = null;
+				requestSize = 0;
+				selectedSlot = -1;
 			}
 		break;
 		}
@@ -917,262 +747,48 @@ public class GuiTownManage extends GuiContainer {
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
 		switch(indOff+ind){
-		case 0: marketInd = 2; break; //Back
-		case 1: marketInd = 4; break; //Materials
-		case 2: marketInd = 5; break; //Foods
-		case 3: marketInd = 6; break; //Tools
-		case 4: marketInd = 7; break; //Weapons
-		case 5: marketInd = 8; break; //Armor
-		case 6: marketInd = 9; break; //Transportation
-		case 7: marketInd = 10; break; //Potions
-		case 8: marketInd = 11; break; //Music Discs
-		case 9: marketInd = 12; break; //NPC
-		case 10: marketInd = 13; break; //Decorational Items
-		case 11: marketInd = 14; break; //Blocks
+		case 0: marketInd = CREATE_TRADE; break; 
+		case 1: marketInd = MATERIALS; break; 
+		case 2: marketInd = FOODS; break; 
+		case 3: marketInd = TOOLS; break; 
+		case 4: marketInd = COMBAT; break; 
+		case 6: marketInd = TRANSPORTATION; break; 
+		case 7: marketInd = POTIONS; break; 
+		case 8: marketInd = MISC; break; 
+		case 9: marketInd = NPC; break; 
+		case 10: marketInd = DECORATIONAL; break; 
+		case 11: marketInd = BLOCKS; break;
+		case 12: marketInd = REDSTONE; break;
 		}
 	}
 	
-	private void selectMaterial(int mousX, int mouseY){
+	private void selectType(CreativeTabs tab){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.stick; break;
-		case 2: item = Items.flint; break;
-		case 3: item = Items.string; break;
-		case 4: item = Items.dye; break;
-		case 5: item = Items.paper; break;
-		case 6: item = Items.feather; break;
-		case 7: item = Items.leather; break;
-		case 8: item = Items.clay_ball; break;
-		case 9: item = Items.brick; break;
-		case 10: item = Items.snowball; break;
-		case 11: item = Items.slime_ball; break;
-		case 12: item = Items.glowstone_dust; break;
-		case 13: item = Items.redstone; break;
-		case 14: item = Items.gunpowder; break;
-		case 15: item = Items.gold_nugget; break;
-		case 16: item = Items.bone; break;
-		case 17: item = Items.skull; break;
-		case 18: item = Items.glass_bottle; break;
-		case 19: item = Items.fireworks; break;
-		case 20: item = Items.lead; break;
-		case 21: item = Items.coal; break;
-		case 22: item = Items.iron_ingot; break;
-		case 23: item = Items.gold_ingot; break;
-		case 24: item = Items.emerald; break;
-		case 25: item = Items.quartz; break;
-		case 26: item = Items.diamond; break;
-		case 27: item = Items.ender_pearl; break;
-		case 28: item = Items.ghast_tear; break;
-		case 29: item = Items.magma_cream; break;
-		case 30: item = Items.netherbrick; break;
-		case 31: item = Items.nether_wart; break;
-		case 32: item = Items.nether_star; break;
+		
+		Item select = null;
+		if(ind+indOff == 0){
+			marketInd = SELECTION;
+			return;
 		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectFoods(int mouseX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.bread; break;
-		case 2: item = Items.cake; break;
-		case 3: item = Items.cookie; break;
-		case 4: item = Items.pumpkin_pie; break;
-		case 5: item = Items.apple; break;
-		case 6: item = Items.melon; break;
-		case 7: item = Items.potato; break;
-		case 8: item = Items.carrot; break;
-		case 9: item = Items.baked_potato; break;
-		case 10: item = Items.fish; break;
-		case 11: item = Items.beef; break;
-		case 12: item = Items.porkchop; break;
-		case 13: item = Items.chicken; break;
-		case 14: item = Items.cooked_fished; break;
-		case 15: item = Items.cooked_beef; break;
-		case 16: item = Items.cooked_porkchop; break;
-		case 17: item = Items.cooked_chicken; break;
-		case 18: item = Items.mushroom_stew; break;
-		case 19: item = Items.spider_eye; break;
-		case 20: item = Items.golden_carrot; break;
-		case 21: item = Items.golden_apple; break;
-		case 22: item = Items.wheat_seeds; break;
-		case 23: item = Items.pumpkin_seeds; break;
-		case 24: item = Items.melon_seeds; break;
-		case 25: item = Items.sugar; break;
-		case 26: item = Items.egg; break;
-		case 27: item = Items.milk_bucket; break;
-		case 28: item = Items.speckled_melon; break;
-		case 29: item = Items.wheat; break;
-		case 30: item = Items.reeds; break;
-		case 31: item = Items.bowl; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectTools(int mouseX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.bucket; break;
-		case 2: item = Items.fishing_rod; break;
-		case 3: item = Items.shears; break;
-		case 4: item = Items.flint_and_steel; break;
-		case 5: item = Items.book; break;
-		case 6: item = Items.clock; break;
-		case 7: item = Items.compass; break;
-		case 8: item = Items.map; break;
-		case 9: item = Items.brewing_stand; break;
-		case 10: item = Items.cauldron; break;
-		case 11: item = Items.flower_pot; break;
-		case 12: item = Items.item_frame; break;
-		case 13: item = Items.saddle; break;
-		case 14: item = Items.sign; break;
-		case 15: item = Items.wooden_shovel; break;
-		case 16: item = Items.wooden_hoe; break;
-		case 17: item = Items.wooden_axe; break;
-		case 18: item = Items.wooden_pickaxe; break;
-		case 19: item = Items.stone_shovel; break;
-		case 20: item = Items.stone_hoe; break;
-		case 21: item = Items.stone_axe; break;
-		case 22: item = Items.stone_pickaxe; break;
-		case 23: item = Items.iron_shovel; break;
-		case 24: item = Items.iron_hoe; break;
-		case 25: item = Items.iron_axe; break;
-		case 26: item = Items.iron_pickaxe; break;
-		case 27: item = Items.golden_shovel; break;
-		case 28: item = Items.golden_hoe; break;
-		case 29: item = Items.golden_axe; break;
-		case 30: item = Items.golden_pickaxe; break;
-		case 31: item = Items.diamond_shovel; break;
-		case 32: item = Items.diamond_hoe; break;
-		case 33: item = Items.diamond_axe; break;
-		case 34: item = Items.diamond_pickaxe; break;
-		case 35: item = Items.blaze_rod; break;
-		case 36: item = Items.repeater; break;
-		case 37: item = Items.comparator; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectWeapons(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.wooden_sword; break;
-		case 2: item = Items.stone_sword; break;
-		case 3: item = Items.iron_sword; break;
-		case 4: item = Items.golden_sword; break;
-		case 5: item = Items.diamond_sword; break;
-		case 6: item = Items.bow; break;
-		case 7: item = Items.arrow; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectArmor(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.leather_boots; break;
-		case 2: item = Items.leather_leggings; break;
-		case 3: item = Items.leather_chestplate; break;
-		case 4: item = Items.leather_helmet; break;
-		case 5: item = Items.iron_boots; break;
-		case 6: item = Items.iron_leggings; break;
-		case 7: item = Items.iron_chestplate; break;
-		case 8: item = Items.iron_helmet; break;
-		case 9: item = Items.golden_boots; break;
-		case 10: item = Items.golden_leggings; break;
-		case 11: item = Items.golden_chestplate; break;
-		case 12: item = Items.golden_helmet; break;
-		case 13: item = Items.diamond_boots; break;
-		case 14: item = Items.diamond_leggings; break;
-		case 15: item = Items.diamond_chestplate; break;
-		case 16: item = Items.diamond_helmet; break;
-		case 17: item = Items.iron_horse_armor; break;
-		case 18: item = Items.golden_horse_armor; break;
-		case 19: item = Items.diamond_horse_armor; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectTransportation(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.minecart; break;
-		case 2: item = Items.chest_minecart; break;
-		case 3: item = Items.furnace_minecart; break;
-		case 4: item = Items.tnt_minecart; break;
-		case 5: item = Items.hopper_minecart; break;
-		case 6: item = Items.boat; break;
-		case 7: item = Items.carrot_on_a_stick; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectPotions(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		}
-	}
-	
-	private void selectMusicDiscs(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.record_blocks; break;
-		case 2: item = Items.record_11; break;
-		case 3: item = Items.record_13; break;
-		case 4: item = Items.record_cat; break;
-		case 5: item = Items.record_chirp; break;
-		case 6: item = Items.record_far; break;
-		case 7: item = Items.record_mall; break;
-		case 8: item = Items.record_mellohi; break;
-		case 9: item = Items.record_stal; break;
-		case 10: item = Items.record_strad; break;
-		case 11: item = Items.record_wait; break;
-		case 12: item = Items.record_ward; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
+		
+		Iterator items = GameData.getItemRegistry().iterator();
+		int index = 1;
+		while(items.hasNext()){
+			Item item = (Item) items.next();
+			if(item != null && item.getCreativeTab() != null){
+				if(item.getCreativeTab().equals(tab)){
+					if((ind+indOff) == index){
+						select = item;
+						makeRequest = new ItemStack(select);
+						marketInd = CREATE_TRADE;
+						requestSize = 1;
+						stackLimit = new ItemStack(item).getMaxStackSize();
+						return;
+					}
+					index++;
+				}
+			}
 		}
 	}
 	
@@ -1186,31 +802,7 @@ public class GuiTownManage extends GuiContainer {
 		if(item != null){
 			makeRequest = new ItemStack(item);
 			marketInd = 2;
-		}
-	}
-	
-	private void selectDecorational(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		Item item = null;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
-		case 1: item = Items.bed; break;
-		case 2: item = Items.wooden_door; break;
-		case 3: item = Items.sign; break;
-		case 4: item = Items.painting; break;
-		}
-		if(item != null){
-			makeRequest = new ItemStack(item);
-			marketInd = 2;
-		}
-	}
-	
-	private void selectBlocks(int mousX, int mouseY){
-		int ind = scrollInd()+itemHovering;
-		int indOff = 0;
-		switch(indOff+ind){
-		case 0: marketInd = 3; break; //Back
+			requestSize = 1;
 		}
 	}
 	/**
@@ -1303,19 +895,19 @@ public class GuiTownManage extends GuiContainer {
 		if (canAfford(id)) {
 			if (xpCosts[selectedTab][id] != -1) {
 				mc.thePlayer.experienceLevel -= xpCosts[selectedTab][id];
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.OFFSET_XPLEVEL);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.OFFSET_XPLEVEL);
 				packet.writeInt(-xpCosts[selectedTab][id]);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			if (itemCosts[selectedTab][id] != null) {
 				Util.removeItem(itemCosts[selectedTab][id], mc.thePlayer);
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_REMOVE);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.INVENTORY_REMOVE);
 				packet.writeItemStack(itemCosts[selectedTab][id]);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_ADD);
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.INVENTORY_ADD);
 			packet.writeItemStack(listItems[selectedTab][id]);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	
@@ -1414,7 +1006,8 @@ public class GuiTownManage extends GuiContainer {
 		int y = listY+2+bSelRect.height*(ind-offset);
 
 		//Hover Selection Highlight
-		if (playerTeamID != null && playerTeamID.equals(blockTeamID) && Contained.isLeader) {
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(this.mc.thePlayer);
+		if (playerTeamID != null && playerTeamID.equals(blockTeamID) && pdata != null && pdata.isLeader) {
 			texMan.bindTexture(bg);
 			if (itemHovering == ind-offset)
 				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
@@ -1464,7 +1057,9 @@ public class GuiTownManage extends GuiContainer {
 			//town hall block, so you can only use it to view your permissions within the territory.
 			indOff = 1;
 		}
-		if (!Contained.isLeader) {
+		
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(this.mc.thePlayer);
+		if (pdata == null || !pdata.isLeader) {
 			if (ind+indOff > 0)
 				return;
 		}
@@ -1576,6 +1171,18 @@ public class GuiTownManage extends GuiContainer {
 			else
 				marketClick(x, y);
 		}
+		
+		//Market: myTrades
+		this.myTradeClick(x, y, par3);
+	}
+	
+	private void keyPressed(){
+		if(marketInd == CREATE_TRADE && this.makeRequest != null){
+			if(Keyboard.isKeyDown(Keyboard.KEY_ADD) && requestSize < this.stackLimit)
+				requestSize++;
+			else if (Keyboard.isKeyDown(Keyboard.KEY_SUBTRACT) && requestSize > 1)
+				requestSize--;
+		}
 	}
 	
 	@Override 
@@ -1644,4 +1251,15 @@ public class GuiTownManage extends GuiContainer {
 		}
 	}
 	
+	@Override
+	protected void handleMouseClick(Slot slot, int slotId, int clickedButton, int clickType) {
+		if(clickedButton == 0 && clickType == 1 && slot != null && marketInd == CREATE_TRADE){
+			if(slot.getStack() != null){
+				this.makeOffer = slot.getStack();
+				selectedSlot = slotId;
+			}
+		}
+		
+		super.handleMouseClick(slot, slotId, clickedButton, clickType);
+	}
 }

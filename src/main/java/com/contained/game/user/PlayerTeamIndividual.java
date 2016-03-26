@@ -3,7 +3,8 @@ package com.contained.game.user;
 import java.util.ArrayList;
 
 import com.contained.game.Contained;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.ui.SurveyData;
 import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Util;
 import com.contained.game.util.ErrorCase.Error;
@@ -16,16 +17,23 @@ import net.minecraft.nbt.NBTTagCompound;
  * Special info regarding a single specific player within a team.
  */
 public class PlayerTeamIndividual {
-
+	public static final int LONER = 0;
+	public static final int TEAM_PLAYER = 1;
+	public static final int LEADER = 2;
+	
 	public String playerName;
 	public String teamID;
 	public boolean isLeader;
-	public long joinTime; //Timestamp of when this player first joined their team.  
+	public SurveyData.SurveyResponse surveyResponses;
+	public long joinTime; //Timestamp of when this player first joined their team. 
+	public long lastOnline; //Timestamp of when this player was last online.
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
 		this.teamID = null;
 		this.joinTime = 0;
+		this.lastOnline = 0;
+		this.surveyResponses = (new SurveyData()).new SurveyResponse();
 		this.isLeader = false;
 	}
 	
@@ -33,11 +41,21 @@ public class PlayerTeamIndividual {
 		this.readFromNBT(ntc);
 	}
 	
+	public PlayerTeamIndividual(PlayerTeamIndividual pdata) {
+		NBTTagCompound ntc = new NBTTagCompound();
+		pdata.writeToNBT(ntc);
+		this.readFromNBT(ntc);
+	}
+
 	/**
 	 * Attempts to join the given team. 
 	 * Possible failures: NOT_EXISTS, TEAM_FULL, IND_ONLY
 	 */
 	public ErrorCase.Error joinTeam(String teamID) {
+		return joinTeam(teamID, false);
+	}
+	
+	public ErrorCase.Error joinTeam(String teamID, boolean isLeader) {
 		if (this.teamID == null) {
 			PlayerTeam requestedTeam = PlayerTeam.get(teamID);
 			if (requestedTeam == null)
@@ -47,6 +65,12 @@ public class PlayerTeamIndividual {
 			
 			this.teamID = teamID;
 			this.joinTime = System.currentTimeMillis();
+			if (isLeader)
+				this.isLeader = true;
+			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
+			if (playerServerEnt != null)
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+			Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(this).toPacket());
 			return Error.NONE; //Successfully joined team.
 		}
 		return Error.IND_ONLY; //Already in a team.
@@ -69,10 +93,11 @@ public class PlayerTeamIndividual {
 			this.isLeader = false;
 			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 			if (playerServerEnt != null)
-				Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 			team.disbandTeam();
 		}
 		
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(this).toPacket());
 		return Error.NONE;
 	}
 	
@@ -92,7 +117,7 @@ public class PlayerTeamIndividual {
 		
 		EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 		if (playerServerEnt != null)
-			Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		
 		return Error.NONE;
 	}
@@ -139,7 +164,7 @@ public class PlayerTeamIndividual {
 		
 		EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 		if (playerServerEnt != null)
-			Contained.channel.sendTo(ClientPacketHandler.packetLeaderStatus(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		
 		return Error.NONE;
 	}
@@ -148,6 +173,10 @@ public class PlayerTeamIndividual {
 		ntc.setString("name", this.playerName);
 		ntc.setBoolean("isLeader", this.isLeader);
 		ntc.setLong("joined", joinTime);
+		ntc.setLong("lastOnline", lastOnline);
+		NBTTagCompound surveyData = new NBTTagCompound();
+		this.surveyResponses.writeToNBT(surveyData);
+		ntc.setTag("surveyResponses", surveyData);
 		if (this.teamID != null)
 			ntc.setString("team", this.teamID);
 		else if (ntc.hasKey("team"))
@@ -158,6 +187,10 @@ public class PlayerTeamIndividual {
 		this.playerName = ntc.getString("name");
 		this.isLeader = ntc.getBoolean("isLeader");
 		this.joinTime = ntc.getLong("joined");
+		this.lastOnline = ntc.getLong("lastOnline");
+		NBTTagCompound surveyData = ntc.getCompoundTag("surveyResponses");
+		this.surveyResponses = (new SurveyData()).new SurveyResponse();
+		this.surveyResponses.readFromNBT(surveyData);
 		if (ntc.hasKey("team"))
 			this.teamID = ntc.getString("team");
 		else
@@ -169,6 +202,15 @@ public class PlayerTeamIndividual {
 		if (ind != null && ind.isLeader)
 			return true;
 		return false;
+	}
+	
+	public int getStatus() {
+		if (this.teamID == null)
+			return LONER;
+		else if (this.isLeader)
+			return LEADER;
+		else
+			return TEAM_PLAYER;
 	}
 	
 	@Override

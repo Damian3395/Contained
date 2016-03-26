@@ -4,6 +4,8 @@ import java.awt.Color;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.*;
 import net.minecraftforge.common.*;
@@ -39,6 +41,10 @@ public class WastelandBiome {
 			this.setDisableRain();
 			this.spawnableCreatureList.clear();
 			this.spawnableWaterCreatureList.clear();
+			this.spawnableMonsterList.clear();
+			
+			this.spawnableMonsterList.add(new SpawnListEntry(EntityGhast.class, 100, 1, 4));
+			this.spawnableMonsterList.add(new SpawnListEntry(EntityPigZombie.class, 100, 2, 4));
 			this.setColor(Color.getHSBColor(0.05f, 0.4f, 0.3f).hashCode());
 		}
 		
