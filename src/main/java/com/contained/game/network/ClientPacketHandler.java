@@ -3,10 +3,8 @@ package com.contained.game.network;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
@@ -21,6 +19,7 @@ import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -37,38 +36,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	private DataVisualization gui;
 	private TerritoryRender render;
 	
-	public static final int OCCUPATIONAL_DATA = 1;
-	public static final int ITEM_USAGE_DATA = 2;
-	public static final int FULL_TERRITORY_SYNC = 3;
-	public static final int ADD_TERRITORY_BLOCK = 4;
-	public static final int REMOVE_TERRITORY_BLOCK = 5;
-	public static final int SYNC_TEAMS = 6;
-	public static final int TE_PARTICLE = 7;
-	public static final int TMACHINE_STATE = 8;
-	
-	public static final int GUILD_JOIN = 9;
-	public static final int GUILD_LEAVE = 10;
-	public static final int GUILD_CREATE = 11;
-	public static final int GUILD_DISBAND = 12;
-	public static final int GUILD_UPDATE = 13;
-	public static final int PLAYER_INVITE = 14;
-	public static final int PLAYER_DECLINE = 15;
-	public static final int PLAYER_KICK = 16;
-	public static final int PLAYER_PROMOTE = 17;
-	public static final int PLAYER_DEMOTE = 18;
-	
-	public static final int LEVEL_UP = 20;
-	public static final int SELECT_CLASS = 21;
-	public static final int PERK_INFO = 22;
-	
-	public static final int UPDATE_PERMISSIONS = 23;
-	public static final int SYNC_LOCAL_PLAYER = 24;
-	
-	public static final int PLAYER_TRADE = 25;
-	public static final int CREATE_TRADE = 26;
-	
-	public static final int PLAYER_ADMIN = 27;
-	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
 		this.gui = gui;
 		this.render = render;
@@ -78,6 +45,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 	public void handlePacket(ClientCustomPacketEvent event) {	
 		BlockCoord bc;
 		TileEntity te;
+		String teamID;
+		int num;
 		channelName = event.packet.channel();
 		Minecraft mc = Minecraft.getMinecraft();
 		
@@ -87,18 +56,18 @@ public class ClientPacketHandler extends ServerPacketHandler {
 			String status;
 			int color;
 			switch(packet.getType()) {
-				case OCCUPATIONAL_DATA:
+				case ClientPacketHandlerUtil.OCCUPATIONAL_DATA:
 					for(int i=0; i<Data.occupationNames.length; i++)
 						ExtendedPlayer.get(mc.thePlayer).setOccupation(i, packet.readInt());
 					break;
 					
-				case ITEM_USAGE_DATA:
+				case ClientPacketHandlerUtil.ITEM_USAGE_DATA:
 					ExtendedPlayer.get(mc.thePlayer).usedOwnItems = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).usedOthersItems = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).usedByOthers = packet.readInt();
 					break;
 					
-				case FULL_TERRITORY_SYNC:
+				case ClientPacketHandlerUtil.FULL_TERRITORY_SYNC:
 					int numBlocks = packet.readInt();
 					Contained.territoryData.clear();
 					for(int i=0; i<numBlocks; i++) {
@@ -108,19 +77,19 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					render.regenerateEdges();
 				break;
 					
-				case ADD_TERRITORY_BLOCK:
+				case ClientPacketHandlerUtil.ADD_TERRITORY_BLOCK:
 					bc = packet.readCoord();
 					Contained.territoryData.put(new Point(bc.x, bc.z), packet.readString());
 					render.regenerateEdges();
 				break;
 				
-				case REMOVE_TERRITORY_BLOCK:
+				case ClientPacketHandlerUtil.REMOVE_TERRITORY_BLOCK:
 					bc = packet.readCoord();
 					Contained.territoryData.remove(new Point(bc.x, bc.z));
 					render.regenerateEdges();
 				break;
 					
-				case SYNC_TEAMS:
+				case ClientPacketHandlerUtil.SYNC_TEAMS:
 					int numTeamsBefore = Contained.teamData.size();
 					Contained.teamData.clear();
 					int numTeams = packet.readInt();
@@ -143,7 +112,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case TE_PARTICLE:
+				case ClientPacketHandlerUtil.TE_PARTICLE:
 					te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
 					if (te instanceof TerritoryMachineTE) {
 						TerritoryMachineTE machine = (TerritoryMachineTE)te;
@@ -151,12 +120,12 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case TMACHINE_STATE:
+				case ClientPacketHandlerUtil.TMACHINE_STATE:
 					te = mc.theWorld.getTileEntity(packet.readInt(), packet.readInt(), packet.readInt());
 					if (te instanceof TerritoryMachineTE) {
 						TerritoryMachineTE machine = (TerritoryMachineTE)te;
 						machine.tickTimer = packet.readInt();
-						String teamID = packet.readString();
+						teamID = packet.readString();
 						if (teamID.equals(""))
 							teamID = null;
 						machine.teamID = teamID;
@@ -165,7 +134,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case GUILD_JOIN:
+				case ClientPacketHandlerUtil.GUILD_JOIN:
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Joined Team")){
@@ -176,12 +145,12 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case GUILD_LEAVE:
+				case ClientPacketHandlerUtil.GUILD_LEAVE:
 					if(mc.currentScreen instanceof GuiGuild)
 						mc.displayGuiScreen(new GuiGuild());
 				break;
 				
-				case GUILD_CREATE:
+				case ClientPacketHandlerUtil.GUILD_CREATE:
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Team Successfully Created")){
@@ -192,12 +161,12 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case GUILD_DISBAND:
+				case ClientPacketHandlerUtil.GUILD_DISBAND:
 					if(mc.currentScreen instanceof GuiGuild)
 						mc.displayGuiScreen(new GuiGuild());
 				break;
 				
-				case GUILD_UPDATE:
+				case ClientPacketHandlerUtil.GUILD_UPDATE:
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Changed Saved")){
@@ -208,11 +177,11 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case PLAYER_INVITE:
+				case ClientPacketHandlerUtil.PLAYER_INVITE:
 					
 				break;
 				
-				case PLAYER_DECLINE:
+				case ClientPacketHandlerUtil.PLAYER_DECLINE:
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Invitation has been removed")){
@@ -226,16 +195,16 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 				
-				case PLAYER_KICK:
+				case ClientPacketHandlerUtil.PLAYER_KICK:
 					if(mc.currentScreen instanceof GuiGuild)
 						mc.displayGuiScreen(new GuiGuild());
 				break;
 				
-				case PLAYER_PROMOTE:
+				case ClientPacketHandlerUtil.PLAYER_PROMOTE:
 					
 				break;
 				
-				case PLAYER_DEMOTE:
+				case ClientPacketHandlerUtil.PLAYER_DEMOTE:
 					status = packet.readString();
 					color = packet.readInt();
 					if(status.equals("Successfully Demoted")){
@@ -244,20 +213,20 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 				break;
 					
-				case LEVEL_UP:
+				case ClientPacketHandlerUtil.LEVEL_UP:
 					ExtendedPlayer.get(mc.thePlayer).occupationLevel = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).addPerk(packet.readInt());
 					if(mc.currentScreen instanceof ClassPerks)
 						mc.displayGuiScreen(new ClassPerks());
 				break;
 					
-				case SELECT_CLASS:
+				case ClientPacketHandlerUtil.SELECT_CLASS:
 					ExtendedPlayer.get(mc.thePlayer).occupationClass = packet.readInt();
 					if(mc.currentScreen instanceof ClassPerks)
 						mc.displayGuiScreen(new ClassPerks());
 				break;
 				
-				case PERK_INFO:
+				case ClientPacketHandlerUtil.PERK_INFO:
 					int perkID;
 					for(int i = 0; i < 5; i++)
 						if((perkID = packet.readInt()) != -1)
@@ -266,13 +235,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ExtendedPlayer.get(mc.thePlayer).occupationLevel = packet.readInt();
 				break;
 				
-				case UPDATE_PERMISSIONS:
+				case ClientPacketHandlerUtil.UPDATE_PERMISSIONS:
 					PlayerTeam team = new PlayerTeam(packet.readNBTTagCompound());					
 					PlayerTeam toModify = PlayerTeam.get(team);
 					toModify.permissions = team.permissions;
 				break;
 				
-				case SYNC_LOCAL_PLAYER:
+				case ClientPacketHandlerUtil.SYNC_LOCAL_PLAYER:
 					NBTTagCompound ntc = packet.readNBTTagCompound();
 					PlayerTeamIndividual pdata = new PlayerTeamIndividual(ntc);
 					boolean found = false;
@@ -287,77 +256,71 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						Contained.teamMemberData.add(pdata);
 				break;
 				
-				case PLAYER_TRADE:
+				case ClientPacketHandlerUtil.PLAYER_TRADE:
 					
 				break;
 				
-				case CREATE_TRADE:
+				case ClientPacketHandlerUtil.CREATE_TRADE:
 					
 				break;
 				
-				case PLAYER_ADMIN:
+				case ClientPacketHandlerUtil.PLAYER_ADMIN:
 					mc.thePlayer.setInvisible(true);
 					mc.thePlayer.capabilities.allowFlying = true;
 					mc.thePlayer.capabilities.disableDamage = true;
 					ExtendedPlayer.get(mc.thePlayer).setAdminRights(true);
 				break;
+				
+				case ClientPacketHandlerUtil.NEW_PLAYER:
+					Contained.teamMemberData.add(new PlayerTeamIndividual(packet.readString()));
+				break;
+				
+				case ClientPacketHandlerUtil.UPDATE_PLAYER:
+					String name = packet.readString();
+					PlayerTeamIndividual toUpdate = null;
+					for(PlayerTeamIndividual player : Contained.teamMemberData) {
+						if (player.playerName.equals(name)) {
+							toUpdate = player;
+							break;
+						}
+					}
+					
+					if (toUpdate == null) {
+						toUpdate = new PlayerTeamIndividual(name);
+						Contained.teamMemberData.add(toUpdate);
+					}
+					
+					teamID = packet.readString();
+					if (!teamID.equals(""))
+						toUpdate.teamID = teamID;
+				break;
+				
+				case ClientPacketHandlerUtil.PLAYER_LIST:
+					PlayerTeamIndividual self = PlayerTeamIndividual.get(mc.thePlayer);
+					Contained.teamMemberData.clear();
+					if (self != null)
+						Contained.teamMemberData.add(self);
+					num = packet.readInt();
+					for(int i=0; i<num; i++) {
+						PlayerTeamIndividual newPlayer = new PlayerTeamIndividual(packet.readString());
+						teamID = packet.readString();
+						if (newPlayer.playerName.equals(mc.thePlayer.getDisplayName()))
+							continue;
+						else {
+							if (!teamID.equals(""))
+								newPlayer.teamID = teamID;
+							Contained.teamMemberData.add(newPlayer);
+						}
+					}
+				break;
+				
+				case ClientPacketHandlerUtil.SYNC_INVITATIONS:
+					Contained.teamInvitations.clear();
+					num = packet.readInt();
+					for(int i=0; i<num; i++)
+						Contained.teamInvitations.add(new PlayerTeamInvitation(packet.readNBTTagCompound()));
+				break;
 			}
 		}
-	}
-	
-	/**
-	 * ====================================
-	 *   Packet Sending Util
-	 * ====================================
-	 */
-	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
-		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
-		territoryPacket.writeInt(territoryData.size());
-		for(Point p : territoryData.keySet()) {
-			territoryPacket.writeCoord(p.x, 0, p.y);
-			territoryPacket.writeString(territoryData.get(p));
-		}
-		return territoryPacket;
-	}
-	
-	public static PacketCustom packetAddTerrBlock(String teamID, int x, int z) {
-		PacketCustom blockPacket = new PacketCustom(Resources.MOD_ID, ADD_TERRITORY_BLOCK);
-		blockPacket.writeCoord(x, 0, z);
-		blockPacket.writeString(teamID);
-		return blockPacket;
-	}
-	
-	public static PacketCustom packetRemoveTerrBlock(int x, int z) {
-		PacketCustom blockPacket = new PacketCustom(Resources.MOD_ID, REMOVE_TERRITORY_BLOCK);
-		blockPacket.writeCoord(x, 0, z);
-		return blockPacket;
-	}
-	
-	public static PacketCustom packetSyncTeams(ArrayList<PlayerTeam> teams) {
-		PacketCustom teamPacket = new PacketCustom(Resources.MOD_ID, SYNC_TEAMS);
-		teamPacket.writeInt(teams.size());
-		for(PlayerTeam team : teams) {
-			NBTTagCompound ntc = new NBTTagCompound();
-			team.writeToNBT(ntc);
-			teamPacket.writeNBTTagCompound(ntc);
-		}
-		return teamPacket;
-	}
-	
-	public static PacketCustom packetUpdatePermissions(PlayerTeam toSync) {
-		PacketCustom permPacket = new PacketCustom(Resources.MOD_ID, UPDATE_PERMISSIONS);
-		NBTTagCompound teamData = new NBTTagCompound();
-		toSync.writeToNBT(teamData);
-		permPacket.writeNBTTagCompound(teamData);
-		return permPacket;
-	}
-
-	public static PacketCustom packetSyncLocalPlayer(EntityPlayer joined) {
-		PacketCustom pdataPacket = new PacketCustom(Resources.MOD_ID, SYNC_LOCAL_PLAYER);
-		NBTTagCompound ntc = new NBTTagCompound();
-		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
-		pdata.writeToNBT(ntc);
-		pdataPacket.writeNBTTagCompound(ntc);
-		return pdataPacket;
 	}
 }

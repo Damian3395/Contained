@@ -5,7 +5,7 @@ import codechicken.lib.packet.PacketCustom;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.KeyBindings;
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.components.Container;
 import com.contained.game.ui.perks.BaseClass;
 import com.contained.game.ui.perks.BuilderClass;
@@ -168,15 +168,15 @@ public class ClassPerks extends GuiScreen{
 			this.update = true;
 			
 			if(selectedClass == NONE){
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.SELECT_CLASS);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.SELECT_CLASS);
 				packet.writeInt(button.id);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.LEVEL_UP);
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LEVEL_UP);
 			packet.writeInt(button.id);
 			packet.writeInt((ExtendedPlayer.get(this.mc.thePlayer).occupationLevel) + 1);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}	
 	}
 	

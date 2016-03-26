@@ -3,7 +3,7 @@ package com.contained.game.item;
 import java.awt.Point;
 
 import com.contained.game.Contained;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
@@ -19,7 +19,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
-import net.minecraft.util.ChatComponentText;
 
 /**
  * Item for claiming a new sector of territory.
@@ -108,7 +107,7 @@ public class TerritoryFlag {
 				
 				p.addExperienceLevel(-Contained.configs.flagXPCost);
 				Contained.territoryData.put(toClaim, playerData.teamID);
-				Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
+				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 				team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+playerData.playerName+" started a new territory sector at ("+x+","+z+").");
 			}
 		}

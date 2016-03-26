@@ -6,7 +6,7 @@ import java.util.List;
 
 import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -59,8 +59,8 @@ public class GuildPlayer {
 		PacketCustom packet;
 		switch(button.id){
 		case LEAVE:
-			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_LEAVE);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_LEAVE);
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			break;
 		}
 	}

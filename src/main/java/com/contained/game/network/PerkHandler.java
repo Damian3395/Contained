@@ -17,7 +17,7 @@ public class PerkHandler {
 		ExtendedPlayer.get(player).addPerk(perkID);
 		ExtendedPlayer.get(player).occupationLevel = level;
 		
-		PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.LEVEL_UP);
+		PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEVEL_UP);
 		perkPacket.writeInt(level);
 		perkPacket.writeInt(perkID);
 		Contained.channel.sendTo(perkPacket.toPacket(), player);
@@ -29,7 +29,7 @@ public class PerkHandler {
 	public void selectClassOccupation(EntityPlayerMP player, int classID){
 		ExtendedPlayer.get(player).occupationClass = classID;
 		
-		PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.SELECT_CLASS);
+		PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SELECT_CLASS);
 		perkPacket.writeInt(classID);
 		Contained.channel.sendTo(perkPacket.toPacket(), player);
 	}

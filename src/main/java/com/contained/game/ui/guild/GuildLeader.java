@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.components.GuiTab;
@@ -160,10 +160,10 @@ public class GuildLeader {
 			if((!newName.isEmpty() && (newName.compareTo(team.displayName) != 0) 
 					|| (selectedColor != team.colorID && !newName.isEmpty()))){
 				
-				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_UPDATE);
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_UPDATE);
 				packet.writeString(newName);
 				packet.writeInt(selectedColor);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			
 		break;
@@ -182,41 +182,41 @@ public class GuildLeader {
 		break;
 			
 		case DISBAND:
-			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_DISBAND);
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_DISBAND);
 			packet.writeString(team.id);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		break;
 		
 		case INVITE:
 			String username = findPlayers.getText();
 			if(!username.isEmpty()){
-				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_INVITE);
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_INVITE);
 				packet.writeString(username);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 		break;
 		
 		case KICK:
 			teammate = teamPlayers.getText();
 			if(!teammate.isEmpty()){
-				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_KICK);
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_KICK);
 				packet.writeString(teammate);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 		break;
 		
 		case PROMOTE:
 			teammate = teamPlayers.getText();
 			if(!teammate.isEmpty()){
-				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_PROMOTE);
+				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_PROMOTE);
 				packet.writeString(teammate);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			
 			break;
 		case DEMOTE:
-			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_DEMOTE);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_DEMOTE);
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			break;
 		}
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ErrorCase;
@@ -17,7 +17,6 @@ import net.minecraft.creativetab.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
 
 /**
  * Items for claiming territory.
@@ -82,7 +81,7 @@ public class ItemTerritory {
 				if (!p.capabilities.isCreativeMode)
 					p.inventory.consumeInventoryItem(ItemTerritory.addTerritory);
 				Contained.territoryData.put(toClaim, playerData.teamID);
-				Contained.channel.sendToAll(ClientPacketHandler.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
+				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 			}
 		}
 	}
@@ -133,7 +132,7 @@ public class ItemTerritory {
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
 					Contained.territoryData.remove(blockToRemove);
-					Contained.channel.sendToAll(ClientPacketHandler.packetRemoveTerrBlock(x, z).toPacket());
+					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());
 				}
 			}
 		}

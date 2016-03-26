@@ -6,7 +6,7 @@ import java.util.List;
 
 import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.components.IconButton;
 import com.contained.game.user.PlayerTeam;
@@ -139,21 +139,21 @@ public class GuildBase {
 		switch(button.id){
 		case JOIN:
 			if(!invites.isEmpty()){
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_JOIN);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_JOIN);
 				packet.writeString(invites.get(currentInvite));
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			
 			break;
 		case DECLINE:
 			if(!invites.isEmpty()){
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_DECLINE);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_DECLINE);
 				packet.writeString(invites.get(currentInvite));
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			break;
 		case NEXT:
-			if(currentInvite < invites.size())
+			if(currentInvite < invites.size()-1)
 				currentInvite++;
 			else
 				currentInvite = 0;
@@ -162,16 +162,16 @@ public class GuildBase {
 			if(currentInvite > 0)
 				currentInvite--;
 			else
-				currentInvite = invites.size();
+				currentInvite = invites.size()-1;
 			break;
 		case CREATE:
 			String name = teamName.getText();
 			if(!name.isEmpty() && 
 					name.compareTo("Team Name") != 0){
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.GUILD_CREATE);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_CREATE);
 				packet.writeString(name);
 				packet.writeInt(currentCol);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}else{
 				teamStatus = "Enter Team Name";
 				teamColorStatus = Color.RED;

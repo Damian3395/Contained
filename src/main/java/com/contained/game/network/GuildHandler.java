@@ -33,7 +33,7 @@ public class GuildHandler {
 		PlayerTeam matchedTeam = null;
 		PlayerTeamIndividual matchedPlayer = null;
 			
-		String inviteName = team;
+		String inviteName = team.toLowerCase();
 		for(PlayerTeamInvitation inv : myInvites) {
 			PlayerTeam teamData = PlayerTeam.get(inv.teamID);
 			if (teamData != null && ((pdata.isLeader && inv.playerName.toLowerCase().equals(inviteName))
@@ -70,10 +70,11 @@ public class GuildHandler {
 			DataLogger.insertJoinTeam("debugmode", player.getDisplayName(), world, team, Util.getDate());
 		}
 		
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_JOIN);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.GUILD_JOIN);
 		guildPacket.writeString(statusInfo);
 		guildPacket.writeInt(statusColor.hashCode());
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
+		Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(player).toPacket(), player);
 	}
 	
 	public void leaveTeam(EntityPlayerMP player){
@@ -83,7 +84,7 @@ public class GuildHandler {
 		pdata.leaveTeam();
 		team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" has left the team.");
 		
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_LEAVE);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.GUILD_LEAVE);
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
 	}
 	
@@ -95,7 +96,7 @@ public class GuildHandler {
 		team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+toKick.playerName+" has been kicked from the team.");
 		toKick.leaveTeam();
 		
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PLAYER_KICK);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_KICK);
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
 		
 		String world = player.dimension == 0 ? "Normal" : "Nether";
@@ -132,7 +133,7 @@ public class GuildHandler {
 			DataLogger.insertPromoteTeamPlayer("debugmode", player.getDisplayName(), world, team.displayName, player.getDisplayName(), Util.getDate());
 		}
 		
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PLAYER_DEMOTE);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_DEMOTE);
 		guildPacket.writeString(statusInfo);
 		guildPacket.writeInt(statusColor.hashCode());
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
@@ -155,7 +156,7 @@ public class GuildHandler {
 		if (allowedName) {
 			Contained.teamData.add(newTeam);
 			System.out.println(pdata.joinTeam(newTeam.id, true).toString());
-			ClientPacketHandler.packetSyncTeams(Contained.teamData).sendToClients();
+			ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).sendToClients();
 			
 			String world = player.dimension == 0 ? "Normal" : "Nether";
 			DataLogger.insertCreateTeam("debugMode", pdata.playerName, world, newTeam.displayName, Util.getDate());
@@ -164,10 +165,11 @@ public class GuildHandler {
 			statusColor = Color.RED;
 		}
 		
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_CREATE);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.GUILD_CREATE);
 		guildPacket.writeString(statusInfo);
 		guildPacket.writeInt(statusColor.hashCode());
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
+		Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(player).toPacket(), player);
 	}
 	
 	public void disbandTeam(EntityPlayerMP leader, String id){
@@ -182,7 +184,7 @@ public class GuildHandler {
 					while(iterator.hasNext()){
 						EntityPlayerMP playerMP = (EntityPlayerMP) iterator.next();
 						if(player.playerName.equals(playerMP.getDisplayName())){
-							PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_DISBAND);
+							PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.GUILD_DISBAND);
 							Contained.channel.sendTo(guildPacket.toPacket(), playerMP);
 						}
 					}
@@ -214,13 +216,13 @@ public class GuildHandler {
 			team.displayName = name;
 			team.colorID = color;
 			team.sendMessageToTeam(team.getFormatCode() + "[NOTICE] Team Update: " + team.getFormatCode() + "§l" + team.displayName + team.getFormatCode() +".");
-			Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
+			Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket());
 		}else{
 			statusInfo = "Team Name Taken";
 			statusColor = Color.RED;
 		}
 		
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.GUILD_UPDATE);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.GUILD_UPDATE);
 		guildPacket.writeString(statusInfo);
 		guildPacket.writeInt(statusColor.hashCode());
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
@@ -240,12 +242,13 @@ public class GuildHandler {
 			@SuppressWarnings("rawtypes")
 			List onlinePlayers = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 			for (Object o : onlinePlayers) {
-				if (o instanceof EntityPlayer) {
-					EntityPlayer onlinePlayer = (EntityPlayer)o;
+				if (o instanceof EntityPlayerMP) {
+					EntityPlayerMP onlinePlayer = (EntityPlayerMP)o;
 					PlayerTeamIndividual onlineData = PlayerTeamIndividual.get(onlinePlayer);
 					if (onlinePlayer.getDisplayName().toLowerCase().equals(newInvite.playerName.toLowerCase())) {
 						PlayerTeam teamData = PlayerTeam.get(newInvite.teamID);
 						onlinePlayer.addChatComponentMessage(new ChatComponentText("[*] "+teamData.getFormatCode()+"§l"+teamData.displayName+"§r would like you to join their group."));
+						Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(onlinePlayer).toPacket(), onlinePlayer);
 					}
 				}
 			}		
@@ -287,9 +290,10 @@ public class GuildHandler {
 			statusColor = Color.RED;
 		}
 	
-		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PLAYER_DECLINE);
+		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_DECLINE);
 		guildPacket.writeString(statusInfo);
 		guildPacket.writeInt(statusColor.hashCode());
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
+		Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(player).toPacket(), player);
 	}
 }

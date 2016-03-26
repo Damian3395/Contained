@@ -3,7 +3,7 @@ package com.contained.game.user;
 import java.util.ArrayList;
 
 import com.contained.game.Contained;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.SurveyData;
 import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Util;
@@ -67,7 +67,8 @@ public class PlayerTeamIndividual {
 				this.isLeader = true;
 			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 			if (playerServerEnt != null)
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+			Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(this).toPacket());
 			return Error.NONE; //Successfully joined team.
 		}
 		return Error.IND_ONLY; //Already in a team.
@@ -90,10 +91,11 @@ public class PlayerTeamIndividual {
 			this.isLeader = false;
 			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 			if (playerServerEnt != null)
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 			team.disbandTeam();
 		}
 		
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(this).toPacket());
 		return Error.NONE;
 	}
 	
@@ -113,7 +115,7 @@ public class PlayerTeamIndividual {
 		
 		EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 		if (playerServerEnt != null)
-			Contained.channel.sendTo(ClientPacketHandler.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		
 		return Error.NONE;
 	}
@@ -160,7 +162,7 @@ public class PlayerTeamIndividual {
 		
 		EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
 		if (playerServerEnt != null)
-			Contained.channel.sendTo(ClientPacketHandler.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		
 		return Error.NONE;
 	}

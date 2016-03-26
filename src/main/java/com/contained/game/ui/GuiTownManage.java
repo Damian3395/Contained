@@ -12,7 +12,7 @@ import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
@@ -259,8 +259,8 @@ public class GuiTownManage extends GuiContainer {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		if (permissionsModified) {
-			PacketCustom packet = ServerPacketHandler.packetUpdatePermissions(localTeams.get(blockTeamInd));
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			PacketCustom packet = ServerPacketHandlerUtil.packetUpdatePermissions(localTeams.get(blockTeamInd));
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	
@@ -867,9 +867,9 @@ public class GuiTownManage extends GuiContainer {
 		if(indOff+ind == 0)
 			marketInd = -1;
 		else{
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.PLAYER_TRADE);
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_TRADE);
 			packet.writeString(marketTrades.get((indOff+ind)-1).id);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	
@@ -1167,19 +1167,19 @@ public class GuiTownManage extends GuiContainer {
 		if (canAfford(id)) {
 			if (xpCosts[selectedTab][id] != -1) {
 				mc.thePlayer.experienceLevel -= xpCosts[selectedTab][id];
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.OFFSET_XPLEVEL);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.OFFSET_XPLEVEL);
 				packet.writeInt(-xpCosts[selectedTab][id]);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
 			if (itemCosts[selectedTab][id] != null) {
 				Util.removeItem(itemCosts[selectedTab][id], mc.thePlayer);
-				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_REMOVE);
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.INVENTORY_REMOVE);
 				packet.writeItemStack(itemCosts[selectedTab][id]);
-				ServerPacketHandler.sendToServer(packet.toPacket());
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandler.INVENTORY_ADD);
+			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.INVENTORY_ADD);
 			packet.writeItemStack(listItems[selectedTab][id]);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	

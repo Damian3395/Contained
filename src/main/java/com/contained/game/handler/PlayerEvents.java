@@ -12,7 +12,7 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.BlockInteractItem;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.SurveyData;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
@@ -62,7 +62,8 @@ public class PlayerEvents {
 				// Server has no info about this player, this must be their first
 				// time joining. Initialize their custom data.
 				Contained.teamMemberData.add(new PlayerTeamIndividual(joined.getDisplayName()));
-			
+				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetNewPlayer(joined.getDisplayName()).toPacket());
+				
 				//Give first time players a tutorial book.
 				if (!joined.inventory.hasItem(ContainedRegistry.book))
 					event.world.spawnEntityInWorld(new EntityItem(event.world, 
@@ -85,14 +86,16 @@ public class PlayerEvents {
 						new ItemStack(SurveyClipboard.instance, 1)));
 			
 			if (joined instanceof EntityPlayerMP) {
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
-				Contained.channel.sendTo(ClientPacketHandler.packetSyncLocalPlayer((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetPlayerList(Contained.teamMemberData).toPacket(), (EntityPlayerMP)joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
 			}
 			
 			//Class Perks
 			ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;
-			PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.PERK_INFO);
+			PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PERK_INFO);
 			for(int i = 0; i < 5; i++){
 				if(i < perks.size())
 					perkPacket.writeInt(perks.get(i));
@@ -117,12 +120,12 @@ public class PlayerEvents {
 				int[] occupationData = ExtendedPlayer.get(player).getOccupationValues();
 				
 				if (player instanceof EntityPlayerMP) {
-					PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.OCCUPATIONAL_DATA);
+					PacketCustom occPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.OCCUPATIONAL_DATA);
 					for(int i=0; i<occupationData.length; i++)
 						occPacket.writeInt(occupationData[i]);
 					Contained.channel.sendTo(occPacket.toPacket(), (EntityPlayerMP)player);
 					
-					PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandler.ITEM_USAGE_DATA);
+					PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ITEM_USAGE_DATA);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedOwnItems);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);

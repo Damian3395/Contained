@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.contained.game.Contained;
-import com.contained.game.network.ClientPacketHandler;
+import com.contained.game.network.ClientPacketHandlerUtil;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -129,7 +130,7 @@ public class PlayerTeam {
 		//Remove the team.
 		Contained.teamData.remove(this);	
 		
-		Contained.channel.sendToAll(ClientPacketHandler.packetSyncTeams(Contained.teamData).toPacket());
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket());
 	}
 	
 	/**

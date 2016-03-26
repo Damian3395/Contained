@@ -55,8 +55,9 @@ public class Contained{
 	public static HashMap<Point, String> territoryData; // [SERVER & CLIENT SIDE] coordinates, teamID. Locations of all blocks that are owned by a team.
 	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
 	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE] all tracked players, online and offline, even those not in teams.
-																   // [CLIENT SIDE] only the data on the local player.
-	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE ONLY] all pending team invitations.
+																   // [CLIENT SIDE] only the data on the local player, as well as display names and team IDs of others.
+	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE] all pending team invitations.
+																   // [CLIENT SIDE] all invitations pertaining to the local player.
 	public static ArrayList<PlayerTrade> trades;
 	
 	@EventHandler

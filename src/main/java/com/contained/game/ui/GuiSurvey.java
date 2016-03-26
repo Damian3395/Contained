@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.network.ServerPacketHandler;
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.user.PlayerTeamIndividual;
 
 import net.minecraft.client.gui.GuiButton;
@@ -238,8 +238,8 @@ public class GuiSurvey extends GuiScreen {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		if (this.lastProgress != playerCopy.surveyResponses.progress) {
-			PacketCustom packet = ServerPacketHandler.packetUpdateSurvey(playerCopy);
-			ServerPacketHandler.sendToServer(packet.toPacket());
+			PacketCustom packet = ServerPacketHandlerUtil.packetUpdateSurvey(playerCopy);
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			
 			PlayerTeamIndividual localPData = PlayerTeamIndividual.get(playerCopy.playerName);
 			localPData.surveyResponses = playerCopy.surveyResponses;
