@@ -157,7 +157,6 @@ public class GuildLeader {
 			String newName = teamName.getText();
 			if((!newName.isEmpty() && (!newName.equals(team.displayName)
 					|| selectedColor != team.colorID))) {
-				
 				packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.GUILD_UPDATE);
 				packet.writeString(newName);
 				packet.writeInt(selectedColor);

@@ -109,9 +109,9 @@ public class TerritoryMachineRender extends TileEntitySpecialRenderer {
 		    // blocks. This provides a window of opportunity for finding
 		    // the machine in the event that it is buried underground, etc.
 		    float xrayProgress = (progress-0.8f)/0.1f;
-		    	if (xrayProgress > 0)
-		    		drawXrayWireframe(xrayProgress);
-		    
+		    if (xrayProgress > 0)
+		    	drawXrayWireframe(xrayProgress);
+			
 			GL11.glPopMatrix();
 		}
 	}	
