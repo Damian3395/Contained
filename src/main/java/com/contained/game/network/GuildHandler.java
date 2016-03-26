@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -79,8 +78,13 @@ public class GuildHandler {
 	
 	public void leaveTeam(EntityPlayerMP player){
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		if (pdata.teamID == null) {
+			//Seems to be some desync of team data between client and server. Resync.
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(pdata);
+			return;
+		}
 		
+		PlayerTeam team = PlayerTeam.get(pdata.teamID);
 		pdata.leaveTeam();
 		team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" has left the team.");
 		
@@ -90,9 +94,17 @@ public class GuildHandler {
 	
 	public void kickPlayer(EntityPlayerMP player, String teammate){
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		if (pdata.teamID == null) {
+			//Seems to be some desync of team data between client and server. Resync.
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(pdata);
+			return;
+		}
 		
+		PlayerTeam team = PlayerTeam.get(pdata.teamID);
 		PlayerTeamIndividual toKick = PlayerTeamIndividual.get(teammate);
+		if (toKick.teamID == null || !toKick.teamID.equals(pdata.teamID))
+			return;
+			
 		team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+toKick.playerName+" has been kicked from the team.");
 		toKick.leaveTeam();
 		
@@ -105,8 +117,13 @@ public class GuildHandler {
 	
 	public void promotePlayer(EntityPlayerMP player, String teammate){
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		if (pdata.teamID == null) {
+			//Seems to be some desync of team data between client and server. Resync.
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(pdata);
+			return;
+		}
 		
+		PlayerTeam team = PlayerTeam.get(pdata.teamID);
 		PlayerTeamIndividual toPromote = PlayerTeamIndividual.get(teammate);
 		toPromote.promote();
 		
@@ -119,8 +136,13 @@ public class GuildHandler {
 		Color statusColor = Color.GREEN;
 		
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		if (pdata.teamID == null) {
+			//Seems to be some desync of team data between client and server. Resync.
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(pdata);
+			return;
+		}
 		
+		PlayerTeam team = PlayerTeam.get(pdata.teamID);
 		ErrorCase.Error result = pdata.demote();
 		if(result == ErrorCase.Error.CANNOT_DEMOTE){
 			System.out.println("You're the only member of this group... you must stay the leader."); //Render This
@@ -174,6 +196,12 @@ public class GuildHandler {
 	
 	public void disbandTeam(EntityPlayerMP leader, String id){
 		PlayerTeam team = PlayerTeam.get(id);
+		if (team == null) {
+			//Seems to be some desync of team data between client and server. Resync.
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(leader.getDisplayName());
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(pdata);
+			return;
+		}
 		
 		ArrayList<PlayerTeamIndividual> players = Contained.teamMemberData;
 		for(PlayerTeamIndividual player : players){
@@ -230,8 +258,13 @@ public class GuildHandler {
 	
 	public void invitePlayer(EntityPlayerMP player, String newTeammate){
 		PlayerTeamIndividual leader = PlayerTeamIndividual.get(player);
-		PlayerTeam team = PlayerTeam.get(leader.teamID);
+		if (leader.teamID == null) {
+			//Seems to be some desync of team data between client and server. Resync.
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(leader);
+			return;
+		}
 		
+		PlayerTeam team = PlayerTeam.get(leader.teamID);
 		PlayerTeamIndividual recipient = PlayerTeamIndividual.get(newTeammate);
 		PlayerTeamInvitation newInvite = new PlayerTeamInvitation(recipient.playerName, team.id, PlayerTeamInvitation.FROM);
 		

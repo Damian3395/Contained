@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import codechicken.lib.packet.PacketCustom;
 
@@ -14,6 +15,7 @@ import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 public class ClientPacketHandlerUtil {
 	public static final int OCCUPATIONAL_DATA = 1;
@@ -180,5 +182,12 @@ public class ClientPacketHandlerUtil {
 			tradePacket.writeNBTTagCompound(ntc);
 		}
 		return tradePacket;
+	}
+	
+	public static void syncTeamMembershipChangeToAll(PlayerTeamIndividual memberChanged) {
+		EntityPlayer playerServerEnt = Util.getOnlinePlayer(memberChanged.playerName);
+		if (playerServerEnt != null)
+			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(memberChanged).toPacket());
 	}
 }

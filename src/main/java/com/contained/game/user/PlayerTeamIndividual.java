@@ -67,10 +67,7 @@ public class PlayerTeamIndividual {
 			this.joinTime = System.currentTimeMillis();
 			if (isLeader)
 				this.isLeader = true;
-			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
-			if (playerServerEnt != null)
-				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
-			Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(this).toPacket());
+			ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(this);
 			return Error.NONE; //Successfully joined team.
 		}
 		return Error.IND_ONLY; //Already in a team.
@@ -81,7 +78,7 @@ public class PlayerTeamIndividual {
 	 * Possible failures: TEAM_ONLY
 	 */
 	public ErrorCase.Error leaveTeam() {
-		if (teamID == null)
+		if (this.teamID == null)
 			return Error.TEAM_ONLY; //This player wasn't in a team.
 		
 		PlayerTeam team = PlayerTeam.get(this.teamID);
@@ -91,13 +88,10 @@ public class PlayerTeamIndividual {
 		
 		if (team.numMembers() == 0) {
 			this.isLeader = false;
-			EntityPlayer playerServerEnt = Util.getOnlinePlayer(this.playerName);
-			if (playerServerEnt != null)
-				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 			team.disbandTeam();
 		}
 		
-		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(this).toPacket());
+		ClientPacketHandlerUtil.syncTeamMembershipChangeToAll(this);
 		return Error.NONE;
 	}
 	

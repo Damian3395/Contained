@@ -72,19 +72,19 @@ public class PlayerEvents {
 				//If player has not completed the survey, give them a reminder.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
 				if (pdata.surveyResponses.progress <= SurveyData.getSurveyLength())
-					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out §a§lyour §a§lsurvey)");
+					Util.displayMessage(joined, "Â§aÂ§l(Reminder: Please take a moment to fill out Â§aÂ§lyour Â§aÂ§lsurvey)");
 				else
 					completedSurvey = true;
 				
 				//If the player has pending invitations, let them know.
 				if (PlayerTeamInvitation.getInvitations(pdata).size() > 0)
-					Util.displayMessage(joined, "§d§lYou have pending inviations in your guild §d§lmenu!");
+					Util.displayMessage(joined, "Â§dÂ§lYou have pending inviations in your guild Â§dÂ§lmenu!");
 			
 				// If the player got accepted into a team since last time they 
 				// were online, let them know.
 				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
-					PlayerTeam newTeam = PlayerTeam.get(pdata);
-					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
+					PlayerTeam newTeam = PlayerTeam.get(pdata.teamID);
+					Util.displayMessage(joined, "Â§dÂ§lYou are now a member of "+newTeam.getFormatCode()+"Â§l"+newTeam.displayName+"Â§dÂ§l!");
 					pdata.lastOnline = System.currentTimeMillis();
 				}
 			}			
