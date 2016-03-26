@@ -3,6 +3,7 @@ package com.contained.game.world.block;
 import org.lwjgl.opengl.GL11;
 
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -102,8 +103,58 @@ public class TerritoryMachineRender extends TileEntitySpecialRenderer {
 			    tessellator.addVertexWithUV(1+margin, progress, 0, 0, progress);
 				tessellator.draw();
 		    }
+		    
+		    // For a brief period of time during the machine's cycle,
+		    // draw an xray wireframe around it that can be seen through
+		    // blocks. This provides a window of opportunity for finding
+		    // the machine in the event that it is buried underground, etc.
+		    float xrayProgress = (progress-0.8f)/0.1f;
+		    if (xrayProgress > 0)
+		    	drawXrayWireframe(xrayProgress);
 			
 			GL11.glPopMatrix();
 		}
 	}	
+	
+	public void drawXrayWireframe(float progress) {
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glDepthMask(false);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glLineWidth(3f);
+		Tessellator tes = Tessellator.instance;
+		
+		tes.startDrawing(GL11.GL_LINES);
+		tes.setColorRGBA_I(0xFFFFFF, (int)(255f*Util.clamp(progress, 0f, 1f)));
+		tes.setBrightness(200);
+		float f0 = 0.0f;
+		float f1 = 1.0f;
+		
+		// Bottom
+		tes.addVertex(f0, f1, f0); tes.addVertex(f1,  f1, f0);
+		tes.addVertex(f1, f1, f0); tes.addVertex(f1,  f1, f1); 
+		tes.addVertex(f1, f1, f1); tes.addVertex(f0,  f1,  f1);
+		tes.addVertex(f0, f1, f1); tes.addVertex(f0,  f1,  f0);
+
+		// Top
+		tes.addVertex(f1,  f0,  f0); tes.addVertex(f1,  f0,  f1);
+		tes.addVertex(f1,  f0,  f1); tes.addVertex(f0,  f0,  f1);
+		tes.addVertex(f0,  f0,  f1); tes.addVertex(f0,  f0,  f0);
+		tes.addVertex(f0,  f0,  f0); tes.addVertex(f1,  f0,  f0);
+		
+		// Corners
+		tes.addVertex(f1,  f0,  f1); tes.addVertex(f1,  f1,  f1);
+		tes.addVertex(f1,  f0,  f0); tes.addVertex(f1,  f1,  f0);
+		tes.addVertex(f0,  f0,  f1); tes.addVertex(f0,  f1,  f1);
+		tes.addVertex(f0,  f0,  f0); tes.addVertex(f0,  f1,  f0);
+		
+		tes.draw();
+		GL11.glDepthMask(true);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+	}
 }

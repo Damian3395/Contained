@@ -23,14 +23,14 @@ public class GenerateWorld {
 	public void preInit(FMLPreInitializationEvent event){
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
-		Resources.worldRadius = config.getInt("worldSize", Configuration.CATEGORY_GENERAL, 25, 0, 500, "Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
+		Resources.worldRadius = config.getInt("worldSize", Configuration.CATEGORY_GENERAL, 30, 0, 500, "Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
 		Resources.minOreRegen = config.getInt("minOreRegen", Configuration.CATEGORY_GENERAL, 15000, 1, 5000000, "Minimum time (in seconds) before harvested ores regenerate.");
 		Resources.maxOreRegen = config.getInt("maxOreRegen", Configuration.CATEGORY_GENERAL, 86000, 1, 5000000, "Maximum time (in seconds) before harvested ores regenerate.");
 		
 		ResourceCluster.writeConfigComment(config);
 		oreSpawnProperties = new ResourceCluster[Resources.NUM_MINERALS];
 		oreSpawnProperties[Resources.GLOWSTONE] = ResourceCluster.generateFromConfig(config, 
-				Blocks.glowstone, 12, 48, 3, 6, 5, 10, 6, 8, 2, 64);
+				Blocks.glowstone, 12, 48, 3, 6, 5, 10, 12, 12, 2, 64);
 		oreSpawnProperties[Resources.QUARTZ] = ResourceCluster.generateFromConfig(config, 
 				Blocks.quartz_block, 8, 32, 2, 5, 5, 10, 4, 6, 2, 16);
 		oreSpawnProperties[Resources.DIAMOND] = ResourceCluster.generateFromConfig(config, 

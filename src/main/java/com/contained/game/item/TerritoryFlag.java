@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
+import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * Item for claiming a new sector of territory.
@@ -36,7 +37,7 @@ public class TerritoryFlag {
 	
 	public static void defineRecipe(){
 		ItemStack output = new ItemStack(instance, 1);
-		ItemStack inputWool = new ItemStack(Blocks.wool, 1);
+		ItemStack inputWool = new ItemStack(Blocks.wool, 1, OreDictionary.WILDCARD_VALUE);
 		ItemStack inputStick = new ItemStack(Items.stick, 1);
 		
 		GameRegistry.addRecipe(output, new Object[]{
@@ -105,7 +106,7 @@ public class TerritoryFlag {
 					return;
 				}
 				
-				p.addExperienceLevel(-Contained.configs.flagXPCost);
+				p.addExperienceLevel(flagXPCost);
 				Contained.territoryData.put(toClaim, playerData.teamID);
 				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 				team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+playerData.playerName+" started a new territory sector at ("+x+","+z+").");

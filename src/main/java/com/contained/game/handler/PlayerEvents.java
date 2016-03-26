@@ -14,9 +14,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.SurveyData;
-import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
-import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -33,7 +31,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -77,7 +74,7 @@ public class PlayerEvents {
 				//If player has not completed the survey, give them a reminder.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
 				if (pdata.surveyResponses.progress <= SurveyData.getSurveyLength())
-					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out your §a§lsurvey)");
+					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out §a§lyour §a§lsurvey)");
 				else
 					completedSurvey = true;
 			}			

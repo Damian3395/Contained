@@ -75,7 +75,9 @@ public class ProtectionEvents {
 		Blocks.diamond_ore,
 		Blocks.redstone_ore,
 		Blocks.emerald_ore,
-		Blocks.lapis_ore
+		Blocks.lapis_ore,
+		Blocks.quartz_block,
+		Blocks.glowstone
 	};
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)

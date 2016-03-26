@@ -44,6 +44,7 @@ public class TerritoryRender {
 			teamColor = currentTerritory.getColor();
 		}
 		mc.fontRenderer.drawStringWithShadow(teamName, 5, 5, teamColor);
+		mc.fontRenderer.drawStringWithShadow("("+(int)mc.thePlayer.posX+","+(int)mc.thePlayer.posY+","+(int)mc.thePlayer.posZ+")", 5, 5+12, 0xFFFFFF);
 	}
 	
 	@SubscribeEvent
