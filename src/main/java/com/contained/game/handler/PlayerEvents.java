@@ -14,7 +14,9 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.SurveyData;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -31,6 +33,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -38,6 +41,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
@@ -140,6 +144,20 @@ public class PlayerEvents {
 				for(ItemStack stack : inventory)
 					if (stack != null)
 						processNewOwnership(player, stack);
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onEntityRender(RenderLivingEvent.Pre event) {
+		// Players in teams will have their team name rendered above
+		// their head in-game.
+		if (event.entity instanceof EntityPlayer) {
+			EntityPlayer p = (EntityPlayer)event.entity;
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+			if (pdata != null && pdata.teamID != null) {
+				PlayerTeam team = PlayerTeam.get(pdata.teamID);
+				RenderUtil.drawNameTag(p, team.getFormatCode()+"§l["+team.displayName+"]", event.x, event.y+0.5, event.z, 64);
 			}
 		}
 	}

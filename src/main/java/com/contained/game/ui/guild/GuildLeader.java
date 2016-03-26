@@ -222,9 +222,7 @@ public class GuildLeader {
 	}
 	
 	public void render(){
-		this.gui.drawDefaultBackground();
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		//this.gui.drawDefaultBackground();
 		tabPane.render();
 		
 		//Settings Buttons
@@ -249,9 +247,6 @@ public class GuildLeader {
 			renderSettings();
 			break;
 		}
-		
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glEnable(GL11.GL_LIGHTING);
 	}
 	
 	private void renderActions(){
