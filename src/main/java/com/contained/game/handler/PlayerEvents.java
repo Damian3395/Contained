@@ -83,7 +83,7 @@ public class PlayerEvents {
 				// If the player got accepted into a team since last time they 
 				// were online, let them know.
 				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
-					PlayerTeam newTeam = PlayerTeam.get(pdata);
+					PlayerTeam newTeam = PlayerTeam.get(pdata.teamID);
 					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
 					pdata.lastOnline = System.currentTimeMillis();
 				}

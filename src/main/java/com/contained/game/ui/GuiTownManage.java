@@ -518,6 +518,7 @@ public class GuiTownManage extends GuiContainer {
 		listCounts[tabMarket] = index;
 	}
 
+	//TODO:
 	private void renderItem(int ind, Object o){
 		ItemStack itemStack = null;
 		if(o == null)
@@ -544,12 +545,9 @@ public class GuiTownManage extends GuiContainer {
 		if (itemHovering == ind-offset)
 			this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
 
-		GL11.glPushMatrix();
-		IIcon iicon1 = itemStack.getIconIndex();
-		this.mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
-		this.drawTexturedModelRectFromIcon(x, y, iicon1, 16, 16);
-		GL11.glPopMatrix();
-		
+		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), itemStack, x, y);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		fr.drawString(itemStack.getDisplayName(), x+20, y+4, 0x000000);
 		
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -588,11 +586,9 @@ public class GuiTownManage extends GuiContainer {
 		if(makeRequest == null)
 			fr.drawString("Select Request", x, y+4, 0x000000);
 		else{
-			GL11.glPushMatrix();
-			IIcon iicon1 = makeRequest.getIconIndex();
-			this.mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
-			this.drawTexturedModelRectFromIcon(x+100, y, iicon1, 16, 16);
-			GL11.glPopMatrix();
+			GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), makeRequest, x+100, y);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			fr.drawString("Selected Request: ", x, y+4, 0x000000);
 		}
 		
@@ -613,11 +609,9 @@ public class GuiTownManage extends GuiContainer {
 		if(makeOffer == null)
 			fr.drawString("Shift-Click: ", x, y+4, 0x000000);
 		else{
-			GL11.glPushMatrix();
-			IIcon iicon1 = makeOffer.getIconIndex();
-			this.mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
-			this.drawTexturedModelRectFromIcon(x+100, y, iicon1, 16, 16);
-			GL11.glPopMatrix();
+			GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), makeOffer, x+100, y);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			fr.drawString("Selected Item: ", x, y+4, 0x000000);
 		}
 		
@@ -644,14 +638,10 @@ public class GuiTownManage extends GuiContainer {
 		if (itemHovering == ind-offset)
 			this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
 		
-		IIcon iicon1 = offer.getIconIndex();
-		IIcon iicon2 = request.getIconIndex();
-		
-		GL11.glPushMatrix();
-		this.mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
-		this.drawTexturedModelRectFromIcon(x+30, y, iicon1, 16, 16);
-		this.drawTexturedModelRectFromIcon(x+110, y, iicon2, 16, 16);
-		GL11.glPopMatrix();
+		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), offer, x+30, y);
+		GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, mc.getTextureManager(), request, x+110, y);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		fr.drawString("Offer: ", x, y+4, 0x000000);
 		fr.drawString("Request: ", x+70, y+4, 0x000000);
 		
@@ -808,6 +798,7 @@ public class GuiTownManage extends GuiContainer {
 	/**
 	 * Display a list of trades.
 	 */
+	//TODO:
 	private void shopList() {	
 		FontRenderer fr = this.mc.fontRenderer;
         int offset = scrollInd();
@@ -1188,6 +1179,8 @@ public class GuiTownManage extends GuiContainer {
 	@Override 
 	public void drawScreen(int mouseX, int mouseY, float ticks) {
 		super.drawScreen(mouseX, mouseY, ticks);
+		
+		keyPressed();
 		
 		// Hover tips (tabs)
 		for(int i=0; i<numTabs; i++) {
