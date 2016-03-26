@@ -45,7 +45,7 @@ public class TradeHandler {
 				if(curSlot.equals(trade.request)){
 					if((curSlot.stackSize + count) <= trade.request.stackSize){
 						count += curSlot.stackSize;
-						player.inventory.setInventorySlotContents(i, null);
+						player.inventory.getStackInSlot(i).stackSize = 0;
 					}else{
 						player.inventory.decrStackSize(i, trade.request.stackSize-count);
 						i = player.inventory.getSizeInventory();
@@ -62,7 +62,7 @@ public class TradeHandler {
 				if(curSlot.equals(trade.offer)){
 					if((curSlot.stackSize + count) <= trade.offer.stackSize){
 						count += curSlot.stackSize;
-						creator.inventory.setInventorySlotContents(i, null);
+						creator.inventory.getStackInSlot(i).stackSize = 0;
 					}else{
 						creator.inventory.decrStackSize(i, trade.offer.stackSize-count);
 						i = creator.inventory.getSizeInventory();
@@ -106,7 +106,8 @@ public class TradeHandler {
 		if(offer == null || request == null && slotId != -1)
 			return;
 		
-		player.inventory.setInventorySlotContents(slotId, null);
+		if(player.inventory.getStackInSlot(slotId) != null)
+			player.inventory.getStackInSlot(slotId).stackSize = 0;
 		
 		//Remove Items From Player
 		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_ITEM);

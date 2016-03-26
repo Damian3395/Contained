@@ -260,7 +260,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.REMOVE_ITEM:
-					player.inventory.setInventorySlotContents(packet.readInt(), null);
+					int slotId = packet.readInt();
+					if(slotId > -1 && mc.thePlayer.inventory.getStackInSlot(slotId) != null)
+						mc.thePlayer.inventory.setInventorySlotContents(slotId, null);
 				break;
 				
 				case ClientPacketHandlerUtil.CREATE_TRADE:
@@ -292,14 +294,14 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					
 					if(trans) { //Trade Creator -Remove Offer -Add Request
 						int count = 0;
-						for(int i = 0; i < player.inventory.getSizeInventory(); i++){
-							ItemStack curSlot = player.inventory.getStackInSlot(i);
+						for(int i = 0; i < mc.thePlayer.inventory.getSizeInventory(); i++){
+							ItemStack curSlot = mc.thePlayer.inventory.getStackInSlot(i);
 							if(curSlot.equals(offer)){
 								if((curSlot.stackSize + count) <= offer.stackSize){
 									count += curSlot.stackSize;
-									player.inventory.setInventorySlotContents(i, null);
+									mc.thePlayer.inventory.setInventorySlotContents(i, null);
 								}else{
-									player.inventory.decrStackSize(i, offer.stackSize-count);
+									mc.thePlayer.inventory.decrStackSize(i, offer.stackSize-count);
 									i = player.inventory.getSizeInventory();
 								}
 							}
@@ -308,13 +310,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}else{ //Trade Acceptor -Remove Request -Add Offer
 						int count = 0;
 						for(int i = 0; i < player.inventory.getSizeInventory(); i++){
-							ItemStack curSlot = player.inventory.getStackInSlot(i);
+							ItemStack curSlot = mc.thePlayer.inventory.getStackInSlot(i);
 							if(curSlot.equals(request)){
 								if((curSlot.stackSize + count) <= request.stackSize){
 									count += curSlot.stackSize;
-									player.inventory.setInventorySlotContents(i, null);
+									mc.thePlayer.inventory.setInventorySlotContents(i, null);
 								}else{
-									player.inventory.decrStackSize(i, request.stackSize-count);
+									mc.thePlayer.inventory.setInventorySlotContents(i, null);
 									i = player.inventory.getSizeInventory();
 								}
 							}

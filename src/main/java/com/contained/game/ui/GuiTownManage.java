@@ -256,15 +256,12 @@ public class GuiTownManage extends GuiContainer {
 		
 		myTrades = new ArrayList<PlayerTrade>();
 		marketTrades = new ArrayList<PlayerTrade>();
-		String[] users = MinecraftServer.getServer().getConfigurationManager().getAllUsernames();
 		for(PlayerTrade trade : Contained.trades){
 			if(trade.displayName.equals(this.mc.thePlayer.getDisplayName()))
 				myTrades.add(trade);
-			else{
-				for(int i = 0; i < users.length; i++)
-					if(users[i].equals(trade.displayName))
-						marketTrades.add(trade);
-			}
+			else
+				marketTrades.add(trade);
+			
 		}
 		
 		makeOffer = null;
