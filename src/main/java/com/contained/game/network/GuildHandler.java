@@ -205,7 +205,7 @@ public class GuildHandler {
 		
 		ArrayList<PlayerTeamIndividual> players = Contained.teamMemberData;
 		for(PlayerTeamIndividual player : players){
-			if(player.teamID.equals(id)){
+			if(player.teamID != null && player.teamID.equals(id)){
 				WorldServer[] servers = MinecraftServer.getServer().worldServers;
 				for(WorldServer server : servers){
 					ListIterator iterator = server.playerEntities.listIterator();
