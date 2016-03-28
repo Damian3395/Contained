@@ -51,6 +51,7 @@ public class Load {
 		Contained.teamData.clear();
 		Contained.teamMemberData.clear();
 		Contained.teamInvitations.clear();
+		Contained.trades.clear();
 		
 		ntc = loadNBTFile("territoryInfo.dat");
 		if (ntc != null) {			

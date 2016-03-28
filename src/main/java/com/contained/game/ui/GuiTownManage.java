@@ -700,13 +700,14 @@ public class GuiTownManage extends GuiContainer {
 		
 		if(button == 0 && indOff+ind == 0)
 			marketInd = NONE;
-		else if(button == 1 && marketInd == MY_TRADES){
+		else if(button == 1 && marketInd == MY_TRADES && indOff+ind > 0){
 			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.CANCEL_TRADE);
 			packet.writeString(myTrades.get((indOff+ind)-1).id);
 			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	
+	//TODO: Fix Replicated Trades
 	private void createTradeClick(int mouseX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;

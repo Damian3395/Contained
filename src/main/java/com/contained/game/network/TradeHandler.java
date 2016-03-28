@@ -138,8 +138,10 @@ public class TradeHandler {
 		tradePacket.writeInt(slotId);
 		Contained.channel.sendTo(tradePacket.toPacket(), player);
 		
-		//Update All Players
+		//Create New Trade
 		PlayerTrade newTrade = new PlayerTrade(player.getDisplayName(), playerTeam.displayName, offer, request);
+		
+		//Update All Players
 		PacketCustom addTrades = ClientPacketHandlerUtil.packetSyncTrades(newTrade, true);
 		Contained.channel.sendToAll(addTrades.toPacket());
 	}
@@ -160,6 +162,9 @@ public class TradeHandler {
 			}
 		}
 		
+		if(removeTrade == null)
+			return;
+		
 		player.inventory.addItemStackToInventory(removeTrade.offer);
 		
 		////Add Item Back To Player
@@ -168,9 +173,7 @@ public class TradeHandler {
 		Contained.channel.sendTo(tradePacket.toPacket(), player);
 		
 		//Update All Players
-		if(removeTrade != null){
-			PacketCustom removeTrades = ClientPacketHandlerUtil.packetSyncTrades(removeTrade, false);
-			Contained.channel.sendToAll(removeTrades.toPacket());
-		}
+		PacketCustom removeTrades = ClientPacketHandlerUtil.packetSyncTrades(removeTrade, false);
+		Contained.channel.sendToAll(removeTrades.toPacket());
 	}
 }

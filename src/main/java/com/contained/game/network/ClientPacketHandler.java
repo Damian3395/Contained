@@ -276,7 +276,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case ClientPacketHandlerUtil.CREATE_TRADE:
 					PlayerTrade addTrade = new PlayerTrade(packet.readNBTTagCompound());
-					if(addTrade.offer != null && addTrade.request != null)
+					if(addTrade != null && addTrade.offer != null && addTrade.request != null)
 						Contained.trades.add(addTrade);
 					
 					if(mc.currentScreen instanceof GuiTownManage)
@@ -333,8 +333,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					int numTrades = packet.readInt();
 					for(int i=0; i<numTrades; i++) {
 						PlayerTrade readTrade = new PlayerTrade(packet.readNBTTagCompound());
-						if(readTrade.offer != null && readTrade.request != null)
+						if(readTrade != null && readTrade.offer != null && readTrade.request != null)
 							Contained.trades.add(readTrade);
+						System.out.println("Trade");
 					}
 				break;
 				
