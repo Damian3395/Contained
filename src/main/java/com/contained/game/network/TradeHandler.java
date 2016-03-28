@@ -1,5 +1,6 @@
 package com.contained.game.network;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import codechicken.lib.packet.PacketCustom;
@@ -20,82 +21,102 @@ import net.minecraft.server.MinecraftServer;
 public class TradeHandler {
 	public TradeHandler(){}
 	
-	public void transaction(EntityPlayerMP player, NBTTagCompound data){
-		PlayerTrade trade = new PlayerTrade(data);
-		EntityPlayerMP creator = null;
+	public void transaction(EntityPlayerMP player, String uuid){
+		//Find The Trade
+		PlayerTrade transTrade = null;
+		for(PlayerTrade trade : Contained.trades){
+			if(trade.id.equals(uuid)){
+				transTrade = trade;
+				break;
+			}
+		}
+		if(transTrade == null)
+			return;
 		
+		//Find The Creator of the Trade
+		EntityPlayerMP creator = null;
 		List list = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
         for (Object playerMP : list) {
             EntityPlayerMP p = (EntityPlayerMP) playerMP;
-            if (p.getDisplayName().equals(trade.displayName))
+            if (p.getDisplayName().equals(transTrade.displayName)){
               creator = p;
+              break;
+            }
         }
-        
         if(creator == null)
         	return;
 		
         //Check If Both Players Have Available Space in their inventory
-		if(player.inventory.getFirstEmptyStack() == -1 || creator.inventory.getFirstEmptyStack() == -1){
+		if(player.inventory.getFirstEmptyStack() < 0 || creator.inventory.getFirstEmptyStack() < 0)
 			return;
-		}else{
-			//Remove Request ItemStack From Player Acceptor
-			int count = 0;
-			for(int i = 0; i < player.inventory.getSizeInventory(); i++){
-				ItemStack curSlot = player.inventory.getStackInSlot(i);
-				if(curSlot.equals(trade.request)){
-					if((curSlot.stackSize + count) <= trade.request.stackSize){
-						count += curSlot.stackSize;
-						player.inventory.getStackInSlot(i).stackSize = 0;
-					}else{
-						player.inventory.decrStackSize(i, trade.request.stackSize-count);
-						i = player.inventory.getSizeInventory();
-					}
+		
+		//Check If Player Has Request Item And Remove It
+		int count = transTrade.request.stackSize;
+		ArrayList<Integer> slots = new ArrayList<Integer>();
+		for(int i = 0; i < player.inventory.getSizeInventory(); i++){
+			ItemStack item = player.inventory.getStackInSlot(i);
+			if(item.equals(transTrade.request)){
+				if((count-item.stackSize) >= 0){
+					slots.add(i);
+					count -= item.stackSize;
+				}else{
+					slots.add(i);
+					count = 0;
+					break;
 				}
 			}
-			//Add Offer ItemStack For Player Acceptor
-			player.inventory.addItemStackToInventory(trade.offer);
-			
-			//Remove Offer ItemStack From Creator
-			count = 0;
-			for(int i = 0; i < creator.inventory.getSizeInventory(); i++){
-				ItemStack curSlot = creator.inventory.getStackInSlot(i);
-				if(curSlot.equals(trade.offer)){
-					if((curSlot.stackSize + count) <= trade.offer.stackSize){
-						count += curSlot.stackSize;
-						creator.inventory.getStackInSlot(i).stackSize = 0;
-					}else{
-						creator.inventory.decrStackSize(i, trade.offer.stackSize-count);
-						i = creator.inventory.getSizeInventory();
-					}
-				}
-			}
-			//Add Request ItemStack For Creator
-			creator.inventory.addItemStackToInventory(trade.request);
 		}
+		
+		//Failed
+		if(count != 0)
+			return;
+		
+		//Success
+		count = transTrade.request.stackSize;
+		for(int i = 0; i < slots.size(); i++){
+			ItemStack item = player.inventory.getStackInSlot(slots.get(i));
+			if((count-item.stackSize) >= 0){
+				player.inventory.setInventorySlotContents(slots.get(i), null);
+				count -= item.stackSize;
+			}else{
+				player.inventory.decrStackSize(slots.get(i), count);
+				break;
+			}
+		}
+		
+		//Add Offer ItemStack For Player Acceptor
+		player.inventory.addItemStackToInventory(transTrade.offer);
+
+		//Add Request ItemStack For Creator
+		creator.inventory.addItemStackToInventory(transTrade.request);
+		
+		Contained.trades.remove(transTrade);
 		
 		//Update Acceptor
 		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.TRADE_TRANS);
-		tradePacket.writeBoolean(false);
-		tradePacket.writeItemStack(trade.offer);
-		tradePacket.writeItemStack(trade.request);
+		tradePacket.writeItemStack(transTrade.offer);
+		tradePacket.writeItemStack(transTrade.request);
 		Contained.channel.sendTo(tradePacket.toPacket(), player);
 		
 		//Update Creator
 		tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.TRADE_TRANS);
-		tradePacket.writeBoolean(true);
-		tradePacket.writeItemStack(trade.offer);
-		tradePacket.writeItemStack(trade.request);
+		tradePacket.writeItemStack(null);
+		tradePacket.writeItemStack(transTrade.request);
 		Contained.channel.sendTo(tradePacket.toPacket(), creator);
+		
+		//Update All Players
+		PacketCustom addTrades = ClientPacketHandlerUtil.packetSyncTrades(transTrade, false);
+		Contained.channel.sendToAll(addTrades.toPacket());
 		
 		//DataLog Trade
 		String world = player.dimension == 0 ? "Normal" : "Nether";
 		DataLogger.insertTrade("debug", creator.getDisplayName()
 				, world
 				, player.getDisplayName()
-				, trade.offer.getDisplayName()
-				, trade.offer.stackSize
-				, trade.request.getDisplayName()
-				, trade.request.stackSize
+				, transTrade.offer.getDisplayName()
+				, transTrade.offer.stackSize
+				, transTrade.request.getDisplayName()
+				, transTrade.request.stackSize
 				, Util.getDate());
 	}
 	
@@ -106,7 +127,11 @@ public class TradeHandler {
 		if(offer == null || request == null && slotId != -1)
 			return;
 		
-		player.inventory.setInventorySlotContents(slotId, null);
+		int slot = slotId + 9;
+		if(slot >= player.inventory.mainInventory.length)
+			slot -= player.inventory.mainInventory.length;
+		
+		player.inventory.setInventorySlotContents(slot, null);
 		
 		//Remove Items From Player
 		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_ITEM);
@@ -127,11 +152,15 @@ public class TradeHandler {
 			return;
 		
 		PlayerTrade removeTrade = null;
-		for(int i = 0; i < Contained.trades.size(); i++)
-			if(Contained.trades.get(i).id.equals(uuid)){
-				removeTrade = Contained.trades.get(i);
-				Contained.trades.remove(removeTrade);
+		for(PlayerTrade trade : Contained.trades){
+			if(trade.id.equals(uuid)){
+				removeTrade = trade;
+				Contained.trades.remove(trade);
+				break;
 			}
+		}
+		
+		player.inventory.addItemStackToInventory(removeTrade.offer);
 		
 		////Add Item Back To Player
 		PacketCustom tradePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);

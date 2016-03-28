@@ -130,7 +130,7 @@ public class ServerPacketHandler {
 				break;
 				
 				case ServerPacketHandlerUtil.PLAYER_TRADE:
-					trade.transaction(player, packet.readNBTTagCompound());
+					trade.transaction(player, packet.readString());
 				break;
 				
 				case ServerPacketHandlerUtil.CREATE_TRADE:

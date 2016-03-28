@@ -289,8 +289,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						return;
 					
 					for(PlayerTrade remTrade : Contained.trades)
-						if(remTrade.id.equals(UUID))
+						if(remTrade.id.equals(UUID)){
 							Contained.trades.remove(remTrade);
+							break;
+						}
 					
 					if(mc.currentScreen instanceof GuiTownManage)
 						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
@@ -301,10 +303,26 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ItemStack offer = packet.readItemStack();
 					ItemStack request = packet.readItemStack();
 					
-					if(trans) //Trade Creator -Remove Offer -Add Request
-						player.inventory.addItemStackToInventory(request);
-					else //Trade Acceptor -Remove Request -Add Offer
-						player.inventory.addItemStackToInventory(offer);
+					if(offer == null){
+						mc.thePlayer.inventory.addItemStackToInventory(request);
+					}else{
+						int count = request.stackSize;
+						for(int i = 0; i < mc.thePlayer.inventory.getSizeInventory(); i++){
+							ItemStack itemRemove = mc.thePlayer.inventory.getStackInSlot(i);
+							if(itemRemove.equals(request)){
+								if((count-itemRemove.stackSize) >= 0){
+									mc.thePlayer.inventory.setInventorySlotContents(i, null);
+									count -= itemRemove.stackSize;
+								}else{
+									mc.thePlayer.inventory.decrStackSize(i, itemRemove.stackSize-count);
+									count = 0;
+									break;
+								}
+							}
+						}
+						
+						mc.thePlayer.inventory.addItemStackToInventory(offer);
+					}
 					
 					if(mc.currentScreen instanceof GuiTownManage)
 						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
