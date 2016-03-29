@@ -21,6 +21,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class Util {	
+	public static String errorCode = "§4§l";
+	public static String warningCode = "§6§l";
+	public static String successCode = "§2§l";
+	public static String infoCode = "§b§l";
+	
 	/**
 	 * Euclidean distance between two points
 	 */

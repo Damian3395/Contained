@@ -700,9 +700,9 @@ public class GuiTownManage extends GuiContainer {
 		
 		if(button == 0 && indOff+ind == 0)
 			marketInd = NONE;
-		else if(button == 1 && marketInd == MY_TRADES && indOff+ind > 0){
+		else if(button == 1 && marketInd == MY_TRADES && indOff+ind > 0 && (indOff+ind-1) < myTrades.size()){
 			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.CANCEL_TRADE);
-			packet.writeString(myTrades.get((indOff+ind)-1).id);
+			packet.writeString(myTrades.get(indOff+ind-1).id);
 			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}

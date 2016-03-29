@@ -266,12 +266,18 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					
 					if(mc.thePlayer.inventory.getStackInSlot(slotId) != null)
 						mc.thePlayer.inventory.setInventorySlotContents(slotId, null);
+					
+					if(mc.currentScreen instanceof GuiTownManage)
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
 				break;
 				
 				case ClientPacketHandlerUtil.ADD_ITEM:
 					ItemStack item = packet.readItemStack();
 					if(mc.thePlayer.inventory.getFirstEmptyStack() > -1 && item != null)
 						mc.thePlayer.inventory.addItemStackToInventory(item);
+					
+					if(mc.currentScreen instanceof GuiTownManage)
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
 				break;
 				
 				case ClientPacketHandlerUtil.CREATE_TRADE:
@@ -299,7 +305,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.TRADE_TRANS:
-					boolean trans = packet.readBoolean();
 					ItemStack offer = packet.readItemStack();
 					ItemStack request = packet.readItemStack();
 					
@@ -309,8 +314,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						int count = request.stackSize;
 						for(int i = 0; i < mc.thePlayer.inventory.getSizeInventory(); i++){
 							ItemStack itemRemove = mc.thePlayer.inventory.getStackInSlot(i);
-							if(itemRemove.equals(request)){
-								if((count-itemRemove.stackSize) >= 0){
+							if(itemRemove != null && itemRemove.getItem().equals(request.getItem())){
+								if((count-itemRemove.stackSize) > 0){
 									mc.thePlayer.inventory.setInventorySlotContents(i, null);
 									count -= itemRemove.stackSize;
 								}else{
@@ -335,7 +340,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						PlayerTrade readTrade = new PlayerTrade(packet.readNBTTagCompound());
 						if(readTrade != null && readTrade.offer != null && readTrade.request != null)
 							Contained.trades.add(readTrade);
-						System.out.println("Trade");
 					}
 				break;
 				
