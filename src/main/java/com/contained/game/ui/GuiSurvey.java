@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.packet.PacketCustom;
 
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.user.PlayerTeamIndividual;
 
@@ -36,6 +37,7 @@ public class GuiSurvey extends GuiScreen {
 	private GuiTextField textResponseA;
 	private GuiTextField textResponseB;
 	private PlayerTeamIndividual playerCopy;
+	private ExtendedPlayer properties;
 	
 	public static final int PAGE_GENDER = 1;
 	public static final int PAGE_AGE = 2;
@@ -52,6 +54,8 @@ public class GuiSurvey extends GuiScreen {
     public void initGui()
     {
 		super.initGui();
+		properties = ExtendedPlayer.get(mc.thePlayer);
+		
 		int bottomMargin = -42;
 		int leftMargin = -6;
 		
@@ -79,6 +83,9 @@ public class GuiSurvey extends GuiScreen {
     	this.textResponseB.setMaxStringLength(25);
     	this.textResponseB.setText("");
     	this.textResponseB.setFocused(false);
+    	
+    	if(properties.lives == 0 && lastProgress <= SurveyData.getSurveyLength())
+    		buttonFinish.enabled = false;
     	
     	this.updateButtons();
     }
@@ -153,8 +160,10 @@ public class GuiSurvey extends GuiScreen {
 	
     @Override
 	public void keyTyped(char c, int i){
-    	super.keyTyped(c, i);
-		if (isTextFieldAEnabled() && this.textResponseA.isFocused())
+    	if(properties.lives > 0)
+    		super.keyTyped(c, i);
+    	
+    	if (isTextFieldAEnabled() && this.textResponseA.isFocused())
 			this.textResponseA.textboxKeyTyped(c, i);
 		if (isTextFieldBEnabled() && this.textResponseB.isFocused())
 			this.textResponseB.textboxKeyTyped(c, i);
@@ -199,8 +208,12 @@ public class GuiSurvey extends GuiScreen {
     		else if (b.id == 8) //Female Button
     			playerCopy.surveyResponses.isMale = false;
     		
-    		if (b.id == 0) //Done Button
-    			this.mc.displayGuiScreen(null);
+    		if (b.id == 0){ //Done Button
+    			if(properties.lives > 0)
+    				this.mc.displayGuiScreen(null);
+    			else if(playerCopy.surveyResponses.progress > SurveyData.getSurveyLength())
+    				this.mc.displayGuiScreen(null);
+    		}
     		else if (b.id == 1 || b.id == 7 || b.id == 8) //Start/Next Button 
     		{
     			if (playerCopy.surveyResponses.progress == PAGE_AGE) 
@@ -300,6 +313,9 @@ public class GuiSurvey extends GuiScreen {
     	
     	else {
     		//Survey Complete Page
+    		if(!buttonFinish.enabled)
+    			buttonFinish.enabled = true;
+    		
     		String title = "Survey Complete!";
     		String body = "Your results:";
     		this.fontRendererObj.drawString("§l§n"+title, x - this.fontRendererObj.getStringWidth(title)/2 + (this.bookImageWidth-36)/2 + 7, y + 16, 0);

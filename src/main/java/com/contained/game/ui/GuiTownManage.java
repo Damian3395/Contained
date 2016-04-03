@@ -686,8 +686,7 @@ public class GuiTownManage extends GuiContainer {
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
 		if(indOff+ind == 0)
-			System.out.println("Back");
-			//marketInd = NONE;
+			marketInd = NONE;
 		else if ((marketTrades.get(indOff+ind-1)) != null){
 			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.PLAYER_TRADE);
 			packet.writeString(marketTrades.get((indOff+ind)-1).id);
@@ -707,7 +706,6 @@ public class GuiTownManage extends GuiContainer {
 		}
 	}
 	
-	//TODO: Fix Replicated Trades
 	private void createTradeClick(int mouseX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;

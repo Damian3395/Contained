@@ -16,6 +16,7 @@ import net.minecraftforge.common.util.Constants;
 public class ExtendedPlayer implements IExtendedEntityProperties {
 	private final static String EXT_PROP_NAME = "ExtendedPlayer";
 	private final EntityPlayer entity;
+	public int lives = 1;
 	private int[] occupationValues = null;
 	public int occupationClass = ClassPerks.NONE;
 	public int occupationLevel = 0;
@@ -25,6 +26,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int usedOthersItems = 0; //# of times player used an item owned by someone else.
 	public int usedByOthers = 0;    //# of times another player used an item owned by this player.
 	public boolean isAdmin = false;
+	public boolean isSpectator = false;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
@@ -91,14 +93,32 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.isAdmin = rights;
 	}
 	
-	@Override
-	public void init(Entity entity, World w) {	
-		if(this.getOccupationClass() == 9)
-			this.entity.capabilities.setPlayerWalkSpeed(0.2f);
+	public boolean isSpectator(){
+		return this.isSpectator;
+	}
+	
+	public void becomeSepectator(boolean spectate){
+		this.isSpectator = spectate;
+	}
+	
+	public void removeLife(){
+		if(this.lives > 0)
+			this.lives--;
+	}
+	
+	public void addLife(){
+		if(this.lives < 10)
+			this.lives++;
+	}
+	
+	public void surveyComplete(){
+		this.lives+=2;
 	}
 
 	@Override
 	public void loadNBTData(NBTTagCompound load) {
+		this.lives = load.getInteger("lives_pt");
+		
 		this.occupationValues = load.getIntArray("occupationValues");
 		this.occupationClass = load.getInteger("occupationClass");
 		this.occupationLevel = load.getInteger("occupationLevel");
@@ -119,6 +139,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 			perks.add(temp[i]);
 		
 		this.isAdmin = load.getBoolean("isAdmin");
+		this.isSpectator = load.getBoolean("isSpectator");
 		
 		this.posX = load.getInteger("posX");
 		this.posY = load.getInteger("posY");
@@ -127,6 +148,8 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 
 	@Override
 	public void saveNBTData(NBTTagCompound save) {
+		save.setInteger("lives_pt", this.lives);
+		
 		save.setIntArray("occupationValues", getOccupationValues());
 		save.setInteger("occupationClass", getOccupationClass());
 		save.setInteger("occupationLevel", this.occupationLevel);
@@ -149,9 +172,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setIntArray("perks", temp);
 		
 		save.setBoolean("isAdmin", this.isAdmin);
+		save.setBoolean("isSpectator", this.isSpectator);
 		
 		save.setInteger("posX", this.posX);
 		save.setInteger("posY", this.posY);
 		save.setInteger("posZ", this.posZ);
 	}
+
+	@Override
+	public void init(Entity entity, World world) {}
 }

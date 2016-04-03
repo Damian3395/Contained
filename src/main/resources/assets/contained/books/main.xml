@@ -35,6 +35,11 @@
  <text>Perks</text>
  <jump>7</jump>
 </link>
+<link>
+ <text>Life and Death</text>
+ <icon>AppleofLife</icon>
+ <jump>13</jump>
+</link>
 </page>
 
 <page type="sectionpage">
@@ -227,6 +232,28 @@ Iron Chest Plate: -10% Damage
 Bow: +10% Range
 (~) Saddle: +5% Speed To Horse
 </text>
+</page>
+
+<page type="sectionpage">
+<title>Life and Death</title>
+<text>When joining the game, you start out with 10 lives. Each time you die, you lose a life. Once you reach 0 lives, you are kicked from the game and cannot join back unless a player in game uses the Stick of Life to revive you. You can consume the Apple of Life, in order to increase your life point by one. You can have a maximum of 10 life points.</text>
+<text>§lIf you complete the survey, you can gain two life points.§r</text>
+</page>
+
+<page type="crafting">
+<text>Apple of Life</text>
+<recipe>
+ <name>AppleofLife</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="crafting">
+<text>Stick of Life</text>
+<recipe>
+ <name>StickofLife</name>
+ <size>three</size>
+</recipe>
 </page>
 
 </book>

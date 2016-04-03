@@ -15,7 +15,7 @@ public class FMLDataEvents {
 	@SubscribeEvent
 	public void onLeftServer(PlayerLoggedOutEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertLogOut("DebugMode", 
+			DataLogger.insertLogOut(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					event.player.worldObj.provider.getDimensionName(),
 					Util.getDate());
@@ -26,7 +26,7 @@ public class FMLDataEvents {
 	@SubscribeEvent
 	public void onSmeltItem(ItemSmeltedEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertSmelt("DebugMode", 
+			DataLogger.insertSmelt(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					event.player.worldObj.provider.getDimensionName(),
 					event.smelting.getDisplayName(), 
@@ -38,7 +38,7 @@ public class FMLDataEvents {
 	@SubscribeEvent
 	public void onCraftItem(ItemCraftedEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertCraft("DebugMode", 
+			DataLogger.insertCraft(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					event.player.worldObj.provider.getDimensionName(),
 					event.crafting.getDisplayName(), 

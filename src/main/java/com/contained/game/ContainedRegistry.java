@@ -1,10 +1,6 @@
 package com.contained.game;
 
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import mantle.client.MProxyClient;
 import mantle.lib.client.MantleClientRegistry;
 
@@ -28,6 +24,7 @@ public class ContainedRegistry {
 	public static TerritoryMachine claimMachine;
 	public static AntiTerritoryMachine antiMachine;
 	
+	public static ItemLife life;
 	public static ItemTerritory territoryItems;
 	public static TerritoryFlag claimFlag;
 	public static SurveyClipboard surveyItem;
@@ -57,6 +54,7 @@ public class ContainedRegistry {
 		mobWitherSkel.instance = Contained.instance;
 		mobWitherSkel.preInit(event);
 		
+		life = new ItemLife();
 		territoryItems = new ItemTerritory();
 		claimFlag = new TerritoryFlag();
 		surveyItem = new SurveyClipboard();
@@ -65,6 +63,7 @@ public class ContainedRegistry {
 	}
 	
 	public void init(FMLInitializationEvent event) {
+		ItemLife.defineRecipe();
 		TerritoryFlag.defineRecipe();
 		TownManageBlock.defineRecipe();
 		MantleClientRegistry.registerManualIcon(ItemTerritory.addTerritoryName, new ItemStack(ItemTerritory.addTerritory, 1));

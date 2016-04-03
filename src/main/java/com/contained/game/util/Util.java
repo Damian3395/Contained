@@ -10,6 +10,7 @@ import com.contained.game.data.Data;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -95,6 +96,12 @@ public class Util {
 	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	
+	public static String getServerID(){
+		if(Resources.LOGGING_ENABLED && MinecraftServer.getServer() != null)
+			return MinecraftServer.getServer().getServerHostname();
+		return "debugMode";
 	}
 	
 	/**

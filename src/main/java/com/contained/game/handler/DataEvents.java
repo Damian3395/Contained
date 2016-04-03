@@ -26,7 +26,7 @@ public class DataEvents {
 		if(event.entity instanceof EntityPlayer && !event.entity.worldObj.isRemote){
 			ExtendedPlayer player = ExtendedPlayer.get(event.entityPlayer);
 			if(!player.achievements.contains(event.achievement.statId)){
-				DataLogger.insertAchievement("DebugMode", 
+				DataLogger.insertAchievement(Util.getServerID(), 
 						event.entityPlayer.getDisplayName(), 
 						event.entityPlayer.worldObj.provider.getDimensionName(), 
 						event.achievement.statId, 
@@ -39,7 +39,7 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onBlockBuild(PlaceEvent event){
 		if(!event.world.isRemote){
-			DataLogger.insertBuild("DebugMode", 
+			DataLogger.insertBuild(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					event.world.provider.getDimensionName(),
 					event.block.getLocalizedName(), 
@@ -53,7 +53,7 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onBlockBreak(BreakEvent event){
 		if(!event.world.isRemote){
-			DataLogger.insertMine("DebugMode", 
+			DataLogger.insertMine(Util.getServerID(), 
 					event.getPlayer().getDisplayName(), 
 					event.world.provider.getDimensionName(),
 					event.block.getLocalizedName(), 
@@ -70,7 +70,7 @@ public class DataEvents {
 			EntityPlayer player = (EntityPlayer)event.entity;
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			properties.world = event.world.provider.getDimensionName();
-			DataLogger.insertLogin("DebugMode", 
+			DataLogger.insertLogin(Util.getServerID(), 
 					player.getDisplayName(), 
 					event.world.provider.getDimensionName(), 
 					Util.getDate());
@@ -101,7 +101,7 @@ public class DataEvents {
 				killer = LanguageRegistry.instance().getStringLocalization("entity." + EntityList.getEntityString((EntityLivingBase) event.source.getSourceOfDamage())+".name", "en_US");
 			} else
 				killer = event.source.getDamageType();
-			DataLogger.insertKill("DebugMode", 
+			DataLogger.insertKill(Util.getServerID(), 
 					event.entityLiving.worldObj.provider.getDimensionName(),
 					killer, 
 					victim, 
@@ -112,7 +112,7 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onAnvil(AnvilRepairEvent event){
 		if(!event.entityPlayer.worldObj.isRemote && event.entity instanceof EntityPlayer){
-			DataLogger.insertAnvil("DebugMode", 
+			DataLogger.insertAnvil(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
 					event.entityPlayer.worldObj.provider.getDimensionName(),
 					event.left.getDisplayName(), event.left.stackSize,
@@ -125,7 +125,7 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onUsedItem(PlayerDestroyItemEvent event){
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer){
-			DataLogger.insertUsed("DebugMode", 
+			DataLogger.insertUsed(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
 					event.entityPlayer.worldObj.provider.getDimensionName(),
 					event.original.getDisplayName(), 
@@ -136,7 +136,7 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onServerChat(ServerChatEvent event){
 		if(!event.player.worldObj.isRemote){
-			DataLogger.insertChat("DebugMode", 
+			DataLogger.insertChat(Util.getServerID(), 
 					event.player.getDisplayName(),
 					event.player.worldObj.provider.getDimensionName(),
 					event.message, 
@@ -147,7 +147,7 @@ public class DataEvents {
 	@SubscribeEvent
 	public void onConsume(PlayerUseItemEvent.Finish event){
 		if(!event.entity.worldObj.isRemote  && event.entity instanceof EntityPlayer){
-			DataLogger.insertConsume("DebugMode", 
+			DataLogger.insertConsume(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(), 
 					event.entityPlayer.worldObj.provider.getDimensionName(),
 					event.item.getDisplayName(), 
@@ -161,7 +161,7 @@ public class DataEvents {
 			EntityPlayer player = (EntityPlayer) event.entity;
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			if(properties.world.compareTo(event.entityLiving.worldObj.provider.getDimensionName()) != 0){
-				DataLogger.insertPortal("DebugMode", 
+				DataLogger.insertPortal(Util.getServerID(), 
 						player.getDisplayName(), 
 						properties.world, 
 						event.entityLiving.worldObj.provider.getDimensionName(),
@@ -180,7 +180,7 @@ public class DataEvents {
 			int y = (int) event.entityLiving.posY;
 			int z = (int) event.entityLiving.posZ;
 			if(properties.posX != x || properties.posY != y || properties.posZ != z){
-				DataLogger.insertMove("DebugMode", 
+				DataLogger.insertMove(Util.getServerID(), 
 						player.getDisplayName(),
 						event.entityLiving.worldObj.provider.getDimensionName(),
 						x, y, z, 

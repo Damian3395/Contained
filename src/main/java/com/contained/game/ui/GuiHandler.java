@@ -14,7 +14,9 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class GuiHandler implements IGuiHandler {
-
+	public static final int GUI_SURVEY_ID = 1;
+	public static final int GUI_REVIVE_PLAYER = 2;
+	
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer p, World w, int x, int y, int z) {
 		TileEntity te = w.getTileEntity(x, y, z);
@@ -28,6 +30,10 @@ public class GuiHandler implements IGuiHandler {
 	public Object getClientGuiElement(int id, EntityPlayer p, World w, int x, int y, int z) {
 		if (id == 1)
 			return new GuiSurvey(PlayerTeamIndividual.get(p));
+		switch(id){
+		case GUI_SURVEY_ID: return new GuiSurvey(PlayerTeamIndividual.get(p));
+		case GUI_REVIVE_PLAYER: return new RevivePlayer();
+		}
 		
 		TileEntity te = w.getTileEntity(x, y, z);
 		if (te != null && te instanceof TownManageTE) {

@@ -5,6 +5,8 @@ tile.wasteland.name=Wasteland
 tile.wastelandBush.name=Dead Bush
 tile.harvestedOre.name=Harvested Ore
 
+item.StickofLife.name=Stick of Life
+item.AppleofLife.name=Apple of Life
 item.ItemClaimTerritory.name=Territory Gem
 item.ItemRemoveTerritory.name=Anti-Territory Gem
 item.TerritoryFlag.name=Territory Flag

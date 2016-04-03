@@ -14,7 +14,9 @@ import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
+import com.contained.game.ui.EndUI;
 import com.contained.game.ui.GuiGuild;
+import com.contained.game.ui.GuiSurvey;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.guild.GuildBase;
@@ -398,6 +400,31 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					num = packet.readInt();
 					for(int i=0; i<num; i++)
 						Contained.teamInvitations.add(new PlayerTeamInvitation(packet.readNBTTagCompound()));
+				break;
+				
+				case ClientPacketHandlerUtil.DISPLAY_END:
+					mc.displayGuiScreen(new EndUI());
+				break;
+				
+				case ClientPacketHandlerUtil.REMOVE_LIFE_PT:
+					ExtendedPlayer removeLife = ExtendedPlayer.get(mc.thePlayer);
+					System.out.println("Client Side Lives: " + removeLife.lives);
+					if(removeLife.lives > 0)
+						removeLife.removeLife();
+					System.out.println("Lives Left: " + removeLife.lives);
+				break;
+				
+				case ClientPacketHandlerUtil.ADD_LIFE_PT:
+					ExtendedPlayer addLife = ExtendedPlayer.get(mc.thePlayer);
+					System.out.println("Client Side Lives: " + addLife.lives);
+					if(addLife.lives < 10)
+						addLife.addLife();
+					System.out.println("Lives Left: " + addLife.lives);
+				break;
+				
+				case ClientPacketHandlerUtil.SURVEY_LIFE:
+					ExtendedPlayer surveyLife = ExtendedPlayer.get(mc.thePlayer);
+					surveyLife.lives+=2;
 				break;
 			}
 		}

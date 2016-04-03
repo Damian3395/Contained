@@ -8,6 +8,7 @@ import com.contained.game.commands.*;
 import com.contained.game.data.DataLogger;
 import com.contained.game.handler.DataEvents;
 import com.contained.game.handler.FMLDataEvents;
+import com.contained.game.handler.FMLEvents;
 import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
 import com.contained.game.handler.RenderEvents;
@@ -69,6 +70,8 @@ public class Contained{
 		event.registerServerCommand(new CommandBecomeAdmin());
 		event.registerServerCommand(new CommandCreate());
 		event.registerServerCommand(new CommandChangeStatus());
+		event.registerServerCommand(new CommandTutorialBook());
+		event.registerServerCommand(new CommandSurveyBook());
 	}
 	
 	@EventHandler
@@ -94,6 +97,7 @@ public class Contained{
 		}
 		
 		FMLCommonHandler.instance().bus().register(new FMLDataEvents());
+		FMLCommonHandler.instance().bus().register(new FMLEvents());
 		world.init();
 		registry.init(event);
 		

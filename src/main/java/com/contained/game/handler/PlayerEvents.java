@@ -30,6 +30,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -41,6 +42,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
@@ -53,7 +55,8 @@ public class PlayerEvents {
 	public void onJoin(EntityJoinWorldEvent event) {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
-			
+			ExtendedPlayer properties = ExtendedPlayer.get(joined);
+				
 			boolean completedSurvey = false;
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
@@ -69,17 +72,27 @@ public class PlayerEvents {
 							new ItemStack(ContainedRegistry.book, 1)));
 			}
 			else {
-				//If player has not completed the survey, give them a reminder.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
+				if(properties.lives < 1){
+					if(pdata.surveyResponses.progress <= SurveyData.getSurveyLength()){
+						PacketCustom surveyPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.DISPLAY_END);
+						Contained.channel.sendTo(surveyPacket.toPacket(), (EntityPlayerMP) joined);
+					} else 
+						((EntityPlayerMP)joined).playerNetServerHandler.kickPlayerFromServer("Sorry You Do Not Have Any More Lives Left. Thank You For Playing!");
+						
+					return;
+				}
+				
+				//If player has not completed the survey, give them a reminder.
 				if (pdata.surveyResponses.progress <= SurveyData.getSurveyLength())
 					Util.displayMessage(joined, "§a§l(Reminder: Please take a moment to fill out §a§lyour §a§lsurvey)");
 				else
 					completedSurvey = true;
-				
+					
 				//If the player has pending invitations, let them know.
 				if (PlayerTeamInvitation.getInvitations(pdata).size() > 0)
 					Util.displayMessage(joined, "§d§lYou have pending inviations in your guild §d§lmenu!");
-			
+				
 				// If the player got accepted into a team since last time they 
 				// were online, let them know.
 				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
@@ -115,6 +128,23 @@ public class PlayerEvents {
 				perkPacket.writeInt(ExtendedPlayer.get(joined).occupationClass);
 				perkPacket.writeInt(ExtendedPlayer.get(joined).occupationLevel);
 				Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) joined);
+			}
+		}
+	}
+	
+	// Players Will Lose A Life Count When Any Form of Death Occurs
+	@SubscribeEvent
+	public void onSpawn(Clone event){
+		if(event.wasDeath && !event.entityPlayer.worldObj.isRemote){
+			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
+			if(properties.lives > 0){
+				properties.removeLife();
+				PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_LIFE_PT);
+				Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)event.entityPlayer);
+			}
+			if(properties.lives == 0){
+				PacketCustom surveyPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.DISPLAY_END);
+				Contained.channel.sendTo(surveyPacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
 			}
 		}
 	}
@@ -163,10 +193,8 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public void onEntityDeath(LivingDeathEvent event) {
-		// Players in teams should drop anti-territory gems when they are killed
-		// by other players.
 		Entity source = event.source.getSourceOfDamage();
-		
+		// Players in teams should drop anti-territory gems when they are killed by other players.
 		if (event.entityLiving != null && source != null && !event.entityLiving.worldObj.isRemote
 		 && event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
 			EntityPlayer killed = (EntityPlayer)event.entityLiving;
@@ -239,8 +267,19 @@ public class PlayerEvents {
 	@SubscribeEvent
 	//When an item is used, if it is consumed by the usage, log it.
 	public void onItemUsed(PlayerUseItemEvent.Finish event) {
-		if (event.entityPlayer != null && event.item != null)
+		if (event.entityPlayer != null && event.item != null){
+			if(!event.entityPlayer.worldObj.isRemote && event.item.getItem() instanceof ItemFood){
+				System.out.println("Food Consumed");
+				if(event.item.getDisplayName().equals("Apple of Life")){
+					System.out.println("Apple Of Life Consumed Current Life: " + ExtendedPlayer.get(event.entityPlayer).lives);
+					ExtendedPlayer.get(event.entityPlayer).addLife();
+					PacketCustom usePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_LIFE_PT);
+					Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)event.entityPlayer);
+					System.out.println("Apple Of Life Consumed New Life Count: " + ExtendedPlayer.get(event.entityPlayer).lives);
+				}		
+			}
 			processItemUsage(event.entityPlayer, event.item);
+		}
 	}
 	
 	@SubscribeEvent

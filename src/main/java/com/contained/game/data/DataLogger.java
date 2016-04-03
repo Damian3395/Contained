@@ -9,12 +9,9 @@ import com.contained.game.util.Resources;
 /*
  * Added Events:
  * Territory
- * Groups
- * Class Occupation
  * Potion Brewing
  * Item Enchanted
  * Animal Tamed
- * Portal
 */
 public class DataLogger {
 	public static java.sql.Connection DB;
@@ -182,6 +179,24 @@ public class DataLogger {
 			preparedStatement.setString(3, world);
 			preparedStatement.setString(4, team);
 			preparedStatement.setString(5, player);
+			preparedStatement.setString(6, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertGuildChat(String server, String user, String team, String world, String message, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO GUILDCHAT VALUES (?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, user);
+			preparedStatement.setString(3, team);
+			preparedStatement.setString(4, world);
+			preparedStatement.setString(5, message);
 			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){

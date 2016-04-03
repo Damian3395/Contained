@@ -18,8 +18,6 @@ import com.contained.game.util.Util;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 
-// TODO: Log Data Events For Creating or Joining Guild, Fix Create Team
-
 public class GuildBase {
 	private final int JOIN = 0;
 	private final int DECLINE = 1;

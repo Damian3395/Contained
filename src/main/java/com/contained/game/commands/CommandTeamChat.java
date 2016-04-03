@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.contained.game.data.DataLogger;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.Util;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -45,6 +47,13 @@ public class CommandTeamChat implements ICommand {
 						String message = StringUtils.join(argString, " ");
 						PlayerTeam team = PlayerTeam.get(pdata.teamID);						
 						team.sendMessageToTeam(team.getFormatCode()+p.getDisplayName()+":"+message);
+						String world = p.dimension == 0 ? "Normal" : "Nether";
+						DataLogger.insertGuildChat(Util.getServerID(), 
+								p.getDisplayName(), 
+								pdata.teamID, 
+								world, 
+								message, 
+								Util.getDate());
 					} else
 						out = "You aren't in a team.";
 				} else

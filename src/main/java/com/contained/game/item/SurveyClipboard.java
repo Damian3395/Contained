@@ -1,6 +1,7 @@
 package com.contained.game.item;
 
 import com.contained.game.Contained;
+import com.contained.game.ui.GuiHandler;
 import com.contained.game.util.Resources;
 
 import net.minecraft.block.*;
@@ -38,7 +39,7 @@ public class SurveyClipboard {
 		
 	     public ItemStack onItemRightClick(ItemStack stack, World w, EntityPlayer p)
 	     {
-	    	 p.openGui(Contained.instance, 1, w, (int)p.posX, (int)p.posY, (int)p.posZ);
+	    	 p.openGui(Contained.instance, GuiHandler.GUI_SURVEY_ID, w, (int)p.posX, (int)p.posY, (int)p.posZ);
 	         return stack;
 	     }
 	}
