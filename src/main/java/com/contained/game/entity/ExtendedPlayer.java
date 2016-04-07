@@ -16,7 +16,7 @@ import net.minecraftforge.common.util.Constants;
 public class ExtendedPlayer implements IExtendedEntityProperties {
 	private final static String EXT_PROP_NAME = "ExtendedPlayer";
 	private final EntityPlayer entity;
-	public int lives = 1;
+	public int lives = 10;
 	private int[] occupationValues = null;
 	public int occupationClass = ClassPerks.NONE;
 	public int occupationLevel = 0;
@@ -27,6 +27,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int usedByOthers = 0;    //# of times another player used an item owned by this player.
 	public boolean isAdmin = false;
 	public boolean isSpectator = false;
+	private boolean inGame = true;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
@@ -97,8 +98,16 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		return this.isSpectator;
 	}
 	
-	public void becomeSepectator(boolean spectate){
-		this.isSpectator = spectate;
+	public void setSpectator(boolean spectator){
+		this.isSpectator = spectator;
+	}
+	
+	public boolean inGame(){
+		return this.inGame;
+	}
+	
+	public void setGame(boolean game){
+		this.inGame = game;
 	}
 	
 	public void removeLife(){
@@ -111,8 +120,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 			this.lives++;
 	}
 	
-	public void surveyComplete(){
-		this.lives+=2;
+	public void resurrect(){
+		if(this.lives == 0)
+			this.lives = 5;
+	}
+	
+	public void setLives(int lives){
+		this.lives = lives;
 	}
 
 	@Override

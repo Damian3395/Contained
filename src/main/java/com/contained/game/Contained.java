@@ -13,6 +13,8 @@ import com.contained.game.handler.PlayerEvents;
 import com.contained.game.handler.ProtectionEvents;
 import com.contained.game.handler.RenderEvents;
 import com.contained.game.handler.WorldEvents;
+import com.contained.game.handler.games.PVPEvents;
+import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.handler.perks.BuilderEvents;
 import com.contained.game.handler.perks.CollectorEvents;
 import com.contained.game.handler.perks.CookEvents;
@@ -91,6 +93,8 @@ public class Contained{
 		MinecraftForge.EVENT_BUS.register(new WizardEvents());
 		MinecraftForge.EVENT_BUS.register(new WarriorEvents());
 		MinecraftForge.EVENT_BUS.register(new ProtectionEvents());
+		MinecraftForge.EVENT_BUS.register(new PVPEvents());
+		MinecraftForge.EVENT_BUS.register(new TreasureEvents());
 		
 		if (event.getSide() == Side.CLIENT) {
 			MinecraftForge.EVENT_BUS.register(new RenderEvents());

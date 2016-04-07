@@ -14,11 +14,11 @@ import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
-import com.contained.game.ui.EndUI;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.GuiSurvey;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.TerritoryRender;
+import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.user.PlayerTeam;
@@ -349,6 +349,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					mc.thePlayer.setInvisible(true);
 					mc.thePlayer.capabilities.allowFlying = true;
 					mc.thePlayer.capabilities.disableDamage = true;
+					mc.thePlayer.capabilities.isCreativeMode = true;
 					ExtendedPlayer.get(mc.thePlayer).setAdminRights(true);
 				break;
 				
@@ -402,30 +403,40 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						Contained.teamInvitations.add(new PlayerTeamInvitation(packet.readNBTTagCompound()));
 				break;
 				
-				case ClientPacketHandlerUtil.DISPLAY_END:
-					mc.displayGuiScreen(new EndUI());
+				case ClientPacketHandlerUtil.END_GAME:
+					mc.displayGuiScreen(new GameOverUI());
 				break;
 				
-				case ClientPacketHandlerUtil.REMOVE_LIFE_PT:
-					ExtendedPlayer removeLife = ExtendedPlayer.get(mc.thePlayer);
-					System.out.println("Client Side Lives: " + removeLife.lives);
-					if(removeLife.lives > 0)
-						removeLife.removeLife();
-					System.out.println("Lives Left: " + removeLife.lives);
+				case ClientPacketHandlerUtil.RESURRECT:
+					ExtendedPlayer resurrectLife = ExtendedPlayer.get(mc.thePlayer);
+					resurrectLife.resurrect();
 				break;
 				
-				case ClientPacketHandlerUtil.ADD_LIFE_PT:
-					ExtendedPlayer addLife = ExtendedPlayer.get(mc.thePlayer);
-					System.out.println("Client Side Lives: " + addLife.lives);
-					if(addLife.lives < 10)
-						addLife.addLife();
-					System.out.println("Lives Left: " + addLife.lives);
+				case ClientPacketHandlerUtil.SYNC_LIVES:
+					ExtendedPlayer syncLife = ExtendedPlayer.get(mc.thePlayer);
+					syncLife.lives = packet.readInt();
 				break;
 				
-				case ClientPacketHandlerUtil.SURVEY_LIFE:
-					ExtendedPlayer surveyLife = ExtendedPlayer.get(mc.thePlayer);
-					surveyLife.lives+=2;
+				case ClientPacketHandlerUtil.PLAYER_SPECTATOR:
+					mc.thePlayer.setInvisible(true);
+					mc.thePlayer.capabilities.allowFlying = true;
+					mc.thePlayer.capabilities.disableDamage = true;
+					mc.thePlayer.capabilities.allowEdit = false;
+					ExtendedPlayer.get(mc.thePlayer).setSpectator(true);
 				break;
+				
+				case ClientPacketHandlerUtil.PLAYER_NORMAL:
+					ExtendedPlayer playerState = ExtendedPlayer.get(mc.thePlayer);
+					mc.thePlayer.setInvisible(false);
+					mc.thePlayer.capabilities.allowFlying = false;
+					mc.thePlayer.capabilities.disableDamage = false;
+					mc.thePlayer.capabilities.allowEdit = true;
+					mc.thePlayer.capabilities.isCreativeMode = false;
+					
+					if(playerState.isAdmin)
+						playerState.setAdminRights(false);
+					if(playerState.isSpectator)
+						playerState.setSpectator(false);
 			}
 		}
 	}

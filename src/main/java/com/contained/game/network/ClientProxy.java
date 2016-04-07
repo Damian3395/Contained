@@ -7,6 +7,8 @@ import com.contained.game.item.AntiTerritoryRender;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.TerritoryRender;
+import com.contained.game.ui.games.GuiPVP;
+import com.contained.game.ui.games.GuiTreasure;
 import com.contained.game.world.block.TerritoryMachineRender;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -23,11 +25,15 @@ import net.minecraftforge.common.MinecraftForge;
 public class ClientProxy extends CommonProxy{
 	public static DataVisualization gui = new DataVisualization(Minecraft.getMinecraft());
 	public static TerritoryRender territory = new TerritoryRender();
+	public static GuiPVP pvp = new GuiPVP();
+	public static GuiTreasure treasure = new GuiTreasure();
 	
 	@Override
 	public void registerRenderers(Contained ins) {		
 		MinecraftForge.EVENT_BUS.register(gui);
 		MinecraftForge.EVENT_BUS.register(territory);
+		MinecraftForge.EVENT_BUS.register(pvp);
+		MinecraftForge.EVENT_BUS.register(treasure);
 		FMLCommonHandler.instance().bus().register(new KeyInputHandler(gui, territory));
 		KeyBindings.init();
 		

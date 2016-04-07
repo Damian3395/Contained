@@ -1,9 +1,11 @@
-package com.contained.game.ui;
+package com.contained.game.ui.games;
 
 import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 
+import com.contained.game.ui.GuiSurvey;
+import com.contained.game.ui.SurveyData;
 import com.contained.game.ui.components.Container;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
@@ -12,7 +14,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 
-public class EndUI extends GuiScreen {
+public class GameOverUI extends GuiScreen {
 	private final int FILL_SURVEY = 0;
 	private final int EXIT_GAME = 1;
 	
@@ -22,7 +24,7 @@ public class EndUI extends GuiScreen {
 	private ResourceLocation thankYou, authors;
 	private boolean surveyFilledOut;
 	
-	public EndUI(){}
+	public GameOverUI(){}
 	
 	@Override
 	public void initGui(){

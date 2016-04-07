@@ -58,10 +58,11 @@ public class ClientPacketHandlerUtil {
 	public static final int PLAYER_LIST = 34;
 	public static final int SYNC_INVITATIONS = 35;
 	
-	public static final int DISPLAY_END = 36;
-	public static final int REMOVE_LIFE_PT = 37;
-	public static final int ADD_LIFE_PT = 38;
-	public static final int SURVEY_LIFE = 39;
+	public static final int END_GAME = 36;
+	public static final int RESURRECT = 37;
+	public static final int SYNC_LIVES = 38;
+	public static final int PLAYER_SPECTATOR = 39;
+	public static final int PLAYER_NORMAL = 40;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
