@@ -59,12 +59,12 @@ public class Load {
 			for(int i=0; i<teamList.tagCount(); i++) {
 				NBTTagCompound data = teamList.getCompoundTagAt(i);
 				PlayerTeam team = new PlayerTeam(data);		
-				Contained.teamData.add(team);
+				Contained.getTeamList(dimID).add(team);
 				if (data.hasKey("territoryX")) {
 					int[] terrX = data.getIntArray("territoryX");
 					int[] terrZ = data.getIntArray("territoryZ");
 					for(int j=0; j<terrX.length; j++)
-						Contained.territoryData.put(new Point(terrX[j], terrZ[j]), team.id);
+						Contained.getTerritoryMap(dimID).put(new Point(terrX[j], terrZ[j]), team.id);
 				}
 			}
 			NBTTagList playerList = ntc.getTagList("playerList", (byte)10);
@@ -83,7 +83,7 @@ public class Load {
 			for(int i=0; i<tradeList.tagCount(); i++){
 				NBTTagCompound data = tradeList.getCompoundTagAt(i);
 				PlayerTrade trade = new PlayerTrade(data);
-				Contained.trades.add(trade);
+				Contained.getTradeList(dimID).add(trade);
 			}
 		}
 	}

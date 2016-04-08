@@ -137,7 +137,7 @@ public class AntiTerritoryMachine {
 			NBTTagCompound itemData = Data.getTagCompound(itemStack);	
 			String teamToRemove = itemData.getString("teamOwner");
 			if (teamToRemove != null && !teamToRemove.equals("")) {
-				PlayerTeam team = PlayerTeam.get(teamToRemove);
+				PlayerTeam team = PlayerTeam.get(teamToRemove, player.dimension);
 				if (team != null) {
 					teamName = team.displayName;
 					formatCode = team.getFormatCode();

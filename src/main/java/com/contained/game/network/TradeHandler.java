@@ -15,7 +15,6 @@ import com.contained.game.util.Util;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
 public class TradeHandler {
@@ -24,7 +23,7 @@ public class TradeHandler {
 	public void transaction(EntityPlayerMP player, String uuid){
 		//Find The Trade
 		PlayerTrade transTrade = null;
-		for(PlayerTrade trade : Contained.trades){
+		for(PlayerTrade trade : Contained.getTradeList(player.dimension)){
 			if(trade.id.equals(uuid)){
 				transTrade = trade;
 				break;
@@ -137,7 +136,7 @@ public class TradeHandler {
 	
 	public void create(EntityPlayerMP player, int slotId, ItemStack offer, ItemStack request){
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		PlayerTeam playerTeam = PlayerTeam.get(pdata.teamID);
+		PlayerTeam playerTeam = PlayerTeam.get(pdata.teamID, player.dimension);
 		
 		if(offer == null || request == null && slotId != -1){
 			Util.displayMessage(player, Util.errorCode + "[Trade Error] Invalid Input");
@@ -162,7 +161,7 @@ public class TradeHandler {
 		
 		//Create New Trade
 		PlayerTrade newTrade = new PlayerTrade(player.getDisplayName(), playerTeam.displayName, offer, request);
-		Contained.trades.add(newTrade);
+		Contained.getTradeList(player.dimension).add(newTrade);
 		
 		Util.displayMessage(player, Util.successCode + "[Trade Success] Trade Created");
 		
@@ -183,7 +182,7 @@ public class TradeHandler {
 		}
 			
 		PlayerTrade removeTrade = null;
-		for(PlayerTrade trade : Contained.trades){
+		for(PlayerTrade trade : Contained.getTradeList(player.dimension)){
 			if(trade.id.equals(uuid)){
 				removeTrade = trade;
 				Contained.trades.remove(trade);

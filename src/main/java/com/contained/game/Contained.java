@@ -57,13 +57,38 @@ public class Contained{
 	GenerateWorld world = new GenerateWorld();
 	ContainedRegistry registry = new ContainedRegistry();
 	
-	public static HashMap<Point, String> territoryData; // [SERVER & CLIENT SIDE] coordinates, teamID. Locations of all blocks that are owned by a team.
-	public static ArrayList<PlayerTeam>  teamData;      // [SERVER & (partial) CLIENT SIDE] all created player teams on the server.
-	public static ArrayList<PlayerTeamIndividual> teamMemberData;  // [SERVER SIDE] all tracked players, online and offline, even those not in teams.
-																   // [CLIENT SIDE] only the data on the local player, as well as display names and team IDs of others.
-	public static ArrayList<PlayerTeamInvitation> teamInvitations; // [SERVER SIDE] all pending team invitations.
-																   // [CLIENT SIDE] all invitations pertaining to the local player.
-	public static ArrayList<PlayerTrade> trades;
+	// Locations of all blocks that are owned by a team.
+	// <Dimension ID, <Block Coordinate, Team ID>>
+	// [Server] Stores territory data for all dimensions.
+	// [Client] Stores territory data for client's current dimension.
+	//			(always uses ID 0 for the dimension)
+	public static HashMap<Integer, HashMap<Point, String>> territoryData; 
+	
+	// All created player teams on the server. 
+	// <Dimension ID, List of Teams>
+	// [SERVER] Full team data for all teams in all dimensions.
+	// [CLIENT] Partial team data (name, color, ID) for teams in client's dimension.
+	//			(always uses ID 0 for the dimension)
+	public static HashMap<Integer, ArrayList<PlayerTeam>>  teamData;      
+	
+	// Custom Mod-relevant data about players on the server.
+	// [SERVER] All tracked players, online and offline, even those not in teams.
+	// [CLIENT] Only the data on the local player, as well as display names 
+	//          and team IDs of others.
+	public static ArrayList<PlayerTeamIndividual> teamMemberData;
+
+	// Player trades currently listed in the marketplace.
+	// <Dimension ID, List of Trades>
+	// [SERVER] All trades in all dimensions.
+	// [CLIENT] ???
+	public static HashMap<Integer, ArrayList<PlayerTrade>> trades;
+	
+	// Pending invitations for players requesting to join teams. (FULL_TEAM_MODE only)
+	// [SERVER] All pending team invitations.
+	// [CLIENT] Only invitations pertaining to the client player.
+	public static ArrayList<PlayerTeamInvitation> teamInvitations; 
+																   
+	
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
@@ -80,11 +105,11 @@ public class Contained{
 	
 	@EventHandler
 	public void init(FMLInitializationEvent event){
-		territoryData = new HashMap<Point, String>();
-		teamData = new ArrayList<PlayerTeam>();
+		territoryData = new HashMap<Integer, HashMap<Point, String>>();
+		teamData = new HashMap<Integer, ArrayList<PlayerTeam>>();
 		teamMemberData = new ArrayList<PlayerTeamIndividual>();
 		teamInvitations = new ArrayList<PlayerTeamInvitation>();
-		trades = new ArrayList<PlayerTrade>();
+		trades = new HashMap<Integer, ArrayList<PlayerTrade>>();
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
@@ -126,5 +151,23 @@ public class Contained{
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event){
 		
+	}
+	
+	public static ArrayList<PlayerTeam> getTeamList(int dimID) {
+		if (!teamData.containsKey(dimID))
+			teamData.put(dimID, new ArrayList<PlayerTeam>());
+		return teamData.get(dimID);
+	}
+	
+	public static HashMap<Point, String> getTerritoryMap(int dimID) {
+		if (!territoryData.containsKey(dimID))
+			territoryData.put(dimID, new HashMap<Point, String>());
+		return territoryData.get(dimID);
+	}
+	
+	public static ArrayList<PlayerTrade> getTradeList(int dimID) {
+		if (!trades.containsKey(dimID))
+			trades.put(dimID, new ArrayList<PlayerTrade>());
+		return trades.get(dimID);
 	}
 }

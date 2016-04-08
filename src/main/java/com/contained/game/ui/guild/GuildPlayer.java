@@ -38,7 +38,7 @@ public class GuildPlayer {
 		EntityPlayer player = (EntityPlayer) this.gui.mc.thePlayer;
 		pdata = PlayerTeamIndividual.get(player);
 		
-		team = PlayerTeam.get(pdata.teamID);
+		team = PlayerTeam.get(pdata.teamID, 0);
 	}
 	
 	public List<GuiButton> getButtonList(){

@@ -15,7 +15,6 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiGuild;
-import com.contained.game.ui.GuiSurvey;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.games.GameOverUI;
@@ -38,11 +37,11 @@ import cpw.mods.fml.relauncher.Side;
  * Handling of packets sent from server to client.
  */
 public class ClientPacketHandler extends ServerPacketHandler {
-	private DataVisualization gui;
+	//private DataVisualization gui;
 	private TerritoryRender render;
 	
 	public ClientPacketHandler(DataVisualization gui, TerritoryRender render) {
-		this.gui = gui;
+		//this.gui = gui;
 		this.render = render;
 	}
 	
@@ -77,14 +76,14 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					Contained.territoryData.clear();
 					for(int i=0; i<numBlocks; i++) {
 						bc = packet.readCoord();
-						Contained.territoryData.put(new Point(bc.x, bc.z), packet.readString());
+						Contained.getTerritoryMap(0).put(new Point(bc.x, bc.z), packet.readString());
 					}
 					render.regenerateEdges();
 				break;
 					
 				case ClientPacketHandlerUtil.ADD_TERRITORY_BLOCK:
 					bc = packet.readCoord();
-					Contained.territoryData.put(new Point(bc.x, bc.z), packet.readString());
+					Contained.getTerritoryMap(0).put(new Point(bc.x, bc.z), packet.readString());
 					render.regenerateEdges();
 				break;
 				
@@ -100,15 +99,15 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					int numTeams = packet.readInt();
 					for(int i=0; i<numTeams; i++) {
 						PlayerTeam readTeam = new PlayerTeam(packet.readNBTTagCompound());
-						Contained.teamData.add(readTeam);
+						Contained.getTeamList(0).add(readTeam);
 					}
 						
 					if (Contained.teamData.size() < numTeamsBefore) {
 						//Some team got disbanded. Need to remove stale territory blocks.
 						ArrayList<Point> terrToRemove = new ArrayList<Point>();
-						for(Point p : Contained.territoryData.keySet()) {
-							String terrID = Contained.territoryData.get(p);
-							if (PlayerTeam.get(terrID) == null)
+						for(Point p : Contained.getTerritoryMap(0).keySet()) {
+							String terrID = Contained.getTerritoryMap(0).get(p);
+							if (PlayerTeam.get(terrID,0) == null)
 								terrToRemove.add(p);
 						}
 						for (Point p : terrToRemove)
@@ -242,7 +241,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case ClientPacketHandlerUtil.UPDATE_PERMISSIONS:
 					PlayerTeam team = new PlayerTeam(packet.readNBTTagCompound());					
-					PlayerTeam toModify = PlayerTeam.get(team);
+					PlayerTeam toModify = PlayerTeam.get(team,0);
 					toModify.permissions = team.permissions;
 				break;
 				
@@ -269,8 +268,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					if(mc.thePlayer.inventory.getStackInSlot(slotId) != null)
 						mc.thePlayer.inventory.setInventorySlotContents(slotId, null);
 					
-					if(mc.currentScreen instanceof GuiTownManage)
-						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+					if(mc.currentScreen instanceof GuiTownManage) {
+						GuiTownManage guiTown = (GuiTownManage)mc.currentScreen;
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, guiTown.te, guiTown.blockTeamID, guiTown.playerTeamID));
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.ADD_ITEM:
@@ -278,17 +279,21 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					if(mc.thePlayer.inventory.getFirstEmptyStack() > -1 && item != null)
 						mc.thePlayer.inventory.addItemStackToInventory(item);
 					
-					if(mc.currentScreen instanceof GuiTownManage)
-						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+					if(mc.currentScreen instanceof GuiTownManage) {
+						GuiTownManage guiTown = (GuiTownManage)mc.currentScreen;
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, guiTown.te, guiTown.blockTeamID, guiTown.playerTeamID));
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.CREATE_TRADE:
 					PlayerTrade addTrade = new PlayerTrade(packet.readNBTTagCompound());
 					if(addTrade != null && addTrade.offer != null && addTrade.request != null)
-						Contained.trades.add(addTrade);
+						Contained.getTradeList(0).add(addTrade);
 					
-					if(mc.currentScreen instanceof GuiTownManage)
-						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+					if(mc.currentScreen instanceof GuiTownManage) {
+						GuiTownManage guiTown = (GuiTownManage)mc.currentScreen;
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, guiTown.te, guiTown.blockTeamID, guiTown.playerTeamID));
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.REMOVE_TRADE:
@@ -296,14 +301,16 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					if(UUID.isEmpty())
 						return;
 					
-					for(PlayerTrade remTrade : Contained.trades)
+					for(PlayerTrade remTrade : Contained.getTradeList(0))
 						if(remTrade.id.equals(UUID)){
 							Contained.trades.remove(remTrade);
 							break;
 						}
 					
-					if(mc.currentScreen instanceof GuiTownManage)
-						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+					if(mc.currentScreen instanceof GuiTownManage) {
+						GuiTownManage guiTown = (GuiTownManage)mc.currentScreen;
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, guiTown.te, guiTown.blockTeamID, guiTown.playerTeamID));
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.TRADE_TRANS:
@@ -331,8 +338,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						mc.thePlayer.inventory.addItemStackToInventory(offer);
 					}
 					
-					if(mc.currentScreen instanceof GuiTownManage)
-						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, GuiTownManage.te, GuiTownManage.blockTeamID, GuiTownManage.playerTeamID));
+					if(mc.currentScreen instanceof GuiTownManage) {
+						GuiTownManage guiTown = (GuiTownManage)mc.currentScreen;
+						mc.displayGuiScreen(new GuiTownManage(mc.thePlayer.inventory, guiTown.te, guiTown.blockTeamID, guiTown.playerTeamID));
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.SYNC_TRADE:
@@ -341,7 +350,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					for(int i=0; i<numTrades; i++) {
 						PlayerTrade readTrade = new PlayerTrade(packet.readNBTTagCompound());
 						if(readTrade != null && readTrade.offer != null && readTrade.request != null)
-							Contained.trades.add(readTrade);
+							Contained.getTradeList(0).add(readTrade);
 					}
 				break;
 				

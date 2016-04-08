@@ -19,7 +19,7 @@ public class RenderEvents {
 			EntityPlayer p = (EntityPlayer)event.entity;
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
 			if (pdata != null && pdata.teamID != null) {
-				PlayerTeam team = PlayerTeam.get(pdata.teamID);
+				PlayerTeam team = PlayerTeam.get(pdata.teamID, p.dimension);
 				RenderUtil.drawNameTag(p, team.getFormatCode()+"§l["+team.displayName+"]", event.x, event.y+0.5, event.z, 64);
 			}
 		}

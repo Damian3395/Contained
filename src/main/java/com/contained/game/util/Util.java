@@ -10,7 +10,6 @@ import com.contained.game.data.Data;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -22,10 +21,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class Util {	
-	public static String errorCode = "�4�l";
-	public static String warningCode = "�6�l";
-	public static String successCode = "�2�l";
-	public static String infoCode = "�b�l";
+	public static String errorCode = "§4§l";
+	public static String warningCode = "§6§l";
+	public static String successCode = "§2§l";
+	public static String infoCode = "§b§l";
 	
 	/**
 	 * Euclidean distance between two points
@@ -125,7 +124,8 @@ public class Util {
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 	}
 	
-	public static String getServerID(){
+	@SuppressWarnings("unused")
+	public static String getServerID() {
 		if(Resources.LOGGING_ENABLED && MinecraftServer.getServer() != null)
 			return MinecraftServer.getServer().getServerHostname();
 		return "debugMode";

@@ -86,7 +86,7 @@ public class PlayerEvents {
 				// If the player got accepted into a team since last time they 
 				// were online, let them know.
 				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
-					PlayerTeam newTeam = PlayerTeam.get(pdata.teamID);
+					PlayerTeam newTeam = PlayerTeam.get(pdata.teamID, joined.dimension);
 					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
 					pdata.lastOnline = System.currentTimeMillis();
 				}
@@ -99,12 +99,12 @@ public class PlayerEvents {
 						new ItemStack(SurveyClipboard.instance, 1)));
 			
 			if (joined instanceof EntityPlayerMP) {
-				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket(), (EntityPlayerMP) joined);
-				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTerritories(Contained.territoryData).toPacket(), (EntityPlayerMP) joined);	
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTerritories(Contained.getTerritoryMap(joined.dimension)).toPacket(), (EntityPlayerMP) joined);	
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer((EntityPlayer)joined).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetPlayerList(Contained.teamMemberData).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
-				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.trades).toPacket(), (EntityPlayerMP) joined);
+				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.getTradeList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
 				
 				//Class Perks
 				ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;

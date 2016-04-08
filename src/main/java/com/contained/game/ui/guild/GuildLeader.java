@@ -61,7 +61,7 @@ public class GuildLeader {
 		EntityPlayer player = (EntityPlayer) this.gui.mc.thePlayer;
 		pdata = PlayerTeamIndividual.get(player);
 		
-		team = PlayerTeam.get(pdata.teamID);
+		team = PlayerTeam.get(pdata.teamID, 0);
 		selectedColor = team.getColorID();
 		
 		tabPane = new GuiTab(gui, GuiTab.STAR, GuiTab.SHIELD, GuiTab.SETTINGS);

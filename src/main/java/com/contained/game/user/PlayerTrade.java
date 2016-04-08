@@ -57,8 +57,8 @@ public class PlayerTrade {
 		return null;
 	}
 	
-	public static PlayerTrade get(Object comp) {
-		return PlayerTrade.get(Contained.trades, comp);
+	public static PlayerTrade get(Object comp, int dim) {
+		return PlayerTrade.get(Contained.getTradeList(dim), comp);
 	}
 	
 }

@@ -25,6 +25,7 @@ public class PlayerTeam {
 	public String displayName;
 	public HashMap<String, PlayerTeamPermission> permissions;
 	public int colorID; //Index for format codes below
+	public int dimID;
 	
 	/*
 	 *  http://minecraft.gamepedia.com/Formatting_codes
@@ -70,20 +71,21 @@ public class PlayerTeam {
 		Color.WHITE.hashCode()
 	};
 	
-	public PlayerTeam() {
-		this(UUID.randomUUID().toString());
+	public PlayerTeam(int dimID) {
+		this(UUID.randomUUID().toString(), dimID);
 	}
 	
-	public PlayerTeam(String id) {
-		this(id, "", 0);
+	public PlayerTeam(String id, int dimID) {
+		this(id, "", 0, dimID);
 	}
 	
-	public PlayerTeam(String name, int color) {
-		this(UUID.randomUUID().toString(), name, color);
+	public PlayerTeam(String name, int color, int dimID) {
+		this(UUID.randomUUID().toString(), name, color, dimID);
 	}
 	
-	public PlayerTeam(String id, String name, int color) {
+	public PlayerTeam(String id, String name, int color, int dimID) {
 		this.id = id;
+		this.dimID = dimID;
 		this.displayName = name;
 		this.permissions = new HashMap<String, PlayerTeamPermission>();
 		setColor(color);
@@ -107,7 +109,7 @@ public class PlayerTeam {
 		
 		//Remove team's territory.
 		ArrayList<Point> territoryToRemove = new ArrayList<Point>();
-		for (Point p : Contained.territoryData.keySet()) {
+		for (Point p : Contained.getTerritoryMap(dimID).keySet()) {
 			if (Contained.territoryData.get(p).equals(this.id))
 				territoryToRemove.add(p);
 		}
@@ -124,13 +126,13 @@ public class PlayerTeam {
 			Contained.teamInvitations.remove(invite);
 		
 		//Remove any custom permissions involving this team.
-		for (PlayerTeam team : Contained.teamData)
+		for (PlayerTeam team : Contained.getTeamList(dimID))
 			team.permissions.remove(this.id);
 		
 		//Remove the team.
 		Contained.teamData.remove(this);	
 		
-		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket());
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(dimID)).toPacket());
 	}
 	
 	/**
@@ -217,7 +219,7 @@ public class PlayerTeam {
 	 */
 	public int territoryCount() {
 		int count = 0;
-		for(Point territory : Contained.territoryData.keySet()) {
+		for(Point territory : Contained.getTerritoryMap(dimID).keySet()) {
 			if (Contained.territoryData.get(territory).equals(id))
 				count++;
 		}
@@ -370,7 +372,16 @@ public class PlayerTeam {
 		return null;
 	}
 	
+	public static PlayerTeam get(Object comp, int dim) {
+		return PlayerTeam.get(Contained.getTeamList(dim), comp);
+	}
+	
 	public static PlayerTeam get(Object comp) {
-		return PlayerTeam.get(Contained.teamData, comp);
+		for(int i : Contained.teamData.keySet()) {
+			PlayerTeam team = PlayerTeam.get(Contained.teamData.get(i), comp);
+			if (team != null)
+				return team;
+		}
+		return null;
 	}
 }

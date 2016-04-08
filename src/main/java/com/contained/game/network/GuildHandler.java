@@ -34,7 +34,7 @@ public class GuildHandler {
 			
 		String inviteName = team.toLowerCase();
 		for(PlayerTeamInvitation inv : myInvites) {
-			PlayerTeam teamData = PlayerTeam.get(inv.teamID);
+			PlayerTeam teamData = PlayerTeam.get(inv.teamID, player.dimension);
 			if (teamData != null && ((pdata.isLeader && inv.playerName.toLowerCase().equals(inviteName))
 				|| (!pdata.isLeader && teamData.displayName.toLowerCase().equals(inviteName)))) 
 			{
@@ -84,7 +84,7 @@ public class GuildHandler {
 			return;
 		}
 		
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		PlayerTeam team = PlayerTeam.get(pdata.teamID, player.dimension);
 		pdata.leaveTeam();
 		team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" has left the team.");
 		
@@ -100,7 +100,7 @@ public class GuildHandler {
 			return;
 		}
 		
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		PlayerTeam team = PlayerTeam.get(pdata.teamID, player.dimension);
 		PlayerTeamIndividual toKick = PlayerTeamIndividual.get(teammate);
 		if (toKick.teamID == null || !toKick.teamID.equals(pdata.teamID))
 			return;
@@ -123,7 +123,7 @@ public class GuildHandler {
 			return;
 		}
 		
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		PlayerTeam team = PlayerTeam.get(pdata.teamID, player.dimension);
 		PlayerTeamIndividual toPromote = PlayerTeamIndividual.get(teammate);
 		toPromote.promote();
 		
@@ -142,7 +142,7 @@ public class GuildHandler {
 			return;
 		}
 		
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		PlayerTeam team = PlayerTeam.get(pdata.teamID, player.dimension);
 		ErrorCase.Error result = pdata.demote();
 		if(result == ErrorCase.Error.CANNOT_DEMOTE){
 			System.out.println("You're the only member of this group... you must stay the leader."); //Render This
@@ -167,7 +167,7 @@ public class GuildHandler {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 
 		boolean allowedName = true;
-		for(PlayerTeam t : Contained.teamData) {
+		for(PlayerTeam t : Contained.getTeamList(player.dimension)) {
 			if (t.displayName.toLowerCase().equals(team.toLowerCase())) {
 				allowedName = false;
 				break;
@@ -176,9 +176,9 @@ public class GuildHandler {
 		
 		PlayerTeam newTeam = new PlayerTeam(team, color);
 		if (allowedName) {
-			Contained.teamData.add(newTeam);
+			Contained.getTeamList(player.dimension).add(newTeam);
 			System.out.println(pdata.joinTeam(newTeam.id, true).toString());
-			ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).sendToClients();
+			ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(player.dimension)).sendToClients();
 			
 			String world = Util.getDimensionString(player.dimension);
 			DataLogger.insertCreateTeam("debugMode", pdata.playerName, world, newTeam.displayName, Util.getDate());
@@ -195,7 +195,7 @@ public class GuildHandler {
 	}
 	
 	public void disbandTeam(EntityPlayerMP leader, String id){
-		PlayerTeam team = PlayerTeam.get(id);
+		PlayerTeam team = PlayerTeam.get(id, leader.dimension);
 		if (team == null) {
 			//Seems to be some desync of team data between client and server. Resync.
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(leader.getDisplayName());
@@ -231,9 +231,9 @@ public class GuildHandler {
 		Color statusColor = Color.GREEN;
 		boolean update = true;
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		PlayerTeam team = PlayerTeam.get(pdata.teamID);
+		PlayerTeam team = PlayerTeam.get(pdata.teamID, player.dimension);
 		
-		for(PlayerTeam t : Contained.teamData) {
+		for(PlayerTeam t : Contained.getTeamList(player.dimension)) {
 			if (t.displayName.toLowerCase().equals(name.toLowerCase())) {
 				update = false;
 				break;
@@ -244,7 +244,7 @@ public class GuildHandler {
 			team.displayName = name;
 			team.colorID = color;
 			team.sendMessageToTeam(team.getFormatCode() + "[NOTICE] Team Update: " + team.getFormatCode() + "§l" + team.displayName + team.getFormatCode() +".");
-			Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).toPacket());
+			Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(player.dimension)).toPacket());
 		}else{
 			statusInfo = "Team Name Taken";
 			statusColor = Color.RED;
@@ -264,7 +264,7 @@ public class GuildHandler {
 			return;
 		}
 		
-		PlayerTeam team = PlayerTeam.get(leader.teamID);
+		PlayerTeam team = PlayerTeam.get(leader.teamID, player.dimension);
 		PlayerTeamIndividual recipient = PlayerTeamIndividual.get(newTeammate);
 		PlayerTeamInvitation newInvite = new PlayerTeamInvitation(recipient.playerName, team.id, PlayerTeamInvitation.FROM);
 		
@@ -279,7 +279,7 @@ public class GuildHandler {
 					EntityPlayerMP onlinePlayer = (EntityPlayerMP)o;
 					PlayerTeamIndividual onlineData = PlayerTeamIndividual.get(onlinePlayer);
 					if (onlinePlayer.getDisplayName().toLowerCase().equals(newInvite.playerName.toLowerCase())) {
-						PlayerTeam teamData = PlayerTeam.get(newInvite.teamID);
+						PlayerTeam teamData = PlayerTeam.get(newInvite.teamID, player.dimension);
 						onlinePlayer.addChatComponentMessage(new ChatComponentText("[*] "+teamData.getFormatCode()+"§l"+teamData.displayName+"§r would like you to join their group."));
 						Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(onlinePlayer).toPacket(), onlinePlayer);
 					}
@@ -303,7 +303,7 @@ public class GuildHandler {
 		if (pdata.isLeader)
 			probe = new PlayerTeamInvitation(inviteName, "", PlayerTeamInvitation.TO);
 		else {
-			for (PlayerTeam t : Contained.teamData) {
+			for (PlayerTeam t : Contained.getTeamList(player.dimension)) {
 				if (t.displayName.toLowerCase().equals(inviteName)) {
 					probe = new PlayerTeamInvitation("", t.id, PlayerTeamInvitation.FROM);
 					break;

@@ -14,7 +14,6 @@ import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
-import com.contained.game.network.ServerPacketHandler;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -43,8 +42,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
 
@@ -75,9 +72,9 @@ public class GuiTownManage extends GuiContainer {
 	private static final ResourceLocation bg = new ResourceLocation(Resources.MOD_ID, "textures/gui/townhall.png");
 	private int numTabs = 4;
 	private int selectedTab = 0;
-	public static String blockTeamID;  //The ID of the territory this block is occupying.
-	public static String playerTeamID; //The team of the player interacting with this block.
-	public static TownManageTE te;
+	public String blockTeamID;  //The ID of the territory this block is occupying.
+	public String playerTeamID; //The team of the player interacting with this block.
+	public TownManageTE te;
 	private int blockTeamInd;
 	
 	// We'll keep a local "offline" copy of the team list for this GUI, because if
@@ -136,7 +133,7 @@ public class GuiTownManage extends GuiContainer {
 		this.blockTeamID = blockTeamID;
 		this.playerTeamID = playerTeamID;
 		this.te = te;
-		this.localTeams = new ArrayList<PlayerTeam>(Contained.teamData);
+		this.localTeams = new ArrayList<PlayerTeam>(Contained.getTeamList(0));
 		
 		if (this.blockTeamID != null) {
 			for(int i=0; i<localTeams.size(); i++) {
@@ -256,7 +253,7 @@ public class GuiTownManage extends GuiContainer {
 		
 		myTrades = new ArrayList<PlayerTrade>();
 		marketTrades = new ArrayList<PlayerTrade>();
-		for(PlayerTrade trade : Contained.trades){
+		for(PlayerTrade trade : Contained.getTradeList(0)){
 			if(trade.displayName.equals(this.mc.thePlayer.getDisplayName()))
 				myTrades.add(trade);
 			else
@@ -500,7 +497,7 @@ public class GuiTownManage extends GuiContainer {
 		int indOff = 0;
 		
 		displayString(0+indOff, "[Back]");
-		Iterator items = GameData.getItemRegistry().iterator();
+		Iterator<Item> items = GameData.getItemRegistry().iterator();
 		int index = 1;
 		while(items.hasNext()){
 			Item item = (Item) items.next();
@@ -761,7 +758,7 @@ public class GuiTownManage extends GuiContainer {
 			return;
 		}
 		
-		Iterator items = GameData.getItemRegistry().iterator();
+		Iterator<Item> items = GameData.getItemRegistry().iterator();
 		int index = 1;
 		while(items.hasNext()){
 			Item item = (Item) items.next();
@@ -784,15 +781,15 @@ public class GuiTownManage extends GuiContainer {
 	private void selectNPC(int mousX, int mouseY){
 		int ind = scrollInd()+itemHovering;
 		int indOff = 0;
-		Item item = null;
+		//Item item = null;
 		switch(indOff+ind){
 		case 0: marketInd = 3; break; //Back
 		}
-		if(item != null){
+		/*if(item != null) {
 			makeRequest = new ItemStack(item);
 			marketInd = 2;
 			requestSize = 1;
-		}
+		}*/
 	}
 	/**
 	 * Display a list of trades.

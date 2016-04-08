@@ -38,7 +38,7 @@ public class GuiHandler implements IGuiHandler {
 		TileEntity te = w.getTileEntity(x, y, z);
 		if (te != null && te instanceof TownManageTE) {
 			Point check = new Point(x, z);
-			String blockTeam = Contained.territoryData.get(check);
+			String blockTeam = Contained.getTerritoryMap(0).get(check);
 
 			if (blockTeam == null)
 				Util.displayError(p, "This block must be within a team's territory to use.");

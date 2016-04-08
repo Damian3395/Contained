@@ -69,7 +69,7 @@ public class TerritoryRender {
 		Tessellator tes = Tessellator.instance;
 		
 		for (TerritoryEdge te : teamEdges.keySet()) {
-			PlayerTeam t = PlayerTeam.get(teamEdges.get(te));
+			PlayerTeam t = PlayerTeam.get(teamEdges.get(te), 0);
 			
 			if(t != null){
 				float margin = 0.01f;
@@ -121,7 +121,7 @@ public class TerritoryRender {
 	private PlayerTeam getTerritory(int x, int z) {
 		Point probe = new Point(x, z);
 		if (Contained.territoryData.containsKey(probe))
-			return PlayerTeam.get(Contained.territoryData.get(probe));
+			return PlayerTeam.get(Contained.territoryData.get(probe), 0);
 		return null;
 	}
 	
@@ -132,30 +132,30 @@ public class TerritoryRender {
 	public void regenerateEdges() {
 		teamEdges.clear();
 		Point probe = new Point(0,0);		
-		for (Point p : Contained.territoryData.keySet()) {			
+		for (Point p : Contained.getTerritoryMap(0).keySet()) {			
 			probe.x = p.x; 
 			probe.y = p.y+1;
 			if (!Contained.territoryData.containsKey(probe) 
 					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.NORTH, p.x, p.y), Contained.territoryData.get(p));
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.NORTH, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 			
 			probe.x = p.x; 
 			probe.y = p.y-1;
 			if (!Contained.territoryData.containsKey(probe) 
 					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.SOUTH, p.x, p.y), Contained.territoryData.get(p));
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.SOUTH, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 			
 			probe.x = p.x-1; 
 			probe.y = p.y;
 			if (!Contained.territoryData.containsKey(probe) 
 					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.WEST, p.x, p.y), Contained.territoryData.get(p));
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.WEST, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 			
 			probe.x = p.x+1; 
 			probe.y = p.y;
 			if (!Contained.territoryData.containsKey(probe) 
 					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
-				teamEdges.put(new TerritoryEdge(TerritoryEdge.EAST, p.x, p.y), Contained.territoryData.get(p));
+				teamEdges.put(new TerritoryEdge(TerritoryEdge.EAST, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 		}
 	}
 }

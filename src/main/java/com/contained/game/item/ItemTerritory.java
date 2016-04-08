@@ -66,7 +66,7 @@ public class ItemTerritory {
 					return;
 				} 
 				if (testClaim == ErrorCase.Error.ALREADY_OWNED) {
-					String ownedBy = Contained.territoryData.get(toClaim);
+					String ownedBy = Contained.getTerritoryMap(p.dimension).get(toClaim);
 					if (!ownedBy.equals(playerData.teamID)) {
 						Util.displayError(p, "You can't claim this area, it already belongs to a team.");
 					}
@@ -80,7 +80,7 @@ public class ItemTerritory {
 				
 				if (!p.capabilities.isCreativeMode)
 					p.inventory.consumeInventoryItem(ItemTerritory.addTerritory);
-				Contained.territoryData.put(toClaim, playerData.teamID);
+				Contained.getTerritoryMap(p.dimension).put(toClaim, playerData.teamID);
 				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 			}
 		}
@@ -113,7 +113,7 @@ public class ItemTerritory {
 					NBTTagCompound itemData = Data.getTagCompound(data);	
 					String teamToRemove = itemData.getString("teamOwner");
 					ErrorCase.Error testRemove = 
-							canRemove(teamToRemove, blockToRemove, probe);				
+							canRemove(teamToRemove, blockToRemove, probe, p.dimension);				
 					
 					if (testRemove == ErrorCase.Error.WRONG_TEAM) {
 						Util.displayError(p, "This item can only remove territory from the team it's linked to.");
@@ -149,7 +149,7 @@ public class ItemTerritory {
 			NBTTagCompound itemData = Data.getTagCompound(itemStack);	
 			String teamToRemove = itemData.getString("teamOwner");
 			if (teamToRemove != null && !teamToRemove.equals("")) {
-				PlayerTeam team = PlayerTeam.get(teamToRemove);
+				PlayerTeam team = PlayerTeam.get(teamToRemove, player.dimension);
 				if (team != null) {
 					teamName = team.displayName;
 					formatCode = team.getFormatCode();
@@ -199,7 +199,7 @@ public class ItemTerritory {
 	 * Does this area of land satisfy all the rules required to be removed
 	 * by a territory gem item? (Possible Errors: TEAM_ONLY, WRONG_TEAM, ADJACENT_ONLY)
 	 */
-	public static ErrorCase.Error canRemove(String teamID, Point toRemove, Point probe) {
+	public static ErrorCase.Error canRemove(String teamID, Point toRemove, Point probe, int dimID) {
 		if (Contained.territoryData.containsKey(toRemove)) {
 			if (teamID != null && !Contained.territoryData.get(toRemove).equals(teamID))
 				return ErrorCase.Error.WRONG_TEAM;
@@ -209,7 +209,7 @@ public class ItemTerritory {
 		
 		String teamOwnedBy = teamID;
 		if (teamOwnedBy == null)
-			teamOwnedBy = Contained.territoryData.get(toRemove);
+			teamOwnedBy = Contained.getTerritoryMap(dimID).get(toRemove);
 		
 		boolean foundAdj = false;
 		for(int i=-1; i<=1; i+=2) {
@@ -221,7 +221,7 @@ public class ItemTerritory {
 					probe.x = toRemove.x;
 					probe.y = toRemove.y+i;
 				}
-				String teamProbed = Contained.territoryData.get(probe);
+				String teamProbed = Contained.getTerritoryMap(dimID).get(probe);
 				if (teamProbed == null || !teamProbed.equals(teamOwnedBy)) {
 					foundAdj = true;
 					break;

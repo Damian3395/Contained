@@ -74,7 +74,7 @@ public class TerritoryMachineTE extends TileEntity {
 							probe.x = this.xCoord+i;
 							probe.y = this.zCoord+j;
 							Point toRemove = new Point(probe.x, probe.y);
-							if (ItemTerritory.canRemove(this.teamID, toRemove, probe) == ErrorCase.Error.NONE)
+							if (ItemTerritory.canRemove(this.teamID, toRemove, probe, this.worldObj.provider.dimensionId) == ErrorCase.Error.NONE)
 								candidates.add(toRemove);
 						}
 					}
@@ -108,7 +108,7 @@ public class TerritoryMachineTE extends TileEntity {
 						sendParticlePacket("crit"); //success
 						Collections.shuffle(candidates);
 						Point toClaim = candidates.get(0);
-						Contained.territoryData.put(toClaim, this.teamID);
+						Contained.getTerritoryMap(this.worldObj.provider.dimensionId).put(toClaim, this.teamID);
 						Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(this.teamID, toClaim.x, toClaim.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail
@@ -141,7 +141,7 @@ public class TerritoryMachineTE extends TileEntity {
 	
 	public void refreshColor() {
 		if (this.teamID != null) {
-			PlayerTeam team = PlayerTeam.get(this.teamID);
+			PlayerTeam team = PlayerTeam.get(this.teamID, this.worldObj.provider.dimensionId);
 			if (team != null)
 				this.renderColor = team.getColor();
 		}

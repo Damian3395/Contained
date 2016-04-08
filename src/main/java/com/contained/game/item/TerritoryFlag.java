@@ -97,7 +97,7 @@ public class TerritoryFlag {
 				}
 				
 				int flagXPCost = Contained.configs.flagXPCost;
-				PlayerTeam team = PlayerTeam.get(playerData.teamID);
+				PlayerTeam team = PlayerTeam.get(playerData.teamID, p.dimension);
 				if (team.territoryCount() == 0)
 					flagXPCost = 0; //First usage of the flag should be free.
 				
@@ -107,7 +107,7 @@ public class TerritoryFlag {
 				}
 				
 				p.addExperienceLevel(flagXPCost);
-				Contained.territoryData.put(toClaim, playerData.teamID);
+				Contained.getTerritoryMap(p.dimension).put(toClaim, playerData.teamID);
 				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
 				team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+playerData.playerName+" started a new territory sector at ("+x+","+z+").");
 			}

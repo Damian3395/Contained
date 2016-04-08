@@ -37,8 +37,8 @@ public class Save {
 		HashMap<String, ArrayList<Integer>> terrX = new HashMap<String, ArrayList<Integer>>();
 		HashMap<String, ArrayList<Integer>> terrZ = new HashMap<String, ArrayList<Integer>>();
 		
-		for (Point p : Contained.territoryData.keySet()) {
-			String team = Contained.territoryData.get(p);
+		for (Point p : Contained.getTerritoryMap(dimID).keySet()) {
+			String team = Contained.getTerritoryMap(dimID).get(p);
 			if (!terrX.containsKey(team)) {
 				terrX.put(team, new ArrayList<Integer>());
 				terrZ.put(team, new ArrayList<Integer>());
@@ -49,7 +49,7 @@ public class Save {
 		
 		//Save team data
 		NBTTagList teamList = new NBTTagList();
-		for(PlayerTeam team : Contained.teamData) {
+		for(PlayerTeam team : Contained.getTeamList(dimID)) {
 			NBTTagCompound teamNBT = new NBTTagCompound();
 			team.writeToNBT(teamNBT);
 			
@@ -79,7 +79,7 @@ public class Save {
 		
 		//Save trades
 		NBTTagList tradeList = new NBTTagList();
-		for(PlayerTrade trade : Contained.trades){
+		for(PlayerTrade trade : Contained.getTradeList(dimID)){
 			NBTTagCompound tradeNBT = new NBTTagCompound();
 			trade.writeToNBT(tradeNBT);
 			tradeList.appendTag(tradeNBT);

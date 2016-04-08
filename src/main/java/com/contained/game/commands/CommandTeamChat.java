@@ -45,7 +45,7 @@ public class CommandTeamChat implements ICommand {
 
 					if (pdata.teamID != null) {
 						String message = StringUtils.join(argString, " ");
-						PlayerTeam team = PlayerTeam.get(pdata.teamID);						
+						PlayerTeam team = PlayerTeam.get(pdata.teamID, p.dimension);						
 						team.sendMessageToTeam(team.getFormatCode()+p.getDisplayName()+":"+message);
 						String world = Util.getDimensionString(p.dimension);
 						DataLogger.insertGuildChat(Util.getServerID(), 

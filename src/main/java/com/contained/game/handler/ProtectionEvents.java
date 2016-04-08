@@ -125,7 +125,7 @@ public class ProtectionEvents {
 				if (pdata.teamID == null)
 					canHarvest = false;
 				else {
-					String ownedTeam = Contained.territoryData.get(new Point(ev.x, ev.z));
+					String ownedTeam = Contained.getTerritoryMap(ev.getPlayer().dimension).get(new Point(ev.x, ev.z));
 					if (ownedTeam == null || !ownedTeam.equals(pdata.teamID))
 						canHarvest = false;
 				}
@@ -242,7 +242,7 @@ public class ProtectionEvents {
 		}
 		else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer) {
 			// Player versus Player: Disable PvP in the following cases:
-			//    -Players cannot attack their own team mates.
+			//    -Players cannot attack their own teammates.
 			//    -Players not in a team cannot be attacked nor can they attack
 			//      other players.
 			//    -Players cannot be attacked within their territory if the
@@ -259,9 +259,9 @@ public class ProtectionEvents {
 			else if (victimTeam.equals(attackerTeam))
 				shouldCancel = true;
 			else if (Contained.territoryData.containsKey(check)) {
-				String territoryTeamID = Contained.territoryData.get(check);
+				String territoryTeamID = Contained.getTerritoryMap(event.entityLiving.dimension).get(check);
 				if (victimTeam.equals(territoryTeamID)) {
-					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID);
+					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID, event.entityLiving.dimension);
 					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize)
 						shouldCancel = true;
 				}
@@ -383,7 +383,7 @@ public class ProtectionEvents {
 			if (Contained.territoryData.containsKey(check)) {
 				//This player is in owned territory.
 				PlayerTeamIndividual entData = PlayerTeamIndividual.get(ent);
-				PlayerTeam team = PlayerTeam.get(Contained.territoryData.get(check));
+				PlayerTeam team = PlayerTeam.get(Contained.territoryData.get(check), ent.dimension);
 				return team.getPermissions(entData.teamID);  
 			}
 		}

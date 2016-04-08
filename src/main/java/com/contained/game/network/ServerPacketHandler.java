@@ -115,13 +115,13 @@ public class ServerPacketHandler {
 					// gone defunct between syncing.
 					ArrayList<String> teamPermsToRemove = new ArrayList<String>();
 					for (String teamID : team.permissions.keySet()) {
-						if (PlayerTeam.get(teamID) == null)
+						if (PlayerTeam.get(teamID, team.dimID) == null)
 							teamPermsToRemove.add(teamID);
 					}
 					for (String teamID : teamPermsToRemove)
 						team.permissions.remove(teamID);
 					
-					PlayerTeam toModify = PlayerTeam.get(team);
+					PlayerTeam toModify = PlayerTeam.get(team, team.dimID);
 					toModify.permissions = team.permissions;
 					
 					//Sync new permission data to all clients.

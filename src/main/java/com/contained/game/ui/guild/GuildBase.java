@@ -199,7 +199,7 @@ public class GuildBase {
 		
 		invites = new ArrayList(myInvites.size());
 		for(int i=0; i<myInvites.size(); i++) {
-			PlayerTeam teamData = PlayerTeam.get(myInvites.get(i).teamID);
+			PlayerTeam teamData = PlayerTeam.get(myInvites.get(i).teamID, 0);
 				if (teamData != null)
 					invites.add(teamData.displayName);
 		}
