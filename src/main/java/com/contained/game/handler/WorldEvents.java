@@ -18,12 +18,13 @@ import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
-public class WorldEvents {
-	boolean readyToGen = false;
-	
+public class WorldEvents {	
 	@SubscribeEvent
 	//Make all chunks within a specified distance from spawn be empty wasteland.
 	public void biomeControl(ChunkProviderEvent.ReplaceBiomeBlocks event) {
+		boolean readyToGen = event.world.playerEntities != null 
+								&& event.world.playerEntities.size() > 0;
+		
 		if (Util.isOverworld(event.world.provider.dimensionId) && readyToGen && !event.world.isRemote) {
 			float wasteAmount = Util.isWasteland(event.world, event.chunkX, event.chunkZ);
 			BiomeGenBase biomeOverride = null;
@@ -87,7 +88,6 @@ public class WorldEvents {
 	public void init(WorldEvent.Load event) {
 		if (Util.isOverworld(event.world.provider.dimensionId) && !event.world.isRemote)
 			Load.loadWorldData(event.world, event.world.provider.dimensionId);
-		readyToGen = true;
 	}
 	
 	@SubscribeEvent

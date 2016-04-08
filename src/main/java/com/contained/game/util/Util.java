@@ -6,18 +6,22 @@ import java.util.Date;
 import java.util.List;
 
 import com.contained.game.data.Data;
+import com.contained.game.world.GenerateWorld;
+import com.contained.game.world.NullTeleporter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class Util {	
@@ -82,15 +86,25 @@ public class Util {
 	public static String getDimensionString(int dimID) {
 		if (dimID == 0)
 			return "Lobby";
-		else if (dimID == 1)
-			return "Nether";
 		else if (dimID == -1)
+			return "Nether";
+		else if (dimID == 1)
 			return "End";
 		else if (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
 			return "PvP";
 		else if (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)
 			return "Treasure";
 		else return "Unknown";
+	}
+	
+	public static void travelToDimension(int dimID, EntityPlayer player) {
+		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
+			MinecraftServer mcServer = MinecraftServer.getServer();
+			WorldServer newWorld = mcServer.worldServerForDimension(dimID);
+			
+			mcServer.getConfigurationManager().transferPlayerToDimension(
+					(EntityPlayerMP)player, dimID, new NullTeleporter(newWorld));
+		}
 	}
 	
 	/**

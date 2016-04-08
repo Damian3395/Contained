@@ -19,9 +19,9 @@ public class Resources {
 	public static final boolean FULL_TEAM_MODE = false;
 	
 	public static final int MIN_PVP_DIMID = 2;
-	public static final int MAX_PVP_DIMID = 7;
+	public static final int MAX_PVP_DIMID = 5;
 	public static final int MIN_TREASURE_DIMID = 10;
-	public static final int MAX_TREASURE_DIMID = 15;
+	public static final int MAX_TREASURE_DIMID = 13;
 	
 	public static final int COAL = 0;
 	public static final int IRON = 1;

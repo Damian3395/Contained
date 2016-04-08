@@ -3,6 +3,8 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.util.Util;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -86,7 +88,7 @@ public class CommandTPXD implements ICommand {
 	     
 				if (player != null && player.ridingEntity == null && player.riddenByEntity == null) {
 					if(player.dimension != dimID)
-						player.travelToDimension(dimID);
+						Util.travelToDimension(dimID, player);
 					player.setPositionAndUpdate(x, y, z);
 				} else
 					sender.addChatMessage(new ChatComponentText("Teleport failed.")); 

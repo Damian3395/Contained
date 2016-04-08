@@ -3,6 +3,8 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.util.Util;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -72,7 +74,7 @@ public class CommandTPX implements ICommand {
 
 				if (player.ridingEntity == null && player.riddenByEntity == null) {
 					if(world.provider.dimensionId != dimID)
-						player.travelToDimension(dimID);
+						Util.travelToDimension(dimID, player);
 					ChunkCoordinates coordinates = player.getBedLocation(dimID);
 					if (coordinates == null)
 						coordinates = world.getSpawnPoint();

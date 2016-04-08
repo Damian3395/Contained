@@ -115,8 +115,8 @@ public class BiomeProperties {
 	// 
 	// === File Handling ===
 	//
-	public void loadFromFile(World w) {
-		NBTTagCompound ntc = Load.loadNBTFile("biomeSpawning.dat");
+	public void loadFromFile(World w, int dimID) {
+		NBTTagCompound ntc = Load.loadNBTFile("biomeSpawning"+dimID+".dat");
 		biomeMapping.clear();
 		
 		//Save file found, load data from storage.
@@ -142,7 +142,7 @@ public class BiomeProperties {
 			generateMapping(w);
 	}
 	
-	public void saveToFile() {
+	public void saveToFile(int dimID) {
 		NBTTagCompound ntc = new NBTTagCompound();		
 		
 		int[] biomeMapX   = new int[this.biomeMapping.size()];
@@ -159,7 +159,7 @@ public class BiomeProperties {
 		ntc.setIntArray("biomeMapZ",   biomeMapZ);
 		ntc.setIntArray("biomeMapIDs", biomeMapIDs);
 		
-		Save.saveNBTFile("biomeSpawning.dat", ntc);
+		Save.saveNBTFile("biomeSpawning"+dimID+".dat", ntc);
 	}
 	
 	// Loads from or generates a config file for all of the biome spawning properties.

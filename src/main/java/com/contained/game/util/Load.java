@@ -38,11 +38,11 @@ public class Load {
 			}
 		}
 		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++) {
-			GenerateWorld.getOreProperties(dimID, i).loadFromFile();
+			GenerateWorld.getOreProperties(dimID, i).loadFromFile(dimID);
 			GenerateWorld.getOreProperties(dimID, i).determineAllChunks(w, Resources.worldRadius);	
 		}
 		
-		GenerateWorld.getBiomeProperties(dimID).loadFromFile(w);
+		GenerateWorld.getBiomeProperties(dimID).loadFromFile(w, dimID);
 		
 		/**
 		 * Territory & Team Data

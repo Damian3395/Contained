@@ -175,7 +175,7 @@ public static final String oreGenCategory = "oreGen";
 	// 
 	// === File Handling ===
 	//
-	public void saveToFile() {
+	public void saveToFile(int dimID) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) 
 			return;
 		
@@ -183,7 +183,7 @@ public static final String oreGenCategory = "oreGen";
 			File saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "OreGen");
 			if (!saveDir.exists())
 				saveDir.mkdirs();
-			File save = new File(saveDir, type.getUnlocalizedName()+".dat");
+			File save = new File(saveDir, type.getUnlocalizedName()+"_"+dimID+".dat");
 			if (!save.exists())
 				save.createNewFile();
 			
@@ -205,14 +205,14 @@ public static final String oreGenCategory = "oreGen";
 		}
 	}
 	
-	public void loadFromFile() {
+	public void loadFromFile(int dimID) {
 		NBTTagCompound loadData = null;
 		
 		try {
 			File saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "OreGen");
 			if (!saveDir.exists())
 				saveDir.mkdirs();
-			File save = new File(saveDir, type.getUnlocalizedName()+".dat");
+			File save = new File(saveDir, type.getUnlocalizedName()+"_"+dimID+".dat");
 			if (save.exists()) {
 				DataInputStream data = new DataInputStream(new FileInputStream(save));
 				loadData = CompressedStreamTools.readCompressed(data);
