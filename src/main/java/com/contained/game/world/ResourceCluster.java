@@ -59,6 +59,16 @@ public static final String oreGenCategory = "oreGen";
 		this.spawnChunks = new ArrayList<Point>();
 	}
 	
+	public ResourceCluster(ResourceCluster copy) {
+		this.type = copy.type;
+		this.veinSize = new Range<Integer>(copy.veinSize);
+		this.veinCount = new Range<Integer>(copy.veinCount);
+		this.clusterSize = new Range<Integer>(copy.clusterSize);
+		this.clusterCount = new Range<Integer>(copy.clusterCount);
+		this.spawnHeight = new Range<Integer>(copy.spawnHeight);
+		this.spawnChunks = new ArrayList<Point>(copy.spawnChunks);
+	}
+	
 	/**
 	 *  Adds all the chunk locations in the finite world where this ore cluster
 	 *  should do generation. (This function will be ignored if the chunk locations

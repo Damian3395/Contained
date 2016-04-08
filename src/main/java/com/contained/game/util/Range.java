@@ -14,6 +14,11 @@ public class Range<T extends Comparable<T>> {
 		}
 	}
 	
+	public Range(Range<T> copy) {
+		this.minValue = copy.minValue;
+		this.maxValue = copy.maxValue;
+	}
+	
 	public T min() {
 		return this.minValue;
 	}

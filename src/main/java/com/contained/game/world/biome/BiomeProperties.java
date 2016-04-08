@@ -34,6 +34,11 @@ public class BiomeProperties {
 		biomeMapping = new HashMap<Point, BiomeGenBase>();
 	}
 	
+	public BiomeProperties(BiomeProperties copy) {
+		this.numOccurences = new HashMap<BiomeGenBase, Integer>(copy.numOccurences);
+		biomeMapping = new HashMap<Point, BiomeGenBase>();
+	}
+	
 	// Generate the mapping of biomes as they should appear over the chunks of
 	// the finite world.
 	public void generateMapping(World w) {

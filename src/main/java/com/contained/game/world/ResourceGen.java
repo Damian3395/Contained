@@ -7,7 +7,6 @@ import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenMinable;
@@ -19,13 +18,15 @@ public class ResourceGen {
 	@SubscribeEvent
 	//Override Minecraft's ore generation with our own custom one.
 	public void generateOre(OreGenEvent.GenerateMinable event) {	
+		int dimID = event.world.provider.dimensionId;
+		
 		if (event.type == EventType.COAL) {
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.COAL]);
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.QUARTZ]);
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.GLOWSTONE]);
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.COAL));
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.QUARTZ));
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.GLOWSTONE));
 			
 			// Generate clumps of soulsand at the bottom of the map in the
 			// netherrack region.
@@ -37,30 +38,30 @@ public class ResourceGen {
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.IRON) {
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.IRON]);
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.IRON));
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.GOLD) {
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.GOLD]);
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.GOLD));
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.DIAMOND) {
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.DIAMOND]);
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.EMERALD]);
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.DIAMOND));
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.EMERALD));
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.REDSTONE) {
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.REDSTONE]);
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.REDSTONE));
 			event.setResult(Result.DENY);
 		} 
 		else if (event.type == EventType.LAPIS) {
-			oreGenFromProperties(event.world, event.rand, event.worldX
-					, event.worldZ, GenerateWorld.oreSpawnProperties[Resources.LAPIS]);
+			oreGenFromProperties(event.world, event.rand, event.worldX, event.worldZ 
+					, GenerateWorld.getOreProperties(dimID, Resources.LAPIS));
 			event.setResult(Result.DENY);
 		} 
 	}

@@ -37,12 +37,12 @@ public class Load {
 					Resources.numWorldChunks++;
 			}
 		}
-		for(int i=0; i<GenerateWorld.oreSpawnProperties.length; i++) {
-			GenerateWorld.oreSpawnProperties[i].loadFromFile();
-			GenerateWorld.oreSpawnProperties[i].determineAllChunks(w, Resources.worldRadius);	
+		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++) {
+			GenerateWorld.getOreProperties(dimID, i).loadFromFile();
+			GenerateWorld.getOreProperties(dimID, i).determineAllChunks(w, Resources.worldRadius);	
 		}
 		
-		GenerateWorld.biomeProperties.loadFromFile(w);
+		GenerateWorld.getBiomeProperties(dimID).loadFromFile(w);
 		
 		/**
 		 * Territory & Team Data

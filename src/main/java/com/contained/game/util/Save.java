@@ -28,9 +28,9 @@ public class Save {
 		NBTTagCompound ntc = new NBTTagCompound();
 		ntc.setInteger("worldRadius", Resources.worldRadius);
 		saveNBTFile("worldProperties"+dimID+".dat", ntc);
-		for(int i=0; i<GenerateWorld.oreSpawnProperties.length; i++)
-			GenerateWorld.oreSpawnProperties[i].saveToFile();
-		GenerateWorld.biomeProperties.saveToFile();
+		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++)
+			GenerateWorld.getOreProperties(dimID, i).saveToFile();
+		GenerateWorld.getBiomeProperties(dimID).saveToFile();
 		
 		//Categorize owned territory by team
 		ntc = new NBTTagCompound();

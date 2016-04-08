@@ -2,9 +2,6 @@ package com.contained.game.handler;
 
 import java.awt.Point;
 
-import com.contained.game.entity.DeepBlaze;
-import com.contained.game.entity.DeepLavaSlime;
-import com.contained.game.entity.DeepWitherSkeleton;
 import com.contained.game.util.Load;
 import com.contained.game.util.Save;
 import com.contained.game.util.Util;
@@ -15,10 +12,8 @@ import com.contained.game.world.block.WastelandBlock;
 import com.contained.game.world.block.WastelandBush;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -44,8 +39,8 @@ public class WorldEvents {
 			}
 			if (biomeOverride == null) {
 				Point p = new Point(event.chunkX, event.chunkZ);
-				if (GenerateWorld.biomeProperties.biomeMapping.containsKey(p))
-					biomeOverride = GenerateWorld.biomeProperties.biomeMapping.get(p);
+				if (GenerateWorld.getBiomeProperties(event.world.provider.dimensionId).biomeMapping.containsKey(p))
+					biomeOverride = GenerateWorld.getBiomeProperties(event.world.provider.dimensionId).biomeMapping.get(p);
 				else
 					biomeOverride = WastelandBiome.biome;
 			}

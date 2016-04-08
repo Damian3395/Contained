@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.util.Util;
 import com.contained.game.world.GenerateWorld;
 
 import net.minecraft.command.ICommand;
@@ -54,25 +55,27 @@ public class CommandDebugOreGen implements ICommand{
 		Point p = new Point(sender.getPlayerCoordinates().posX/16, 
 							sender.getPlayerCoordinates().posZ/16);
 		
-		String out = "";
-		for(int i=0; i<GenerateWorld.oreSpawnProperties.length; i++) {
-			if (GenerateWorld.oreSpawnProperties[i].spawnChunks.contains(p)) {
-				if (out.equals(""))
-					out += GenerateWorld.oreSpawnProperties[i].type.getLocalizedName();
-				else
-					out += ", "+GenerateWorld.oreSpawnProperties[i].type.getLocalizedName();
-			}
-		}
-		
 		if (sender instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer)sender;
-			player.capabilities.allowFlying = true;
+			int dimID = player.dimension;
+			String out = "";
+			
+			if (Util.isOverworld(dimID)) {
+			for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++) {
+				if (GenerateWorld.getOreProperties(dimID, i).spawnChunks.contains(p)) {
+					if (out.equals(""))
+						out += GenerateWorld.getOreProperties(dimID, i).type.getLocalizedName();
+					else
+						out += ", "+GenerateWorld.getOreProperties(dimID, i).type.getLocalizedName();
+				}
+			}
+			}
+			
+			if (out.equals(""))
+				sender.addChatMessage(new ChatComponentText("None"));
+			else
+				sender.addChatMessage(new ChatComponentText(out));
 		}
-		
-		if (out.equals(""))
-			sender.addChatMessage(new ChatComponentText("None"));
-		else
-			sender.addChatMessage(new ChatComponentText(out));
 	} 
 
 	@Override 
