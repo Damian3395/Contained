@@ -19,11 +19,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
 public class Load {
-	public static void loadWorldData(World w){
+	public static void loadWorldData(World w, int dimID){
 		/**
 		 * Finite World Generation Data
 		 */
-		NBTTagCompound ntc = loadNBTFile("worldProperties.dat");
+		NBTTagCompound ntc = loadNBTFile("worldProperties"+dimID+".dat");
 		if (ntc != null)
 			Resources.worldRadius = ntc.getInteger("worldRadius");
 		int spawnX = w.getSpawnPoint().posX/16;
@@ -53,7 +53,7 @@ public class Load {
 		Contained.teamInvitations.clear();
 		Contained.trades.clear();
 		
-		ntc = loadNBTFile("territoryInfo.dat");
+		ntc = loadNBTFile("territoryInfo"+dimID+".dat");
 		if (ntc != null) {			
 			NBTTagList teamList = ntc.getTagList("teamList", (byte)10);
 			for(int i=0; i<teamList.tagCount(); i++) {

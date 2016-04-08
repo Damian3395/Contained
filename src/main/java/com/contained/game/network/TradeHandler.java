@@ -124,7 +124,7 @@ public class TradeHandler {
 		Contained.channel.sendToAll(addTrades.toPacket());
 			
 		//DataLog Trade
-		String world = player.dimension == 0 ? "Normal" : "Nether";
+		String world = Util.getDimensionString(player.dimension);
 		DataLogger.insertTrade("debug", creator.getDisplayName()
 				, world
 				, player.getDisplayName()

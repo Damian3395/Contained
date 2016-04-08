@@ -17,7 +17,7 @@ public class FMLDataEvents {
 		if(!event.player.worldObj.isRemote){
 			DataLogger.insertLogOut(Util.getServerID(), 
 					event.player.getDisplayName(), 
-					event.player.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.player.dimension),
 					Util.getDate());
 			System.out.println("Inserting Logout: " + event.player.getDisplayName());
 		}
@@ -28,7 +28,7 @@ public class FMLDataEvents {
 		if(!event.player.worldObj.isRemote){
 			DataLogger.insertSmelt(Util.getServerID(), 
 					event.player.getDisplayName(), 
-					event.player.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.player.dimension),
 					event.smelting.getDisplayName(), 
 					Util.getDate());
 			System.out.println("Inserting Smelt " + event.smelting.getDisplayName());
@@ -40,7 +40,7 @@ public class FMLDataEvents {
 		if(!event.player.worldObj.isRemote){
 			DataLogger.insertCraft(Util.getServerID(), 
 					event.player.getDisplayName(), 
-					event.player.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.player.dimension),
 					event.crafting.getDisplayName(), 
 					Util.getDate());
 			System.out.println("Inserting Craft " + event.crafting.getDisplayName());

@@ -23,11 +23,11 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
 public class Save {
-	public static void saveWorldData() {
+	public static void saveWorldData(int dimID) {
 		//Save world generation data
 		NBTTagCompound ntc = new NBTTagCompound();
 		ntc.setInteger("worldRadius", Resources.worldRadius);
-		saveNBTFile("worldProperties.dat", ntc);
+		saveNBTFile("worldProperties"+dimID+".dat", ntc);
 		for(int i=0; i<GenerateWorld.oreSpawnProperties.length; i++)
 			GenerateWorld.oreSpawnProperties[i].saveToFile();
 		GenerateWorld.biomeProperties.saveToFile();
@@ -95,7 +95,7 @@ public class Save {
 		}
 		ntc.setTag("invitationList", invitationList);
 		
-		saveNBTFile("territoryInfo.dat", ntc);
+		saveNBTFile("territoryInfo"+dimID+".dat", ntc);
 	}
 	
 	/**

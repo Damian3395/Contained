@@ -29,7 +29,7 @@ public class WorldEvents {
 	@SubscribeEvent
 	//Make all chunks within a specified distance from spawn be empty wasteland.
 	public void biomeControl(ChunkProviderEvent.ReplaceBiomeBlocks event) {
-		if (event.world.provider.dimensionId == 0 && readyToGen && !event.world.isRemote) {
+		if (Util.isOverworld(event.world.provider.dimensionId) && readyToGen && !event.world.isRemote) {
 			float wasteAmount = Util.isWasteland(event.world, event.chunkX, event.chunkZ);
 			BiomeGenBase biomeOverride = null;
 			if (wasteAmount > 0) {
@@ -90,20 +90,20 @@ public class WorldEvents {
 	//
 	@SubscribeEvent
 	public void init(WorldEvent.Load event) {
-		if (event.world.provider.dimensionId == 0 && !event.world.isRemote)
-			Load.loadWorldData(event.world);
+		if (Util.isOverworld(event.world.provider.dimensionId) && !event.world.isRemote)
+			Load.loadWorldData(event.world, event.world.provider.dimensionId);
 		readyToGen = true;
 	}
 	
 	@SubscribeEvent
 	public void close(WorldEvent.Unload event) {
-		if (event.world.provider.dimensionId == 0)
-			Save.saveWorldData();
+		if (Util.isOverworld(event.world.provider.dimensionId))
+			Save.saveWorldData(event.world.provider.dimensionId);
 	}
 	
 	@SubscribeEvent
 	public void close(WorldEvent.Save event) {
-		if (event.world.provider.dimensionId == 0)
-			Save.saveWorldData();
+		if (Util.isOverworld(event.world.provider.dimensionId))
+			Save.saveWorldData(event.world.provider.dimensionId);
 	}
 }

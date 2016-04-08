@@ -1,6 +1,7 @@
 package com.contained.game;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.DimensionManager;
 import mantle.client.MProxyClient;
 import mantle.lib.client.MantleClientRegistry;
 
@@ -9,6 +10,7 @@ import com.contained.game.entity.DeepLavaSlime;
 import com.contained.game.entity.DeepWitherSkeleton;
 import com.contained.game.item.*;
 import com.contained.game.ui.ToolPage;
+import com.contained.game.util.Resources;
 import com.contained.game.world.block.*;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -75,6 +77,11 @@ public class ContainedRegistry {
 		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");
 		GameRegistry.registerTileEntity(TownManageTE.class, "TownManageTE");
 		GameRegistry.registerTileEntity(HarvestedOreTE.class, "harvestedOreTE");
+		
+		for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++)
+			DimensionManager.registerDimension(i, 0);
+		for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++)
+			DimensionManager.registerDimension(i, 0);
 	}
 	
 }

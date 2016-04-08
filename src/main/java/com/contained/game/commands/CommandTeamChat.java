@@ -47,7 +47,7 @@ public class CommandTeamChat implements ICommand {
 						String message = StringUtils.join(argString, " ");
 						PlayerTeam team = PlayerTeam.get(pdata.teamID);						
 						team.sendMessageToTeam(team.getFormatCode()+p.getDisplayName()+":"+message);
-						String world = p.dimension == 0 ? "Normal" : "Nether";
+						String world = Util.getDimensionString(p.dimension);
 						DataLogger.insertGuildChat(Util.getServerID(), 
 								p.getDisplayName(), 
 								pdata.teamID, 

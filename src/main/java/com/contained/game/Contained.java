@@ -74,6 +74,8 @@ public class Contained{
 		event.registerServerCommand(new CommandChangeStatus());
 		event.registerServerCommand(new CommandTutorialBook());
 		event.registerServerCommand(new CommandSurveyBook());
+		event.registerServerCommand(new CommandTPX());
+		event.registerServerCommand(new CommandTPXD());
 	}
 	
 	@EventHandler

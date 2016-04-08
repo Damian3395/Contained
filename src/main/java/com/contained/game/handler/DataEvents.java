@@ -28,7 +28,7 @@ public class DataEvents {
 			if(!player.achievements.contains(event.achievement.statId)){
 				DataLogger.insertAchievement(Util.getServerID(), 
 						event.entityPlayer.getDisplayName(), 
-						event.entityPlayer.worldObj.provider.getDimensionName(), 
+						Util.getDimensionString(event.entityPlayer.dimension), 
 						event.achievement.statId, 
 						Util.getDate());
 				player.achievements.add(event.achievement.statId);
@@ -41,7 +41,7 @@ public class DataEvents {
 		if(!event.world.isRemote){
 			DataLogger.insertBuild(Util.getServerID(), 
 					event.player.getDisplayName(), 
-					event.world.provider.getDimensionName(),
+					Util.getDimensionString(event.player.dimension),
 					event.block.getLocalizedName(), 
 					event.x, 
 					event.y, 
@@ -55,7 +55,7 @@ public class DataEvents {
 		if(!event.world.isRemote){
 			DataLogger.insertMine(Util.getServerID(), 
 					event.getPlayer().getDisplayName(), 
-					event.world.provider.getDimensionName(),
+					Util.getDimensionString(event.getPlayer().dimension),
 					event.block.getLocalizedName(), 
 					event.x, 
 					event.y, 
@@ -69,10 +69,10 @@ public class DataEvents {
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer){
 			EntityPlayer player = (EntityPlayer)event.entity;
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
-			properties.world = event.world.provider.getDimensionName();
+			properties.world = Util.getDimensionString(player.dimension);
 			DataLogger.insertLogin(Util.getServerID(), 
 					player.getDisplayName(), 
-					event.world.provider.getDimensionName(), 
+					Util.getDimensionString(player.dimension), 
 					Util.getDate());
 		}
 	}
@@ -102,7 +102,7 @@ public class DataEvents {
 			} else
 				killer = event.source.getDamageType();
 			DataLogger.insertKill(Util.getServerID(), 
-					event.entityLiving.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.entity.dimension),
 					killer, 
 					victim, 
 					Util.getDate());
@@ -114,7 +114,7 @@ public class DataEvents {
 		if(!event.entityPlayer.worldObj.isRemote && event.entity instanceof EntityPlayer){
 			DataLogger.insertAnvil(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
-					event.entityPlayer.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.entityPlayer.dimension),
 					event.left.getDisplayName(), event.left.stackSize,
 					event.right.getDisplayName(), event.right.stackSize,
 					event.output.getDisplayName(), event.output.stackSize,
@@ -127,7 +127,7 @@ public class DataEvents {
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer){
 			DataLogger.insertUsed(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
-					event.entityPlayer.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.entityPlayer.dimension),
 					event.original.getDisplayName(), 
 					Util.getDate());
 		}
@@ -138,7 +138,7 @@ public class DataEvents {
 		if(!event.player.worldObj.isRemote){
 			DataLogger.insertChat(Util.getServerID(), 
 					event.player.getDisplayName(),
-					event.player.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.player.dimension),
 					event.message, 
 					Util.getDate());
 		}
@@ -149,7 +149,7 @@ public class DataEvents {
 		if(!event.entity.worldObj.isRemote  && event.entity instanceof EntityPlayer){
 			DataLogger.insertConsume(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(), 
-					event.entityPlayer.worldObj.provider.getDimensionName(),
+					Util.getDimensionString(event.entityPlayer.dimension),
 					event.item.getDisplayName(), 
 					Util.getDate());
 		}
@@ -160,13 +160,13 @@ public class DataEvents {
 		if(!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityPlayer){
 			EntityPlayer player = (EntityPlayer) event.entity;
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
-			if(properties.world.compareTo(event.entityLiving.worldObj.provider.getDimensionName()) != 0){
+			if(properties.world.compareTo(Util.getDimensionString(event.entityLiving.dimension)) != 0){
 				DataLogger.insertPortal(Util.getServerID(), 
 						player.getDisplayName(), 
 						properties.world, 
-						event.entityLiving.worldObj.provider.getDimensionName(),
+						Util.getDimensionString(event.entityLiving.dimension),
 						Util.getDate());
-				properties.world = event.entityLiving.worldObj.provider.getDimensionName();
+				properties.world = Util.getDimensionString(event.entityLiving.dimension);
 			}
 		}
 	}
@@ -182,7 +182,7 @@ public class DataEvents {
 			if(properties.posX != x || properties.posY != y || properties.posZ != z){
 				DataLogger.insertMove(Util.getServerID(), 
 						player.getDisplayName(),
-						event.entityLiving.worldObj.provider.getDimensionName(),
+						Util.getDimensionString(event.entityLiving.dimension),
 						x, y, z, 
 						Util.getDate());
 				properties.posX = x;

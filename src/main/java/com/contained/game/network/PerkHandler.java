@@ -22,7 +22,7 @@ public class PerkHandler {
 		perkPacket.writeInt(perkID);
 		Contained.channel.sendTo(perkPacket.toPacket(), player);
 		
-		String world = (player.dimension == 0) ? "Normal" : "Nether";
+		String world = Util.getDimensionString(player.dimension);
 		DataLogger.insertPerk("debugmode", player.getDisplayName(), world, perkID, Util.getDate());
 	}
 	

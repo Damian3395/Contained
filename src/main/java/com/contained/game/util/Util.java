@@ -22,10 +22,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class Util {	
-	public static String errorCode = "§4§l";
-	public static String warningCode = "§6§l";
-	public static String successCode = "§2§l";
-	public static String infoCode = "§b§l";
+	public static String errorCode = "ï¿½4ï¿½l";
+	public static String warningCode = "ï¿½6ï¿½l";
+	public static String successCode = "ï¿½2ï¿½l";
+	public static String infoCode = "ï¿½bï¿½l";
 	
 	/**
 	 * Euclidean distance between two points
@@ -54,7 +54,7 @@ public class Util {
 	 * partially wasteland.
 	 */
 	public static float isWasteland(World w, float chunkX, float chunkZ) {
-		if (w.provider.dimensionId != 0)
+		if (!Util.isOverworld(w.provider.dimensionId))
 			return 0;
 		
 		float spawnX = w.getSpawnPoint().posX/16;
@@ -65,6 +65,33 @@ public class Util {
 			return Math.min(1f, (distDiff-Resources.worldRadius)/5f);
 		}
 		return 0;
+	}
+	
+	/**
+	 * Check if the given dimension ID refers to a dimension that should
+	 * be treated as a finite overworld.
+	 */
+	public static boolean isOverworld(int dimID) {
+		if (dimID == 0  
+			|| (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
+			|| (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static String getDimensionString(int dimID) {
+		if (dimID == 0)
+			return "Lobby";
+		else if (dimID == 1)
+			return "Nether";
+		else if (dimID == -1)
+			return "End";
+		else if (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
+			return "PvP";
+		else if (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)
+			return "Treasure";
+		else return "Unknown";
 	}
 	
 	/**

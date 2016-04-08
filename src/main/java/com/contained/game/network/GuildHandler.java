@@ -65,7 +65,7 @@ public class GuildHandler {
 			statusInfo = "Joined Team";
 			statusColor = Color.GREEN;
 			
-			String world = player.dimension == 0 ? "Normal" : "Nether";
+			String world = Util.getDimensionString(player.dimension);
 			DataLogger.insertJoinTeam("debugmode", player.getDisplayName(), world, team, Util.getDate());
 		}
 		
@@ -111,7 +111,7 @@ public class GuildHandler {
 		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_KICK);
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
 		
-		String world = player.dimension == 0 ? "Normal" : "Nether";
+		String world = Util.getDimensionString(player.dimension);
 		DataLogger.insertKickPlayer("debugmode", player.getDisplayName(), world, toKick.playerName, team.displayName, Util.getDate());
 	}
 	
@@ -127,7 +127,7 @@ public class GuildHandler {
 		PlayerTeamIndividual toPromote = PlayerTeamIndividual.get(teammate);
 		toPromote.promote();
 		
-		String world = player.dimension == 0 ? "Normal" : "Nether";
+		String world = Util.getDimensionString(player.dimension);
 		DataLogger.insertPromoteTeamPlayer("debugmode", player.getDisplayName(), world, team.displayName, teammate, Util.getDate());
 	}
 	
@@ -151,7 +151,7 @@ public class GuildHandler {
 		}else{
 			team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" is no longer a team leader.");
 			
-			String world = player.dimension == 0 ? "Normal" : "Nether";
+			String world = Util.getDimensionString(player.dimension);
 			DataLogger.insertPromoteTeamPlayer("debugmode", player.getDisplayName(), world, team.displayName, player.getDisplayName(), Util.getDate());
 		}
 		
@@ -180,7 +180,7 @@ public class GuildHandler {
 			System.out.println(pdata.joinTeam(newTeam.id, true).toString());
 			ClientPacketHandlerUtil.packetSyncTeams(Contained.teamData).sendToClients();
 			
-			String world = player.dimension == 0 ? "Normal" : "Nether";
+			String world = Util.getDimensionString(player.dimension);
 			DataLogger.insertCreateTeam("debugMode", pdata.playerName, world, newTeam.displayName, Util.getDate());
 		} else {
 			statusInfo = "Team Name Already In-Use";
@@ -222,7 +222,7 @@ public class GuildHandler {
 		
 		team.disbandTeam();
 		
-		String world = leader.dimension == 0 ? "Normal" : "Nether";
+		String world = Util.getDimensionString(leader.dimension);
 		DataLogger.insertDisbandTeam("debugmod", leader.getDisplayName(), world, team.displayName, Util.getDate());
 	}
 	
@@ -287,7 +287,7 @@ public class GuildHandler {
 			}		
 		}
 		
-		String world = player.dimension == 0 ? "Normal" : "Nether";
+		String world = Util.getDimensionString(player.dimension);
 		DataLogger.insertInvitePlayer("debugmode", player.getDisplayName(), world, newTeammate, team.displayName, Util.getDate());
 	}
 	
