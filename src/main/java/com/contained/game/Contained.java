@@ -59,8 +59,8 @@ public class Contained{
 	
 	// Locations of all blocks that are owned by a team.
 	// <Dimension ID, <Block Coordinate, Team ID>>
-	// [Server] Stores territory data for all dimensions.
-	// [Client] Stores territory data for client's current dimension.
+	// [SERVER] Stores territory data for all dimensions.
+	// [CLIENT] Stores territory data for client's current dimension.
 	//			(always uses ID 0 for the dimension)
 	public static HashMap<Integer, HashMap<Point, String>> territoryData; 
 	
@@ -71,7 +71,7 @@ public class Contained{
 	//			(always uses ID 0 for the dimension)
 	public static HashMap<Integer, ArrayList<PlayerTeam>>  teamData;      
 	
-	// Custom Mod-relevant data about players on the server.
+	// Custom mod-relevant data about players on the server.
 	// [SERVER] All tracked players, online and offline, even those not in teams.
 	// [CLIENT] Only the data on the local player, as well as display names 
 	//          and team IDs of others.
@@ -87,7 +87,19 @@ public class Contained{
 	// [SERVER] All pending team invitations.
 	// [CLIENT] Only invitations pertaining to the client player.
 	public static ArrayList<PlayerTeamInvitation> teamInvitations; 
-																   
+				
+	// Time left for a mini-game in a dimension.
+	// [SERVER] Time remaining for all active mini-game dimensions.
+	// [CLIENT] Time remaining for client player's current mini-game.
+	//			(always uses ID 0 for the dimension)
+	public static int[] timeLeft;
+	
+	// Is a mini-game running in the given dimension? Running means the
+	// game has started and the timer is counting down.
+	// [SERVER] Activity status of a game in all mini-game dimensions.
+	// [CLIENT] Activity status of the client player's current mini-game.
+	//	        (always uses ID 0 for the dimension)
+	public static boolean[] gameActive;
 	
 	
 	@EventHandler
@@ -110,6 +122,8 @@ public class Contained{
 		teamMemberData = new ArrayList<PlayerTeamIndividual>();
 		teamInvitations = new ArrayList<PlayerTeamInvitation>();
 		trades = new HashMap<Integer, ArrayList<PlayerTrade>>();
+		timeLeft = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
+		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
@@ -169,5 +183,13 @@ public class Contained{
 		if (!trades.containsKey(dimID))
 			trades.put(dimID, new ArrayList<PlayerTrade>());
 		return trades.get(dimID);
+	}
+	
+	public static void tickTimeLeft(int dimID) {
+		if (gameActive[dimID]) {
+			timeLeft[dimID] -= 1;
+			if (timeLeft[dimID] < 0)
+				timeLeft[dimID] = 0;
+		}
 	}
 }

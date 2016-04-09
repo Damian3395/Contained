@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.contained.game.data.Data;
-import com.contained.game.world.GenerateWorld;
 import com.contained.game.world.NullTeleporter;
 
 import net.minecraft.block.Block;
@@ -75,11 +74,8 @@ public class Util {
 	 * be treated as a finite overworld.
 	 */
 	public static boolean isOverworld(int dimID) {
-		if (dimID == 0  
-			|| (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
-			|| (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)) {
+		if (dimID == 0  || MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID))
 			return true;
-		}
 		return false;
 	}
 	
@@ -90,9 +86,9 @@ public class Util {
 			return "Nether";
 		else if (dimID == 1)
 			return "End";
-		else if (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
+		else if (MiniGameUtil.isPvP(dimID))
 			return "PvP";
-		else if (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)
+		else if (MiniGameUtil.isTreasure(dimID))
 			return "Treasure";
 		else return "Unknown";
 	}
@@ -104,6 +100,7 @@ public class Util {
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 					(EntityPlayerMP)player, dimID, new NullTeleporter(newWorld));
+			MiniGameUtil.startGame(dimID); //TODO: This is just for debug.
 		}
 	}
 	
@@ -136,6 +133,16 @@ public class Util {
 	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	
+	public static String getTimestamp(int ticks) {
+		int seconds = ticks/20;
+		int minutes = seconds/60;
+		int hours = minutes/60;
+		if (hours == 0)
+			return minutes+":"+String.format("%02d", seconds%60);
+		else
+			return hours+":"+String.format("%02d", minutes%60)+":"+String.format("%02d", seconds%60);
 	}
 	
 	@SuppressWarnings("unused")

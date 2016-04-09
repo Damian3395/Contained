@@ -24,8 +24,13 @@ public class Load {
 		 * Finite World Generation Data
 		 */
 		NBTTagCompound ntc = loadNBTFile("worldProperties"+dimID+".dat");
-		if (ntc != null)
+		if (ntc != null) {
 			Resources.worldRadius = ntc.getInteger("worldRadius");
+			if (ntc.hasKey("gameTime"))
+				Contained.timeLeft[dimID] = ntc.getInteger("gameTime");
+			if (ntc.hasKey("isActive"))
+				Contained.gameActive[dimID] = ntc.getBoolean("isActive");
+		}
 		int spawnX = w.getSpawnPoint().posX/16;
 		int spawnZ = w.getSpawnPoint().posZ/16;
 		Resources.numWorldChunks = 0;

@@ -64,6 +64,8 @@ public class ClientPacketHandlerUtil {
 	public static final int PLAYER_SPECTATOR = 39;
 	public static final int PLAYER_NORMAL = 40;
 	
+	public static final int MINIGAME_TIMER_SYNC = 41;
+	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
 		territoryPacket.writeInt(territoryData.size());
@@ -196,5 +198,11 @@ public class ClientPacketHandlerUtil {
 		if (playerServerEnt != null)
 			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(memberChanged).toPacket());
+	}
+	
+	public static void syncMinigameTime(int dimID) {
+		PacketCustom timePacket = new PacketCustom(Resources.MOD_ID, MINIGAME_TIMER_SYNC);
+		timePacket.writeInt(Contained.timeLeft[dimID]);
+		Contained.channel.sendToDimension(timePacket.toPacket(), dimID);
 	}
 }

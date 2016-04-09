@@ -17,9 +17,17 @@ public class Settings {
 	public int antiClaimDelay;
 	public int antiClaimRadius;
 	
+	public int treasureDuration;
+	public int pvpDuration;
+	
 	public Settings(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
+		
+		treasureDuration = config.getInt("treasureDuration", Configuration.CATEGORY_GENERAL, 2400, 1, 5000000, 
+				"Time (in seconds) that the Treasure Hunting mini-game lasts.");
+		pvpDuration = config.getInt("pvpDuration", Configuration.CATEGORY_GENERAL, 2400, 1, 5000000, 
+				"Time (in seconds) that the PvP mini-game lasts.");
 		
 		creativeOverride = config.getBoolean("creativeOverride", Configuration.CATEGORY_GENERAL, true, 
 				"Should a player in creative mode be exempt from the protection rules of a territory?");

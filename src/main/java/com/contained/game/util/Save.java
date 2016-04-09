@@ -27,6 +27,10 @@ public class Save {
 		//Save world generation data
 		NBTTagCompound ntc = new NBTTagCompound();
 		ntc.setInteger("worldRadius", Resources.worldRadius);
+		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID)) {
+			ntc.setInteger("gameTime", Contained.timeLeft[dimID]);
+			ntc.setBoolean("isActive", Contained.gameActive[dimID]);
+		}
 		saveNBTFile("worldProperties"+dimID+".dat", ntc);
 		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++)
 			GenerateWorld.getOreProperties(dimID, i).saveToFile(dimID);
