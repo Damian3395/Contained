@@ -125,4 +125,18 @@ public class Save {
 		}
 		return true;
 	}
+	
+	public static void removeDimFiles(int dimID) {
+		File saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "FiniteWorldData");
+		File territory = new File(saveDir, "territoryInfo"+dimID+".dat");
+		if (territory.exists())
+			territory.delete();
+		File world = new File(saveDir, "worldProperties"+dimID+".dat");
+		if (world.exists())
+			world.delete();
+		
+		GenerateWorld.getBiomeProperties(dimID).deleteFile(dimID);
+		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++)
+			GenerateWorld.getOreProperties(dimID, i).deleteFile(dimID);
+	}
 }

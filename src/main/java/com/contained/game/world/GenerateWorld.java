@@ -76,4 +76,12 @@ public class GenerateWorld {
 			biomeProperties.put(dimID, new BiomeProperties(defaultBiomeProperties));
 		return biomeProperties.get(dimID);
 	}
+	
+	public static void resetOreProperties(int dimID) {
+		oreSpawnProperties.remove(dimID);
+	}
+	
+	public static void resetBiomeProperties(int dimID) {
+		biomeProperties.remove(dimID);
+	}
 }

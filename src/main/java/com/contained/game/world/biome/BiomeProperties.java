@@ -1,6 +1,7 @@
 package com.contained.game.world.biome;
 
 import java.awt.Point;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import com.contained.game.util.Util;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 
 /**
@@ -160,6 +162,13 @@ public class BiomeProperties {
 		ntc.setIntArray("biomeMapIDs", biomeMapIDs);
 		
 		Save.saveNBTFile("biomeSpawning"+dimID+".dat", ntc);
+	}
+	
+	public void deleteFile(int dimID) {
+		File saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "FiniteWorldData");
+		File biome = new File(saveDir, "biomeSpawning"+dimID+".dat");
+		if (biome.exists())
+			biome.delete();
 	}
 	
 	// Loads from or generates a config file for all of the biome spawning properties.

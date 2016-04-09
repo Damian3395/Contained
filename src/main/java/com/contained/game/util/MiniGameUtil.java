@@ -1,5 +1,11 @@
 package com.contained.game.util;
 
+import java.util.ArrayList;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
+
 import com.contained.game.Contained;
 import com.contained.game.network.ClientPacketHandlerUtil;
 
@@ -38,5 +44,15 @@ public class MiniGameUtil {
 		// players) back to the lobby, clear any stale data regarding this game,
 		// and regenerate the dimension.
 		stopGame(dimID);
+		WorldServer w = DimensionManager.getWorld(dimID);
+		if (w != null) {
+			ArrayList<EntityPlayer> toTeleport = new ArrayList<EntityPlayer>();
+			for(Object p : w.playerEntities) {
+				if (p instanceof EntityPlayer)
+					toTeleport.add((EntityPlayer)p);
+			}
+			for(EntityPlayer p : toTeleport)
+				Util.travelToDimension(0, p);
+		}
 	}
 }
