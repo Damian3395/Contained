@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.List;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
@@ -118,7 +119,7 @@ public class ProtectionEvents {
 				}
 			}
 			
-			if (isSpecial) {
+			if (isSpecial && Contained.configs.harvestRequiresTerritory[Settings.getDimConfig(ev.world.provider.dimensionId)]) {
 				//This block type needs additional special permission checks.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(ev.getPlayer());
 				boolean canHarvest = true;
@@ -151,11 +152,13 @@ public class ProtectionEvents {
 					check.harvestBlock(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z, ev.world.getBlockMetadata(ev.x, ev.y, ev.z));
 					check.dropXpOnBlockBreak(ev.world, ev.x, ev.y, ev.z, ev.getExpToDrop());
 					
-					ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
-					TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
-					if (te != null && te instanceof HarvestedOreTE) {
-						HarvestedOreTE harvestTE = (HarvestedOreTE)te;
-						harvestTE.blockToRespawn = b;
+					if (Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
+						ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
+						TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
+						if (te != null && te instanceof HarvestedOreTE) {
+							HarvestedOreTE harvestTE = (HarvestedOreTE)te;
+							harvestTE.blockToRespawn = b;
+						}
 					}
 					ev.setCanceled(true);
 					break;
@@ -262,7 +265,7 @@ public class ProtectionEvents {
 				String territoryTeamID = Contained.getTerritoryMap(event.entityLiving.dimension).get(check);
 				if (victimTeam.equals(territoryTeamID)) {
 					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID, event.entityLiving.dimension);
-					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize)
+					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize[Settings.getDimConfig(event.entityLiving.dimension)])
 						shouldCancel = true;
 				}
 			}

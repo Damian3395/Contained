@@ -1,5 +1,7 @@
 package com.contained.game;
 
+import com.contained.game.util.MiniGameUtil;
+
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.common.config.Configuration;
 
@@ -7,15 +9,29 @@ import net.minecraftforge.common.config.Configuration;
  * Loads and stores information from the mod's configuration files.
  */
 public class Settings {	
-	public int largeTeamSize;
+	
 	public boolean creativeOverride;
 	
-	public int maxTeamSize;
-	public int flagXPCost;
-	public int claimDelay;
-	public int claimRadius;
-	public int antiClaimDelay;
-	public int antiClaimRadius;
+	public static final int OVERWORLD = 0;
+	public static final int MINIGAME = 1;
+	
+	public int[] maxTeamSize = new int[2];
+	public int[] flagXPCost = new int[2];
+	public int[] claimDelay = new int[2];
+	public int[] claimRadius = new int[2];
+	public int[] antiClaimDelay = new int[2];
+	public int[] antiClaimRadius = new int[2];
+	public int[] largeTeamSize = new int[2];
+	public int[] minOreRegen = new int[2];   //Min amount of time in seconds before ores regenerate.
+	public int[] maxOreRegen = new int[2];  //Max amount of time in seconds before ores regenerate.
+	
+	public int[] smallGemEXPCost = new int[2];
+	public int[] smallGemCount = new int[2];
+	public int[] bulkGemEXPCost = new int[2];
+	public int[] bulkGemCount = new int[2];
+	public int[] terrMachineEXPCost = new int[2];
+	
+	public boolean[] harvestRequiresTerritory = new boolean[2];
 	
 	public int treasureDuration;
 	public int pvpDuration;
@@ -28,25 +44,84 @@ public class Settings {
 				"Time (in seconds) that the Treasure Hunting mini-game lasts.");
 		pvpDuration = config.getInt("pvpDuration", Configuration.CATEGORY_GENERAL, 2400, 1, 5000000, 
 				"Time (in seconds) that the PvP mini-game lasts.");
-		
 		creativeOverride = config.getBoolean("creativeOverride", Configuration.CATEGORY_GENERAL, true, 
 				"Should a player in creative mode be exempt from the protection rules of a territory?");
-		largeTeamSize = config.getInt("largeTeamRequirement", Configuration.CATEGORY_GENERAL, 100, 0, 99999,
-				"How many blocks of land must a team own before their territory is vulnerable to invasion from other teams?");
-		maxTeamSize = config.getInt("maxTeamSize", Configuration.CATEGORY_GENERAL, 5, 1, 999, 
-				"What is the maximum player capacity of a team?");
-		flagXPCost = config.getInt("flagXPCost", Configuration.CATEGORY_GENERAL, 30, 0, 999, 
-				"How many Minecraft levels do you need to use the flag item?");
-		claimRadius = config.getInt("claimRadius", Configuration.CATEGORY_GENERAL, 2, 0, 10, 
-				"What is the radius, in blocks, that the Territory Machines can claim land?");
-		claimDelay = config.getInt("claimDelay", Configuration.CATEGORY_GENERAL, 90, 1, 60000, 
-				"How long, in seconds, does it take for the Territory Machine to claim a block of land?");
-		antiClaimRadius = config.getInt("antiClaimRadius", Configuration.CATEGORY_GENERAL, 2, 0, 10, 
-				"What is the radius, in blocks, that the Anti-Territory Machines can steal land?");
-		antiClaimDelay = config.getInt("antiClaimDelay", Configuration.CATEGORY_GENERAL, 90, 1, 60000, 
-				"How long, in seconds, does it take for the Anti-Territory Machine to steal a block of land?");
+		
+		for(int i=0; i<=1; i++) {
+			String category = "overworld_settings";
+			if (i == MINIGAME)
+				category = "minigame_settings";
+			
+			largeTeamSize[i] = config.getInt("largeTeamRequirement", category, 
+					defaultValue(i, 100, 0), 0, 99999,
+					"How many blocks of land must a team own before their territory is vulnerable to invasion from other teams?");
+			maxTeamSize[i] = config.getInt("maxTeamSize", category, 
+					defaultValue(i, 5, 5), 1, 999, 
+					"What is the maximum player capacity of a team?");
+			flagXPCost[i] = config.getInt("flagXPCost", category, 
+					defaultValue(i, 30, 10), 0, 999, 
+					"How many Minecraft levels do you need to use the flag item?");
+			claimRadius[i] = config.getInt("claimRadius", category, 
+					defaultValue(i, 2, 3), 0, 10, 
+					"What is the radius, in blocks, that the Territory Machines can claim land?");
+			claimDelay[i] = config.getInt("claimDelay", category, 
+					defaultValue(i, 90, 10), 1, 60000, 
+					"How long, in seconds, does it take for the Territory Machine to claim a block of land?");
+			antiClaimRadius[i] = config.getInt("antiClaimRadius", category, 
+					defaultValue(i, 2, 3), 0, 10, 
+					"What is the radius, in blocks, that the Anti-Territory Machines can steal land?");
+			antiClaimDelay[i] = config.getInt("antiClaimDelay", category, 
+					defaultValue(i, 90, 15), 1, 60000, 
+					"How long, in seconds, does it take for the Anti-Territory Machine to steal a block of land?");
+			minOreRegen[i] = config.getInt("minOreRegen", category, 
+					defaultValue(i, 5400, 0), 0, 5000000, 
+					"Minimum time (in seconds) before harvested ores regenerate.");
+			maxOreRegen[i] = config.getInt("maxOreRegen", category, 
+					defaultValue(i, 10000, 0), 0, 5000000, 
+					"Maximum time (in seconds) before harvested ores regenerate.");
+			harvestRequiresTerritory[i] = config.getBoolean("harvestTerritoryLock", category, 
+					defaultValue(i, true, false), 
+					"Are you only allowed to harvest ores in areas that you own the territory of?");
+			
+			smallGemEXPCost[i] = config.getInt("shopSmallGemCost", category, 
+					defaultValue(i, 1, 1), 1, 999, 
+					"How much EXP does it cost to purchase a territory gem? (small quantity)");
+			smallGemCount[i] = config.getInt("shopSmallGemCount", category, 
+					defaultValue(i, 1, 5), 1, 64, 
+					"How many territory gems do you get for the purchase? (small quantity)");
+			bulkGemEXPCost[i] = config.getInt("shopBulkGemCost", category, 
+					defaultValue(i, 7, 7), 1, 999, 
+					"How much EXP does it cost to purchase many territory gems? (bulk quantity)");
+			bulkGemCount[i] = config.getInt("shopBulkGemCount", category, 
+					defaultValue(i, 10, 50), 1, 64, 
+					"How many territory gems do you get for the purchase? (bulk quantity)");
+			terrMachineEXPCost[i] = config.getInt("shopTerrMachineCost", category, 
+					defaultValue(i, 30, 10), 1, 999, 
+					"How much EXP does it cost to purchase a territory machine?");
+		}
 		
 		config.save();
+	}
+	
+	private int defaultValue(int type, int overworldValue, int minigameValue) {
+		if (type == OVERWORLD)
+			return overworldValue;
+		else
+			return minigameValue;
+	}
+	
+	private boolean defaultValue(int type, boolean overworldValue, boolean minigameValue) {
+		if (type == OVERWORLD)
+			return overworldValue;
+		else
+			return minigameValue;
+	}
+	
+	public static int getDimConfig(int dimID) {
+		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID))
+			return MINIGAME;
+		else
+			return OVERWORLD;
 	}
 	
 }
