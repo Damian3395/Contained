@@ -1,6 +1,7 @@
 package com.contained.game.handler;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.Contained;
@@ -21,6 +22,7 @@ import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.BlockFurnace;
 import net.minecraft.block.BlockHopper;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
@@ -32,6 +34,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerBrewingStand;
 import net.minecraft.inventory.ContainerChest;
@@ -42,6 +45,7 @@ import net.minecraft.inventory.ContainerHopper;
 import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -149,7 +153,7 @@ public class ProtectionEvents {
 	                    if (itemstack.stackSize == 0)
 	                        ev.getPlayer().destroyCurrentEquippedItem();
 	                }
-					check.harvestBlock(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z, ev.world.getBlockMetadata(ev.x, ev.y, ev.z));
+					harvestBlock(ev.world, check, ev.getPlayer(), ev.x, ev.y, ev.z);
 					check.dropXpOnBlockBreak(ev.world, ev.x, ev.y, ev.z, ev.getExpToDrop());
 					
 					if (Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
@@ -159,12 +163,35 @@ public class ProtectionEvents {
 							HarvestedOreTE harvestTE = (HarvestedOreTE)te;
 							harvestTE.blockToRespawn = b;
 						}
-					}
+					} else
+						ev.world.setBlock(ev.x, ev.y, ev.z, Blocks.air);
 					ev.setCanceled(true);
 					break;
 				}
 			}
 		}
+	}
+	
+	public static void harvestBlock(World w, Block b, EntityPlayer p, int x, int y, int z) {
+		p.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock(b)], 1);
+		p.addExhaustion(0.025F);
+		int fortune = EnchantmentHelper.getFortuneModifier(p);
+		int meta = w.getBlockMetadata(x, y, z);
+		ArrayList<ItemStack> items;
+		if (b == Blocks.iron_ore || b == Blocks.gold_ore) {
+			items = new ArrayList<ItemStack>();
+			int count = Blocks.diamond_ore.quantityDropped(meta, fortune, w.rand);
+			for(int i=0; i<count; i++) {
+				if (b == Blocks.iron_ore)
+					items.add(new ItemStack(Items.iron_ingot, 1));
+				else if (b == Blocks.gold_ore)
+					items.add(new ItemStack(Items.gold_ingot, 1));
+			}
+		}
+		else
+			items = b.getDrops(w, x, y, z, meta, fortune);
+		for (ItemStack item : items)
+			Util.dropBlockAsItem(w, x, y, z, item);
 	}
 	
 	@SubscribeEvent

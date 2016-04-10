@@ -24,9 +24,7 @@ public class GenerateWorld {
 		wastelandBiome.load();
 	}
 	
-	public void preInit(FMLPreInitializationEvent event){
-		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-		config.load();
+	public void preInit(FMLPreInitializationEvent event, Configuration config){
 		Resources.worldRadius = config.getInt("worldSize", Configuration.CATEGORY_GENERAL, 30, 0, 500, "Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
 		
 		ResourceCluster.writeConfigComment(config);
@@ -55,7 +53,6 @@ public class GenerateWorld {
 		
 		BiomeProperties.writeConfigComment(config);
 		defaultBiomeProperties = BiomeProperties.generateFromConfig(config);
-		config.save();
 	}
 	
 	public static ResourceCluster getOreProperties(int dimID, int oreType) {

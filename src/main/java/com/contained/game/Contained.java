@@ -54,7 +54,7 @@ public class Contained{
 	public static FMLEventChannel channel; //For client -> server packets.
 	
 	public static Settings configs;
-	GenerateWorld world = new GenerateWorld();
+	public static GenerateWorld world = new GenerateWorld();
 	ContainedRegistry registry = new ContainedRegistry();
 	
 	// Locations of all blocks that are owned by a team.
@@ -104,7 +104,6 @@ public class Contained{
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
-		//event.registerServerCommand(new CommandDebugOreGen());
 		event.registerServerCommand(new CommandTeamChat());
 		event.registerServerCommand(new CommandBecomeAdmin());
 		event.registerServerCommand(new CommandCreate());
@@ -153,12 +152,9 @@ public class Contained{
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		new DataLogger();
-		registry.preInit(event);
-		configs = new Settings(event);
-		
+		registry.preInit(event);		
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
-		
-		world.preInit(event);
+		configs = new Settings(event);
 		proxy.registerRenderers(this);
 	}
 	

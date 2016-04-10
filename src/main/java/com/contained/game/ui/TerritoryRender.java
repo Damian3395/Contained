@@ -53,7 +53,7 @@ public class TerritoryRender {
 				//Render Time Limit
 				String time = "Time Left: "+Util.getTimestamp(Contained.timeLeft[0]);
 				mc.fontRenderer.drawStringWithShadow(time ,ev.resolution.getScaledWidth()
-						  -mc.fontRenderer.getStringWidth(time)-5, 5, 0xFFFFFF);
+						  -mc.fontRenderer.getStringWidth(time)-5, 5, 0xFFFFFFFF);
 			}
 		}
 	}

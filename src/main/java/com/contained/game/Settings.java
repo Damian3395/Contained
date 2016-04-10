@@ -32,6 +32,7 @@ public class Settings {
 	public int[] terrMachineEXPCost = new int[2];
 	
 	public boolean[] harvestRequiresTerritory = new boolean[2];
+	public boolean[] enableDowsing = new boolean[2];
 	
 	public int treasureDuration;
 	public int pvpDuration;
@@ -48,7 +49,7 @@ public class Settings {
 				"Should a player in creative mode be exempt from the protection rules of a territory?");
 		
 		for(int i=0; i<=1; i++) {
-			String category = "overworld_settings";
+			String category = "lobby_settings";
 			if (i == MINIGAME)
 				category = "minigame_settings";
 			
@@ -82,6 +83,9 @@ public class Settings {
 			harvestRequiresTerritory[i] = config.getBoolean("harvestTerritoryLock", category, 
 					defaultValue(i, true, false), 
 					"Are you only allowed to harvest ores in areas that you own the territory of?");
+			enableDowsing[i] = config.getBoolean("enableDowsing", category, 
+					defaultValue(i, false, true), 
+					"Give players access to the dowsing rod item for finding ore veins?");
 			
 			smallGemEXPCost[i] = config.getInt("shopSmallGemCost", category, 
 					defaultValue(i, 1, 1), 1, 999, 
@@ -99,6 +103,8 @@ public class Settings {
 					defaultValue(i, 30, 10), 1, 999, 
 					"How much EXP does it cost to purchase a territory machine?");
 		}
+		
+		Contained.world.preInit(event, config);
 		
 		config.save();
 	}

@@ -12,6 +12,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -93,6 +94,8 @@ public class Util {
 		else return "Unknown";
 	}
 	
+	// TODO: The player often spawns inside the ground when they teleport to
+	// another dimension. Fix this.
 	public static void travelToDimension(int dimID, EntityPlayer player) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
 			MinecraftServer mcServer = MinecraftServer.getServer();
@@ -257,4 +260,18 @@ public class Util {
 	public static float clamp(float val, float min, float max) {
 		return Math.max(Math.min(max, val), min);
 	}
+	
+    public static void dropBlockAsItem(World w, int x, int y, int z, ItemStack item)
+    {
+        if (!w.isRemote && w.getGameRules().getGameRuleBooleanValue("doTileDrops") && !w.restoringBlockSnapshots)
+        {
+            float f = 0.7F;
+            double d0 = (double)(w.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            double d1 = (double)(w.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            double d2 = (double)(w.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            EntityItem entityitem = new EntityItem(w, (double)x + d0, (double)y + d1, (double)z + d2, item);
+            entityitem.delayBeforeCanPickup = 10;
+            w.spawnEntityInWorld(entityitem);
+        }
+    }
 }

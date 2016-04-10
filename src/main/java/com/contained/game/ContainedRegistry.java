@@ -28,6 +28,7 @@ public class ContainedRegistry {
 	
 	public static ItemLife life;
 	public static ItemTerritory territoryItems;
+	public static DowsingRod oreDetector;
 	public static TerritoryFlag claimFlag;
 	public static SurveyClipboard surveyItem;
 	public static TutorialBook book;
@@ -58,6 +59,7 @@ public class ContainedRegistry {
 		
 		life = new ItemLife();
 		territoryItems = new ItemTerritory();
+		oreDetector = new DowsingRod();
 		claimFlag = new TerritoryFlag();
 		surveyItem = new SurveyClipboard();
 		book = new TutorialBook();

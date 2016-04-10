@@ -41,7 +41,7 @@ public class FMLEvents {
 		if (DimensionManager.getWorld(dimID) == null && !Contained.gameActive[dimID]) {
 			//Dimension is empty and the game is over.
 			File dimDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM"+dimID);
-			if (dimDir.exists()) {
+			if (dimDir.exists() && dimDir.isDirectory()) {
 				//...but the dimension still exists on disk.
 				//Remove it from disk.
 				
