@@ -58,31 +58,31 @@ public class BaseClass {
 	}
 	
 	public void render(){
-		this.gui.mc.fontRenderer.drawStringWithShadow("Class Perks", 
+		this.gui.mc.fontRenderer.drawString("Class Perks", 
 				(this.gui.width - this.gui.mc.fontRenderer.getStringWidth("Class Perks"))/2,
-				(this.gui.height/2)-100, Color.WHITE.hashCode());
+				(this.gui.height/2)-100, Color.BLACK.hashCode());
 		
 		int x = gui.width/2-60;
 		int y = gui.height/2;
 		
-		drawXP(x, y-90, collectorXP, Color.WHITE);
+		drawXP(x, y-90, collectorXP, Color.BLACK);
 		collectorBar.render();
 		
-		drawXP(x, y-60, builderXP, Color.WHITE);
+		drawXP(x, y-60, builderXP, Color.BLACK);
 		builderBar.render();
 		
-		drawXP(x, y-30, cookXP, Color.WHITE);
+		drawXP(x, y-30, cookXP, Color.BLACK);
 		cookBar.render();
 		
-		drawXP(x, y, wizardXP, Color.WHITE);
+		drawXP(x, y, wizardXP, Color.BLACK);
 		wizardBar.render();
 		
-		drawXP(x, y+30, warriorXP, Color.WHITE);
+		drawXP(x, y+30, warriorXP, Color.BLACK);
 		warriorBar.render();
 	}
 	
 	private void drawXP(int x, int y, int xp, Color color){
-		this.gui.mc.fontRenderer.drawStringWithShadow(xp + "/" + level, x - this.gui.mc.fontRenderer.getStringWidth(xp + "/" + level) - 10, y+5, Color.WHITE.hashCode());
+		this.gui.mc.fontRenderer.drawString(xp + "/" + level, x - this.gui.mc.fontRenderer.getStringWidth(xp + "/" + level) - 10, y+5, color.hashCode());
 	}
 	
 	public void actionPerformed(GuiButton button){

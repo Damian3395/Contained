@@ -72,17 +72,17 @@ public class BuilderClass {
 	}
 	
 	public void render(){
-		this.gui.mc.fontRenderer.drawStringWithShadow("The Builder", 
+		this.gui.mc.fontRenderer.drawString("The Builder", 
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("The Builder")/2),
-				(this.gui.height/2)-100, Color.WHITE.hashCode());
-		this.gui.mc.fontRenderer.drawStringWithShadow("LeveL: " + this.level,
+				(this.gui.height/2)-100, Color.BLACK.hashCode());
+		this.gui.mc.fontRenderer.drawString("LeveL: " + this.level,
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth("LeveL: " + this.level)/2) - 100,
-				gui.height/2+35, Color.WHITE.hashCode());
+				gui.height/2+35, Color.BLACK.hashCode());
 		
 		String xp = (this.builderXP < levelThree) ? this.builderXP + "/" + this.nextLevel : "MAX";
-		this.gui.mc.fontRenderer.drawStringWithShadow(xp, 
+		this.gui.mc.fontRenderer.drawString(xp, 
 				((this.gui.width)/2) - (this.gui.mc.fontRenderer.getStringWidth(xp)/2) + 80,
-				gui.height/2+35, Color.WHITE.hashCode());
+				gui.height/2+35, Color.BLACK.hashCode());
 		builder.render();
 	}
 	

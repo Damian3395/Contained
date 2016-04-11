@@ -1,4 +1,4 @@
-package com.contained.game.ui;
+package com.contained.game.ui.games;
 
 import com.contained.game.ui.components.Container;
 

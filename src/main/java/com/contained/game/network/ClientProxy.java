@@ -25,7 +25,7 @@ import net.minecraftforge.common.MinecraftForge;
 public class ClientProxy extends CommonProxy{
 	public static DataVisualization gui = new DataVisualization(Minecraft.getMinecraft());
 	public static TerritoryRender territory = new TerritoryRender();
-	public static GuiPVP pvp = new GuiPVP();
+	public static GuiPVP pvp = new GuiPVP(Minecraft.getMinecraft());
 	public static GuiTreasure treasure = new GuiTreasure();
 	
 	@Override

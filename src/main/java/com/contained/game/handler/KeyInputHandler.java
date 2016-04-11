@@ -4,6 +4,7 @@ import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.TerritoryRender;
+import com.contained.game.ui.games.GuiMiniGames;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -37,6 +38,10 @@ public class KeyInputHandler {
 			else
 				mc.thePlayer.closeScreen();
 		}
+		
+		if (KeyBindings.toggleMiniGames.isPressed())
+			mc.displayGuiScreen(new GuiMiniGames());
+		
 		if (KeyBindings.toggleTerritoryRender.isPressed())
 			territory.doRender = !territory.doRender;
 	}

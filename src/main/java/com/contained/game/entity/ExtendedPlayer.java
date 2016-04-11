@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import com.contained.game.data.Data;
 import com.contained.game.ui.ClassPerks;
+import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +30,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public boolean isAdmin = false;
 	public boolean isSpectator = false;
 	private boolean inGame = true;
+	public int gameMode = Resources.PVP_MODE;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
@@ -127,6 +130,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	
 	public void setLives(int lives){
 		this.lives = lives;
+	}
+	
+	public void setGameMode(int gameMode){
+		this.gameMode = gameMode;
 	}
 
 	@Override

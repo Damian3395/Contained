@@ -187,7 +187,7 @@ public class GuildBase {
 	}
 	
 	private void renderFont(int x, int y, String text, Color color){
-		this.gui.mc.fontRenderer.drawStringWithShadow(text, 
+		this.gui.mc.fontRenderer.drawString(text, 
 				(this.gui.width - this.gui.mc.fontRenderer.getStringWidth(text))/2 + x,
 				(this.gui.height/2) + y, color.hashCode());
 	}

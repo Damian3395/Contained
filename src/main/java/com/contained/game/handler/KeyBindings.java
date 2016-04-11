@@ -13,6 +13,7 @@ public class KeyBindings {
 	public static KeyBinding toggleTerritoryRender;
 	public static KeyBinding toggleClassPerks;
 	public static KeyBinding toggleGuild;
+	public static KeyBinding toggleMiniGames;
 	
 	public static void init() {
 		// Data Visualization GUI Container Keyboard Event Handler
@@ -38,5 +39,11 @@ public class KeyBindings {
 				, Keyboard.KEY_G
 				,"key.categories."+Resources.MOD_ID);
 		ClientRegistry.registerKeyBinding(toggleGuild);
+		
+		// Mini Games GUI Container Keyboard Event Handler
+		toggleMiniGames = new KeyBinding("key.miniGamesGui"
+				, Keyboard.KEY_L
+				, "key.categories."+Resources.MOD_ID);
+		ClientRegistry.registerKeyBinding(toggleMiniGames);
 	}
 }
