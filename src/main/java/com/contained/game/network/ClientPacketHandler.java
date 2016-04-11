@@ -24,6 +24,7 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -446,6 +447,15 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						playerState.setAdminRights(false);
 					if(playerState.isSpectator)
 						playerState.setSpectator(false);
+				break;
+				
+				case ClientPacketHandlerUtil.MINIGAME_TIMER_SYNC:
+					Contained.timeLeft[0] = packet.readInt();
+					if (Contained.timeLeft[0] == 0)
+						Contained.gameActive[0] = false;
+					else
+						Contained.gameActive[0] = true;
+				break;
 			}
 		}
 	}

@@ -5,11 +5,13 @@ import java.util.ArrayList;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
+import com.contained.game.Settings;
 import com.contained.game.data.Data;
 import com.contained.game.data.DataItemStack;
 import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.BlockInteractItem;
+import com.contained.game.item.DowsingRod;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandlerUtil;
@@ -30,7 +32,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -42,7 +43,6 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
@@ -63,12 +63,6 @@ public class PlayerEvents {
 				// time joining. Initialize their custom data.
 				Contained.teamMemberData.add(new PlayerTeamIndividual(joined.getDisplayName()));
 				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetNewPlayer(joined.getDisplayName()).toPacket());
-				
-				//Give first time players a tutorial book.
-				if (!joined.inventory.hasItem(ContainedRegistry.book))
-					event.world.spawnEntityInWorld(new EntityItem(event.world, 
-							joined.posX, joined.posY+1, joined.posZ, 
-							new ItemStack(ContainedRegistry.book, 1)));
 			}
 			else {
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined);
@@ -97,6 +91,20 @@ public class PlayerEvents {
 				event.world.spawnEntityInWorld(new EntityItem(event.world, 
 						joined.posX, joined.posY+1, joined.posZ, 
 						new ItemStack(SurveyClipboard.instance, 1)));
+			
+			//If dowsing is enabled, give the player a dowsing rod.
+			if (Contained.configs.enableDowsing[Settings.getDimConfig(joined.dimension)]
+					&& !joined.inventory.hasItem(DowsingRod.instance)) {
+				event.world.spawnEntityInWorld(new EntityItem(event.world, 
+						joined.posX, joined.posY+1, joined.posZ, 
+						new ItemStack(DowsingRod.instance, 1)));
+			}
+			
+			//Tutorial book
+			if (!joined.inventory.hasItem(ContainedRegistry.book))
+				event.world.spawnEntityInWorld(new EntityItem(event.world, 
+						joined.posX, joined.posY+1, joined.posZ, 
+						new ItemStack(ContainedRegistry.book, 1)));
 			
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);

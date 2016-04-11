@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.data.Data;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TerritoryFlag;
@@ -199,8 +200,8 @@ public class GuiTownManage extends GuiContainer {
 			listCounts[tabPermission] = localTeams.size()-1;
 		
 			//Territory Purchase Declarations
-			listItems[tabTerritory][0] = new ItemStack(ItemTerritory.addTerritory, 1);
-			listItems[tabTerritory][1] = new ItemStack(ItemTerritory.addTerritory, 10);
+			listItems[tabTerritory][0] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.smallGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
+			listItems[tabTerritory][1] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.bulkGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
 			listItems[tabTerritory][2] = new ItemStack(ItemTerritory.removeTerritory, 1);
 			NBTTagCompound itemData = Data.getTagCompound(listItems[tabTerritory][2]);
 			if (this.blockTeamID == null)
@@ -210,10 +211,13 @@ public class GuiTownManage extends GuiContainer {
 			listItems[tabTerritory][2].setTagCompound(itemData);
 			listItems[tabTerritory][3] = new ItemStack(TerritoryMachine.instance, 1);
 			
-			xpCosts[tabTerritory][0] = 1;
-			xpCosts[tabTerritory][1] = 8;
+			//TODO: Do some testing with this on the server. I think if the config
+			// file on the client and the config file on the server are not the
+			// same, this will allow the player to override the server configs.
+			xpCosts[tabTerritory][0] = Contained.configs.smallGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+			xpCosts[tabTerritory][1] = Contained.configs.bulkGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
 			xpCosts[tabTerritory][2] = -1;
-			xpCosts[tabTerritory][3] = 30;
+			xpCosts[tabTerritory][3] = Contained.configs.terrMachineEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
 			
 			itemCosts[tabTerritory][0] = null;
 			itemCosts[tabTerritory][1] = null;

@@ -7,6 +7,7 @@ import java.util.List;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.components.GuiScrollPane;
@@ -270,7 +271,7 @@ public class GuildLeader {
 		disband.visible = true;
 		teamColor.visible = true;
 		invite.visible = true;
-		if(team.numMembers() == Contained.configs.maxTeamSize){
+		if(team.numMembers() == Contained.configs.maxTeamSize[Settings.getDimConfig(team.dimID)]){
 			invite.enabled = false;
 			renderFont(0, -80, "Max Players Reached", Color.YELLOW);
 		}

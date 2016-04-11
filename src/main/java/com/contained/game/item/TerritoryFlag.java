@@ -3,6 +3,7 @@ package com.contained.game.item;
 import java.awt.Point;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -96,7 +97,7 @@ public class TerritoryFlag {
 					return;
 				}
 				
-				int flagXPCost = Contained.configs.flagXPCost;
+				int flagXPCost = Contained.configs.flagXPCost[Settings.getDimConfig(p.dimension)];
 				PlayerTeam team = PlayerTeam.get(playerData.teamID, p.dimension);
 				if (team.territoryCount() == 0)
 					flagXPCost = 0; //First usage of the flag should be free.

@@ -1,9 +1,11 @@
 package com.contained.game.handler;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
@@ -20,6 +22,7 @@ import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.BlockFurnace;
 import net.minecraft.block.BlockHopper;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
@@ -31,6 +34,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerBrewingStand;
 import net.minecraft.inventory.ContainerChest;
@@ -41,6 +45,7 @@ import net.minecraft.inventory.ContainerHopper;
 import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -118,7 +123,7 @@ public class ProtectionEvents {
 				}
 			}
 			
-			if (isSpecial) {
+			if (isSpecial && Contained.configs.harvestRequiresTerritory[Settings.getDimConfig(ev.world.provider.dimensionId)]) {
 				//This block type needs additional special permission checks.
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(ev.getPlayer());
 				boolean canHarvest = true;
@@ -148,20 +153,45 @@ public class ProtectionEvents {
 	                    if (itemstack.stackSize == 0)
 	                        ev.getPlayer().destroyCurrentEquippedItem();
 	                }
-					check.harvestBlock(ev.world, ev.getPlayer(), ev.x, ev.y, ev.z, ev.world.getBlockMetadata(ev.x, ev.y, ev.z));
+					harvestBlock(ev.world, check, ev.getPlayer(), ev.x, ev.y, ev.z);
 					check.dropXpOnBlockBreak(ev.world, ev.x, ev.y, ev.z, ev.getExpToDrop());
 					
-					ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
-					TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
-					if (te != null && te instanceof HarvestedOreTE) {
-						HarvestedOreTE harvestTE = (HarvestedOreTE)te;
-						harvestTE.blockToRespawn = b;
-					}
+					if (Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
+						ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
+						TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
+						if (te != null && te instanceof HarvestedOreTE) {
+							HarvestedOreTE harvestTE = (HarvestedOreTE)te;
+							harvestTE.blockToRespawn = b;
+						}
+					} else
+						ev.world.setBlock(ev.x, ev.y, ev.z, Blocks.air);
 					ev.setCanceled(true);
 					break;
 				}
 			}
 		}
+	}
+	
+	public static void harvestBlock(World w, Block b, EntityPlayer p, int x, int y, int z) {
+		p.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock(b)], 1);
+		p.addExhaustion(0.025F);
+		int fortune = EnchantmentHelper.getFortuneModifier(p);
+		int meta = w.getBlockMetadata(x, y, z);
+		ArrayList<ItemStack> items;
+		if (b == Blocks.iron_ore || b == Blocks.gold_ore) {
+			items = new ArrayList<ItemStack>();
+			int count = Blocks.diamond_ore.quantityDropped(meta, fortune, w.rand);
+			for(int i=0; i<count; i++) {
+				if (b == Blocks.iron_ore)
+					items.add(new ItemStack(Items.iron_ingot, 1));
+				else if (b == Blocks.gold_ore)
+					items.add(new ItemStack(Items.gold_ingot, 1));
+			}
+		}
+		else
+			items = b.getDrops(w, x, y, z, meta, fortune);
+		for (ItemStack item : items)
+			Util.dropBlockAsItem(w, x, y, z, item);
 	}
 	
 	@SubscribeEvent
@@ -262,7 +292,7 @@ public class ProtectionEvents {
 				String territoryTeamID = Contained.getTerritoryMap(event.entityLiving.dimension).get(check);
 				if (victimTeam.equals(territoryTeamID)) {
 					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID, event.entityLiving.dimension);
-					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize)
+					if (territoryTeam.territoryCount() < Contained.configs.largeTeamSize[Settings.getDimConfig(event.entityLiving.dimension)])
 						shouldCancel = true;
 				}
 			}

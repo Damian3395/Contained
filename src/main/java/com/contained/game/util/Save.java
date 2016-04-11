@@ -26,7 +26,11 @@ public class Save {
 	public static void saveWorldData(int dimID) {
 		//Save world generation data
 		NBTTagCompound ntc = new NBTTagCompound();
-		ntc.setInteger("worldRadius", Resources.worldRadius);
+		ntc.setInteger("worldRadius", Contained.configs.getWorldRadius(dimID));
+		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID)) {
+			ntc.setInteger("gameTime", Contained.timeLeft[dimID]);
+			ntc.setBoolean("isActive", Contained.gameActive[dimID]);
+		}
 		saveNBTFile("worldProperties"+dimID+".dat", ntc);
 		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++)
 			GenerateWorld.getOreProperties(dimID, i).saveToFile(dimID);
@@ -120,5 +124,19 @@ public class Save {
 			return false;
 		}
 		return true;
+	}
+	
+	public static void removeDimFiles(int dimID) {
+		File saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "FiniteWorldData");
+		File territory = new File(saveDir, "territoryInfo"+dimID+".dat");
+		if (territory.exists())
+			territory.delete();
+		File world = new File(saveDir, "worldProperties"+dimID+".dat");
+		if (world.exists())
+			world.delete();
+		
+		GenerateWorld.getBiomeProperties(dimID).deleteFile(dimID);
+		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++)
+			GenerateWorld.getOreProperties(dimID, i).deleteFile(dimID);
 	}
 }

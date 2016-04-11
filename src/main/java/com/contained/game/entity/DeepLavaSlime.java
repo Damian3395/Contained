@@ -21,7 +21,7 @@ public class DeepLavaSlime {
 		mobid = entityID;
 		EntityRegistry.registerGlobalEntityID(DeepLavaSlime.EntityDeepLavaSlime.class, "deepLavaSlime", entityID);
 		EntityRegistry.registerModEntity(DeepLavaSlime.EntityDeepLavaSlime.class, "deepLavaSlime", entityID, instance, 64, 1, true);
-		EntityRegistry.addSpawn(DeepLavaSlime.EntityDeepLavaSlime.class, 100, 2, 4, EnumCreatureType.monster, Util.getBiomesArray());
+		EntityRegistry.addSpawn(DeepLavaSlime.EntityDeepLavaSlime.class, 50, 2, 4, EnumCreatureType.monster, Util.getBiomesArray());
 	}
 
 	public static class EntityDeepLavaSlime extends EntityMagmaCube

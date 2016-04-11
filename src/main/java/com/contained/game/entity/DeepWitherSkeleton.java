@@ -23,7 +23,7 @@ public class DeepWitherSkeleton {
 		mobid = entityID;
 		EntityRegistry.registerGlobalEntityID(DeepWitherSkeleton.EntityDeepWitherSkeleton.class, "deepWitherSkeleton", entityID);
 		EntityRegistry.registerModEntity(DeepWitherSkeleton.EntityDeepWitherSkeleton.class, "deepWitherSkeleton", entityID, instance, 64, 1, true);
-		EntityRegistry.addSpawn(DeepWitherSkeleton.EntityDeepWitherSkeleton.class, 100, 2, 4, EnumCreatureType.monster, Util.getBiomesArray());
+		EntityRegistry.addSpawn(DeepWitherSkeleton.EntityDeepWitherSkeleton.class, 150, 2, 4, EnumCreatureType.monster, Util.getBiomesArray());
 	}
 
 	public static class EntityDeepWitherSkeleton extends EntitySkeleton
@@ -31,7 +31,6 @@ public class DeepWitherSkeleton {
 		public EntityDeepWitherSkeleton(World w) {
 			super(w);
 			setSkeletonType(1);
-			this.setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
 		}
 		
 		@Override
@@ -42,6 +41,20 @@ public class DeepWitherSkeleton {
 		@Override
 		public boolean getCanSpawnHere() {
 			return this.posY <= 24;
+		}
+		
+		@Override
+		public void addRandomArmor() {
+			super.addRandomArmor();
+			if (Math.random() <= 0.5) {
+				double rand = Math.random();
+				if (rand <= 0.5)
+					this.setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
+				else if (rand <= 0.85)
+					this.setCurrentItemOrArmor(0, new ItemStack(Items.iron_sword));
+				else
+					this.setCurrentItemOrArmor(0, new ItemStack(Items.diamond_sword));
+			}
 		}
 	}
 }

@@ -11,7 +11,7 @@ import net.minecraft.item.*;
 import net.minecraft.world.World;
 
 /**
- * Item for claiming a new sector of territory.
+ * Item for accessing the personality survey GUI.
  */
 public class SurveyClipboard {
 	public SurveyClipboard(){}

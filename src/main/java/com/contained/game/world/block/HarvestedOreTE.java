@@ -1,6 +1,7 @@
 package com.contained.game.world.block;
 
-import com.contained.game.util.Resources;
+import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.util.Util;
 
 import net.minecraft.block.Block;
@@ -22,7 +23,8 @@ public class HarvestedOreTE extends TileEntity {
 	
 	public HarvestedOreTE() {
 		super();
-		expireTime = System.currentTimeMillis()+1000L*Util.randomRange(Resources.minOreRegen, Resources.maxOreRegen);
+		int dimConfig = Settings.getDimConfig(this.worldObj.provider.dimensionId);
+		expireTime = System.currentTimeMillis()+1000L*Util.randomRange(Contained.configs.minOreRegen[dimConfig], Contained.configs.maxOreRegen[dimConfig]);
 	}
 	
 	@Override

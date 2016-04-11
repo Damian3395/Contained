@@ -7,6 +7,7 @@ import java.util.Collections;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
@@ -44,13 +45,14 @@ public class TerritoryMachineTE extends TileEntity {
 		this.shouldClaim = mode;
 		this.teamID = null;
 		this.renderColor = 0xFFFFFF;
+		int dimID = this.worldObj.provider.dimensionId;
 		
 		if (shouldClaim) {
-			this.claimDelay = Contained.configs.claimDelay*20;
-			this.claimRadius = Contained.configs.claimRadius;
+			this.claimDelay = Contained.configs.claimDelay[Settings.getDimConfig(dimID)]*20;
+			this.claimRadius = Contained.configs.claimRadius[Settings.getDimConfig(dimID)];
 		} else {
-			this.claimDelay = Contained.configs.antiClaimDelay*20;
-			this.claimRadius = Contained.configs.antiClaimRadius;
+			this.claimDelay = Contained.configs.antiClaimDelay[Settings.getDimConfig(dimID)]*20;
+			this.claimRadius = Contained.configs.antiClaimRadius[Settings.getDimConfig(dimID)];
 		}
 	}
 	

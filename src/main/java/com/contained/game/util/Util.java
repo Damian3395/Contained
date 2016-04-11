@@ -5,14 +5,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.contained.game.Contained;
 import com.contained.game.data.Data;
-import com.contained.game.world.GenerateWorld;
 import com.contained.game.world.NullTeleporter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -64,9 +65,8 @@ public class Util {
 		float spawnZ = w.getSpawnPoint().posZ/16;
 		float distDiff = Util.euclidDist(spawnX, spawnZ, chunkX, chunkZ);
 		
-		if (distDiff > Resources.worldRadius) {
-			return Math.min(1f, (distDiff-Resources.worldRadius)/5f);
-		}
+		if (distDiff > Contained.configs.getWorldRadius(w.provider.dimensionId))
+			return Math.min(1f, (distDiff-Contained.configs.getWorldRadius(w.provider.dimensionId))/(float)Resources.wastelandPadding);
 		return 0;
 	}
 	
@@ -75,11 +75,8 @@ public class Util {
 	 * be treated as a finite overworld.
 	 */
 	public static boolean isOverworld(int dimID) {
-		if (dimID == 0  
-			|| (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
-			|| (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)) {
+		if (dimID == 0  || MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID))
 			return true;
-		}
 		return false;
 	}
 	
@@ -90,13 +87,15 @@ public class Util {
 			return "Nether";
 		else if (dimID == 1)
 			return "End";
-		else if (dimID >= Resources.MIN_PVP_DIMID && dimID <= Resources.MAX_PVP_DIMID)
+		else if (MiniGameUtil.isPvP(dimID))
 			return "PvP";
-		else if (dimID >= Resources.MIN_TREASURE_DIMID && dimID <= Resources.MAX_TREASURE_DIMID)
+		else if (MiniGameUtil.isTreasure(dimID))
 			return "Treasure";
 		else return "Unknown";
 	}
 	
+	// TODO: The player often spawns inside the ground when they teleport to
+	// another dimension. Fix this.
 	public static void travelToDimension(int dimID, EntityPlayer player) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
 			MinecraftServer mcServer = MinecraftServer.getServer();
@@ -104,6 +103,7 @@ public class Util {
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 					(EntityPlayerMP)player, dimID, new NullTeleporter(newWorld));
+			MiniGameUtil.startGame(dimID); //TODO: This is just for debug.
 		}
 	}
 	
@@ -136,6 +136,16 @@ public class Util {
 	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	
+	public static String getTimestamp(int ticks) {
+		int seconds = ticks/20;
+		int minutes = seconds/60;
+		int hours = minutes/60;
+		if (hours == 0)
+			return minutes+":"+String.format("%02d", seconds%60);
+		else
+			return hours+":"+String.format("%02d", minutes%60)+":"+String.format("%02d", seconds%60);
 	}
 	
 	@SuppressWarnings("unused")
@@ -250,4 +260,18 @@ public class Util {
 	public static float clamp(float val, float min, float max) {
 		return Math.max(Math.min(max, val), min);
 	}
+	
+    public static void dropBlockAsItem(World w, int x, int y, int z, ItemStack item)
+    {
+        if (!w.isRemote && w.getGameRules().getGameRuleBooleanValue("doTileDrops") && !w.restoringBlockSnapshots)
+        {
+            float f = 0.7F;
+            double d0 = (double)(w.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            double d1 = (double)(w.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            double d2 = (double)(w.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            EntityItem entityitem = new EntityItem(w, (double)x + d0, (double)y + d1, (double)z + d2, item);
+            entityitem.delayBeforeCanPickup = 10;
+            w.spawnEntityInWorld(entityitem);
+        }
+    }
 }

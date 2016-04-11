@@ -232,6 +232,13 @@ public static final String oreGenCategory = "oreGen";
 		}
 	}
 	
+	public void deleteFile(int dimID) {
+		File saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "OreGen");
+		File save = new File(saveDir, type.getUnlocalizedName()+"_"+dimID+".dat");
+		if (save.exists())
+			save.delete();
+	}
+	
 	// Loads from or generates a config file for all of the ore generation
 	// properties dealing with this specific cluster gen.
 	public static ResourceCluster generateFromConfig(Configuration c,

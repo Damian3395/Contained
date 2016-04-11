@@ -3,6 +3,7 @@ package com.contained.game.user;
 import java.util.ArrayList;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.SurveyData;
 import com.contained.game.util.ErrorCase;
@@ -60,7 +61,7 @@ public class PlayerTeamIndividual {
 			PlayerTeam requestedTeam = PlayerTeam.get(teamID);
 			if (requestedTeam == null)
 				return Error.NOT_EXISTS; //Team doesn't exist.
-			else if (requestedTeam.numMembers() >= Contained.configs.maxTeamSize)
+			else if (requestedTeam.numMembers() >= Contained.configs.maxTeamSize[Settings.getDimConfig(requestedTeam.dimID)])
 				return Error.TEAM_FULL; //Team is full.
 			
 			this.teamID = teamID;
