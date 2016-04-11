@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.contained.game.Contained;
 import com.contained.game.util.Load;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Save;
@@ -56,7 +57,7 @@ public class BiomeProperties {
 		Collections.shuffle(biomeGenOrdering);
 		untilNextBiome = 0;
 		biomeGenOrdering.add(0, null); //dummy: will be removed by the until initialization
-		updateUntil();
+		updateUntil(w);
 		
 		//Start the recursive mapping
 		int spawnX = w.getSpawnPoint().posX/16;
@@ -88,28 +89,28 @@ public class BiomeProperties {
 				recursiveBiomeMap(w, probe.x, probe.y, probe);
 		}
 		
-		biomeMapping.put(myPoint, getNextBiome());
+		biomeMapping.put(myPoint, getNextBiome(w));
 	}
 	
 	//Returns the next biome that should be used for generation.
-	private BiomeGenBase getNextBiome() {
+	private BiomeGenBase getNextBiome(World w) {
 		BiomeGenBase next = null;
 		if (biomeGenOrdering.size() == 0)
 			return BiomeGenBase.plains;
 		else {
 			next = biomeGenOrdering.get(0);
-			updateUntil();
+			updateUntil(w);
 		}
 		return next;
 	}
 	
 	//Tracks the amount of generated chunks until the next biome type should be used.
-	private void updateUntil() {
+	private void updateUntil(World w) {
 		untilNextBiome--;
 		if (untilNextBiome <= 0) {
 			biomeGenOrdering.remove(0);
 			if (biomeGenOrdering.size() != 0)
-				this.untilNextBiome = (Resources.numWorldChunks/numBiomeGens)
+				this.untilNextBiome = (Contained.configs.getNumChunks(w.provider.dimensionId)/numBiomeGens)
 											*numOccurences.get(biomeGenOrdering.get(0));
 		}
 	}

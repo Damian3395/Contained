@@ -25,26 +25,15 @@ public class Load {
 		 */
 		NBTTagCompound ntc = loadNBTFile("worldProperties"+dimID+".dat");
 		if (ntc != null) {
-			Resources.worldRadius = ntc.getInteger("worldRadius");
+			Contained.configs.setWorldRadius(dimID, ntc.getInteger("worldRadius"));
 			if (ntc.hasKey("gameTime"))
 				Contained.timeLeft[dimID] = ntc.getInteger("gameTime");
 			if (ntc.hasKey("isActive"))
 				Contained.gameActive[dimID] = ntc.getBoolean("isActive");
 		}
-		int spawnX = w.getSpawnPoint().posX/16;
-		int spawnZ = w.getSpawnPoint().posZ/16;
-		Resources.numWorldChunks = 0;
-		for(int chunkX=spawnX-(Resources.worldRadius+Resources.wastelandPadding); 
-				chunkX<=spawnX+(Resources.worldRadius+Resources.wastelandPadding); chunkX++) {
-			for(int chunkZ=spawnZ-(Resources.worldRadius+Resources.wastelandPadding); 
-					chunkZ<=spawnZ+(Resources.worldRadius+Resources.wastelandPadding); chunkZ++) {
-				if (Util.isWasteland(w, chunkX, chunkZ) != 1)
-					Resources.numWorldChunks++;
-			}
-		}
 		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++) {
 			GenerateWorld.getOreProperties(dimID, i).loadFromFile(dimID);
-			GenerateWorld.getOreProperties(dimID, i).determineAllChunks(w, Resources.worldRadius);	
+			GenerateWorld.getOreProperties(dimID, i).determineAllChunks(w, Contained.configs.getWorldRadius(dimID));	
 		}
 		
 		GenerateWorld.getBiomeProperties(dimID).loadFromFile(w, dimID);

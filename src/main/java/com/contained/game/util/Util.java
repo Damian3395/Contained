@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.world.NullTeleporter;
 
@@ -64,9 +65,8 @@ public class Util {
 		float spawnZ = w.getSpawnPoint().posZ/16;
 		float distDiff = Util.euclidDist(spawnX, spawnZ, chunkX, chunkZ);
 		
-		if (distDiff > Resources.worldRadius) {
-			return Math.min(1f, (distDiff-Resources.worldRadius)/5f);
-		}
+		if (distDiff > Contained.configs.getWorldRadius(w.provider.dimensionId))
+			return Math.min(1f, (distDiff-Contained.configs.getWorldRadius(w.provider.dimensionId))/(float)Resources.wastelandPadding);
 		return 0;
 	}
 	

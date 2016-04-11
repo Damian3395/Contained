@@ -24,9 +24,7 @@ public class GenerateWorld {
 		wastelandBiome.load();
 	}
 	
-	public void preInit(FMLPreInitializationEvent event, Configuration config){
-		Resources.worldRadius = config.getInt("worldSize", Configuration.CATEGORY_GENERAL, 30, 0, 500, "Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
-		
+	public void preInit(FMLPreInitializationEvent event, Configuration config){		
 		ResourceCluster.writeConfigComment(config);
 		defaultOreProperties = new ResourceCluster[Resources.NUM_MINERALS];
 		defaultOreProperties[Resources.GLOWSTONE] = ResourceCluster.generateFromConfig(config, 

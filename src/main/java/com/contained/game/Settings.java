@@ -1,8 +1,11 @@
 package com.contained.game;
 
 import com.contained.game.util.MiniGameUtil;
+import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 /**
@@ -37,6 +40,13 @@ public class Settings {
 	public int treasureDuration;
 	public int pvpDuration;
 	
+	public int worldRadius;
+	public int pvpRadius;
+	public int treasureRadius;
+	public int numWorldChunks; //Total number of chunks in the finite world.
+	public int numPvPChunks;
+	public int numTreasureChunks;
+	
 	public Settings(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
@@ -52,6 +62,19 @@ public class Settings {
 			String category = "lobby_settings";
 			if (i == MINIGAME)
 				category = "minigame_settings";
+			
+			if (i == OVERWORLD)
+				worldRadius = config.getInt("worldSize", category, 
+					40, 0, 500, 
+					"Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
+			else if (i == MINIGAME) {
+				pvpRadius = config.getInt("pvpWorldSize", category, 
+					15, 0, 500, 
+					"Radius of the PvP worlds in chunks (16x16 blocks), centered around spawn.");
+				treasureRadius = config.getInt("treasureWorldSize", category, 
+					25, 0, 500, 
+					"Radius of the treasure hunting worlds in chunks (16x16 blocks), centered around spawn.");
+			}
 			
 			largeTeamSize[i] = config.getInt("largeTeamRequirement", category, 
 					defaultValue(i, 100, 0), 0, 99999,
@@ -104,6 +127,7 @@ public class Settings {
 					"How much EXP does it cost to purchase a territory machine?");
 		}
 		
+		recalculateNumChunks();		
 		Contained.world.preInit(event, config);
 		
 		config.save();
@@ -128,6 +152,54 @@ public class Settings {
 			return MINIGAME;
 		else
 			return OVERWORLD;
+	}
+	
+	public int getWorldRadius(int dimID) {
+		if (MiniGameUtil.isPvP(dimID))
+			return pvpRadius;
+		else if (MiniGameUtil.isTreasure(dimID))
+			return treasureRadius;
+		else
+			return worldRadius;
+	}
+	
+	public void setWorldRadius(int dimID, int radius) {
+		if (MiniGameUtil.isPvP(dimID))
+			pvpRadius = radius;
+		else if (MiniGameUtil.isTreasure(dimID))
+			treasureRadius = radius;
+		else
+			worldRadius = radius;	
+		recalculateNumChunks();
+	}
+	
+	public int getNumChunks(int dimID) {
+		if (MiniGameUtil.isPvP(dimID))
+			return numPvPChunks;
+		else if (MiniGameUtil.isTreasure(dimID))
+			return numTreasureChunks;
+		else
+			return numWorldChunks;
+	}
+	
+	private void recalculateNumChunks() {
+		numWorldChunks = 0;
+		numPvPChunks = 0;
+		numTreasureChunks = 0;
+		int maxRadius = Math.max(Math.max(worldRadius, pvpRadius), treasureRadius);
+		for(int chunkX=-(maxRadius+Resources.wastelandPadding); 
+				chunkX<=(maxRadius+Resources.wastelandPadding); chunkX++) {
+			for(int chunkZ=-(maxRadius+Resources.wastelandPadding); 
+					chunkZ<=(maxRadius+Resources.wastelandPadding); chunkZ++) {
+				float distDiff = Util.euclidDist(0, 0, chunkX, chunkZ);
+				if (distDiff <= (worldRadius+Resources.wastelandPadding))
+					numWorldChunks++;
+				if (distDiff <= (pvpRadius+Resources.wastelandPadding))
+					numPvPChunks++;
+				if (distDiff <= (treasureRadius+Resources.wastelandPadding))
+					numTreasureChunks++;
+			}
+		}
 	}
 	
 }
