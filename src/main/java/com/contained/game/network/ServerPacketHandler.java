@@ -28,6 +28,7 @@ public class ServerPacketHandler {
 	private GuildHandler guild = new GuildHandler();
 	private PerkHandler perk = new PerkHandler();
 	private TradeHandler trade = new TradeHandler();
+	private MiniGameHandler games = new MiniGameHandler();
 	
 	@SubscribeEvent
 	public void handlePacket(ServerCustomPacketEvent event) {		
@@ -144,6 +145,14 @@ public class ServerPacketHandler {
 				case ServerPacketHandlerUtil.UPDATE_SURVEY:
 					PlayerTeamIndividual toUpdate = PlayerTeamIndividual.get(packet.readString());
 					toUpdate.surveyResponses.readFromNBT(packet.readNBTTagCompound());
+				break;
+				
+				case ServerPacketHandlerUtil.JOIN_MINI_GAME:
+					games.joinMiniGame(player);
+				break;
+				
+				case ServerPacketHandlerUtil.CANCEL_JOIN_MINI_GAME:
+					games.cancelMiniGame(player);
 				break;
 			}
 		}

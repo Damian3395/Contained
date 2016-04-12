@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
-import com.contained.game.world.NullTeleporter;
+import com.contained.game.world.GameTeleporter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
@@ -102,7 +102,7 @@ public class Util {
 			WorldServer newWorld = mcServer.worldServerForDimension(dimID);
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
-					(EntityPlayerMP)player, dimID, new NullTeleporter(newWorld));
+					(EntityPlayerMP)player, dimID, new GameTeleporter(newWorld));
 			MiniGameUtil.startGame(dimID); //TODO: This is just for debug.
 		}
 	}

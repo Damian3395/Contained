@@ -18,6 +18,10 @@ public class Resources {
 	public static final int MIN_TREASURE_DIMID = 10;
 	public static final int MAX_TREASURE_DIMID = 13;
 	
+	public static final int MAX_MINI_GAME_TEAM_SIZE = 5;
+	public static final int MAX_PVP_GAMES = 5;
+	public static final int MAX_TREASURE_GAMES = 5;
+	
 	public static final int FREE_PLAY = -1;
 	public static final int PVP_MODE = 0;
 	public static final int TREASURE_MODE = 1;

@@ -7,9 +7,8 @@ import net.minecraft.world.WorldServer;
 /**
  * A teleportation between dimensions that doesn't require a portal.
  */
-public class NullTeleporter extends Teleporter {
-
-	public NullTeleporter(WorldServer server) {
+public class GameTeleporter extends Teleporter {
+	public GameTeleporter(WorldServer server) {
 		super(server);
 	}
 	

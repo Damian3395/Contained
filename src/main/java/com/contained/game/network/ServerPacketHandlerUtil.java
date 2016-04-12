@@ -38,6 +38,8 @@ public class ServerPacketHandlerUtil {
 	public static final int CANCEL_TRADE = 21;
 	
 	public static final int UPDATE_SURVEY = 22;
+	public static final int JOIN_MINI_GAME = 23;
+	public static final int CANCEL_JOIN_MINI_GAME = 24;
 	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);

@@ -1,5 +1,6 @@
 package com.contained.game;
 
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.DimensionManager;
 import mantle.client.MProxyClient;
@@ -74,6 +75,10 @@ public class ContainedRegistry {
 		MantleClientRegistry.registerManualIcon(ItemTerritory.removeTerritoryName, new ItemStack(ItemTerritory.removeTerritory, 1));
 		MantleClientRegistry.registerManualIcon(AntiTerritoryMachine.blockName, new ItemStack(AntiTerritoryMachine.instance, 1));
 		MantleClientRegistry.registerManualIcon(TerritoryMachine.blockName, new ItemStack(TerritoryMachine.instance, 1));
+		MantleClientRegistry.registerManualIcon("guild", new ItemStack(Items.diamond_sword, 1));
+		MantleClientRegistry.registerManualIcon("occupation", new ItemStack(Items.baked_potato, 1));
+		MantleClientRegistry.registerManualIcon("xp", new ItemStack(Items.experience_bottle, 1));
+		MantleClientRegistry.registerManualIcon("miniGame", new ItemStack(Items.blaze_powder, 1));
 		MProxyClient.registerManualPage("toolpage", ToolPage.class);
 		
 		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");

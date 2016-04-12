@@ -48,9 +48,11 @@ public class ClassPerks extends GuiScreen{
 	
 	@Override
 	public void initGui(){
-		selectedClass = ExtendedPlayer.get(mc.thePlayer).getOccupationClass();
-		classXP = ExtendedPlayer.get(mc.thePlayer).getOccupationValues();
-		level = ExtendedPlayer.get(mc.thePlayer).occupationLevel;
+		ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
+		
+		selectedClass = properties.getOccupationClass();
+		classXP = properties.getOccupationValues();
+		level = properties.occupationLevel;
 		
 		background = new Container((this.width-256)/2, ((this.height-256)/2) + 20, 256, 176, "ui.png", this);
 		

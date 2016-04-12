@@ -29,11 +29,19 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int usedByOthers = 0;    //# of times another player used an item owned by this player.
 	public boolean isAdmin = false;
 	public boolean isSpectator = false;
-	private boolean inGame = true;
-	public int gameMode = Resources.PVP_MODE;
+	private boolean inGame = false;
+	private boolean joiningGame = false;
+	public int gameMode = Resources.FREE_PLAY;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
+	public int pvpWon = 0;
+	public int pvpLost = 0;
+	public int treasureWon = 0;
+	public int treasureLost = 0;
+	public int kills = 0;
+	public int deaths = 0;
+	public int treasuresOpened = 0;
 	public String world = "";
 	
 	public ExtendedPlayer(EntityPlayer entity) {
@@ -135,6 +143,14 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public void setGameMode(int gameMode){
 		this.gameMode = gameMode;
 	}
+	
+	public void setJoiningGame(boolean joining){
+		this.joiningGame = joining;
+	}
+	
+	public boolean isWaitingForMiniGame(){
+		return joiningGame;
+	}
 
 	@Override
 	public void loadNBTData(NBTTagCompound load) {
@@ -165,6 +181,14 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.posX = load.getInteger("posX");
 		this.posY = load.getInteger("posY");
 		this.posZ = load.getInteger("posZ");
+		
+		this.pvpWon = load.getInteger("pvpWon");
+		this.pvpLost = load.getInteger("pvpLost");
+		this.treasureWon = load.getInteger("treasureWon");
+		this.treasureLost = load.getInteger("treasureLost");
+		this.kills = load.getInteger("kills");
+		this.deaths = load.getInteger("deaths");
+		this.treasuresOpened = load.getInteger("treasuresOpened");
 	}
 
 	@Override
@@ -198,6 +222,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("posX", this.posX);
 		save.setInteger("posY", this.posY);
 		save.setInteger("posZ", this.posZ);
+		
+		save.setInteger("pvpWon", this.pvpWon);
+		save.setInteger("pvpLost", this.pvpLost);
+		save.setInteger("treasureWon", this.treasureWon);
+		save.setInteger("treasureLost", this.treasureLost);
+		save.setInteger("kills", this.kills);
+		save.setInteger("deaths", this.deaths);
 	}
 
 	@Override

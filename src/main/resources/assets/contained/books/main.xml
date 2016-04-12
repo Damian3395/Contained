@@ -9,37 +9,56 @@
 <page type="contents">
 <text>Table of Contents</text>
 <link>
- <text>Guilds</text>
+ <text>Mini Games</text>
+ <icon>miniGame</icon>
  <jump>1</jump>
+</link>
+<link>
+ <text>Guilds</text>
+ <icon>guild</icon>
+ <jump>2</jump>
 </link>
 <link>
  <text>Getting Started</text>
  <icon>TerritoryFlag</icon>
- <jump>2</jump>
+ <jump>3</jump>
 </link>
 <link>
  <text>Town Hall</text>
  <icon>townHall</icon>
- <jump>3</jump>
+ <jump>4</jump>
 </link>
 <link>
  <text>Territory Gems/Machines</text>
  <icon>ClaimTerritoryMachine</icon>
- <jump>4</jump>
-</link>
-<link>
- <text>Occupational Classes</text>
  <jump>5</jump>
 </link>
 <link>
+ <text>Occupational Classes</text>
+ <icon>occupation</icon>
+ <jump>6</jump>
+</link>
+<link>
  <text>Perks</text>
- <jump>7</jump>
+ <icon>xp</icon>
+ <jump>8</jump>
 </link>
 <link>
  <text>Life and Death</text>
  <icon>AppleofLife</icon>
- <jump>13</jump>
+ <jump>14</jump>
 </link>
+</page>
+
+<page type="sectionpage">
+<title>Mini-Games</title>
+<text>§lPress 'L' To Access The Mini Games Lobby§r
+
+We have two mini games: PVP and Treasure Hunt.
+By pressing the 'join' button, you will be added to a queue to be added to a random game.
+While you are waiting for a queue, you can cancel your request to join a mini game.
+If your team wins the game, each player will be rewarded based on their performance with random items.
+</text>
 </page>
 
 <page type="sectionpage">

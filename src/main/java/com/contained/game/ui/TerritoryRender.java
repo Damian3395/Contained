@@ -46,16 +46,6 @@ public class TerritoryRender {
 		}
 		mc.fontRenderer.drawStringWithShadow(teamName, 5, 5, teamColor);
 		mc.fontRenderer.drawStringWithShadow("("+(int)mc.thePlayer.posX+","+(int)mc.thePlayer.posY+","+(int)mc.thePlayer.posZ+")", 5, 5+12, 0xFFFFFF);
-	
-		if (Contained.gameActive[0] && mc.thePlayer != null) {
-			int dimID = mc.thePlayer.dimension;
-			if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID)) {
-				//Render Time Limit
-				String time = "Time Left: "+Util.getTimestamp(Contained.timeLeft[0]);
-				mc.fontRenderer.drawStringWithShadow(time ,ev.resolution.getScaledWidth()
-						  -mc.fontRenderer.getStringWidth(time)-5, 5, 0xFFFFFFFF);
-			}
-		}
 	}
 	
 	@SubscribeEvent

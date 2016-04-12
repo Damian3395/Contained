@@ -48,7 +48,7 @@ public class Load {
 		Contained.trades.clear();
 		
 		ntc = loadNBTFile("territoryInfo"+dimID+".dat");
-		if (ntc != null) {			
+		if (ntc != null) {		
 			NBTTagList teamList = ntc.getTagList("teamList", (byte)10);
 			for(int i=0; i<teamList.tagCount(); i++) {
 				NBTTagCompound data = teamList.getCompoundTagAt(i);
@@ -78,6 +78,11 @@ public class Load {
 				NBTTagCompound data = tradeList.getCompoundTagAt(i);
 				PlayerTrade trade = new PlayerTrade(data);
 				Contained.getTradeList(dimID).add(trade);
+			}
+			
+			if(dimID == 0){
+				NBTTagCompound gameCounts = ntc.getCompoundTag("GameCounts");
+				Contained.GAME_COUNT = gameCounts.getInteger("count");
 			}
 		}
 	}

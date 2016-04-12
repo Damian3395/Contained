@@ -22,6 +22,7 @@ import com.contained.game.handler.perks.WarriorEvents;
 import com.contained.game.handler.perks.WizardEvents;
 import com.contained.game.network.CommonProxy;
 import com.contained.game.ui.GuiHandler;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -56,6 +57,14 @@ public class Contained{
 	public static Settings configs;
 	public static GenerateWorld world = new GenerateWorld();
 	ContainedRegistry registry = new ContainedRegistry();
+	
+	//Create Unique GameStampID
+	public static int GAME_COUNT = 0;
+	public static int PVP_GAMES = 0;
+	public static int TREASURE_GAMES = 0;
+	
+	//Mini Games
+	public static ArrayList<PlayerMiniGame> miniGames;
 	
 	// Locations of all blocks that are owned by a team.
 	// <Dimension ID, <Block Coordinate, Team ID>>
@@ -123,6 +132,7 @@ public class Contained{
 		trades = new HashMap<Integer, ArrayList<PlayerTrade>>();
 		timeLeft = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
+		miniGames = new ArrayList<PlayerMiniGame>(10);
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());

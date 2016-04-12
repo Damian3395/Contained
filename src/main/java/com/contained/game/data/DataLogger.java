@@ -6,12 +6,14 @@ import java.sql.SQLException;
 
 import com.contained.game.util.Resources;
 
-/*
+/* TODO:
  * Added Events:
  * Territory
  * Potion Brewing
  * Item Enchanted
  * Animal Tamed
+ * MiniGames
+ * Add Attribute GAMEID, GAMEMODE, DIMENSION to all tables
 */
 public class DataLogger {
 	public static java.sql.Connection DB;
@@ -23,6 +25,81 @@ public class DataLogger {
 	
 	public DataLogger(){
 		connectDataBase();
+	}
+	
+	public static void insertGameWon(String server, int gameID, int gameMode, String winningTeam, String losingTeam, int scoreWinning, int scoreLosing, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO GAMERESULTS VALUES (?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setInt(3, gameMode);
+			preparedStatement.setString(4, winningTeam);
+			preparedStatement.setString(5, losingTeam);
+			preparedStatement.setInt(6, scoreWinning);
+			preparedStatement.setInt(7, scoreLosing);
+			preparedStatement.setString(8, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insetOpenTreasure(String server, int gameID, String player, String team, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TREASURE VALUES (?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setString(3, player);
+			preparedStatement.setString(4, team);
+			preparedStatement.setString(5, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertMiniGameTeam(String server, int gameID, int gameMode, String[] players, String team, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TREASURE VALUES (?,?,?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setInt(3, gameMode);
+			for(int i = 0; i < players.length; i++)
+				preparedStatement.setString(4+i, players[i]);
+			preparedStatement.setString(9, team);
+			preparedStatement.setString(10, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertMiniGameChat(String server, int gameID, int gameMode, String player, String team, String chat, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TREASURE VALUES (?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setInt(3, gameMode);
+			preparedStatement.setString(4, player);
+			preparedStatement.setString(5, team);
+			preparedStatement.setString(6, chat);
+			preparedStatement.setString(7, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public static void insertTrade(String server, String creator, String world, String acceptor, String offer, int offerSize, String request, int requestSize, String date){

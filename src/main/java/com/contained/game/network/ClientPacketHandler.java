@@ -18,6 +18,7 @@ import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.games.GameOverUI;
+import com.contained.game.ui.games.GuiMiniGames;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.user.PlayerTeam;
@@ -455,6 +456,22 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						Contained.gameActive[0] = false;
 					else
 						Contained.gameActive[0] = true;
+				break;
+				
+				case ClientPacketHandlerUtil.JOIN_MINI_GAME:
+					ExtendedPlayer joinMiniGame = ExtendedPlayer.get(mc.thePlayer);
+					joinMiniGame.setJoiningGame(true);
+					
+					if(mc.currentScreen instanceof GuiMiniGames)
+						mc.displayGuiScreen(new GuiMiniGames());
+				break;
+				
+				case ClientPacketHandlerUtil.CANCEL_JOIN_MINI_GAME:
+					ExtendedPlayer cancelMiniGame = ExtendedPlayer.get(mc.thePlayer);
+					cancelMiniGame.setJoiningGame(false);
+					
+					if(mc.currentScreen instanceof GuiMiniGames)
+						mc.displayGuiScreen(new GuiMiniGames());
 				break;
 			}
 		}

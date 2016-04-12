@@ -53,7 +53,7 @@ public class FMLEvents {
 				// the problem:
 				// RegionFileCache.clearRegionFileReferences();
 				
-				System.out.println("Deleting DIM"+dimID);
+				//System.out.println("Deleting DIM"+dimID);
 				try {
 					FileUtils.deleteDirectory(dimDir);
 				} catch (IOException e) { }

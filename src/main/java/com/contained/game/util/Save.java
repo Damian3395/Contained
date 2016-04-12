@@ -51,6 +51,13 @@ public class Save {
 			terrZ.get(team).add(p.y);
 		}
 		
+		//Save GameCount
+		if(dimID == 0){
+			NBTTagCompound gameCounts = new NBTTagCompound();
+			gameCounts.setInteger("count", Contained.GAME_COUNT);
+			ntc.setTag("GameCounts", gameCounts);
+		}
+		
 		//Save team data
 		NBTTagList teamList = new NBTTagList();
 		for(PlayerTeam team : Contained.getTeamList(dimID)) {

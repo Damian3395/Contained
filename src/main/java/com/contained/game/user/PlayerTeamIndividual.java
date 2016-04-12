@@ -1,6 +1,8 @@
 package com.contained.game.user;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
@@ -12,7 +14,9 @@ import com.contained.game.util.ErrorCase.Error;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 /**
  * Special info regarding a single specific player within a team.
@@ -28,6 +32,7 @@ public class PlayerTeamIndividual {
 	public SurveyData.SurveyResponse surveyResponses;
 	public long joinTime; //Timestamp of when this player first joined their team. 
 	public long lastOnline; //Timestamp of when this player was last online.
+	private List inventory;
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -46,6 +51,14 @@ public class PlayerTeamIndividual {
 		NBTTagCompound ntc = new NBTTagCompound();
 		pdata.writeToNBT(ntc);
 		this.readFromNBT(ntc);
+	}
+	
+	public void setInventory(List inventory){
+		this.inventory = inventory;
+	}
+	
+	public List getInventory(){
+		return inventory;
 	}
 
 	/**
@@ -176,6 +189,19 @@ public class PlayerTeamIndividual {
 			ntc.setString("team", this.teamID);
 		else if (ntc.hasKey("team"))
 			ntc.removeTag("team");
+		NBTTagList inventoryList = new NBTTagList();
+		if(inventory != null){
+			Iterator iterator = inventory.iterator();
+			while(iterator.hasNext()){
+				NBTTagCompound saveItem = new NBTTagCompound();
+				ItemStack item = (ItemStack) iterator.next();
+				if(item != null){
+					item.writeToNBT(saveItem);
+					inventoryList.appendTag(saveItem);
+				}
+			}
+		}
+		ntc.setTag("inventory", inventoryList);
 	}
 	
 	public void readFromNBT(NBTTagCompound ntc) {
@@ -190,6 +216,12 @@ public class PlayerTeamIndividual {
 			this.teamID = ntc.getString("team");
 		else
 			this.teamID = null;
+		NBTTagList inventoryList = ntc.getTagList("inventory", (byte)10);
+		for(int i=0; i<inventoryList.tagCount(); i++) {
+			NBTTagCompound data = inventoryList.getCompoundTagAt(i);
+			ItemStack item = ItemStack.loadItemStackFromNBT(data);
+			inventory.add(item);
+		}
 	}
 	
 	public static boolean isLeader(EntityPlayer p) {

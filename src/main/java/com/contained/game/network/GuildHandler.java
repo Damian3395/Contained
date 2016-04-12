@@ -66,7 +66,7 @@ public class GuildHandler {
 			statusColor = Color.GREEN;
 			
 			String world = Util.getDimensionString(player.dimension);
-			DataLogger.insertJoinTeam("debugmode", player.getDisplayName(), world, team, Util.getDate());
+			DataLogger.insertJoinTeam(Util.getServerID(), player.getDisplayName(), world, team, Util.getDate());
 		}
 		
 		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.GUILD_JOIN);
@@ -112,7 +112,7 @@ public class GuildHandler {
 		Contained.channel.sendTo(guildPacket.toPacket(), player);
 		
 		String world = Util.getDimensionString(player.dimension);
-		DataLogger.insertKickPlayer("debugmode", player.getDisplayName(), world, toKick.playerName, team.displayName, Util.getDate());
+		DataLogger.insertKickPlayer(Util.getServerID(), player.getDisplayName(), world, toKick.playerName, team.displayName, Util.getDate());
 	}
 	
 	public void promotePlayer(EntityPlayerMP player, String teammate){
@@ -128,7 +128,7 @@ public class GuildHandler {
 		toPromote.promote();
 		
 		String world = Util.getDimensionString(player.dimension);
-		DataLogger.insertPromoteTeamPlayer("debugmode", player.getDisplayName(), world, team.displayName, teammate, Util.getDate());
+		DataLogger.insertPromoteTeamPlayer(Util.getServerID(), player.getDisplayName(), world, team.displayName, teammate, Util.getDate());
 	}
 	
 	public void demotePlayer(EntityPlayerMP player){
@@ -152,7 +152,7 @@ public class GuildHandler {
 			team.sendMessageToTeam(team.getFormatCode()+"[NOTICE] "+pdata.playerName+" is no longer a team leader.");
 			
 			String world = Util.getDimensionString(player.dimension);
-			DataLogger.insertPromoteTeamPlayer("debugmode", player.getDisplayName(), world, team.displayName, player.getDisplayName(), Util.getDate());
+			DataLogger.insertPromoteTeamPlayer(Util.getServerID(), player.getDisplayName(), world, team.displayName, player.getDisplayName(), Util.getDate());
 		}
 		
 		PacketCustom guildPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_DEMOTE);
@@ -181,7 +181,7 @@ public class GuildHandler {
 			ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(player.dimension)).sendToClients();
 			
 			String world = Util.getDimensionString(player.dimension);
-			DataLogger.insertCreateTeam("debugMode", pdata.playerName, world, newTeam.displayName, Util.getDate());
+			DataLogger.insertCreateTeam(Util.getServerID(), pdata.playerName, world, newTeam.displayName, Util.getDate());
 		} else {
 			statusInfo = "Team Name Already In-Use";
 			statusColor = Color.RED;
@@ -288,7 +288,7 @@ public class GuildHandler {
 		}
 		
 		String world = Util.getDimensionString(player.dimension);
-		DataLogger.insertInvitePlayer("debugmode", player.getDisplayName(), world, newTeammate, team.displayName, Util.getDate());
+		DataLogger.insertInvitePlayer(Util.getServerID(), player.getDisplayName(), world, newTeammate, team.displayName, Util.getDate());
 	}
 	
 	public void declineInvite(EntityPlayerMP player, String team){
