@@ -32,9 +32,21 @@ public class PlayerTeamIndividual {
 	public SurveyData.SurveyResponse surveyResponses;
 	public long joinTime; //Timestamp of when this player first joined their team. 
 	public long lastOnline; //Timestamp of when this player was last online.
-	private List inventory;
+	
+	public String lobbyTeamID;
+	public boolean lobbyLeader;
+	public List inventory;
 	
 	public PlayerTeamIndividual(String name) {
+		this.playerName = name;
+		this.teamID = null;
+		this.joinTime = 0;
+		this.lastOnline = 0;
+		this.surveyResponses = (new SurveyData()).new SurveyResponse();
+		this.isLeader = false;
+	}
+	
+	public PlayerTeamIndividual(String name, int teamID){
 		this.playerName = name;
 		this.teamID = null;
 		this.joinTime = 0;
@@ -85,6 +97,22 @@ public class PlayerTeamIndividual {
 			return Error.NONE; //Successfully joined team.
 		}
 		return Error.IND_ONLY; //Already in a team.
+	}
+	
+	public void joinMiniTeam(String teamID){
+		this.lobbyTeamID = teamID;
+		this.lobbyLeader = isLeader;
+		this.teamID = teamID;
+	}
+	
+	public void revertMiniGameChanges(){
+		this.teamID = lobbyTeamID;
+		this.isLeader = lobbyLeader;
+		this.lobbyTeamID = null;
+	}
+	
+	public void setTeamLeader(){
+		this.isLeader = true;
 	}
 	
 	/**
