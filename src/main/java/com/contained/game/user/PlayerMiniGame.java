@@ -2,6 +2,8 @@ package com.contained.game.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,9 +14,9 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.data.DataLogger;
 import com.contained.game.network.ClientPacketHandlerUtil;
-import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -30,8 +32,7 @@ public class PlayerMiniGame {
 	private String[] combine = {"And", "Or", "With", "Rather Than", "In Contrast", "But", "Besides"
 			, "Coupled With", "Beyond", "Under", "Above", "Nearly", "Aside From", "In Essence"};
 	
-	private int gameMode, gameID, dim, teamOneSize, teamTwoSize;
-	private String teamOne, teamTwo;
+	private int gameMode, gameID, dim;
 	
 	public PlayerMiniGame(){
 		Random rand = new Random();
@@ -61,67 +62,40 @@ public class PlayerMiniGame {
 	}
 	
 	//Game Player To Random Team
-	public void addPlayer(EntityPlayerMP player){
-		Random rand = new Random();
-		
+	public void addPlayer(EntityPlayerMP player){		
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
-		
-		if(teams.get(0) == null){ //Create First Team
+		if (teams.size() < Contained.configs.gameNumTeams[Settings.getGameConfig(dim)])
 			createTeam(player);
-			teamOneSize++;
-		}else if(teams.get(1) == null){ //Create Second Team
-			createTeam(player);
-			teamTwoSize++;
-		}else{ //Randomize Teams
-			if(teamOneSize < Resources.MAX_MINI_GAME_TEAM_SIZE 
-					&& teamTwoSize < Resources.MAX_MINI_GAME_TEAM_SIZE){
-				if(rand.nextBoolean())
-					addPlayerToTeam(player, 0);
-				else
-					addPlayerToTeam(player, 1);
-					
-			}else if(teamOneSize < Resources.MAX_MINI_GAME_TEAM_SIZE)
-				addPlayerToTeam(player, 0);
-			else if(teamTwoSize < Resources.MAX_MINI_GAME_TEAM_SIZE)
-				addPlayerToTeam(player, 1);
+		else { //Randomize Teams
+			ArrayList<Integer> candidateTeams = new ArrayList<Integer>();
+			for(int i=0; i<teams.size(); i++) {
+				if (teams.get(i).numMembers() < Contained.configs.maxTeamSize[Settings.getGameConfig(dim)])
+					candidateTeams.add(i);
+			}
+			Collections.shuffle(candidateTeams);
+			if (candidateTeams.size() == 0)
+				Util.serverMessage("[ERROR] Failed to add player to mini-game team, because they were all already full!");
+			else
+				addPlayerToTeam(player, candidateTeams.get(0));
 		}
 	}
 	
-	private void addPlayerToTeam(EntityPlayerMP player, int team){
-		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
+	private void addPlayerToTeam(EntityPlayerMP player, int team) {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 		pdata.joinMiniTeam(Contained.getTeamList(dim).get(team).displayName);
-		
-		if(team == 0)
-			teamOneSize++;
-		else
-			teamTwoSize++;
 	}
 	
-	public void removePlayer(EntityPlayerMP player){
-		for(PlayerTeamIndividual pdata : Contained.teamMemberData)
-			if(pdata.playerName.equals(player.getDisplayName())){
-				if(teamOne != null && pdata.teamID.equals(teamOne)){
-					pdata.revertMiniGameChanges();
-					teamOneSize--;
-				}else if(teamTwo != null && pdata.teamID.equals(teamTwo)){
-					pdata.revertMiniGameChanges();
-					teamTwoSize--;
-				}
-			}
+	public void removePlayer(EntityPlayerMP player) {
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+		if(getTeamID(pdata.playerName) != -1)
+			pdata.revertMiniGameChanges();
 	}
 	
 	public void launchGame(){
 		if(isGameReady()){
 			pickRandomTeamLeaders();
-			
 			teleportPlayers(0, dim);
-			
-			if(MiniGameUtil.isPvP(dim))
-				Contained.timeLeft[dim] = Contained.configs.pvpDuration*20;
-			else if(MiniGameUtil.isTreasure(dim))
-				Contained.timeLeft[dim] = Contained.configs.treasureDuration*20;
-				
+			Contained.timeLeft[dim] = Contained.configs.gameDuration[Settings.getGameConfig(dim)]*20;	
 			Contained.gameActive[this.dim] = true;
 			ClientPacketHandlerUtil.syncMinigameTime(dim);
 		}
@@ -138,8 +112,7 @@ public class PlayerMiniGame {
 	private void teleportPlayers(int from, int to){
 		WorldServer lobby = MinecraftServer.getServer().worldServers[from];
 		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
-			if(pdata.teamID.equals(teamOne) 
-					|| pdata.teamID.equals(teamTwo)){
+			if(getTeamID(pdata.playerName) != -1) {
 				EntityPlayer player = lobby.getPlayerEntityByName(pdata.playerName);
 				if(to == dim){
 					pdata.setInventory(player.inventoryContainer.inventoryItemStacks);
@@ -153,36 +126,27 @@ public class PlayerMiniGame {
 		}
 	}
 	
-	public boolean isGameReady(){
-		int teamOneSize, teamTwoSize;
-		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
+	public boolean isGameReady() {		
+		int teamPlayerCount = 0;
+		for(PlayerTeam team : Contained.getTeamList(dim))
+			teamPlayerCount += team.numMembers();
 		
-		if(teams.get(0) != null)
-			teamOneSize = teams.get(0).getOnlinePlayers().size();
-		else 
-			return false;
-		
-		if(teams.get(1) != null)
-			teamTwoSize = teams.get(1).getOnlinePlayers().size();
-		else
-			return false;
-		
-		if(teamOneSize == Resources.MAX_MINI_GAME_TEAM_SIZE && teamTwoSize == Resources.MAX_MINI_GAME_TEAM_SIZE)
+		if (teamPlayerCount >= 
+				Contained.configs.maxTeamSize[Settings.getGameConfig(dim)]
+			   *Contained.configs.gameNumTeams[Settings.getGameConfig(dim)])
 			return true;
-		
 		return false;
 	}
 	
-	public boolean hasPlayer(String player){
-		for(PlayerTeamIndividual pdata : Contained.teamMemberData)
-			if(pdata.playerName.equals(player)){
-				if(teamOne != null && pdata.teamID.equals(teamOne))
-					return true;
-				else if(teamTwo != null && pdata.teamID.equals(teamTwo))
-					return true;
-			}
-		
-		return false;
+	// Index of this player's team in this dimension's team arraylist, or -1
+	// if the player does not currently belong to any of this dimension's teams.
+	public int getTeamID(String player) {
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+		for (int i=0; i<Contained.getTeamList(dim).size(); i++) {
+			if (pdata.teamID.equals(Contained.getTeamList(dim).get(i).id))
+				return i;
+		}
+		return -1;
 	}
 	
 	public int getGameDimension(){
@@ -198,30 +162,16 @@ public class PlayerMiniGame {
 	}
 	
 	private void pickRandomTeamLeaders(){
-		Random rand = new Random();
-		boolean teamOneLeader = false;
-		boolean teamTwoLeader = false;
-		int teamOneCount = 0;
-		int teamTwoCount = 0;
-		
-		for(PlayerTeamIndividual player : Contained.teamMemberData){
-			if(teamOneLeader && teamTwoLeader){
-				break;
-			}else if(player.teamID.equals(teamOne)){
-				if((rand.nextBoolean() || teamOneCount == 4) && !teamOneLeader){
-					player.setTeamLeader();
-					teamOneLeader = true;
-				}else
-					teamOneCount++;
-			}else if(player.teamID.equals(teamTwo)){
-				if((rand.nextBoolean() || teamTwoCount == 4) && !teamTwoLeader){
-					player.setTeamLeader();
-					teamTwoLeader = true;
-				}else
-					teamTwoCount++;
+		for(PlayerTeam team : Contained.getTeamList(dim)) {
+			List<String> teamPlayers = team.getTeamPlayers();
+			if (teamPlayers.size() != 0) {
+				Collections.shuffle(teamPlayers);
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(teamPlayers.get(0));
+				pdata.setTeamLeader();
 			}
-		}
-			
+			else
+				Util.serverMessage("[ERROR] Tried to set a leader for a team that had no members.");
+		}			
 	}
 	
 	private String generateName(){
@@ -272,23 +222,15 @@ public class PlayerMiniGame {
 	private void createTeam(EntityPlayerMP player){
 		Random rand = new Random();
 		String teamName = generateName();
-			
 		while(teamExists(teamName))
 			teamName = generateName();
 		
 		PlayerTeam newTeam = new PlayerTeam(teamName, rand.nextInt(PlayerTeam.formatColors.length), dim);
 		Contained.getTeamList(dim).add(newTeam);
-		
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		pdata.joinMiniTeam(teamName);
-		
-		if(teamOne == null)
-			teamOne = teamName;
-		else
-			teamTwo = teamName;
+		pdata.joinMiniTeam(teamName);	
 		
 		ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(dim)).sendToClients();
-		
 		String world = Util.getDimensionString(dim);
 		DataLogger.insertCreateTeam(Util.getServerID(), pdata.playerName, world, newTeam.displayName, Util.getDate());
 	}

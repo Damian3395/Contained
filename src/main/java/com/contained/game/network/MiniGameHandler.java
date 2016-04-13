@@ -44,7 +44,7 @@ public class MiniGameHandler {
 		properties.setJoiningGame(false);
 		
 		for(PlayerMiniGame miniGame : Contained.miniGames){
-			if(miniGame.hasPlayer(player.getDisplayName())){
+			if(miniGame.getTeamID(player.getDisplayName()) != -1){
 				miniGame.removePlayer(player);
 				break;
 			}

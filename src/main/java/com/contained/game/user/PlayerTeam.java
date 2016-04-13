@@ -156,7 +156,7 @@ public class PlayerTeam {
 	/*
 	 * Gets all of the players from this team both online/offline
 	 */
-	public List<String> getTeamPlayers(String username){
+	public List<String> getTeamPlayers(){
 		List<String> list = new ArrayList<String>();
 		
 		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
@@ -170,7 +170,7 @@ public class PlayerTeam {
 	/*
 	 * Gets all of the players that have logged into the server
 	 */
-	public List<String> getPlayersList(String username){
+	public List<String> getPlayersList(){
 		List<String> list = new ArrayList<String>();
 		
 		for(PlayerTeamIndividual pdata : Contained.teamMemberData)

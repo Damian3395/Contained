@@ -66,7 +66,7 @@ public class GuildLeader {
 		selectedColor = team.getColorID();
 		
 		tabPane = new GuiTab(gui, GuiTab.STAR, GuiTab.SHIELD, GuiTab.SETTINGS);
-		teamPlayers = new GuiScrollPane(gui, x-80, y-70, team.getTeamPlayers(this.gui.mc.thePlayer.getDisplayName()));
+		teamPlayers = new GuiScrollPane(gui, x-80, y-70, team.getTeamPlayers());
 		findPlayers = new GuiScrollPane(gui,x-80, y-50, team.getLonerList(this.gui.mc.thePlayer.getDisplayName()));
 		
 		teamName = new GuiTextField(this.gui.mc.fontRenderer, x - 120, y-80, 100, 20);

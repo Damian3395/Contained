@@ -251,11 +251,18 @@ public class Util {
 	}
 	
 	/**
-	 * Outputs a message to chat, if debug mode is enabled.
+	 * Outputs a local message to chat, but only if debug mode is enabled.
 	 */
 	public static void debugMessage(EntityPlayer player, String msg) {
 		if (Resources.DEBUG_ENABLED)
 			player.addChatComponentMessage(new ChatComponentText(msg));
+	}
+	
+	/**
+	 * Outputs a global message to chat, visible to all players.
+	 */
+	public static void serverMessage(String msg) {
+		MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), "say "+msg);
 	}
 	
 	public static float clamp(float val, float min, float max) {

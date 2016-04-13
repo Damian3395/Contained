@@ -16,8 +16,14 @@ public class Settings {
 	
 	public static final int OVERWORLD = 0;
 	public static final int MINIGAME = 1;
+	public static final int PVP = 1;
+	public static final int TREASURE = 2;
 	
-	public int[] maxTeamSize = new int[2];
+	public int[] maxTeamSize = new int[3];
+	public int[] worldRadius = new int[3];
+	public int[] numChunks = new int[3];
+	public int[] gameDuration = new int[3];
+	public int[] gameNumTeams = new int[3];
 	public int[] flagXPCost = new int[2];
 	public int[] claimDelay = new int[2];
 	public int[] claimRadius = new int[2];
@@ -36,51 +42,21 @@ public class Settings {
 	public boolean[] harvestRequiresTerritory = new boolean[2];
 	public boolean[] enableDowsing = new boolean[2];
 	
-	public int treasureDuration;
-	public int pvpDuration;
-	
-	public int worldRadius;
-	public int pvpRadius;
-	public int treasureRadius;
-	public int numWorldChunks; //Total number of chunks in the finite world.
-	public int numPvPChunks;
-	public int numTreasureChunks;
-	
 	public Settings(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		
-		treasureDuration = config.getInt("treasureDuration", Configuration.CATEGORY_GENERAL, 2400, 1, 5000000, 
-				"Time (in seconds) that the Treasure Hunting mini-game lasts.");
-		pvpDuration = config.getInt("pvpDuration", Configuration.CATEGORY_GENERAL, 2400, 1, 5000000, 
-				"Time (in seconds) that the PvP mini-game lasts.");
 		creativeOverride = config.getBoolean("creativeOverride", Configuration.CATEGORY_GENERAL, true, 
 				"Should a player in creative mode be exempt from the protection rules of a territory?");
-		
+				
 		for(int i=0; i<=1; i++) {
 			String category = "lobby_settings";
 			if (i == MINIGAME)
 				category = "minigame_settings";
 			
-			if (i == OVERWORLD)
-				worldRadius = config.getInt("worldSize", category, 
-					40, 0, 500, 
-					"Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
-			else if (i == MINIGAME) {
-				pvpRadius = config.getInt("pvpWorldSize", category, 
-					10, 0, 500, 
-					"Radius of the PvP worlds in chunks (16x16 blocks), centered around spawn.");
-				treasureRadius = config.getInt("treasureWorldSize", category, 
-					20, 0, 500, 
-					"Radius of the treasure hunting worlds in chunks (16x16 blocks), centered around spawn.");
-			}
-			
 			largeTeamSize[i] = config.getInt("largeTeamRequirement", category, 
 					defaultValue(i, 100, 0), 0, 99999,
 					"How many blocks of land must a team own before their territory is vulnerable to invasion from other teams?");
-			maxTeamSize[i] = config.getInt("maxTeamSize", category, 
-					defaultValue(i, 5, 5), 1, 999, 
-					"What is the maximum player capacity of a team?");
 			flagXPCost[i] = config.getInt("flagXPCost", category, 
 					defaultValue(i, 30, 10), 0, 999, 
 					"How many Minecraft levels do you need to use the flag item?");
@@ -126,6 +102,33 @@ public class Settings {
 					"How much EXP does it cost to purchase a territory machine?");
 		}
 		
+		for(int i=0; i<=2; i++) {
+			String category = "lobby_settings";
+			String prefix = "";
+			if (i > 0)
+				category = "minigame_settings";
+			if (i == PVP)
+				prefix = "pvp_";
+			if (i == TREASURE)
+				prefix = "treasure_";
+			
+			worldRadius[i] = config.getInt(prefix+"worldSize", category, 
+					defaultValue(i, 40, 10, 20), 0, 500, 
+					"Radius of the finite world in chunks (16x16 blocks), centered around spawn.");			
+			maxTeamSize[i] = config.getInt(prefix+"maxTeamSize", category, 
+					defaultValue(i, 5, 5, 5), 1, 999, 
+					"What is the maximum player capacity of a team?");	
+			
+			if (i != OVERWORLD) {
+				gameDuration[i] = config.getInt(prefix+"Duration", category, 
+						defaultValue(i, 0, 2400, 2400), 1, 5000000, 
+						"Time (in seconds) that the mini-game lasts.");
+				gameNumTeams[i] = config.getInt(prefix+"NumTeams", category, 
+						defaultValue(i, 0, 2, 2), 1, 100, 
+						"Number of player teams that will participate in the mini-game.");
+			}
+		}
+		
 		recalculateNumChunks();		
 		Contained.world.preInit(event, config);
 		
@@ -146,6 +149,15 @@ public class Settings {
 			return minigameValue;
 	}
 	
+	private int defaultValue(int type, int overworldValue, int pvpValue, int treasureValue) {
+		if (type == OVERWORLD)
+			return overworldValue;
+		else if (type == PVP)
+			return pvpValue;
+		else
+			return treasureValue;
+	}
+	
 	public static int getDimConfig(int dimID) {
 		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID))
 			return MINIGAME;
@@ -153,50 +165,56 @@ public class Settings {
 			return OVERWORLD;
 	}
 	
+	public static int getGameConfig(int dimID) {
+		if (MiniGameUtil.isPvP(dimID))
+			return PVP;
+		else if (MiniGameUtil.isTreasure(dimID))
+			return TREASURE;
+		else
+			return OVERWORLD;
+	}
+	
 	public int getWorldRadius(int dimID) {
 		if (MiniGameUtil.isPvP(dimID))
-			return pvpRadius;
+			return worldRadius[PVP];
 		else if (MiniGameUtil.isTreasure(dimID))
-			return treasureRadius;
+			return worldRadius[TREASURE];
 		else
-			return worldRadius;
+			return worldRadius[OVERWORLD];
 	}
 	
 	public void setWorldRadius(int dimID, int radius) {
 		if (MiniGameUtil.isPvP(dimID))
-			pvpRadius = radius;
+			worldRadius[PVP] = radius;
 		else if (MiniGameUtil.isTreasure(dimID))
-			treasureRadius = radius;
+			worldRadius[TREASURE] = radius;
 		else
-			worldRadius = radius;	
+			worldRadius[OVERWORLD] = radius;	
 		recalculateNumChunks();
 	}
 	
 	public int getNumChunks(int dimID) {
 		if (MiniGameUtil.isPvP(dimID))
-			return numPvPChunks;
+			return numChunks[PVP];
 		else if (MiniGameUtil.isTreasure(dimID))
-			return numTreasureChunks;
+			return numChunks[TREASURE];
 		else
-			return numWorldChunks;
+			return numChunks[OVERWORLD];
 	}
 	
 	private void recalculateNumChunks() {
-		numWorldChunks = 0;
-		numPvPChunks = 0;
-		numTreasureChunks = 0;
-		int maxRadius = Math.max(Math.max(worldRadius, pvpRadius), treasureRadius);
+		for(int i=0; i<=2; i+=1) 
+			numChunks[i] = 0;
+		int maxRadius = Math.max(Math.max(worldRadius[OVERWORLD], worldRadius[PVP]), worldRadius[TREASURE]);
 		for(int chunkX=-(maxRadius+Resources.wastelandPadding); 
 				chunkX<=(maxRadius+Resources.wastelandPadding); chunkX++) {
 			for(int chunkZ=-(maxRadius+Resources.wastelandPadding); 
 					chunkZ<=(maxRadius+Resources.wastelandPadding); chunkZ++) {
 				float distDiff = Util.euclidDist(0, 0, chunkX, chunkZ);
-				if (distDiff <= (worldRadius+Resources.wastelandPadding))
-					numWorldChunks++;
-				if (distDiff <= (pvpRadius+Resources.wastelandPadding))
-					numPvPChunks++;
-				if (distDiff <= (treasureRadius+Resources.wastelandPadding))
-					numTreasureChunks++;
+				for(int i=0; i<=2; i+=1) {
+					if (distDiff <= (worldRadius[i]+Resources.wastelandPadding))
+						numChunks[i]++;
+				}
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 import com.contained.game.Contained;
+import com.contained.game.Settings;
 import com.contained.game.network.ClientPacketHandlerUtil;
 
 public class MiniGameUtil {
@@ -27,9 +28,9 @@ public class MiniGameUtil {
 		// to the start of a Minecraft day.
 		
 		if (isPvP(dimID))
-			Contained.timeLeft[dimID] = Contained.configs.pvpDuration*20;
+			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Settings.PVP]*20;
 		else if (isTreasure(dimID))
-			Contained.timeLeft[dimID] = Contained.configs.treasureDuration*20;
+			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Settings.TREASURE]*20;
 		else
 			return;
 		Contained.gameActive[dimID] = true;

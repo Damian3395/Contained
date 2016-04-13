@@ -51,7 +51,9 @@ public class FMLEvents {
 				//
 				// This might be on the right track... but doesn't seem to solve
 				// the problem:
-				// RegionFileCache.clearRegionFileReferences();
+				System.out.println("deleting "+dimID);
+				RegionFileCache.clearRegionFileReferences();
+				System.gc();
 				
 				//System.out.println("Deleting DIM"+dimID);
 				try {
