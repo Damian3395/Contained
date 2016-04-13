@@ -25,7 +25,6 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
-import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
