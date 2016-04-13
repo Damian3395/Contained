@@ -10,14 +10,17 @@ import net.minecraft.inventory.Container;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
 import com.contained.game.data.DataLogger;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
+//TODO: Update Player Properties
 public class PlayerMiniGame {
 	private String[] intro = {"The", "League of", "Demons of"
 			, " Avengers of", "Call of", "Warlords of", "Clan of"
@@ -88,7 +91,6 @@ public class PlayerMiniGame {
 	}
 	
 	private void addPlayerToTeam(EntityPlayerMP player, int team){
-		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 		pdata.joinMiniTeam(Contained.getTeamList(dim).get(team).displayName);
 		
@@ -132,6 +134,8 @@ public class PlayerMiniGame {
 		Contained.gameActive[dim] = false;
 		Contained.timeLeft[dim] = 0;
 		ClientPacketHandlerUtil.syncMinigameTime(dim);
+		Contained.getTeamList(dim).remove(0);
+		Contained.getTeamList(dim).remove(1);
 		Contained.miniGames.remove(this);
 	}
 	
@@ -141,13 +145,47 @@ public class PlayerMiniGame {
 			if(pdata.teamID.equals(teamOne) 
 					|| pdata.teamID.equals(teamTwo)){
 				EntityPlayer player = lobby.getPlayerEntityByName(pdata.playerName);
-				if(to == dim){
+				if(to == dim){ //Starting New MiniGame
+					ExtendedPlayer properties = ExtendedPlayer.get(player);
+					properties.setGameMode(gameMode);
+					properties.setJoiningGame(false);
+					properties.setGame(true);
+					pdata.xp = player.experienceTotal;
 					pdata.setInventory(player.inventoryContainer.inventoryItemStacks);
+					clearInventory(player);
+					
 					Util.travelToDimension(to, player);
-				}else{
+					
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+					miniGamePacket.writeInt(gameMode);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+				}else{ //Ending MiniGame
 					Util.travelToDimension(to, player);
+					ExtendedPlayer properties = ExtendedPlayer.get(player);
+					properties.setGameMode(Resources.FREE_PLAY);
+					properties.setGame(false);
 					player.inventoryContainer = (Container) pdata.inventory;
+					player.experienceTotal = pdata.xp;
 					pdata.inventory = null;
+					
+					//Sync GameMode
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+					//Sync Game Stats
+					if(gameMode == Resources.PVP_MODE){
+						PacketCustom pvpStatsPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
+						pvpStatsPacket.writeInt(properties.pvpWon);
+						pvpStatsPacket.writeInt(properties.pvpLost);
+						pvpStatsPacket.writeInt(properties.kills);
+						pvpStatsPacket.writeInt(properties.deaths);
+						Contained.channel.sendTo(pvpStatsPacket.toPacket(), (EntityPlayerMP) player);
+					}else{
+						PacketCustom treasureStatsPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
+						treasureStatsPacket.writeInt(properties.treasureWon);
+						treasureStatsPacket.writeInt(properties.treasureLost);
+						treasureStatsPacket.writeInt(properties.treasuresOpened);
+						Contained.channel.sendTo(treasureStatsPacket.toPacket(), (EntityPlayerMP) player);
+					}
 				}
 			}
 		}
@@ -222,6 +260,13 @@ public class PlayerMiniGame {
 			}
 		}
 			
+	}
+	
+	private void clearInventory(EntityPlayer player){
+		for(int i = 0; i < player.inventory.getSizeInventory(); i++){
+			if(player.inventory.getStackInSlot(i) != null)
+				player.inventory.setInventorySlotContents(i, null);
+		}
 	}
 	
 	private String generateName(){

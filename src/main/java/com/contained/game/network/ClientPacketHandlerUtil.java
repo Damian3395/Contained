@@ -67,6 +67,10 @@ public class ClientPacketHandlerUtil {
 	public static final int MINIGAME_TIMER_SYNC = 41;
 	public static final int JOIN_MINI_GAME = 42;
 	public static final int CANCEL_JOIN_MINI_GAME = 43;
+	public static final int MINIGAME_STARTED = 44;
+	public static final int MINIGAME_ENDED = 45;
+	public static final int SYNC_PVP_STATS = 46;
+	public static final int SYNC_TEASURE_STATS = 47;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);

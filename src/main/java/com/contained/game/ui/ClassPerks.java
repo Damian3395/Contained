@@ -18,6 +18,7 @@ import com.contained.game.util.Resources;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 
+//TODO: Create Awesome Player Abilities With Cool Down Timer and Button
 public class ClassPerks extends GuiScreen{
 	public static final int NONE = -1;
 	public static final int COLLECTOR = 0;

@@ -15,6 +15,7 @@ import com.contained.game.util.Resources;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
+//TODO: Add Score To Team, Add Count To Player, End Game
 public class PVPEvents {
 	@SubscribeEvent
 	public void onSpawn(Clone event){

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import com.contained.game.util.Resources;
 
 /* TODO:
- * Added Events:
+ * Add Events:
  * Territory
  * Potion Brewing
  * Item Enchanted
