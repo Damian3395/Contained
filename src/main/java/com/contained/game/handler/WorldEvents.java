@@ -40,10 +40,7 @@ public class WorldEvents {
 			}
 			if (biomeOverride == null) {
 				Point p = new Point(event.chunkX, event.chunkZ);
-				if (GenerateWorld.getBiomeProperties(event.world.provider.dimensionId).biomeMapping.containsKey(p))
-					biomeOverride = GenerateWorld.getBiomeProperties(event.world.provider.dimensionId).biomeMapping.get(p);
-				else
-					biomeOverride = WastelandBiome.biome;
+				biomeOverride = GenerateWorld.getBiomeProperties(event.world.provider.dimensionId).getBiome(p);
 			}
 			
 			//Override biomes based on finite world configurations
