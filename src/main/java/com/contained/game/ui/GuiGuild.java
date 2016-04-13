@@ -2,12 +2,14 @@ package com.contained.game.ui;
 
 import java.util.List;
 
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.KeyBindings;
 import com.contained.game.ui.components.Container;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.ui.guild.GuildPlayer;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -24,6 +26,12 @@ public class GuiGuild extends GuiScreen {
 	
 	@Override
 	public void initGui(){
+		ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
+		if(properties.gameMode != Resources.FREE_PLAY){
+			mc.displayGuiScreen(null);
+			return;
+		}
+		
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(mc.thePlayer);
 		guildStatus = pdata.getStatus();
 				

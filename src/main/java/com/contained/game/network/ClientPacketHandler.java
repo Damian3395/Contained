@@ -472,6 +472,34 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					if(mc.currentScreen instanceof GuiMiniGames)
 						mc.displayGuiScreen(new GuiMiniGames());
 				break;
+				
+				case ClientPacketHandlerUtil.MINIGAME_STARTED:
+					ExtendedPlayer startMiniGame = ExtendedPlayer.get(mc.thePlayer);
+					startMiniGame.setGameMode(packet.readInt());
+					startMiniGame.setJoiningGame(false);
+					startMiniGame.setGame(true);
+				break;
+				
+				case ClientPacketHandlerUtil.MINIGAME_ENDED:
+					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
+					endMiniGame.setGameMode(Resources.FREE_PLAY);
+					endMiniGame.setGame(false);
+				break;
+				
+				case ClientPacketHandlerUtil.SYNC_PVP_STATS:
+					ExtendedPlayer pvpStats = ExtendedPlayer.get(mc.thePlayer);
+					pvpStats.pvpWon = packet.readInt();
+					pvpStats.pvpLost = packet.readInt();
+					pvpStats.kills = packet.readInt();
+					pvpStats.deaths = packet.readInt();
+				break;
+					
+				case ClientPacketHandlerUtil.SYNC_TEASURE_STATS:
+					ExtendedPlayer treasureStats = ExtendedPlayer.get(mc.thePlayer);
+					treasureStats.treasureWon = packet.readInt();
+					treasureStats.treasureLost = packet.readInt();
+					treasureStats.treasuresOpened = packet.readInt();
+				break;
 			}
 		}
 	}

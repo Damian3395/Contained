@@ -36,6 +36,7 @@ public class PlayerTeamIndividual {
 	public String lobbyTeamID = null;
 	public boolean lobbyLeader;
 	public List inventory;
+	public int xp;
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -112,6 +113,7 @@ public class PlayerTeamIndividual {
 			this.teamID = lobbyTeamID;
 			this.isLeader = lobbyLeader;
 			this.lobbyTeamID = null;
+			this.lobbyLeader = false;
 		}
 	}
 	
