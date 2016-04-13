@@ -2,7 +2,13 @@ package com.contained.game.handler;
 
 import java.awt.Point;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.contained.game.data.DataLogger;
+import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Load;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Save;
 import com.contained.game.util.Util;
 import com.contained.game.world.GenerateWorld;
@@ -12,8 +18,11 @@ import com.contained.game.world.block.WastelandBlock;
 import com.contained.game.world.block.WastelandBush;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -60,7 +69,6 @@ public class WorldEvents {
 		}
 	}
 	
-	
 	@SubscribeEvent
 	//Scatter some dead bushes around the wasteland, for effect.
 	public void doDecorations(DecorateBiomeEvent.Pre event) {
@@ -76,6 +84,42 @@ public class WorldEvents {
 				(new WorldGenDecoration(WastelandBush.instance)).generate(event.world, event.rand, x, y, z);
 			}
 		}
+	}
+	
+	@SubscribeEvent
+	//We'll handle sending out chat messages ourselves, so that:
+	//  -In the games: Chat messages only send to your own team members.
+	//  -Elsewhere: Chat messages only send to people in the same dimension as you.
+	public void handleChat(ServerChatEvent event) {
+		if (event.player == null)
+			return;
+		
+		int dimID = event.player.dimension;
+		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID)) {
+			//Team Chat Mode
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(event.player);
+
+			if (pdata.teamID != null) {
+				PlayerTeam team = PlayerTeam.get(pdata.teamID, dimID);						
+				team.sendMessageToTeam(team.getFormatCode()+"<"+event.username+"> "+event.message);
+				String world = Util.getDimensionString(dimID);
+				DataLogger.insertGuildChat(Util.getServerID(), 
+						event.username, 
+						pdata.teamID, 
+						world, 
+						event.message, 
+						Util.getDate());
+			} else
+				Util.displayError(event.player, "Could not send chat message -- you aren't in a team!");
+		} else {
+			//Public Dimension Chat Mode
+			for(Object p : event.player.worldObj.playerEntities) {
+				if (p instanceof EntityPlayer)
+					Util.displayMessage((EntityPlayer)p, "<"+event.username+"> "+event.message);
+			}
+		}
+		
+		event.setCanceled(true);
 	}
 	
 	//
