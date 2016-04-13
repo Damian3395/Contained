@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 import com.contained.game.Contained;
 import com.contained.game.util.Load;
-import com.contained.game.util.Resources;
 import com.contained.game.util.Save;
 import com.contained.game.util.Util;
 
@@ -27,7 +26,7 @@ public class BiomeProperties {
 
 	public static final String biomeGenCategory = "biomeGen";
 	public HashMap<BiomeGenBase, Integer> numOccurences; //Maps chunks to the number of times they should occur
-	public HashMap<Point, BiomeGenBase> biomeMapping;
+	private HashMap<Point, BiomeGenBase> biomeMapping;
 	private ArrayList<BiomeGenBase> biomeGenOrdering;    //The order of which to generate the forced biomes.
 	private int numBiomeGens = 0;	//Total number of biome occurrences that must be forced.
 	private int untilNextBiome = 0; //How many chunks of this biome must be generated until moving on.
@@ -63,10 +62,10 @@ public class BiomeProperties {
 		int spawnX = w.getSpawnPoint().posX/16;
 		int spawnZ = w.getSpawnPoint().posZ/16;
 		Point probe = new Point(0,0);
-		recursiveBiomeMap(w, spawnX, spawnZ, probe);
+		recursiveBiomeMap(w, spawnX, spawnZ, probe, 1);
 	}
 	
-	private void recursiveBiomeMap(World w, int chunkX, int chunkZ, Point probe) {
+	private void recursiveBiomeMap(World w, int chunkX, int chunkZ, Point probe, int depth) {
 		// Select adjacent chunks for generation in a random order.
 		Integer[] exploreOrder = {0,1,2,3};
 		Point myPoint = new Point(chunkX, chunkZ);
@@ -77,6 +76,8 @@ public class BiomeProperties {
 		biomeMapping.put(myPoint, null);
 		
 		for(int i=0; i<=3; i++) {
+			if (depth >= 1000)
+				break;
 			if (exploreOrder[i] == 0) { probe.x = chunkX; probe.y = chunkZ+1; } // Up
 			if (exploreOrder[i] == 1) { probe.x = chunkX; probe.y = chunkZ-1; } // Down
 			if (exploreOrder[i] == 2) { probe.x = chunkX-1; probe.y = chunkZ; } // Left
@@ -86,7 +87,7 @@ public class BiomeProperties {
 			// explore that direction for additional mapping.
 			if (!biomeMapping.containsKey(probe)
 						&& Util.isWasteland(w, probe.x, probe.y) < 1) 
-				recursiveBiomeMap(w, probe.x, probe.y, probe);
+				recursiveBiomeMap(w, probe.x, probe.y, probe, depth+1);
 		}
 		
 		biomeMapping.put(myPoint, getNextBiome(w));
@@ -102,6 +103,13 @@ public class BiomeProperties {
 			updateUntil(w);
 		}
 		return next;
+	}
+	
+	public BiomeGenBase getBiome(Point p) {
+		if (biomeMapping.containsKey(p))
+			return biomeMapping.get(p);
+		else
+			return BiomeGenBase.plains;
 	}
 	
 	//Tracks the amount of generated chunks until the next biome type should be used.

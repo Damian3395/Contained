@@ -23,6 +23,9 @@ public class MiniGameUtil {
 	}
 	
 	public static void startGame(int dimID) {
+		// TODO: At the start of the game, the time in the dimension should be set
+		// to the start of a Minecraft day.
+		
 		if (isPvP(dimID))
 			Contained.timeLeft[dimID] = Contained.configs.pvpDuration*20;
 		else if (isTreasure(dimID))

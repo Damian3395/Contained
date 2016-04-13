@@ -5,7 +5,6 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 /**
@@ -69,10 +68,10 @@ public class Settings {
 					"Radius of the finite world in chunks (16x16 blocks), centered around spawn.");
 			else if (i == MINIGAME) {
 				pvpRadius = config.getInt("pvpWorldSize", category, 
-					15, 0, 500, 
+					10, 0, 500, 
 					"Radius of the PvP worlds in chunks (16x16 blocks), centered around spawn.");
 				treasureRadius = config.getInt("treasureWorldSize", category, 
-					25, 0, 500, 
+					20, 0, 500, 
 					"Radius of the treasure hunting worlds in chunks (16x16 blocks), centered around spawn.");
 			}
 			

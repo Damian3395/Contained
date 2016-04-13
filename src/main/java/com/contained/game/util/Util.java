@@ -98,11 +98,12 @@ public class Util {
 	// another dimension. Fix this.
 	public static void travelToDimension(int dimID, EntityPlayer player) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
+			EntityPlayerMP mpPlayer = (EntityPlayerMP)player;
 			MinecraftServer mcServer = MinecraftServer.getServer();
 			WorldServer newWorld = mcServer.worldServerForDimension(dimID);
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
-					(EntityPlayerMP)player, dimID, new GameTeleporter(newWorld));
+						mpPlayer, dimID, new GameTeleporter(newWorld));
 			MiniGameUtil.startGame(dimID); //TODO: This is just for debug.
 		}
 	}

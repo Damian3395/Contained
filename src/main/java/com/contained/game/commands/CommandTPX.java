@@ -75,10 +75,6 @@ public class CommandTPX implements ICommand {
 				if (player.ridingEntity == null && player.riddenByEntity == null) {
 					if(world.provider.dimensionId != dimID)
 						Util.travelToDimension(dimID, player);
-					ChunkCoordinates coordinates = player.getBedLocation(dimID);
-					if (coordinates == null)
-						coordinates = world.getSpawnPoint();
-					player.setPositionAndUpdate(coordinates.posX, coordinates.posY+3, coordinates.posZ);
 				} else
 					sender.addChatMessage(new ChatComponentText("Teleport failed."));
 			} catch (NumberFormatException e) {

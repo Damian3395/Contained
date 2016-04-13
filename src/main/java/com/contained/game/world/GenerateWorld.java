@@ -32,9 +32,9 @@ public class GenerateWorld {
 		defaultOreProperties[Resources.QUARTZ] = ResourceCluster.generateFromConfig(config, 
 				Blocks.quartz_block, 8, 32, 2, 5, 5, 10, 4, 6, 2, 16);
 		defaultOreProperties[Resources.DIAMOND] = ResourceCluster.generateFromConfig(config, 
-				Blocks.diamond_ore, 2, 8, 6, 12, 6, 12, 2, 3, 2, 24);
+				Blocks.diamond_ore, 8, 16, 4, 6, 6, 12, 2, 3, 2, 24);
 		defaultOreProperties[Resources.EMERALD] = ResourceCluster.generateFromConfig(config, 
-				Blocks.emerald_ore, 2, 8, 6, 12, 6, 12, 2, 3, 2, 24);
+				Blocks.emerald_ore, 8, 16, 4, 6, 6, 12, 2, 3, 2, 24);
 		defaultOreProperties[Resources.GOLD] = ResourceCluster.generateFromConfig(config, 
 				Blocks.gold_ore, 8, 32, 2, 5, 5, 10, 3, 5, 2, 32);
 		defaultOreProperties[Resources.REDSTONE] = ResourceCluster.generateFromConfig(config, 
