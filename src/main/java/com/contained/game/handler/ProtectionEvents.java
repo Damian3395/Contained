@@ -288,7 +288,7 @@ public class ProtectionEvents {
 				shouldCancel = true;
 			else if (victimTeam.equals(attackerTeam))
 				shouldCancel = true;
-			else if (Contained.territoryData.containsKey(check)) {
+			else if (Contained.getTerritoryMap(event.entityLiving.dimension).containsKey(check)) {
 				String territoryTeamID = Contained.getTerritoryMap(event.entityLiving.dimension).get(check);
 				if (victimTeam.equals(territoryTeamID)) {
 					PlayerTeam territoryTeam = PlayerTeam.get(territoryTeamID, event.entityLiving.dimension);
@@ -410,10 +410,10 @@ public class ProtectionEvents {
 	public static PlayerTeamPermission getPermissions(World w, EntityPlayer ent, double x, double y, double z) {	
 		if (ent != null && !isExempt(w, ent)) {
 			Point check = new Point((int)x, (int)z);
-			if (Contained.territoryData.containsKey(check)) {
+			if (Contained.getTerritoryMap(ent.dimension).containsKey(check)) {
 				//This player is in owned territory.
 				PlayerTeamIndividual entData = PlayerTeamIndividual.get(ent);
-				PlayerTeam team = PlayerTeam.get(Contained.territoryData.get(check), ent.dimension);
+				PlayerTeam team = PlayerTeam.get(Contained.getTerritoryMap(ent.dimension).get(check), ent.dimension);
 				return team.getPermissions(entData.teamID);  
 			}
 		}

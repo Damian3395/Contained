@@ -86,7 +86,7 @@ public class TerritoryMachineTE extends TileEntity {
 						sendParticlePacket("crit"); //success
 						Collections.shuffle(candidates);
 						Point toRemove = candidates.get(0);
-						Contained.territoryData.remove(toRemove);
+						Contained.getTerritoryMap(this.worldObj.provider.dimensionId).remove(toRemove);
 						Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(toRemove.x, toRemove.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail
@@ -100,7 +100,7 @@ public class TerritoryMachineTE extends TileEntity {
 							probe.x = this.xCoord+i;
 							probe.y = this.zCoord+j;
 							Point toClaim = new Point(probe.x, probe.y);
-							if (ItemTerritory.canClaim(this.teamID, toClaim, probe) == ErrorCase.Error.NONE)
+							if (ItemTerritory.canClaim(this.teamID, toClaim, probe, this.worldObj.provider.dimensionId) == ErrorCase.Error.NONE)
 								candidates.add(toClaim);
 						}
 					}

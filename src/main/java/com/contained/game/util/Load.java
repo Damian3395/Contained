@@ -41,11 +41,11 @@ public class Load {
 		/**
 		 * Territory & Team Data
 		 */
-		Contained.territoryData.clear();
-		Contained.teamData.clear();
+		Contained.getTerritoryMap(dimID).clear();
+		Contained.getTeamList(dimID).clear();
 		Contained.teamMemberData.clear();
 		Contained.teamInvitations.clear();
-		Contained.trades.clear();
+		Contained.getTradeList(dimID).clear();
 		
 		ntc = loadNBTFile("territoryInfo"+dimID+".dat");
 		if (ntc != null) {		

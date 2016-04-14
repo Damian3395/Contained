@@ -2,9 +2,8 @@ package com.contained.game.handler;
 
 import java.awt.Point;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.contained.game.data.DataLogger;
+import com.contained.game.entity.ExtendedLivingBase;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Load;
@@ -18,11 +17,15 @@ import com.contained.game.world.block.WastelandBlock;
 import com.contained.game.world.block.WastelandBush;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.event.ServerChatEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -53,8 +56,10 @@ public class WorldEvents {
 			}
 			
 			//Override biomes based on finite world configurations
-			for(int i=0; i<event.biomeArray.length; i++)
-				event.biomeArray[i] = biomeOverride;
+			if (biomeOverride != null) {
+				for(int i=0; i<event.biomeArray.length; i++)
+					event.biomeArray[i] = biomeOverride;
+			}
 			
 			//Low areas of map should use netherrack instead of stone.
 			for(int i=0;i<16;i++) {
@@ -120,6 +125,43 @@ public class WorldEvents {
 		}
 		
 		event.setCanceled(true);
+	}
+	
+	//
+	// == Creature Handling ==
+	//
+	@SubscribeEvent
+	public void onEntityConstructing(EntityConstructing event)
+	{		
+		//Register custom attributes to living entities.
+		if (event.entity instanceof EntityLivingBase && !(event.entity instanceof EntityPlayer)) {
+			EntityLivingBase mobCast = (EntityLivingBase)event.entity;
+			ExtendedLivingBase.register(mobCast);
+		}
+	}	
+	
+	@SubscribeEvent
+	public void onEntityUpdate(LivingEvent.LivingUpdateEvent event)
+	{
+		// Link custom spawned monsters (from spawn eggs) to the team of the
+		// player that spawned them.
+		if (!event.entity.worldObj.isRemote) {
+			if (event.entity instanceof EntityLiving && !(event.entity instanceof EntityPlayer)) {
+				ExtendedLivingBase props = ExtendedLivingBase.get((EntityLivingBase)event.entity);
+				EntityLiving living = (EntityLiving)event.entity;
+				if (living.hasCustomNameTag() && props.getTeam() == null) {
+					PlayerTeamIndividual ownerData = PlayerTeamIndividual.get(living.getCustomNameTag());
+					if (ownerData != null && ownerData.teamID != null) {
+						PlayerTeam team = PlayerTeam.get(ownerData.teamID, event.entity.worldObj.provider.dimensionId);
+						if (team != null) {
+							props.setTeam(ownerData.teamID);
+							living.setCustomNameTag(team.getFormatCode()+"§l§n"+team.displayName);
+							living.setAlwaysRenderNameTag(true);
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	//

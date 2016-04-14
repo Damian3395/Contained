@@ -109,7 +109,7 @@ public class BiomeProperties {
 		if (biomeMapping.containsKey(p))
 			return biomeMapping.get(p);
 		else
-			return BiomeGenBase.plains;
+			return null;
 	}
 	
 	//Tracks the amount of generated chunks until the next biome type should be used.

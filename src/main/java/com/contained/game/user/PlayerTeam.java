@@ -110,11 +110,11 @@ public class PlayerTeam {
 		//Remove team's territory.
 		ArrayList<Point> territoryToRemove = new ArrayList<Point>();
 		for (Point p : Contained.getTerritoryMap(dimID).keySet()) {
-			if (Contained.territoryData.get(p).equals(this.id))
+			if (Contained.getTerritoryMap(dimID).get(p).equals(this.id))
 				territoryToRemove.add(p);
 		}
 		for (Point p : territoryToRemove) //Second pass, to avoid concurrent modification.
-			Contained.territoryData.remove(p); 
+			Contained.getTerritoryMap(dimID).remove(p); 
 		
 		//Remove any pending invitations involving this team.
 		ArrayList<PlayerTeamInvitation> invitationsToRemove = new ArrayList<PlayerTeamInvitation>();
@@ -220,7 +220,7 @@ public class PlayerTeam {
 	public int territoryCount() {
 		int count = 0;
 		for(Point territory : Contained.getTerritoryMap(dimID).keySet()) {
-			if (Contained.territoryData.get(territory).equals(id))
+			if (Contained.getTerritoryMap(dimID).get(territory).equals(id))
 				count++;
 		}
 		return count;
@@ -314,6 +314,7 @@ public class PlayerTeam {
 	public void writeToNBT(NBTTagCompound ntc) {
 		ntc.setString("id", this.id);
 		ntc.setInteger("color", this.colorID);
+		ntc.setInteger("dimID", this.dimID);
 		ntc.setString("name", this.displayName);
 		
 		NBTTagList permList = new NBTTagList();
@@ -329,6 +330,7 @@ public class PlayerTeam {
 	public void readFromNBT(NBTTagCompound ntc) {
 		this.id = ntc.getString("id");
 		this.displayName = ntc.getString("name");
+		this.dimID = ntc.getInteger("dimID");
 		setColor(ntc.getInteger("color"));
 		
 		this.permissions = new HashMap<String, PlayerTeamPermission>();

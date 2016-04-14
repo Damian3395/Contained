@@ -174,7 +174,7 @@ public class GuildHandler {
 			}
 		}
 		
-		PlayerTeam newTeam = new PlayerTeam(team, color);
+		PlayerTeam newTeam = new PlayerTeam(team, color, player.dimension);
 		if (allowedName) {
 			Contained.getTeamList(player.dimension).add(newTeam);
 			System.out.println(pdata.joinTeam(newTeam.id, true).toString());

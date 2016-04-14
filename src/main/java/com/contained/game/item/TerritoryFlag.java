@@ -92,7 +92,7 @@ public class TerritoryFlag {
 					Util.displayError(p, "Only team leaders can use this item to claim territory.");
 					return;
 				}
-				if (Contained.territoryData.containsKey(toClaim)) {
+				if (Contained.getTerritoryMap(p.dimension).containsKey(toClaim)) {
 					Util.displayError(p, "You can't claim this area, it already belongs to a team.");
 					return;
 				}

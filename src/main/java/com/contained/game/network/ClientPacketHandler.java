@@ -74,7 +74,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					
 				case ClientPacketHandlerUtil.FULL_TERRITORY_SYNC:
 					int numBlocks = packet.readInt();
-					Contained.territoryData.clear();
+					Contained.getTerritoryMap(0).clear();
 					for(int i=0; i<numBlocks; i++) {
 						bc = packet.readCoord();
 						Contained.getTerritoryMap(0).put(new Point(bc.x, bc.z), packet.readString());
@@ -90,7 +90,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case ClientPacketHandlerUtil.REMOVE_TERRITORY_BLOCK:
 					bc = packet.readCoord();
-					Contained.territoryData.remove(new Point(bc.x, bc.z));
+					Contained.getTerritoryMap(0).remove(new Point(bc.x, bc.z));
 					render.regenerateEdges();
 				break;
 					
@@ -112,7 +112,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 								terrToRemove.add(p);
 						}
 						for (Point p : terrToRemove)
-							Contained.territoryData.remove(p);
+							Contained.getTerritoryMap(0).remove(p);
 						render.regenerateEdges();
 					}
 				break;

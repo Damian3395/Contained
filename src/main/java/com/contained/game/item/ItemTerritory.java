@@ -59,7 +59,7 @@ public class ItemTerritory {
 				Point probe = new Point();
 				
 				ErrorCase.Error testClaim = 
-						canClaim(playerData.teamID, toClaim, probe);
+						canClaim(playerData.teamID, toClaim, probe, p.dimension);
 				
 				if (testClaim == ErrorCase.Error.TEAM_ONLY) {
 					Util.displayError(p, "You must be in a team to use this item.");
@@ -108,7 +108,7 @@ public class ItemTerritory {
 				Point blockToRemove = new Point(x,z);
 				Point probe = new Point();
 				
-				if (Contained.territoryData.containsKey(blockToRemove)) {					
+				if (Contained.getTerritoryMap(p.dimension).containsKey(blockToRemove)) {					
 					//The team this item is allowed to remove the land of.
 					NBTTagCompound itemData = Data.getTagCompound(data);	
 					String teamToRemove = itemData.getString("teamOwner");
@@ -131,7 +131,7 @@ public class ItemTerritory {
 					}
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
-					Contained.territoryData.remove(blockToRemove);
+					Contained.getTerritoryMap(p.dimension).remove(blockToRemove);
 					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());
 				}
 			}
@@ -164,10 +164,11 @@ public class ItemTerritory {
 	 * Does this area of land satisfy all the rules required to be claimed
 	 * by a territory gem item? (Possible Errors: TEAM_ONLY, ALREADY_OWNED, ADJACENT_ONLY)
 	 */
-	public static ErrorCase.Error canClaim(String teamID, Point toClaim, Point probe) {
+	public static ErrorCase.Error canClaim(String teamID, Point toClaim, Point probe, int dimID) {
 		if (teamID == null)
 			return ErrorCase.Error.TEAM_ONLY;
-		else if (Contained.territoryData.containsKey(toClaim))
+		
+		if (Contained.getTerritoryMap(dimID).containsKey(toClaim))
 			return ErrorCase.Error.ALREADY_OWNED;
 		
 		boolean foundAdj = false;
@@ -180,7 +181,7 @@ public class ItemTerritory {
 					probe.x = toClaim.x;
 					probe.y = toClaim.y+i;
 				}
-				if (Contained.territoryData.containsKey(probe)) {
+				if (Contained.getTerritoryMap(dimID).containsKey(probe)) {
 					foundAdj = true;
 					break;
 				}
@@ -200,8 +201,8 @@ public class ItemTerritory {
 	 * by a territory gem item? (Possible Errors: TEAM_ONLY, WRONG_TEAM, ADJACENT_ONLY)
 	 */
 	public static ErrorCase.Error canRemove(String teamID, Point toRemove, Point probe, int dimID) {
-		if (Contained.territoryData.containsKey(toRemove)) {
-			if (teamID != null && !Contained.territoryData.get(toRemove).equals(teamID))
+		if (Contained.getTerritoryMap(dimID).containsKey(toRemove)) {
+			if (teamID != null && !Contained.getTerritoryMap(dimID).get(toRemove).equals(teamID))
 				return ErrorCase.Error.WRONG_TEAM;
 		}
 		else

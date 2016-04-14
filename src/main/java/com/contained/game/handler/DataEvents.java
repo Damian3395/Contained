@@ -115,8 +115,10 @@ public class DataEvents {
 			DataLogger.insertAnvil(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
 					Util.getDimensionString(event.entityPlayer.dimension),
-					event.left.getDisplayName(), event.left.stackSize,
-					event.right.getDisplayName(), event.right.stackSize,
+					event.left == null ? "" : event.left.getDisplayName(), 
+					event.left == null ? 0 : event.left.stackSize,
+					event.right == null ? "" : event.right.getDisplayName(), 
+					event.right == null ? 0 : event.right.stackSize,
 					event.output.getDisplayName(), event.output.stackSize,
 					Util.getDate());
 		}

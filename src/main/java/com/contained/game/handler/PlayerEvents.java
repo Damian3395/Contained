@@ -32,6 +32,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -201,8 +202,9 @@ public class PlayerEvents {
 			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(ev.entityPlayer);
 			if (playerData.teamID != null) {
 				Point probe = new Point(ev.x, ev.z);
-				if (!Contained.territoryData.containsKey(probe)
-						|| !Contained.territoryData.get(probe).equals(playerData.teamID)) {
+				int dimID = ev.entityPlayer.worldObj.provider.dimensionId;
+				if (!Contained.getTerritoryMap(dimID).containsKey(probe)
+						|| !Contained.getTerritoryMap(dimID).get(probe).equals(playerData.teamID)) {
 					ev.result = EntityPlayer.EnumStatus.OTHER_PROBLEM;
 					Util.displayError(ev.entityPlayer, "You can only sleep within your team's territory.");
 				}
@@ -320,6 +322,10 @@ public class PlayerEvents {
 			//Set this player as the new owner of the item
 			itemData.setString("owner", newOwner.getDisplayName());
 			item.setTagCompound(itemData);
+			
+			//If the item is a spawn egg, set its display name to match the owner.
+			if (item.getItem() instanceof ItemMonsterPlacer)
+				item.setStackDisplayName(newOwner.getDisplayName());
 		}
 	}
 	

@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
-import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Util;
 
 import net.minecraft.client.Minecraft;
@@ -121,8 +120,8 @@ public class TerritoryRender {
 	 */
 	private PlayerTeam getTerritory(int x, int z) {
 		Point probe = new Point(x, z);
-		if (Contained.territoryData.containsKey(probe))
-			return PlayerTeam.get(Contained.territoryData.get(probe), 0);
+		if (Contained.getTerritoryMap(0).containsKey(probe))
+			return PlayerTeam.get(Contained.getTerritoryMap(0).get(probe), 0);
 		return null;
 	}
 	
@@ -136,26 +135,26 @@ public class TerritoryRender {
 		for (Point p : Contained.getTerritoryMap(0).keySet()) {			
 			probe.x = p.x; 
 			probe.y = p.y+1;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
+			if (!Contained.getTerritoryMap(0).containsKey(probe) 
+					|| !Contained.getTerritoryMap(0).get(probe).equals(Contained.getTerritoryMap(0).get(p)))
 				teamEdges.put(new TerritoryEdge(TerritoryEdge.NORTH, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 			
 			probe.x = p.x; 
 			probe.y = p.y-1;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
+			if (!Contained.getTerritoryMap(0).containsKey(probe) 
+					|| !Contained.getTerritoryMap(0).get(probe).equals(Contained.getTerritoryMap(0).get(p)))
 				teamEdges.put(new TerritoryEdge(TerritoryEdge.SOUTH, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 			
 			probe.x = p.x-1; 
 			probe.y = p.y;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
+			if (!Contained.getTerritoryMap(0).containsKey(probe) 
+					|| !Contained.getTerritoryMap(0).get(probe).equals(Contained.getTerritoryMap(0).get(p)))
 				teamEdges.put(new TerritoryEdge(TerritoryEdge.WEST, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 			
 			probe.x = p.x+1; 
 			probe.y = p.y;
-			if (!Contained.territoryData.containsKey(probe) 
-					|| !Contained.territoryData.get(probe).equals(Contained.territoryData.get(p)))
+			if (!Contained.getTerritoryMap(0).containsKey(probe) 
+					|| !Contained.getTerritoryMap(0).get(probe).equals(Contained.getTerritoryMap(0).get(p)))
 				teamEdges.put(new TerritoryEdge(TerritoryEdge.EAST, p.x, p.y), Contained.getTerritoryMap(0).get(p));
 		}
 	}
