@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import codechicken.lib.packet.PacketCustom;
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
@@ -73,6 +74,9 @@ public class ClientPacketHandlerUtil {
 	public static final int SYNC_PVP_STATS = 46;
 	public static final int SYNC_TEASURE_STATS = 47;
 	public static final int SYNC_GAME_SCORE = 48;
+	
+	public static final int ADD_TREASURE_POINTS = 49;
+	public static final int REMOVE_TREASURE_POINTS = 50;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
@@ -224,5 +228,40 @@ public class ClientPacketHandlerUtil {
 				syncGameScorePacket.writeInt(score);
 				Contained.channel.sendTo(syncGameScorePacket.toPacket(), miniGamePlayer);
 			} 	
+	}
+	
+	public static void addTreasureAndSync(int dimID, ArrayList<BlockCoord> points) {
+		ArrayList<BlockCoord> activeSoFar = Contained.getActiveTreasures(dimID);
+		for (BlockCoord p : points)
+			activeSoFar.add(p);
+		
+		PacketCustom treasurePacket = packetAddTreasures(points);
+		Contained.channel.sendToDimension(treasurePacket.toPacket(), dimID);
+	}
+	
+	public static void removeTreasureAndSync(int dimID, BlockCoord point) {
+		ArrayList<BlockCoord> p = new ArrayList<BlockCoord>();
+		p.add(point);
+		removeTreasureAndSync(dimID, p);
+	}
+	
+	public static void removeTreasureAndSync(int dimID, ArrayList<BlockCoord> points) {
+		ArrayList<BlockCoord> activeSoFar = Contained.getActiveTreasures(dimID);
+		for (BlockCoord p : points)
+			activeSoFar.remove(p);
+		
+		PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, REMOVE_TREASURE_POINTS);
+		treasurePacket.writeInt(points.size());
+		for (BlockCoord p : points)
+			treasurePacket.writeCoord(p);
+		Contained.channel.sendToDimension(treasurePacket.toPacket(), dimID);		
+	}
+	
+	public static PacketCustom packetAddTreasures(ArrayList<BlockCoord> points) {
+		PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, ADD_TREASURE_POINTS);
+		treasurePacket.writeInt(points.size());
+		for (BlockCoord p : points)
+			treasurePacket.writeCoord(p);
+		return treasurePacket;
 	}
 }

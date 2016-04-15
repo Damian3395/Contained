@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import codechicken.lib.vec.BlockCoord;
+
 import com.contained.game.commands.*;
 import com.contained.game.data.DataLogger;
 import com.contained.game.handler.DataEvents;
@@ -27,6 +29,7 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.world.GenerateWorld;
 
@@ -109,6 +112,13 @@ public class Contained{
 	// [CLIENT] Activity status of the client player's current mini-game.
 	//	        (always uses ID 0 for the dimension)
 	public static boolean[] gameActive;
+	
+	// Positions of active treasure chests for treasure mini-game dimensions.
+	// [SERVER] Position of all unclaimed chests in all treasure dimensions.
+	// [CLIENT] Position of all unclaimed chests in the client player's game.
+	//			(always uses ID 0 for the dimension)
+	public static HashMap<Integer, ArrayList<BlockCoord>> activeTreasures;
+	
 	public static int[][] gameScores;
 	
 	@EventHandler
@@ -131,6 +141,7 @@ public class Contained{
 		teamMemberData = new ArrayList<PlayerTeamIndividual>();
 		teamInvitations = new ArrayList<PlayerTeamInvitation>();
 		trades = new HashMap<Integer, ArrayList<PlayerTrade>>();
+		activeTreasures = new HashMap<Integer, ArrayList<BlockCoord>>();
 		timeLeft = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		miniGames = new ArrayList<PlayerMiniGame>(10);
@@ -195,6 +206,14 @@ public class Contained{
 		if (!trades.containsKey(dimID))
 			trades.put(dimID, new ArrayList<PlayerTrade>());
 		return trades.get(dimID);
+	}
+	
+	public static ArrayList<BlockCoord> getActiveTreasures(int dimID) {
+		if (dimID != 0 && !MiniGameUtil.isTreasure(dimID))
+			return new ArrayList<BlockCoord>();
+		if (!trades.containsKey(dimID))
+			activeTreasures.put(dimID, new ArrayList<BlockCoord>());
+		return activeTreasures.get(dimID);
 	}
 	
 	public static void tickTimeLeft(int dimID) {

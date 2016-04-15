@@ -1,9 +1,13 @@
 package com.contained.game.minigames;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Random;
 
+import codechicken.lib.vec.BlockCoord;
+
 import com.contained.game.item.ItemTerritory;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.TerritoryMachine;
 
@@ -17,11 +21,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
 public final class TreasureChestGenerator {	
-	World world;
-	
-	public TreasureChestGenerator(World world){
-		this.world=world;
-	}
 	
 	public static void definePossibleChestLoot(ChestGenHooks hook) {
 		hook.setMin(4);
@@ -95,26 +94,26 @@ public final class TreasureChestGenerator {
 		}
 	}
 	
-	public void generateChest(int chestAmount, ChestGenHooks hook){
-		if (this.world.isRemote)
+	public static void generateChest(World w, int chestAmount, ChestGenHooks hook){
+		if (w.isRemote)
 			return;
 		
 		int x,y,z;
-		Random r = new Random();
-		System.out.println("generating "+chestAmount+" chests.");
-		
+		Random r = new Random();		
+		ArrayList<BlockCoord> generatedPoints = new ArrayList<BlockCoord>();
 		for(int i=0;i<chestAmount;i++){
-			Point randomSpawnPoint = Util.getRandomLocation(this.world);
+			Point randomSpawnPoint = Util.getRandomLocation(w);
 			x=randomSpawnPoint.x;
 			z=randomSpawnPoint.y;			
-			y=this.world.getTopSolidOrLiquidBlock(x, z);		//coordinates to generate chests
+			y=w.getTopSolidOrLiquidBlock(x, z);		//coordinates to generate chests
 			
-			this.world.setBlock(x, y, z, Blocks.chest);			//generate a chest
-			TileEntity chest = this.world.getTileEntity(x, y, z);	
+			w.setBlock(x, y, z, Blocks.chest);		//generate a chest
+			TileEntity chest = w.getTileEntity(x, y, z);	
 			if (chest instanceof IInventory) {
 				WeightedRandomChestContent.generateChestContents(r, hook.getItems(r), (IInventory)chest, hook.getCount(r));
 			}
-			System.out.println("Chest#"+i+" is generated at ("+x+","+y+","+z+")");			
+			generatedPoints.add(new BlockCoord(x, y, z));			
 		}		
+		ClientPacketHandlerUtil.addTreasureAndSync(w.provider.dimensionId, generatedPoints);
 	}
 }

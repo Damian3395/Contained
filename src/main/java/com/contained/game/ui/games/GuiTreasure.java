@@ -1,8 +1,11 @@
 package com.contained.game.ui.games;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
+
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
@@ -36,7 +39,6 @@ public class GuiTreasure extends Gui {
 	private Rectangle colon = new Rectangle(64,32,32,32);
 	private Rectangle score = new Rectangle(96,32,128,32);
 	private Rectangle treasures = new Rectangle(0,96,240,32);
-	private Rectangle chests_left = new Rectangle(0,160,240,32);
 	
 	public GuiTreasure(Minecraft mc){
 		super();
@@ -129,5 +131,11 @@ public class GuiTreasure extends Gui {
 		}
 		
 		return 0;
+	}
+	
+	public static void renderChests() {
+		ArrayList<BlockCoord> chestPositions = Contained.getActiveTreasures(0);
+		
+		
 	}
 }

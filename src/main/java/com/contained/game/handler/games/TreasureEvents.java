@@ -1,5 +1,12 @@
 package com.contained.game.handler.games;
 
+import codechicken.lib.vec.BlockCoord;
+
+import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
+import com.contained.game.minigames.TreasureChestGenerator;
+import com.contained.game.network.ClientPacketHandlerUtil;
+
 import net.minecraft.block.BlockChest;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
@@ -8,25 +15,16 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class TreasureEvents {
 	@SubscribeEvent
 	public void onTreasureChestOpen(PlayerInteractEvent event){
-		
-		if(!event.entityPlayer.getEntityWorld().isRemote 
-				&& (event.entityPlayer.getEntityWorld().getBlock(event.x, event.y, event.z) instanceof BlockChest) 
-				&& event.action == Action.RIGHT_CLICK_BLOCK){
-			System.out.println("Event Detected");
-			// TODO: Keep queue of active chests, and remove chest from queue
-			// upon open. This is important because opening the same chest twice
-			// shouldn't award more than one point AND it's very important to
-			// distinguish between chests belonging to the mini-game, and chests
-			// crafted by players.
-			
-			// TODO: Packet sending is unnecessary here! Sending packet from
-			// server to server?? Although when visualizations are ready, will
-			// need a packet here to update visualizations on the client side.
-			//PacketCustom refreshChestPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.REFRESH_CHEST);
-			//Contained.channel.sendToServer(refreshChestPacket.toPacket());
-			
-			System.out.println(event.entityPlayer.getDisplayName()+"has found a chest!");
-			return;
+		if(!event.world.isRemote
+				&& (event.world.getBlock(event.x, event.y, event.z) instanceof BlockChest) 
+				&& event.action == Action.RIGHT_CLICK_BLOCK){	
+			BlockCoord eventLocation = new BlockCoord(event.x, event.y, event.z);
+			int dimID = event.world.provider.dimensionId;
+			if (Contained.getActiveTreasures(dimID).contains(eventLocation)) {
+				ClientPacketHandlerUtil.removeTreasureAndSync(dimID, eventLocation);
+				//TODO: Increase team score by 1.
+				TreasureChestGenerator.generateChest(event.world, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);
+			}
 		}
 		
 	}

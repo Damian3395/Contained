@@ -39,8 +39,7 @@ public class CommandStartTreasureHunt implements ICommand {
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
-						TreasureChestGenerator tcg = new TreasureChestGenerator(sender.getEntityWorld());
-						tcg.generateChest(Integer.parseInt(argString[0]), ContainedRegistry.CUSTOM_CHEST_LOOT);
+						TreasureChestGenerator.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[0]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 						MinecraftForge.EVENT_BUS.register(new TreasureEvents());
 					} catch (Exception e){
 						e.printStackTrace();

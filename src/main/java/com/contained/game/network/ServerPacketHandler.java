@@ -247,12 +247,6 @@ public class ServerPacketHandler {
 						//handle exception, tell client side.
 					}
 				break;
-				
-				case ServerPacketHandlerUtil.REFRESH_CHEST:
-					TreasureChestGenerator tcg = new TreasureChestGenerator(this.player.getServerForPlayer());
-					tcg.generateChest(1, ContainedRegistry.CUSTOM_CHEST_LOOT);
-					System.out.println("Server: Chest regenerated.");
-				break;
 			}
 		}
 	}
