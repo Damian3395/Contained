@@ -7,7 +7,6 @@ import org.lwjgl.opengl.GL11;
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -54,50 +53,54 @@ public class GuiPVP extends Gui {
 		if(event.type.equals(ElementType.ALL)){
 			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
-			int teamID = game.getTeamID(mc.thePlayer.getDisplayName());
-			if(properties.gameMode != Resources.PVP_MODE)
-				return;
-			
-			mc.entityRenderer.setupOverlayRendering();
-			
-			x = event.resolution.getScaledWidth()/2;
-			y = event.resolution.getScaledHeight()/2;
-			
-			GL11.glPushMatrix();
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);;
-			GL11.glDisable(GL11.GL_LIGHTING);     
-			this.mc.renderEngine.bindTexture(img);
-			//GameMode
-			this.drawTexturedModalRect(x-(pvp.width/2), y-170, pvp.x, pvp.y, pvp.width, pvp.height);
-			
-			//Score
-			this.drawTexturedModalRect(x-(score.width/2)-250, y-170, score.x, score.y, score.width, score.height);
-			String scoreVal = Integer.toString(Contained.gameScores[game.getGameDimension()][teamID]);
-			int offset = 0;
-			for(int i = 0; i < scoreVal.length(); i++)
-				offset = renderNumber(Character.toString(scoreVal.charAt(i)), x-(score.width/2-250)+offset, y-170);
-			
-			//Timer
-			String time = Util.getTimestamp(Contained.timeLeft[0]);
-			offset = 0;
-			for(int i = 0; i < time.length(); i++)
-				offset = renderNumber(Character.toString(time.charAt(i)), x+150+offset, y-170);
-			
-			//Lives
-			int side = LEFT;
-			for(int i = 0; i < properties.lives; i++){
-				if(side == LEFT){
-					this.drawTexturedModalRect(x+120-(left_life.width/2)+((i*left_life.width)/2)+(i*2), y+140
-							, left_life.x, left_life.y, left_life.width, left_life.height);
-					side = RIGHT;
-				}else if(side == RIGHT){
-					this.drawTexturedModalRect(x+120-(right_life.width/2)+((i*right_life.width)/2)+(i*2), y+140
-							, right_life.x, right_life.y, right_life.width, right_life.height);
-					side = LEFT;
+			if (game != null) {
+				int teamID = game.getTeamID(mc.thePlayer.getDisplayName());
+				if(properties.gameMode != Resources.PVP_MODE)
+					return;
+				if (teamID == -1)
+					return;
+				
+				mc.entityRenderer.setupOverlayRendering();
+				
+				x = event.resolution.getScaledWidth()/2;
+				y = event.resolution.getScaledHeight()/2;
+				
+				GL11.glPushMatrix();
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);;
+				GL11.glDisable(GL11.GL_LIGHTING);     
+				this.mc.renderEngine.bindTexture(img);
+				//GameMode
+				this.drawTexturedModalRect(x-(pvp.width/2), y-170, pvp.x, pvp.y, pvp.width, pvp.height);
+				
+				//Score
+				this.drawTexturedModalRect(x-(score.width/2)-250, y-170, score.x, score.y, score.width, score.height);
+				String scoreVal = Integer.toString(Contained.gameScores[game.getGameDimension()][teamID]);
+				int offset = 0;
+				for(int i = 0; i < scoreVal.length(); i++)
+					offset = renderNumber(Character.toString(scoreVal.charAt(i)), x-(score.width/2-250)+offset, y-170);
+				
+				//Timer
+				String time = Util.getTimestamp(Contained.timeLeft[0]);
+				offset = 0;
+				for(int i = 0; i < time.length(); i++)
+					offset = renderNumber(Character.toString(time.charAt(i)), x+150+offset, y-170);
+				
+				//Lives
+				int side = LEFT;
+				for(int i = 0; i < properties.lives; i++){
+					if(side == LEFT){
+						this.drawTexturedModalRect(x+120-(left_life.width/2)+((i*left_life.width)/2)+(i*2), y+140
+								, left_life.x, left_life.y, left_life.width, left_life.height);
+						side = RIGHT;
+					}else if(side == RIGHT){
+						this.drawTexturedModalRect(x+120-(right_life.width/2)+((i*right_life.width)/2)+(i*2), y+140
+								, right_life.x, right_life.y, right_life.width, right_life.height);
+						side = LEFT;
+					}
 				}
-			}
-			
-			GL11.glPopMatrix();
+				
+				GL11.glPopMatrix();
+			}			
 		}
 	}
 	

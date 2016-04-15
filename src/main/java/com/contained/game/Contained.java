@@ -121,6 +121,7 @@ public class Contained{
 		event.registerServerCommand(new CommandSurveyBook());
 		event.registerServerCommand(new CommandTPX());
 		event.registerServerCommand(new CommandTPXD());
+		event.registerServerCommand(new CommandStartTreasureHunt());
 	}
 	
 	@EventHandler
@@ -134,11 +135,11 @@ public class Contained{
 		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		miniGames = new ArrayList<PlayerMiniGame>(10);
 		gameScores = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1][];
-		gameScores[configs.OVERWORLD] = new int[configs.gameNumTeams[configs.OVERWORLD]];
+		gameScores[Settings.OVERWORLD] = new int[configs.gameNumTeams[Settings.OVERWORLD]];
 		for(int i = Resources.MIN_PVP_DIMID; i < Resources.MAX_PVP_DIMID; i++)
-			gameScores[i] = new int[configs.gameNumTeams[configs.PVP]];
+			gameScores[i] = new int[configs.gameNumTeams[Settings.PVP]];
 		for(int i = Resources.MAX_TREASURE_DIMID; i < Resources.MAX_TREASURE_DIMID; i++)
-			gameScores[i] = new int[configs.gameNumTeams[configs.TREASURE]];
+			gameScores[i] = new int[configs.gameNumTeams[Settings.TREASURE]];
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
@@ -176,7 +177,6 @@ public class Contained{
 	
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event){
-		
 	}
 	
 	public static ArrayList<PlayerTeam> getTeamList(int dimID) {

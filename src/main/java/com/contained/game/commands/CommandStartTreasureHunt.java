@@ -3,6 +3,7 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.minigames.TreasureChestGenerator;
@@ -39,7 +40,7 @@ public class CommandStartTreasureHunt implements ICommand {
 				}else{
 					try{
 						TreasureChestGenerator tcg = new TreasureChestGenerator(sender.getEntityWorld());
-						tcg.generateChest(Integer.parseInt(argString[0]));
+						tcg.generateChest(Integer.parseInt(argString[0]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 						MinecraftForge.EVENT_BUS.register(new TreasureEvents());
 					} catch (Exception e){
 						e.printStackTrace();
