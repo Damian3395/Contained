@@ -18,6 +18,7 @@ public class GuiScrollPane {
 	private ResourceLocation img;
 	private int selected = -1;
 	private int index = -1;
+	public boolean isElementSelected;
 	
 	public GuiScrollPane(GuiScreen gui, int x, int y, List<String> list){
 		this.gui = gui;
@@ -41,6 +42,7 @@ public class GuiScrollPane {
 					&& (y > (this.y+(i*16)) && (y < (this.y+((i+1) * 16)))) 
 					&& button == 0 
 					&& (i + (6 * this.scrollSect)) < this.list.size()){
+				isElementSelected = true;
 				selected = i;
 				index = (i + (6 * this.scrollSect));
 			}
@@ -52,6 +54,7 @@ public class GuiScrollPane {
 					&& (y < (this.y+((i+1) * 16)))) 
 					&& button == 0 
 					&& (i + (6 * this.scrollSect)) < this.list.size()){
+				isElementSelected = true;
 				selected = i;
 				index = (i + (6 * this.scrollSect));
 			}

@@ -1,4 +1,4 @@
-package com.contained.game.ui;
+package com.contained.game.ui.territory;
 
 public class TerritoryEdge {
 

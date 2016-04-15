@@ -1,4 +1,4 @@
-package com.contained.game.ui;
+package com.contained.game.ui.perks;
 
 import codechicken.lib.packet.PacketCustom;
 
@@ -7,12 +7,6 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.KeyBindings;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.components.Container;
-import com.contained.game.ui.perks.BaseClass;
-import com.contained.game.ui.perks.BuilderClass;
-import com.contained.game.ui.perks.CollectorClass;
-import com.contained.game.ui.perks.CookClass;
-import com.contained.game.ui.perks.WarriorClass;
-import com.contained.game.ui.perks.WizardClass;
 import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;

@@ -12,15 +12,15 @@ import net.minecraft.tileentity.TileEntity;
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
-import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.GuiTownManage;
-import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
+import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
+import com.contained.game.ui.perks.ClassPerks;
+import com.contained.game.ui.territory.TerritoryRender;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -499,6 +499,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					treasureStats.treasureWon = packet.readInt();
 					treasureStats.treasureLost = packet.readInt();
 					treasureStats.treasuresOpened = packet.readInt();
+				break;
+				
+				case ClientPacketHandlerUtil.SYNC_GAME_SCORE:
+					int dim = packet.readInt();
+					int teamNum = packet.readInt();
+					int score = packet.readInt();
+					Contained.gameScores[dim][teamNum] = score;
 				break;
 			}
 		}

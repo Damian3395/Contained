@@ -4,9 +4,9 @@ import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 
-import com.contained.game.ui.GuiSurvey;
-import com.contained.game.ui.SurveyData;
 import com.contained.game.ui.components.Container;
+import com.contained.game.ui.survey.GuiSurvey;
+import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 

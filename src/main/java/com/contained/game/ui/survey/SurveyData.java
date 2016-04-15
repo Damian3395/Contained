@@ -1,4 +1,4 @@
-package com.contained.game.ui;
+package com.contained.game.ui.survey;
 
 import net.minecraft.nbt.NBTTagCompound;
 

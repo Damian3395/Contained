@@ -1,11 +1,14 @@
 package com.contained.game.network;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.ObjectGenerator;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -14,9 +17,11 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Handling of packets sent from client to server.
@@ -153,6 +158,99 @@ public class ServerPacketHandler {
 				
 				case ServerPacketHandlerUtil.CANCEL_JOIN_MINI_GAME:
 					games.cancelMiniGame(player);
+				break;
+				
+				case ServerPacketHandlerUtil.REVIVE_PLAYER:
+					int dimID = packet.readInt();
+					String revivePlayer = packet.readString();
+					EntityPlayerMP teamPlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(revivePlayer);
+					ExtendedPlayer deadProperties = ExtendedPlayer.get(teamPlayer);
+					if(deadProperties.lives == 0){
+						//Revive Player
+						deadProperties.resurrect();
+						
+						//Sync Client Lives
+						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
+						syncLifePacket.writeInt(deadProperties.lives);
+						Contained.channel.sendTo(syncLifePacket.toPacket(), teamPlayer);
+						
+						//Sync Client GameMode
+						PacketCustom normalPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_NORMAL);
+						Contained.channel.sendTo(normalPacket.toPacket(), teamPlayer);
+						
+						//Remove Stick of Life
+						int slotID = 0;
+						for(int i = 0; i < player.inventory.getSizeInventory(); i++)
+							if(player.inventory.getStackInSlot(i) != null
+								&& player.inventory.getStackInSlot(i).getDisplayName().equals("Stick of Life")){
+								slotID = i;
+								player.inventory.setInventorySlotContents(i, null);
+								break;
+							}
+						
+						//Sync Client Items
+						PacketCustom removeLifeStickPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_ITEM);
+						syncLifePacket.writeInt(slotID);
+						Contained.channel.sendTo(removeLifeStickPacket.toPacket(), teamPlayer);
+					}else
+						Util.displayMessage(player, "Selected Team-Player Is Already Alive!");
+				break;
+				
+				case ServerPacketHandlerUtil.BECOME_ADMIN:
+					player.setInvisible(true);
+					player.capabilities.allowFlying = true;
+					player.capabilities.disableDamage = true;
+					ExtendedPlayer.get(player).setAdminRights(true);
+					PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_ADMIN);
+					Contained.channel.sendTo(adminPacket.toPacket(),this.player);
+				break;
+				
+				case ServerPacketHandlerUtil.ADMIN_CREATE:
+					int x,y,z;
+					String object,name;
+					Random r= new Random();
+					object=packet.readString();
+					name=packet.readString();
+					x = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posX;
+					y = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posY;
+					z = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posZ;
+					ObjectGenerator og = new ObjectGenerator();
+					if(!og.generate(object, this.player.getServerForPlayer(), x, y, z)){
+						System.out.println("Server: Cannot generate <"+object+"> ");
+					}else{
+						System.out.println("Server: Generate <"+object+"> succedded");
+					}
+				break;
+					
+				case ServerPacketHandlerUtil.ADMIN_CHANGE:
+					int healthPercentage,hungerPercentage;
+					String playerName;
+					healthPercentage=packet.readInt();
+					hungerPercentage=packet.readInt();
+					playerName=packet.readString();
+					try{
+	    				EntityPlayer target = this.player.getServerForPlayer().getPlayerEntityByName(playerName); 
+	    				if(healthPercentage!=-1){
+	    					
+	    					if(healthPercentage<=100 && healthPercentage>0){
+		    					target.setHealth(target.getMaxHealth()*healthPercentage/100);
+		    				}
+	    				}
+	    				if(hungerPercentage!=-1){
+	    					
+	    					if(hungerPercentage<=100 && hungerPercentage>0){
+		    					target.getFoodStats().setFoodLevel(20*hungerPercentage/100);
+		    				}
+	    				}
+					}catch(Exception e){
+						//handle exception, tell client side.
+					}
+				break;
+				
+				case ServerPacketHandlerUtil.REFRESH_CHEST:
+					TreasureChestGenerator tcg = new TreasureChestGenerator(this.player.getServerForPlayer());
+					tcg.generateChest(1);
+					System.out.println("Server: Chest regenerated.");
 				break;
 			}
 		}

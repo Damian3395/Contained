@@ -22,7 +22,6 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
-//TODO: Update Player Properties
 public class PlayerMiniGame {
 	private String[] intro = {"The", "League of", "Demons of"
 			, " Avengers of", "Call of", "Warlords of", "Clan of"
@@ -109,8 +108,8 @@ public class PlayerMiniGame {
 		Contained.gameActive[dim] = false;
 		Contained.timeLeft[dim] = 0;
 		ClientPacketHandlerUtil.syncMinigameTime(dim);
-		Contained.getTeamList(dim).remove(0);
-		Contained.getTeamList(dim).remove(1);
+		for(int i = 0; i < Contained.getTeamList(dim).size(); i++)
+			Contained.getTeamList(dim).remove(i);
 		Contained.miniGames.remove(this);
 	}
 	
@@ -127,6 +126,7 @@ public class PlayerMiniGame {
 					pdata.xp = player.experienceTotal;
 					pdata.setInventory(player.inventoryContainer.inventoryItemStacks);
 					clearInventory(player);
+					pdata.armor = player.inventory.armorInventory;
 					
 					Util.travelToDimension(to, player);
 					
@@ -140,7 +140,9 @@ public class PlayerMiniGame {
 					properties.setGame(false);
 					player.inventoryContainer = (Container) pdata.inventory;
 					player.experienceTotal = pdata.xp;
+					player.inventory.armorInventory = pdata.armor;
 					pdata.inventory = null;
+					pdata.armor = null;
 					
 					//Sync GameMode
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
@@ -279,5 +281,21 @@ public class PlayerMiniGame {
 		ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(dim)).sendToClients();
 		String world = Util.getDimensionString(dim);
 		DataLogger.insertCreateTeam(Util.getServerID(), pdata.playerName, world, newTeam.displayName, Util.getDate());
+	}
+	
+	public static PlayerMiniGame get(int dim){
+		for(PlayerMiniGame game : Contained.miniGames)
+			if(game.dim == dim)
+				return game;
+		
+		return null;
+	}
+	
+	public static PlayerMiniGame get(String teamName){
+		for(PlayerMiniGame game : Contained.miniGames)
+			if(game.teamExists(teamName))
+				return game;
+		
+		return null;
 	}
 }

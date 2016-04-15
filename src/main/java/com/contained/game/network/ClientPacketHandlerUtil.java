@@ -7,6 +7,7 @@ import java.util.HashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
@@ -71,6 +72,7 @@ public class ClientPacketHandlerUtil {
 	public static final int MINIGAME_ENDED = 45;
 	public static final int SYNC_PVP_STATS = 46;
 	public static final int SYNC_TEASURE_STATS = 47;
+	public static final int SYNC_GAME_SCORE = 48;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
@@ -210,5 +212,17 @@ public class ClientPacketHandlerUtil {
 		PacketCustom timePacket = new PacketCustom(Resources.MOD_ID, MINIGAME_TIMER_SYNC);
 		timePacket.writeInt(Contained.timeLeft[dimID]);
 		Contained.channel.sendToDimension(timePacket.toPacket(), dimID);
+	}
+	
+	public static void syncMiniGameScore(int dimID, int teamID, int score){
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData)
+			if(pdata.teamID.equals(Contained.getTeamList(dimID).get(teamID).displayName)){
+				EntityPlayerMP miniGamePlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(pdata.playerName);
+				PacketCustom syncGameScorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_GAME_SCORE);
+				syncGameScorePacket.writeInt(dimID);
+				syncGameScorePacket.writeInt(teamID);
+				syncGameScorePacket.writeInt(score);
+				Contained.channel.sendTo(syncGameScorePacket.toPacket(), miniGamePlayer);
+			} 	
 	}
 }

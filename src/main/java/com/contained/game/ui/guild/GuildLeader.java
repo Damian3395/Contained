@@ -9,7 +9,6 @@ import codechicken.lib.packet.PacketCustom;
 import com.contained.game.Contained;
 import com.contained.game.Settings;
 import com.contained.game.network.ServerPacketHandlerUtil;
-import com.contained.game.ui.GuiGuild;
 import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.components.GuiTab;
 import com.contained.game.ui.components.IconButton;

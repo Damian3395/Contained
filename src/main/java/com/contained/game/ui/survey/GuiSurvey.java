@@ -1,4 +1,4 @@
-package com.contained.game.ui;
+package com.contained.game.ui.survey;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
@@ -9,6 +9,7 @@ import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ServerPacketHandlerUtil;
+import com.contained.game.ui.survey.SurveyData.Q;
 import com.contained.game.user.PlayerTeamIndividual;
 
 import net.minecraft.client.gui.GuiButton;

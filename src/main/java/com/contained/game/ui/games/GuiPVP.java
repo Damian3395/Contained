@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -52,6 +53,8 @@ public class GuiPVP extends Gui {
 	public void renderAllHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
 			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
+			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
+			int teamID = game.getTeamID(mc.thePlayer.getDisplayName());
 			if(properties.gameMode != Resources.PVP_MODE)
 				return;
 			
@@ -69,11 +72,16 @@ public class GuiPVP extends Gui {
 			
 			//Score
 			this.drawTexturedModalRect(x-(score.width/2)-250, y-170, score.x, score.y, score.width, score.height);
+			String scoreVal = Integer.toString(Contained.gameScores[game.getGameDimension()][teamID]);
+			int offset = 0;
+			for(int i = 0; i < scoreVal.length(); i++)
+				offset = renderNumber(Character.toString(scoreVal.charAt(i)), x-(score.width/2-250)+offset, y-170);
 			
 			//Timer
-			//String time = Util.getTimestamp(Contained.timeLeft[0]);
-			//for(int i = 0; i < time.length(); i++)
-			//	renderNumber(Character.toString(time.charAt(i)), x+(i*32), y);
+			String time = Util.getTimestamp(Contained.timeLeft[0]);
+			offset = 0;
+			for(int i = 0; i < time.length(); i++)
+				offset = renderNumber(Character.toString(time.charAt(i)), x+150+offset, y-170);
 			
 			//Lives
 			int side = LEFT;
@@ -93,44 +101,46 @@ public class GuiPVP extends Gui {
 		}
 	}
 	
-	private void renderNumber(String number, int x, int y){
+	private int renderNumber(String number, int x, int y){
 		int num = Integer.parseInt(number);
 		int colonNum = Integer.parseInt(":");
 		System.out.println("Colon Dec: " + colonNum);
 		switch(num){
 		case 58:
 			this.drawTexturedModalRect(x-(colon.width/2), y, colon.x, colon.y, colon.width, colon.height);
-			break;
+			return colon.width;
 		case 0:
 			this.drawTexturedModalRect(x-(zero.width/2), y, zero.x, zero.y, zero.width, zero.height);
-			break;
+			return zero.width;
 		case 1:
 			this.drawTexturedModalRect(x-(one.width/2), y, one.x, one.y, one.width, one.height);
-			break;
+			return one.width;
 		case 2:
 			this.drawTexturedModalRect(x-(two.width/2), y, two.x, two.y, two.width, two.height);
-			break;
+			return two.width;
 		case 3:
 			this.drawTexturedModalRect(x-(three.width/2), y, three.x, three.y, three.width, three.height);
-			break;
+			return three.width;
 		case 4:
 			this.drawTexturedModalRect(x-(four.width/2), y, four.x, four.y, four.width, four.height);
-			break;
+			return four.width;
 		case 5:
 			this.drawTexturedModalRect(x-(five.width/2), y, five.x, five.y, five.width, five.height);
-			break;
+			return five.width;
 		case 6:
 			this.drawTexturedModalRect(x-(six.width/2), y, six.x, six.y, six.width, six.height);
-			break;
+			return six.width;
 		case 7:
 			this.drawTexturedModalRect(x-(seven.width/2), y, seven.x, seven.y, seven.width, seven.height);
-			break;
+			return seven.width;
 		case 8:
 			this.drawTexturedModalRect(x-(eight.width/2), y, eight.x, eight.y, eight.width, eight.height);
-			break;
+			return eight.width;
 		case 9:
 			this.drawTexturedModalRect(x-(nine.width/2), y, nine.x, nine.y, nine.width, nine.height);
-			break;
+			return nine.width;
 		}
+		
+		return 0;
 	}
 }

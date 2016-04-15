@@ -1,4 +1,4 @@
-package com.contained.game.ui;
+package com.contained.game.ui.territory;
 
 import java.awt.Color;
 import java.awt.Point;

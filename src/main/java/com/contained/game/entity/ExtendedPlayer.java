@@ -3,9 +3,8 @@ package com.contained.game.entity;
 import java.util.ArrayList;
 
 import com.contained.game.data.Data;
-import com.contained.game.ui.ClassPerks;
+import com.contained.game.ui.perks.ClassPerks;
 import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,9 +28,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int usedByOthers = 0;    //# of times another player used an item owned by this player.
 	public boolean isAdmin = false;
 	public boolean isSpectator = false;
-	private boolean inGame = false;
+	private boolean inGame = true;
 	private boolean joiningGame = false;
-	public int gameMode = Resources.FREE_PLAY;
+	public int gameMode = Resources.PVP_MODE;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;

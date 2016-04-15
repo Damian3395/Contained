@@ -1,10 +1,10 @@
 package com.contained.game.handler;
 
-import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.DataVisualization;
-import com.contained.game.ui.GuiGuild;
-import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.games.GuiMiniGames;
+import com.contained.game.ui.guild.GuiGuild;
+import com.contained.game.ui.perks.ClassPerks;
+import com.contained.game.ui.territory.TerritoryRender;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

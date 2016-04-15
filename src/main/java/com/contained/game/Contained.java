@@ -109,7 +109,7 @@ public class Contained{
 	// [CLIENT] Activity status of the client player's current mini-game.
 	//	        (always uses ID 0 for the dimension)
 	public static boolean[] gameActive;
-	
+	public static int[][] gameScores;
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
@@ -133,6 +133,12 @@ public class Contained{
 		timeLeft = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		miniGames = new ArrayList<PlayerMiniGame>(10);
+		gameScores = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1][];
+		gameScores[configs.OVERWORLD] = new int[configs.gameNumTeams[configs.OVERWORLD]];
+		for(int i = Resources.MIN_PVP_DIMID; i < Resources.MAX_PVP_DIMID; i++)
+			gameScores[i] = new int[configs.gameNumTeams[configs.PVP]];
+		for(int i = Resources.MAX_TREASURE_DIMID; i < Resources.MAX_TREASURE_DIMID; i++)
+			gameScores[i] = new int[configs.gameNumTeams[configs.TREASURE]];
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());

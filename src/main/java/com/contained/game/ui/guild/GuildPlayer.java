@@ -7,7 +7,6 @@ import java.util.List;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.network.ServerPacketHandlerUtil;
-import com.contained.game.ui.GuiGuild;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;

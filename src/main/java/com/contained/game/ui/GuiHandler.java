@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import com.contained.game.Contained;
 import com.contained.game.ui.games.RevivePlayer;
+import com.contained.game.ui.survey.GuiSurvey;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.ContainerTownHall;

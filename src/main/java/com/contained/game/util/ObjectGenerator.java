@@ -9,14 +9,20 @@ import net.minecraft.entity.boss.*;
 import net.minecraft.entity.monster.*;
 import net.minecraft.entity.passive.*;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
 
 public class ObjectGenerator {
 	public boolean generate(String target, World world, int x, int y, int z){
 		boolean isEntity=false;
 		boolean isBlock=false;
+		boolean isTileEntity=false;
 		Entity entityTarget = null;
 		Block blockTarget=null;
+		TileEntity tileEntityTarget=null;
 		Random r=new Random();
 
 		/*===========================
@@ -230,34 +236,84 @@ public class ObjectGenerator {
 			blockTarget = Blocks.iron_ore;
 			isBlock=true;
 		}
+		
+		/*===========================
+		 * Treasure Chest
+		 * ==========================
+		 */
+		
+		else if(target.toLowerCase().equals("treasurechest")||target.toLowerCase().equals("treasure chest")){
+			isTileEntity=true;
+		}
+		
+		
+		
 		else {
+			System.out.println("XYZ:("+x+","+y+","+z+")");
 			isEntity=false;
 			isBlock=false;
+			isTileEntity=false;
 			return false;
 		}
 
 		if(isEntity){
-			entityTarget.setLocationAndAngles(x + r.nextInt(3),
-					y, z + r.nextInt(3), 0.0F, 0.0F);
-			if (world.spawnEntityInWorld(entityTarget)) {
-				return true;
-			}else{
+			try{
+				entityTarget.setLocationAndAngles(x, y, z, 0.0F, 0.0F);
+				if (world.spawnEntityInWorld(entityTarget)) {
+					return true;
+				}else{
+					isEntity=false;
+					isBlock=false;
+					isTileEntity=false;
+					return false;
+				}
+			} catch (Exception e){
 				isEntity=false;
 				isBlock=false;
+				isTileEntity=false;
 				return false;
 			}
 		}else if(isBlock){
-			if (world.setBlock(x + r.nextInt(3),
-					y, z + r.nextInt(3), blockTarget)) {
-				return true;
-			}else{
+			try{
+				if (world.setBlock(x, y, z, blockTarget)) {
+					return true;
+				}else{
+					isEntity=false;
+					isBlock=false;
+					isTileEntity=false;
+					return false;
+				}
+			}catch (Exception e){
 				isEntity=false;
 				isBlock=false;
+				isTileEntity=false;
 				return false;
-			}	
+			}
+		}else if(isTileEntity){
+			try{
+//				world.setTileEntity(x+2, y, z, tileEntityTarget);
+				world.setBlock(x, y-1, z, Blocks.chest);
+				int temp=world.getTopSolidOrLiquidBlock(x+3, z);
+				System.out.println("getTopSolidOrLiquidBlock("+x+3+","+ z+")="+temp);
+				world.setBlock(x+3, temp, z, Blocks.chest);
+				temp=world.getTopSolidOrLiquidBlock(x+500, z);
+				System.out.println("getTopSolidOrLiquidBlock("+x+500+","+ z+")="+temp);
+				world.setBlock(x+500, temp, z, Blocks.chest);
+				TileEntityChest a = (TileEntityChest)world.getTileEntity(x, y-1, z);
+				ItemStack is = new ItemStack(Items.bow,1);
+				a.setInventorySlotContents(1, is);
+				return true;
+			}catch (Exception e){
+				isEntity=false;
+				isBlock=false;
+				isTileEntity=false;
+				return false;
+			}
+			
 		}else{
 			isEntity=false;
 			isBlock=false;
+			isTileEntity=false;
 			return false;
 		}
 

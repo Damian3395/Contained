@@ -1,13 +1,10 @@
-package com.contained.game.ui;
+package com.contained.game.ui.guild;
 
 import java.util.List;
 
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.KeyBindings;
 import com.contained.game.ui.components.Container;
-import com.contained.game.ui.guild.GuildBase;
-import com.contained.game.ui.guild.GuildLeader;
-import com.contained.game.ui.guild.GuildPlayer;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 

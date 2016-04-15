@@ -7,7 +7,7 @@ import java.util.List;
 import com.contained.game.Contained;
 import com.contained.game.Settings;
 import com.contained.game.network.ClientPacketHandlerUtil;
-import com.contained.game.ui.SurveyData;
+import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.util.ErrorCase;
 import com.contained.game.util.Util;
 import com.contained.game.util.ErrorCase.Error;
@@ -37,6 +37,7 @@ public class PlayerTeamIndividual {
 	public boolean lobbyLeader;
 	public List inventory;
 	public int xp;
+	public ItemStack[] armor;
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -245,6 +246,17 @@ public class PlayerTeamIndividual {
 			}
 		}
 		ntc.setTag("inventory", inventoryList);
+		
+		NBTTagList armorList = new NBTTagList();
+		if(armor != null){
+			for(int i = 0; i < armor.length; i++){
+				NBTTagCompound saveArmor = new NBTTagCompound();
+				armor[i].writeToNBT(saveArmor);
+				armorList.appendTag(saveArmor);
+			}
+				
+		}
+		ntc.setTag("armor", armorList);
 	}
 	
 	public void readFromNBT(NBTTagCompound ntc) {
@@ -266,11 +278,13 @@ public class PlayerTeamIndividual {
 		else
 			this.lobbyTeamID = null;
 		NBTTagList inventoryList = ntc.getTagList("inventory", (byte)10);
-		for(int i=0; i<inventoryList.tagCount(); i++) {
-			NBTTagCompound data = inventoryList.getCompoundTagAt(i);
-			ItemStack item = ItemStack.loadItemStackFromNBT(data);
-			inventory.add(item);
-		}
+		for(int i=0; i<inventoryList.tagCount(); i++) 
+			inventory.add(ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i)));
+		
+		NBTTagList armorList = ntc.getTagList("armor", (byte)10);
+		armor = new ItemStack[armorList.tagCount()];
+		for(int i = 0; i<armorList.tagCount(); i++)
+			armor[i] = ItemStack.loadItemStackFromNBT(armorList.getCompoundTagAt(i));
 	}
 	
 	public static boolean isLeader(EntityPlayer p) {

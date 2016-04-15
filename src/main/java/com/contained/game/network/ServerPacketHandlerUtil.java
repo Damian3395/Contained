@@ -40,6 +40,13 @@ public class ServerPacketHandlerUtil {
 	public static final int UPDATE_SURVEY = 22;
 	public static final int JOIN_MINI_GAME = 23;
 	public static final int CANCEL_JOIN_MINI_GAME = 24;
+	public static final int REVIVE_PLAYER = 25;
+	
+	public static final int BECOME_ADMIN = 26;
+	public static final int ADMIN_CREATE = 27;
+	public static final int ADMIN_CHANGE = 28;
+	
+	public static final int REFRESH_CHEST = 29;
 	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);

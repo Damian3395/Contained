@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.components.IconButton;
 import com.contained.game.ui.components.ProgressBar;
 

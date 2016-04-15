@@ -6,9 +6,9 @@ import com.contained.game.handler.KeyInputHandler;
 import com.contained.game.item.AntiTerritoryRender;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.ui.DataVisualization;
-import com.contained.game.ui.TerritoryRender;
 import com.contained.game.ui.games.GuiPVP;
 import com.contained.game.ui.games.GuiTreasure;
+import com.contained.game.ui.territory.TerritoryRender;
 import com.contained.game.world.block.TerritoryMachineRender;
 import com.contained.game.world.block.TerritoryMachineTE;
 

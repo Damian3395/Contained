@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.contained.game.ui.ClassPerks;
 import com.contained.game.ui.components.ProgressBar;
 
 import net.minecraft.client.gui.GuiButton;
