@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
@@ -31,7 +32,30 @@ public class Save {
 			ntc.setInteger("gameTime", Contained.timeLeft[dimID]);
 			ntc.setBoolean("isActive", Contained.gameActive[dimID]);
 		}
+		
+		//Active Treasure
+		ArrayList<BlockCoord> activeTreasure = Contained.getActiveTreasures(dimID);
+		if (activeTreasure.size() > 0 && MiniGameUtil.isTreasure(dimID)) {
+			int[] activeX = new int[activeTreasure.size()];
+			int[] activeY = new int[activeTreasure.size()];
+			int[] activeZ = new int[activeTreasure.size()];
+			for (int i=0 ;i<activeTreasure.size(); i++) {
+				activeX[i] = activeTreasure.get(i).x;
+				activeY[i] = activeTreasure.get(i).y;
+				activeZ[i] = activeTreasure.get(i).z;
+			}
+			ntc.setIntArray("treasureX", activeX);
+			ntc.setIntArray("treasureY", activeY);
+			ntc.setIntArray("treasureZ", activeZ);
+		} else {
+			if (ntc.hasKey("treasureX")) {
+				ntc.removeTag("treasureX");
+				ntc.removeTag("treasureY");
+				ntc.removeTag("treasureZ");
+			}
+		}
 		saveNBTFile("worldProperties"+dimID+".dat", ntc);
+		
 		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++)
 			GenerateWorld.getOreProperties(dimID, i).saveToFile(dimID);
 		GenerateWorld.getBiomeProperties(dimID).saveToFile(dimID);

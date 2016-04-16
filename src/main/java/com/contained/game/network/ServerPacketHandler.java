@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.user.PlayerTeam;
@@ -245,12 +246,6 @@ public class ServerPacketHandler {
 					}catch(Exception e){
 						//handle exception, tell client side.
 					}
-				break;
-				
-				case ServerPacketHandlerUtil.REFRESH_CHEST:
-					TreasureChestGenerator tcg = new TreasureChestGenerator(this.player.getServerForPlayer());
-					tcg.generateChest(1);
-					System.out.println("Server: Chest regenerated.");
 				break;
 			}
 		}

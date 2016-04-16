@@ -2,6 +2,7 @@ package com.contained.game;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.DimensionManager;
 import mantle.client.MProxyClient;
 import mantle.lib.client.MantleClientRegistry;
@@ -10,6 +11,7 @@ import com.contained.game.entity.DeepBlaze;
 import com.contained.game.entity.DeepLavaSlime;
 import com.contained.game.entity.DeepWitherSkeleton;
 import com.contained.game.item.*;
+import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.ui.ToolPage;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.*;
@@ -37,6 +39,9 @@ public class ContainedRegistry {
 	public static DeepBlaze mobBlaze;
 	public static DeepLavaSlime mobMagma;
 	public static DeepWitherSkeleton mobWitherSkel;
+	
+	public static final ChestGenHooks CUSTOM_CHEST_LOOT =
+			ChestGenHooks.getInfo(Resources.MOD_ID + ":minigame");
 	
 	public void preInit(FMLPreInitializationEvent event) {
 		wasteland = new WastelandBlock(); 		  wasteland.preInit(event);
@@ -89,6 +94,7 @@ public class ContainedRegistry {
 			DimensionManager.registerDimension(i, 0);
 		for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++)
 			DimensionManager.registerDimension(i, 0);
-	}
-	
+		
+		TreasureChestGenerator.definePossibleChestLoot(CUSTOM_CHEST_LOOT);
+	}	
 }

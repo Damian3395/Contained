@@ -46,8 +46,6 @@ public class ServerPacketHandlerUtil {
 	public static final int ADMIN_CREATE = 27;
 	public static final int ADMIN_CHANGE = 28;
 	
-	public static final int REFRESH_CHEST = 29;
-	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);
 	}

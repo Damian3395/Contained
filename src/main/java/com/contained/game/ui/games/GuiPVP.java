@@ -56,6 +56,7 @@ public class GuiPVP extends Gui {
 				return;
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
+
 			if(game == null)
 				return;
 			
@@ -101,8 +102,7 @@ public class GuiPVP extends Gui {
 					side = LEFT;
 				}
 			}
-			
-			GL11.glPopMatrix();
+			GL11.glPopMatrix();			
 		}
 	}
 	

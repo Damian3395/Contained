@@ -6,6 +6,7 @@ import java.util.List;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.minigames.TreasureChestGenerator;
@@ -75,8 +76,7 @@ public class CommandStartTreasureHunt implements ICommand {
 						syncLifePacket.writeInt(properties.gameMode);
 						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
 						
-						TreasureChestGenerator tcg = new TreasureChestGenerator(sender.getEntityWorld());
-						tcg.generateChest(Integer.parseInt(argString[1]));
+						TreasureChestGenerator.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[0]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);

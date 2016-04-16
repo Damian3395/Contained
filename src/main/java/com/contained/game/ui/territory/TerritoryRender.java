@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Util;
 
 import net.minecraft.client.Minecraft;
@@ -50,13 +51,9 @@ public class TerritoryRender {
 	@SubscribeEvent
 	public void onRenderScreen(RenderWorldLastEvent ev) {
 		if (mc.theWorld != null && doRender) {
-			float dt = ev.partialTicks;
-			float px = (float)mc.thePlayer.prevPosX;
-			float py = (float)mc.thePlayer.prevPosY;
-			float pz = (float)mc.thePlayer.prevPosZ;
-			drawTerritoryEdges(px + ((float)mc.thePlayer.posX - px) * dt,
-								py + ((float)mc.thePlayer.posY - py) * dt,
-								pz + ((float)mc.thePlayer.posZ - pz) * dt);
+			drawTerritoryEdges(RenderUtil.getOriginX(mc, ev.partialTicks),
+								RenderUtil.getOriginY(mc, ev.partialTicks),
+								RenderUtil.getOriginZ(mc, ev.partialTicks));
 		}
 	}
 	

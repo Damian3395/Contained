@@ -485,6 +485,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					endMiniGame.setGameMode(Resources.FREE_PLAY);
 					endMiniGame.setGame(false);
+					Contained.getActiveTreasures(0).clear();
 				break;
 				
 				case ClientPacketHandlerUtil.SYNC_PVP_STATS:
@@ -519,6 +520,16 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						PlayerTeam newTeam = new PlayerTeam(packet.readNBTTagCompound());
 						Contained.getTeamList(dimID).add(newTeam);
 					}
+				case ClientPacketHandlerUtil.ADD_TREASURE_POINTS:
+					int numToAdd = packet.readInt();
+					for(int i=0; i<numToAdd; i++)
+						Contained.getActiveTreasures(0).add(packet.readCoord());
+				break;
+				
+				case ClientPacketHandlerUtil.REMOVE_TREASURE_POINTS:
+					int numToRemove = packet.readInt();
+					for(int i=0; i<numToRemove; i++)
+						Contained.getActiveTreasures(0).remove(packet.readCoord());
 				break;
 			}
 		}

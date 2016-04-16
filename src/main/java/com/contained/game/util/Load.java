@@ -4,6 +4,9 @@ import java.awt.Point;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
@@ -30,6 +33,15 @@ public class Load {
 				Contained.timeLeft[dimID] = ntc.getInteger("gameTime");
 			if (ntc.hasKey("isActive"))
 				Contained.gameActive[dimID] = ntc.getBoolean("isActive");
+			ArrayList<BlockCoord> activeTreasure = Contained.getActiveTreasures(dimID);
+			activeTreasure.clear();
+			if (ntc.hasKey("treasureX")) {
+				int[] treasureX = ntc.getIntArray("treasureX");
+				int[] treasureY = ntc.getIntArray("treasureY");
+				int[] treasureZ = ntc.getIntArray("treasureZ");
+				for(int i=0; i<treasureX.length; i++)
+					activeTreasure.add(new BlockCoord(treasureX[i], treasureY[i], treasureZ[i]));
+			}
 		}
 		for(int i=0; i<GenerateWorld.defaultOreProperties.length; i++) {
 			GenerateWorld.getOreProperties(dimID, i).loadFromFile(dimID);
