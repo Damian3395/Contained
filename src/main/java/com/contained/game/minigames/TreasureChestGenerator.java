@@ -109,9 +109,8 @@ public final class TreasureChestGenerator {
 			
 			w.setBlock(x, y, z, Blocks.chest);		//generate a chest
 			TileEntity chest = w.getTileEntity(x, y, z);	
-			if (chest instanceof IInventory) {
+			if (chest instanceof IInventory)
 				WeightedRandomChestContent.generateChestContents(r, hook.getItems(r), (IInventory)chest, hook.getCount(r));
-			}
 			generatedPoints.add(new BlockCoord(x, y, z));			
 		}		
 		ClientPacketHandlerUtil.addTreasureAndSync(w.provider.dimensionId, generatedPoints);

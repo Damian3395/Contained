@@ -4,6 +4,11 @@ import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 
+import codechicken.lib.vec.BlockCoord;
+
+import com.contained.game.ui.territory.TerritoryEdge;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -73,5 +78,41 @@ public class RenderUtil {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glPopMatrix();
         }
+    }
+    
+    public static void drawPillar(int x, int z, float radius, int color, float ox, float oy, float oz) {
+		Tessellator tes = Tessellator.instance;
+		float x1 = x+0.5f-radius-ox;
+		float x2 = x+0.5f+radius-ox;
+		float y1 = 0-oy;
+		float y2 = 255-oy;
+		float z1 = z+0.5f-radius-oz;
+		float z2 = z+0.5f+radius-oz;
+	
+		tes.startDrawing(GL11.GL_TRIANGLE_STRIP);
+		tes.setColorRGBA_I(color, 100);
+
+		tes.addVertex(x1, y1, z1); tes.addVertex(x1, y2, z1);
+		tes.addVertex(x2, y1, z1); tes.addVertex(x2, y2, z1);
+		tes.addVertex(x2, y1, z2); tes.addVertex(x2, y2, z2);
+		tes.addVertex(x1, y1, z2); tes.addVertex(x1, y2, z2);
+		tes.addVertex(x1, y1, z1); tes.addVertex(x1, y2, z1);
+
+		tes.draw();
+    }
+    
+    public static float getOriginX(Minecraft mc, float dt) {
+		float px = (float)mc.thePlayer.prevPosX;
+		return px + ((float)mc.thePlayer.posX - px) * dt;
+    }
+    
+    public static float getOriginY(Minecraft mc, float dt) {
+		float py = (float)mc.thePlayer.prevPosY;
+		return py + ((float)mc.thePlayer.posY - py) * dt;
+    }
+  
+    public static float getOriginZ(Minecraft mc, float dt) {
+		float pz = (float)mc.thePlayer.prevPosZ;
+		return pz + ((float)mc.thePlayer.posZ - pz) * dt;
     }
 }

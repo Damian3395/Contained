@@ -211,7 +211,7 @@ public class Contained{
 	public static ArrayList<BlockCoord> getActiveTreasures(int dimID) {
 		if (dimID != 0 && !MiniGameUtil.isTreasure(dimID))
 			return new ArrayList<BlockCoord>();
-		if (!trades.containsKey(dimID))
+		if (!activeTreasures.containsKey(dimID))
 			activeTreasures.put(dimID, new ArrayList<BlockCoord>());
 		return activeTreasures.get(dimID);
 	}

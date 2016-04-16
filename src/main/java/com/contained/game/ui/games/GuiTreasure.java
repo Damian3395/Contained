@@ -1,5 +1,6 @@
 package com.contained.game.ui.games;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
@@ -9,15 +10,20 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.ui.territory.TerritoryEdge;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeam;
+import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 public class GuiTreasure extends Gui {
@@ -133,9 +139,38 @@ public class GuiTreasure extends Gui {
 		return 0;
 	}
 	
-	public static void renderChests() {
+	@SubscribeEvent
+	public void onRenderScreen(RenderWorldLastEvent ev) {
+		if (mc.theWorld != null) {
+			renderChests(RenderUtil.getOriginX(mc, ev.partialTicks),
+						 RenderUtil.getOriginY(mc, ev.partialTicks),
+						 RenderUtil.getOriginZ(mc, ev.partialTicks), ev.partialTicks);
+		}
+	}
+	
+	public void renderChests(float ox, float oy, float oz, float dt) {
 		ArrayList<BlockCoord> chestPositions = Contained.getActiveTreasures(0);
 		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		GL11.glDepthMask(false);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );
 		
+		for (BlockCoord point : chestPositions) {		
+			RenderUtil.drawPillar(point.x, point.z, 0.4f, Color.yellow.hashCode(),
+									RenderUtil.getOriginX(mc, dt),
+									RenderUtil.getOriginY(mc, dt),
+									RenderUtil.getOriginZ(mc, dt));
+			RenderUtil.drawPillar(point.x, point.z, 0.15f, Color.white.hashCode(),
+									RenderUtil.getOriginX(mc, dt),
+									RenderUtil.getOriginY(mc, dt),
+									RenderUtil.getOriginZ(mc, dt));
+		}
+		
+		GL11.glDepthMask(true);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_CULL_FACE);		
 	}
 }
