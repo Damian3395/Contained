@@ -116,7 +116,7 @@ public class PlayerEvents {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.getTradeList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
 				if (MiniGameUtil.isTreasure(joined.dimension))
-					Contained.channel.sendTo(ClientPacketHandlerUtil.packetAddTreasures(Contained.getActiveTreasures(joined.dimension)).toPacket(), (EntityPlayerMP)joined);
+					Contained.channel.sendTo(ClientPacketHandlerUtil.packetAddTreasures(Contained.getActiveTreasures(joined.dimension), true).toPacket(), (EntityPlayerMP)joined);
 				
 				//Class Perks
 				ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;

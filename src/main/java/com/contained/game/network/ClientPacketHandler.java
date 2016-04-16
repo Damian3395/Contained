@@ -511,6 +511,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case ClientPacketHandlerUtil.ADD_TREASURE_POINTS:
 					int numToAdd = packet.readInt();
+					boolean clearFirst = packet.readBoolean();
+					if (clearFirst)
+						Contained.getActiveTreasures(0).clear();
 					for(int i=0; i<numToAdd; i++)
 						Contained.getActiveTreasures(0).add(packet.readCoord());
 				break;
