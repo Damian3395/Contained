@@ -3,6 +3,7 @@ package com.contained.game.util;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.contained.game.Contained;
@@ -94,8 +95,6 @@ public class Util {
 		else return "Unknown";
 	}
 	
-	// TODO: The player often spawns inside the ground when they teleport to
-	// another dimension. Fix this.
 	public static void travelToDimension(int dimID, EntityPlayer player) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
 			EntityPlayerMP mpPlayer = (EntityPlayerMP)player;
@@ -104,7 +103,6 @@ public class Util {
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 						mpPlayer, dimID, new GameTeleporter(newWorld));
-			MiniGameUtil.startGame(dimID); //TODO: This is just for debug.
 		}
 	}
 	
@@ -263,6 +261,15 @@ public class Util {
 	 */
 	public static void serverMessage(String msg) {
 		MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), "say "+msg);
+	}
+	
+	public static void dimensionMessage(int dim, String msg) {
+		List players = MinecraftServer.getServer().worldServers[dim].playerEntities;
+		Iterator iterator = players.iterator();
+		while(iterator.hasNext()){
+			EntityPlayer player = (EntityPlayer) iterator.next();
+			player.addChatComponentMessage(new ChatComponentText(msg));
+		}
 	}
 	
 	public static float clamp(float val, float min, float max) {

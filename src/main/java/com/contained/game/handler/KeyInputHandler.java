@@ -1,6 +1,7 @@
 package com.contained.game.handler;
 
 import com.contained.game.ui.DataVisualization;
+import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.games.GuiMiniGames;
 import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.perks.ClassPerks;
@@ -44,5 +45,8 @@ public class KeyInputHandler {
 		
 		if (KeyBindings.toggleTerritoryRender.isPressed())
 			territory.doRender = !territory.doRender;
+		
+		if(KeyBindings.toggleAdmin.isPressed())
+			mc.displayGuiScreen(new GuiAdmin(mc.thePlayer));
 	}
 }

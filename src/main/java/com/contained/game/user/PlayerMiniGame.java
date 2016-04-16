@@ -9,6 +9,7 @@ import java.util.Random;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -61,6 +62,15 @@ public class PlayerMiniGame {
 		
 		gameID = Contained.GAME_COUNT;
 		Contained.GAME_COUNT++;
+	}
+	
+	public PlayerMiniGame(int dimID){
+		super();
+		this.dim = dimID;
+	}
+	
+	public PlayerMiniGame(NBTTagCompound ntc) {
+		this.readFromNBT(ntc);
 	}
 	
 	//Game Player To Random Team
@@ -184,7 +194,7 @@ public class PlayerMiniGame {
 	public int getTeamID(String player) {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 		for (int i=0; i<Contained.getTeamList(dim).size(); i++) {
-			if (pdata.teamID.equals(Contained.getTeamList(dim).get(i).id))
+			if (pdata.teamID.equals(Contained.getTeamList(dim).get(i).displayName))
 				return i;
 		}
 		return -1;
@@ -267,7 +277,7 @@ public class PlayerMiniGame {
 		return dim;
 	}
 	
-	private void createTeam(EntityPlayerMP player){
+	private void createTeam(EntityPlayer player){
 		Random rand = new Random();
 		String teamName = generateName();
 		while(teamExists(teamName))
@@ -278,9 +288,26 @@ public class PlayerMiniGame {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 		pdata.joinMiniTeam(teamName);	
 		
-		ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(dim)).sendToClients();
 		String world = Util.getDimensionString(dim);
 		DataLogger.insertCreateTeam(Util.getServerID(), pdata.playerName, world, newTeam.displayName, Util.getDate());
+	}
+	
+	public void testLaunch(EntityPlayer player){
+		createTeam(player);
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+		pdata.setTeamLeader();
+	}
+	
+	public void writeToNBT(NBTTagCompound ntc) {
+		ntc.setInteger("dimID", this.dim);
+		ntc.setInteger("gameID", this.gameID);
+		ntc.setInteger("gameMode", this.gameMode);
+	}
+	
+	public void readFromNBT(NBTTagCompound ntc) {
+		ntc.getInteger("dimID");
+		ntc.getInteger("gameID");
+		ntc.getInteger("gameMode");
 	}
 	
 	public static PlayerMiniGame get(int dim){

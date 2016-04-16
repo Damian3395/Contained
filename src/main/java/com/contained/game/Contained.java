@@ -121,6 +121,8 @@ public class Contained{
 		event.registerServerCommand(new CommandSurveyBook());
 		event.registerServerCommand(new CommandTPX());
 		event.registerServerCommand(new CommandTPXD());
+		event.registerServerCommand(new CommandStartTreasureHunt());
+		event.registerServerCommand(new CommandStartPVP());
 	}
 	
 	@EventHandler
@@ -135,9 +137,9 @@ public class Contained{
 		miniGames = new ArrayList<PlayerMiniGame>(10);
 		gameScores = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1][];
 		gameScores[configs.OVERWORLD] = new int[configs.gameNumTeams[configs.OVERWORLD]];
-		for(int i = Resources.MIN_PVP_DIMID; i < Resources.MAX_PVP_DIMID; i++)
+		for(int i = Resources.MIN_PVP_DIMID; i <= Resources.MAX_PVP_DIMID; i++)
 			gameScores[i] = new int[configs.gameNumTeams[configs.PVP]];
-		for(int i = Resources.MAX_TREASURE_DIMID; i < Resources.MAX_TREASURE_DIMID; i++)
+		for(int i = Resources.MAX_TREASURE_DIMID; i <= Resources.MAX_TREASURE_DIMID; i++)
 			gameScores[i] = new int[configs.gameNumTeams[configs.TREASURE]];
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());

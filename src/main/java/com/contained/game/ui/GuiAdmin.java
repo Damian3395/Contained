@@ -16,6 +16,7 @@ import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.components.GuiTab;
 import com.contained.game.util.ObjectGenerator;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
 import net.minecraft.client.gui.GuiButton;
@@ -72,12 +73,8 @@ public class GuiAdmin extends GuiScreen{
 		this.player=p;
 		this.playerList=MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 		this.onlinePlayerNames= new ArrayList<String>();
-		for(EntityPlayer ep : playerList){
-			System.out.println("online player:"+ep.getDisplayName());
-			this.onlinePlayerNames.add(ep.getDisplayName().toString());
-			System.out.println("add to list:"+ep.getDisplayName());
-		}
-		
+		for(EntityPlayer ep : playerList)
+			this.onlinePlayerNames.add(ep.getDisplayName().toString());	
 	}
 	
 	@Override
@@ -209,7 +206,6 @@ public class GuiAdmin extends GuiScreen{
     		switch(b.id){
 	    	case BTN_LOGIN : 
 	    		if(this.tf_password.getText().equals("password")){
-	    			System.out.println("Password right.");
 	    			this.player.setInvisible(true);
 	    			this.player.capabilities.disableDamage = true;
 	    			this.player.capabilities.allowFlying = true;
@@ -217,9 +213,9 @@ public class GuiAdmin extends GuiScreen{
 					PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.BECOME_ADMIN);
 					Contained.channel.sendToServer(adminPacket.toPacket());
 					this.updateButtons();
+					Util.displayMessage(mc.thePlayer, Util.successCode + "You Are Now A Admin!");
 	    		} else {
-//	    			this.fontRendererObj.drawString("Wrong Password!", x -120, y -80, 0);  //show wrong password warning
-	    			System.out.println("Wrong Password!");
+	    			Util.displayMessage(mc.thePlayer, Util.errorCode + "Wrong Password!");
 	    		}
 	    		
 	    		break;
@@ -238,7 +234,6 @@ public class GuiAdmin extends GuiScreen{
 							
 							
 					}catch(NullPointerException e){
-//						System.out.println("ERROR!");
 						this.tf_objectName.setText("Check Object Name");
 						this.tf_targetPlayer.setText("Check Player Name");
 						this.isObjectDefaultText=true;
@@ -296,7 +291,7 @@ public class GuiAdmin extends GuiScreen{
 						this.tf_targetPlayer.setText("No Player Online.");
 					}
 				}catch(Exception e){
-					System.out.println("ERROR in BTN_VUL");
+					e.printStackTrace();
 				}
 					
 	    		break;
@@ -322,7 +317,7 @@ public class GuiAdmin extends GuiScreen{
 						this.tf_targetPlayer.setText("No Player Online.");
 					}
 				}catch(Exception e){
-					System.out.println("ERROR in BTN_HUN");
+					e.printStackTrace();
 				}
 	    		break;
 	    	case BTN_CLS :		// look for the closest player
@@ -347,7 +342,7 @@ public class GuiAdmin extends GuiScreen{
 						this.tf_targetPlayer.setText("No Player Online.");
 					}
 				}catch(Exception e){
-					System.out.println("ERROR in BTN_CLS");
+					e.printStackTrace();
 				}
 	    		break;
 
@@ -373,7 +368,7 @@ public class GuiAdmin extends GuiScreen{
 						this.tf_targetPlayer.setText("No Player Online.");
 					}
 				}catch(Exception e){
-					System.out.println("ERROR in BTN_FAR");
+					e.printStackTrace();
 				}
 	    		break;
 	    		

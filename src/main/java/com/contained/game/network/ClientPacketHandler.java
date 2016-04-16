@@ -21,6 +21,7 @@ import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.ui.perks.ClassPerks;
 import com.contained.game.ui.territory.TerritoryRender;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -506,6 +507,18 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					int teamNum = packet.readInt();
 					int score = packet.readInt();
 					Contained.gameScores[dim][teamNum] = score;
+				break;
+				
+				case ClientPacketHandlerUtil.SYNC_MINI_GAME:
+					PlayerMiniGame newGame = new PlayerMiniGame(packet.readNBTTagCompound());
+					Contained.miniGames.add(newGame);
+					int dimID = packet.readInt();
+					int teams = packet.readInt();
+					Contained.getTeamList(dimID).clear();
+					for(int i = 0; i < teams; i++){
+						PlayerTeam newTeam = new PlayerTeam(packet.readNBTTagCompound());
+						Contained.getTeamList(dimID).add(newTeam);
+					}
 				break;
 			}
 		}

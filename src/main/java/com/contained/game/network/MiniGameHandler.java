@@ -9,7 +9,6 @@ import com.contained.game.util.Util;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 
-//TODO: Finish This
 public class MiniGameHandler {
 	public MiniGameHandler(){}
 	

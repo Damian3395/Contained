@@ -18,13 +18,12 @@ import com.contained.game.util.Resources;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-//TODO: Add Score To Team, Add Count To Player, End Game
 public class PVPEvents {
 	@SubscribeEvent
 	public void onSpawn(Clone event){
 		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
 			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			if(properties.inGame() && properties.gameMode == Resources.PVP_MODE){
+			if(properties.inGame() && properties.gameMode == Resources.PVP_MODE){				
 				properties.setLives(ExtendedPlayer.get(event.original).lives);
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
@@ -32,8 +31,8 @@ public class PVPEvents {
 				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
 				
 				if(properties.lives == 0){
-					PacketCustom endGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.END_GAME);
-					Contained.channel.sendTo(endGamePacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
+					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
+					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
 				}
 			}
 		}

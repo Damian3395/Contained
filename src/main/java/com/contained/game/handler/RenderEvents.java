@@ -10,7 +10,6 @@ import com.contained.game.util.RenderUtil;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class RenderEvents {
-
 	@SubscribeEvent
 	public void onEntityRender(RenderLivingEvent.Pre event) {
 		// Players in teams will have their team name rendered above
@@ -20,7 +19,8 @@ public class RenderEvents {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
 			if (pdata != null && pdata.teamID != null) {
 				PlayerTeam team = PlayerTeam.get(pdata.teamID, p.dimension);
-				RenderUtil.drawNameTag(p, team.getFormatCode()+"§l["+team.displayName+"]", event.x, event.y+0.5, event.z, 64);
+				if(team != null)
+					RenderUtil.drawNameTag(p, team.getFormatCode()+"§l["+team.displayName+"]", event.x, event.y+0.5, event.z, 64);
 			}
 		}
 	}

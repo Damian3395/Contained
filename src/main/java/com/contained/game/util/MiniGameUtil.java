@@ -3,12 +3,18 @@ package com.contained.game.util;
 import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 
 public class MiniGameUtil {
 	public static boolean isPvP(int dimID) {
@@ -23,17 +29,44 @@ public class MiniGameUtil {
 		return false;
 	}
 	
-	public static void startGame(int dimID) {
-		// TODO: At the start of the game, the time in the dimension should be set
-		// to the start of a Minecraft day.
+	public static boolean isDimensionEmpty(int dim) {
+		for(PlayerMiniGame games : Contained.miniGames)
+			if(games.getGameDimension() == dim)
+				return false;
 		
+		return true;
+	}
+	
+	public static void startGame(int dimID, EntityPlayerMP player) {
+		//Create Timer
 		if (isPvP(dimID))
 			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Settings.PVP]*20;
 		else if (isTreasure(dimID))
 			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Settings.TREASURE]*20;
 		else
 			return;
+		
+		//Create MiniGame & Start It
 		Contained.gameActive[dimID] = true;
+		PlayerMiniGame newGame = new PlayerMiniGame(dimID);
+		newGame.testLaunch(player);
+		Contained.miniGames.add(newGame);
+		
+		//Sync MiniGame & Teams
+		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_MINI_GAME);
+		NBTTagCompound miniGameData = new NBTTagCompound();
+		newGame.writeToNBT(miniGameData);
+		miniGamePacket.writeNBTTagCompound(miniGameData);
+		miniGamePacket.writeInt(dimID);
+		miniGamePacket.writeInt(Contained.getTeamList(dimID).size());
+		for(PlayerTeam team : Contained.getTeamList(dimID)){
+			NBTTagCompound teamData = new NBTTagCompound();
+			team.writeToNBT(teamData);
+			miniGamePacket.writeNBTTagCompound(teamData);
+		}
+		Contained.channel.sendTo(miniGamePacket.toPacket(), player);
+		
+		//Sync Timer
 		ClientPacketHandlerUtil.syncMinigameTime(dimID);
 	}
 	

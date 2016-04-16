@@ -14,6 +14,7 @@ public class KeyBindings {
 	public static KeyBinding toggleClassPerks;
 	public static KeyBinding toggleGuild;
 	public static KeyBinding toggleMiniGames;
+	public static KeyBinding toggleAdmin;
 	
 	public static void init() {
 		// Data Visualization GUI Container Keyboard Event Handler
@@ -45,5 +46,11 @@ public class KeyBindings {
 				, Keyboard.KEY_L
 				, "key.categories."+Resources.MOD_ID);
 		ClientRegistry.registerKeyBinding(toggleMiniGames);
+		
+		// Admin GUI Container Keyboard Event Handler
+		toggleAdmin = new KeyBinding("key.adminGui"
+				, Keyboard.KEY_O
+				, "key.categories."+Resources.MOD_ID);
+		ClientRegistry.registerKeyBinding(toggleAdmin);
 	}
 }

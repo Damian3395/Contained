@@ -28,9 +28,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int usedByOthers = 0;    //# of times another player used an item owned by this player.
 	public boolean isAdmin = false;
 	public boolean isSpectator = false;
-	private boolean inGame = true;
+	private boolean inGame = false;
 	private boolean joiningGame = false;
-	public int gameMode = Resources.PVP_MODE;
+	public int gameMode = Resources.FREE_PLAY;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
