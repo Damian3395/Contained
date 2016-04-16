@@ -236,7 +236,7 @@ public class ClientPacketHandlerUtil {
 		for (BlockCoord p : points)
 			activeSoFar.add(p);
 		
-		PacketCustom treasurePacket = packetAddTreasures(points);
+		PacketCustom treasurePacket = packetAddTreasures(points, false);
 		Contained.channel.sendToDimension(treasurePacket.toPacket(), dimID);
 	}
 	
@@ -258,9 +258,14 @@ public class ClientPacketHandlerUtil {
 		Contained.channel.sendToDimension(treasurePacket.toPacket(), dimID);		
 	}
 	
-	public static PacketCustom packetAddTreasures(ArrayList<BlockCoord> points) {
+	/**
+	 * @param reset Should this append to (reset=false) or overwrite (reset=true)
+	 * 				the previous chest data on the client side?
+	 */
+	public static PacketCustom packetAddTreasures(ArrayList<BlockCoord> points, boolean reset) {
 		PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, ADD_TREASURE_POINTS);
 		treasurePacket.writeInt(points.size());
+		treasurePacket.writeBoolean(reset);
 		for (BlockCoord p : points)
 			treasurePacket.writeCoord(p);
 		return treasurePacket;
