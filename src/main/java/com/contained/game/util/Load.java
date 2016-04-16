@@ -33,9 +33,9 @@ public class Load {
 				Contained.timeLeft[dimID] = ntc.getInteger("gameTime");
 			if (ntc.hasKey("isActive"))
 				Contained.gameActive[dimID] = ntc.getBoolean("isActive");
+			ArrayList<BlockCoord> activeTreasure = Contained.getActiveTreasures(dimID);
+			activeTreasure.clear();
 			if (ntc.hasKey("treasureX")) {
-				ArrayList<BlockCoord> activeTreasure = Contained.getActiveTreasures(dimID);
-				activeTreasure.clear();
 				int[] treasureX = ntc.getIntArray("treasureX");
 				int[] treasureY = ntc.getIntArray("treasureY");
 				int[] treasureZ = ntc.getIntArray("treasureZ");

@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.vecmath.Vector3d;
+
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.commands.*;
@@ -121,6 +123,8 @@ public class Contained{
 	
 	public static int[][] gameScores;
 	
+	public static Vector3d vec3;
+	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
 		event.registerServerCommand(new CommandTeamChat());
@@ -147,6 +151,7 @@ public class Contained{
 		miniGames = new ArrayList<PlayerMiniGame>(10);
 		gameScores = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1][];
 		gameScores[Settings.OVERWORLD] = new int[configs.gameNumTeams[Settings.OVERWORLD]];
+		vec3 = new Vector3d();
 		for(int i = Resources.MIN_PVP_DIMID; i < Resources.MAX_PVP_DIMID; i++)
 			gameScores[i] = new int[configs.gameNumTeams[Settings.PVP]];
 		for(int i = Resources.MAX_TREASURE_DIMID; i < Resources.MAX_TREASURE_DIMID; i++)

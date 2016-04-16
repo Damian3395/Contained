@@ -2,14 +2,21 @@ package com.contained.game.handler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
+import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
@@ -26,6 +33,7 @@ public class FMLEvents {
 	@SubscribeEvent
 	public void onTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == Phase.START) {
+			//Tick the mini-game timers, and check for game-over.
 			for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++) {
 				processGameTick(i);
 				checkDimensionReset(i);
@@ -33,6 +41,24 @@ public class FMLEvents {
 			for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++) {
 				processGameTick(i);
 				checkDimensionReset(i);
+				
+				//Periodically see if any treasure chests are missing in the treasure
+				//mini-game (this can happen if they're blown up by TNT/Creepers/etc)
+				if (Math.random() <= 1.0/100.0) {
+					if (DimensionManager.getWorld(i) != null && Contained.gameActive[i]) {
+						WorldServer w = DimensionManager.getWorld(i);
+						ArrayList<BlockCoord> toRemove = new ArrayList<BlockCoord>();
+						for (BlockCoord point : Contained.getActiveTreasures(i)) {
+							Block b = w.getBlock(point.x, point.y, point.z);
+							if (!(b instanceof BlockChest))
+								toRemove.add(new BlockCoord(point.x, point.y, point.z));
+						}
+						for (BlockCoord point : toRemove) {
+							ClientPacketHandlerUtil.removeTreasureAndSync(i, point);
+							TreasureChestGenerator.generateChest(w, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);
+						}
+					}
+				}
 			}				
 		}
 	}

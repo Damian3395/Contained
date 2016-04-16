@@ -35,7 +35,7 @@ public class Save {
 		
 		//Active Treasure
 		ArrayList<BlockCoord> activeTreasure = Contained.getActiveTreasures(dimID);
-		if (activeTreasure.size() > 0) {
+		if (activeTreasure.size() > 0 && MiniGameUtil.isTreasure(dimID)) {
 			int[] activeX = new int[activeTreasure.size()];
 			int[] activeY = new int[activeTreasure.size()];
 			int[] activeZ = new int[activeTreasure.size()];

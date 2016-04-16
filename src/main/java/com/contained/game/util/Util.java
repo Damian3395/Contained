@@ -39,6 +39,10 @@ public class Util {
 		return (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
 	}
 	
+	public static float euclidDist(float x1, float y1, float z1, float x2, float y2, float z2) {
+		return (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2) + Math.pow(z1-z2, 2));
+	}
+	
 	public static boolean isSolidBlock(Block b) {
 		if (b != null && !b.equals(Blocks.air) && !(b instanceof BlockBush) 
 				&& !isLiquidBlock(b))

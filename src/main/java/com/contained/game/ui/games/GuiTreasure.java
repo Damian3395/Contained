@@ -10,9 +10,7 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.ui.territory.TerritoryEdge;
 import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.user.PlayerTeam;
 import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -20,7 +18,6 @@ import com.contained.game.util.Util;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -150,14 +147,14 @@ public class GuiTreasure extends Gui {
 	
 	public void renderChests(float ox, float oy, float oz, float dt) {
 		ArrayList<BlockCoord> chestPositions = Contained.getActiveTreasures(0);
-		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );
-		
-		for (BlockCoord point : chestPositions) {		
+	
+		for (BlockCoord point : chestPositions) {	
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_CULL_FACE);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glDepthMask(false);
+			GL11.glEnable(GL11.GL_BLEND);
+			//GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );
 			RenderUtil.drawPillar(point.x, point.z, 0.4f, Color.yellow.hashCode(),
 									RenderUtil.getOriginX(mc, dt),
 									RenderUtil.getOriginY(mc, dt),
@@ -166,11 +163,18 @@ public class GuiTreasure extends Gui {
 									RenderUtil.getOriginX(mc, dt),
 									RenderUtil.getOriginY(mc, dt),
 									RenderUtil.getOriginZ(mc, dt));
+			int dist = (int)Util.euclidDist((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, 
+											(float)point.x, (float)point.y, (float)point.z);
+			RenderUtil.drawClampedWorldLabel("["+dist+"m]", point.x, point.y+1, point.z, 50,
+					RenderUtil.getOriginX(mc, dt),
+					RenderUtil.getOriginY(mc, dt),
+					RenderUtil.getOriginZ(mc, dt));
 		}
 		
 		GL11.glDepthMask(true);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_CULL_FACE);		
+		GL11.glEnable(GL11.GL_CULL_FACE);	
+		GL11.glEnable(GL11.GL_LIGHTING);
 	}
 }
