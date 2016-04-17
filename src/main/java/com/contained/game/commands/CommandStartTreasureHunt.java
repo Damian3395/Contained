@@ -68,11 +68,7 @@ public class CommandStartTreasureHunt implements ICommand {
 						//Create & Sync MiniGame
 						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
 						
-						//Set Client GameMode
-						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-						syncLifePacket.writeInt(properties.gameMode);
-						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
-						
+						//Generate Chests
 						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 					} catch (Exception e){
 						e.printStackTrace();

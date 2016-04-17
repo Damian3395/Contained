@@ -14,6 +14,7 @@ import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -42,6 +43,7 @@ public class CommandStartPVP implements ICommand {
 					out = this.getCommandUsage(sender);
 				else{
 					try{
+						EntityPlayer player = (EntityPlayer) sender;
 						ExtendedPlayer properties = ExtendedPlayer.get((EntityPlayer)sender);
 						
 						//Check Valid PVP Dimension
@@ -61,7 +63,14 @@ public class CommandStartPVP implements ICommand {
 						properties.setGameMode(Resources.PVP);
 						properties.setGame(true);
 						
+						System.out.println("Saving Player PData");
+						PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+						pdata.xp = player.experienceTotal;
+						pdata.armor = player.inventory.armorInventory;
+						pdata.inventory = player.inventory.mainInventory;
+						
 						//Teleport Player
+						System.out.println("Teleporting Player");
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame

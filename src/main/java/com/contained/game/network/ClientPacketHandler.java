@@ -478,6 +478,15 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.MINIGAME_STARTED:
+					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
+					storePdata.xp = mc.thePlayer.experienceTotal;
+					storePdata.armor = mc.thePlayer.inventory.armorInventory;
+					storePdata.inventory = mc.thePlayer.inventory.mainInventory;
+					
+					mc.thePlayer.experienceTotal = 0;
+					MiniGameUtil.clearMainInventory(mc.thePlayer);
+					MiniGameUtil.clearArmorInventory(mc.thePlayer);
+					
 					ExtendedPlayer startMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					startMiniGame.setGameMode(packet.readInt());
 					startMiniGame.setJoiningGame(false);
@@ -498,6 +507,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					endMiniGame.setGameMode(Resources.OVERWORLD);
 					endMiniGame.setGame(false);
+					System.out.println("Client Removing MiniGame & PlayerTeams");
 					int removeDim = packet.readInt();
 					Contained.getTeamList(removeDim).clear();
 					for(PlayerMiniGame game : Contained.miniGames)
@@ -508,16 +518,16 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					for(int i = 0; i < Contained.gameScores[removeDim].length; i++)
 						Contained.gameScores[removeDim][i] = 0;
 					
+					MiniGameUtil.clearMainInventory(mc.thePlayer);
+					MiniGameUtil.clearArmorInventory(mc.thePlayer);
+					
 					PlayerTeamIndividual restorePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
 					mc.thePlayer.experienceTotal = restorePdata.xp;
 					mc.thePlayer.inventory.armorInventory = restorePdata.armor;
-					List inventory = restorePdata.inventory;
-					Iterator iterator = inventory.iterator();
-					while(iterator.hasNext()){
-						ItemStack restoreItem = (ItemStack) iterator.next();
-						if(restoreItem != null)
-							mc.thePlayer.inventory.addItemStackToInventory(restoreItem);
-					}
+					mc.thePlayer.inventory.mainInventory = restorePdata.inventory;
+					restorePdata.xp = 0;
+					restorePdata.armor = null;
+					restorePdata.inventory = null;
 					restorePdata.revertMiniGameChanges();
 					
 					if(MiniGameUtil.isTreasure(removeDim))

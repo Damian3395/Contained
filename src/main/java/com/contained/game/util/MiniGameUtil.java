@@ -52,19 +52,25 @@ public class MiniGameUtil {
 	}
 	
 	public static void startGame(int dimID, EntityPlayerMP player) {
-		//Create Timer
-		if (isPvP(dimID))
+		int gameMode = Resources.OVERWORLD;
+		if (isPvP(dimID)){
 			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Resources.PVP]*20;
-		else if (isTreasure(dimID))
+			gameMode = Resources.PVP;
+		}else if (isTreasure(dimID)){
 			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Resources.TREASURE]*20;
-		else
+			gameMode = Resources.TREASURE;
+		}else
 			return;
 		
 		//Create MiniGame & Start It
 		Contained.gameActive[dimID] = true;
-		PlayerMiniGame newGame = new PlayerMiniGame(dimID);
+		PlayerMiniGame newGame = new PlayerMiniGame(dimID, gameMode);
 		newGame.testLaunch(player);
 		Contained.miniGames.add(newGame);
+		
+		player.experienceTotal = 0;
+		clearMainInventory(player);
+		clearArmorInventory(player);
 		
 		//Sync MiniGame & Teams
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
@@ -98,16 +104,16 @@ public class MiniGameUtil {
 		for(int i = 0; i < Contained.gameScores[dimID].length; i++)
 			Contained.gameScores[dimID][i] = 0;
 		
+		clearMainInventory(player);
+		clearArmorInventory(player);
+		
 		PlayerTeamIndividual restorePdata = PlayerTeamIndividual.get(player.getDisplayName());
 		player.experienceTotal = restorePdata.xp;
 		player.inventory.armorInventory = restorePdata.armor;
-		List inventory = restorePdata.inventory;
-		Iterator iterator = inventory.iterator();
-		while(iterator.hasNext()){
-			ItemStack restoreItem = (ItemStack) iterator.next();
-			if(restoreItem != null)
-				player.inventory.addItemStackToInventory(restoreItem);
-		}
+		player.inventory.mainInventory = restorePdata.inventory;
+		restorePdata.xp = 0;
+		restorePdata.armor = null;
+		restorePdata.inventory = null;
 		restorePdata.revertMiniGameChanges();
 		
 		if(MiniGameUtil.isTreasure(dimID))
@@ -178,5 +184,15 @@ public class MiniGameUtil {
 			generatedPoints.add(new BlockCoord(x, y, z));			
 		}		
 		ClientPacketHandlerUtil.addTreasureAndSync(w.provider.dimensionId, generatedPoints);
+	}
+	
+	public static void clearMainInventory(EntityPlayer player){
+		for(int i = 0; i < player.inventory.getSizeInventory(); i++)
+			player.inventory.setInventorySlotContents(i, null);
+	}
+	
+	public static void clearArmorInventory(EntityPlayer player){
+		for(int i = 0; i < player.inventory.armorInventory.length; i++)
+			player.inventory.armorInventory[i] = null;
 	}
 }

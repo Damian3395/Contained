@@ -1,3 +1,4 @@
+
 package com.contained.game.user;
 
 import java.util.ArrayList;
@@ -147,11 +148,14 @@ public class PlayerMiniGame {
 					properties.setJoiningGame(false);
 					properties.setGame(true);
 					pdata.xp = player.experienceTotal;
-					pdata.setInventory(player.inventoryContainer.inventoryItemStacks);
+					pdata.setInventory(player.inventory.mainInventory);
 					pdata.armor = player.inventory.armorInventory;
-					clearInventory(player);
 					
 					Util.travelToDimension(to, player);
+					
+					clearInventory(player);
+					player.inventory.armorInventory = null;
+					player.experienceTotal = 0;
 					
 					PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 					startGamePacket.writeInt(gameMode);
@@ -168,15 +172,16 @@ public class PlayerMiniGame {
 					Contained.channel.sendTo(startGamePacket.toPacket(), (EntityPlayerMP) player);
 				}else{ //Ending MiniGame
 					ExtendedPlayer properties = ExtendedPlayer.get(player);
+					
+					Util.travelToDimension(to, player);
+					
 					properties.setGameMode(Resources.OVERWORLD);
 					properties.setGame(false);
-					player.inventoryContainer = (Container) pdata.inventory;
+					player.inventory.mainInventory = pdata.inventory;
 					player.experienceTotal = pdata.xp;
 					player.inventory.armorInventory = pdata.armor;
 					pdata.inventory = null;
 					pdata.armor = null;
-					
-					Util.travelToDimension(to, player);
 					
 					//Sync MiniGames and Teams
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);

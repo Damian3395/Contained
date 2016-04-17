@@ -35,9 +35,9 @@ public class PlayerTeamIndividual {
 	
 	public String lobbyTeamID = null;
 	public boolean lobbyLeader;
-	public List inventory;
-	public int xp;
+	public ItemStack[] inventory;
 	public ItemStack[] armor;
+	public int xp;
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -67,11 +67,11 @@ public class PlayerTeamIndividual {
 		this.readFromNBT(ntc);
 	}
 	
-	public void setInventory(List inventory){
+	public void setInventory(ItemStack[] inventory){
 		this.inventory = inventory;
 	}
 	
-	public List getInventory(){
+	public ItemStack[] getInventory(){
 		return inventory;
 	}
 
@@ -239,11 +239,9 @@ public class PlayerTeamIndividual {
 		}
 		NBTTagList inventoryList = new NBTTagList();
 		if(inventory != null){
-			Iterator iterator = inventory.iterator();
-			while(iterator.hasNext()){
-				NBTTagCompound saveItem = new NBTTagCompound();
-				ItemStack item = (ItemStack) iterator.next();
+			for(ItemStack item : inventory){
 				if(item != null){
+					NBTTagCompound saveItem = new NBTTagCompound();
 					item.writeToNBT(saveItem);
 					inventoryList.appendTag(saveItem);
 				}
@@ -254,9 +252,11 @@ public class PlayerTeamIndividual {
 		NBTTagList armorList = new NBTTagList();
 		if(armor != null){
 			for(int i = 0; i < armor.length; i++){
-				NBTTagCompound saveArmor = new NBTTagCompound();
-				armor[i].writeToNBT(saveArmor);
-				armorList.appendTag(saveArmor);
+				if(armor[i] != null){
+					NBTTagCompound saveArmor = new NBTTagCompound();
+					armor[i].writeToNBT(saveArmor);
+					armorList.appendTag(saveArmor);
+				}
 			}
 				
 		}
@@ -282,11 +282,12 @@ public class PlayerTeamIndividual {
 		else
 			this.lobbyTeamID = null;
 		NBTTagList inventoryList = ntc.getTagList("inventory", (byte)10);
+		this.inventory = new ItemStack[36];
 		for(int i=0; i<inventoryList.tagCount(); i++) 
-			inventory.add(ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i)));
-		
+			inventory[i] = ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i));
+			
 		NBTTagList armorList = ntc.getTagList("armor", (byte)10);
-		armor = new ItemStack[armorList.tagCount()];
+		armor = new ItemStack[4];
 		for(int i = 0; i<armorList.tagCount(); i++)
 			armor[i] = ItemStack.loadItemStackFromNBT(armorList.getCompoundTagAt(i));
 	}
