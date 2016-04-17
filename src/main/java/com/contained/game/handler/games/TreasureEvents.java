@@ -17,7 +17,9 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -28,6 +30,13 @@ public class TreasureEvents {
 	
 	public TreasureEvents(){
 		this.mc = Minecraft.getMinecraft();
+	}
+	
+	public static void initializeTreasureGame(int dimID) {
+		WorldServer w = DimensionManager.getWorld(dimID);
+		Contained.getActiveTreasures(dimID).clear();
+		if (w != null)
+			MiniGameUtil.generateChest(w, 15, ContainedRegistry.CUSTOM_CHEST_LOOT);
 	}
 	
 	@SubscribeEvent

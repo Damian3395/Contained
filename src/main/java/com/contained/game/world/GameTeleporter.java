@@ -24,7 +24,7 @@ public class GameTeleporter extends Teleporter {
 	@Override
 	public void placeInPortal(Entity player, double x, double y, double z, float rot) {
 		ChunkCoordinates c = this.worldServer.provider.getRandomizedSpawnPoint();
-		player.setLocationAndAngles(c.posX, c.posY, c.posZ, rot, 0);
+		player.setLocationAndAngles(c.posX, c.posY+1, c.posZ, rot, 0);
 		player.motionX = player.motionY = player.motionZ = 0;
 	}
 	

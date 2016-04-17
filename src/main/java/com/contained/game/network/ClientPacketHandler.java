@@ -520,6 +520,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						PlayerTeam newTeam = new PlayerTeam(packet.readNBTTagCompound());
 						Contained.getTeamList(dimID).add(newTeam);
 					}
+				break;
+					
 				case ClientPacketHandlerUtil.ADD_TREASURE_POINTS:
 					int numToAdd = packet.readInt();
 					boolean clearFirst = packet.readBoolean();

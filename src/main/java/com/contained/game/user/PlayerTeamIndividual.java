@@ -1,8 +1,6 @@
 package com.contained.game.user;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
@@ -35,8 +33,8 @@ public class PlayerTeamIndividual {
 	
 	public String lobbyTeamID = null;
 	public boolean lobbyLeader;
-	public List inventory;
 	public int xp;
+	public ItemStack[] inventory;
 	public ItemStack[] armor;
 	
 	public PlayerTeamIndividual(String name) {
@@ -67,12 +65,28 @@ public class PlayerTeamIndividual {
 		this.readFromNBT(ntc);
 	}
 	
-	public void setInventory(List inventory){
-		this.inventory = inventory;
+	public void setInventory(EntityPlayer toCopy){
+		this.armor = copyItemStacks(toCopy.inventory.armorInventory);
+		this.inventory = copyItemStacks(toCopy.inventory.mainInventory);
 	}
 	
-	public List getInventory(){
-		return inventory;
+	public ItemStack[] getInventory(){
+		return copyItemStacks(this.inventory);
+	}
+	
+	public ItemStack[] getArmor() {
+		return copyItemStacks(this.armor);
+	}
+	
+	private ItemStack[] copyItemStacks(ItemStack[] toCopy) {
+		ItemStack[] temp = new ItemStack[toCopy.length];
+		for(int i=0; i<temp.length; i++) {
+			if (toCopy[i] == null)
+				temp[i] = null;
+			else
+				temp[i] = toCopy[i].copy();
+		}
+		return temp;
 	}
 
 	/**
@@ -235,12 +249,12 @@ public class PlayerTeamIndividual {
 		}
 		NBTTagList inventoryList = new NBTTagList();
 		if(inventory != null){
-			Iterator iterator = inventory.iterator();
-			while(iterator.hasNext()){
+			for(int i=0; i<inventory.length; i++){
 				NBTTagCompound saveItem = new NBTTagCompound();
-				ItemStack item = (ItemStack) iterator.next();
+				ItemStack item = (ItemStack)inventory[i];
 				if(item != null){
 					item.writeToNBT(saveItem);
+					saveItem.setInteger("index", i);
 					inventoryList.appendTag(saveItem);
 				}
 			}
@@ -251,8 +265,11 @@ public class PlayerTeamIndividual {
 		if(armor != null){
 			for(int i = 0; i < armor.length; i++){
 				NBTTagCompound saveArmor = new NBTTagCompound();
-				armor[i].writeToNBT(saveArmor);
-				armorList.appendTag(saveArmor);
+				if (armor[i] != null) {
+					armor[i].writeToNBT(saveArmor);
+					saveArmor.setInteger("index", i);
+					armorList.appendTag(saveArmor);
+				}
 			}
 				
 		}
@@ -278,13 +295,18 @@ public class PlayerTeamIndividual {
 		else
 			this.lobbyTeamID = null;
 		NBTTagList inventoryList = ntc.getTagList("inventory", (byte)10);
-		for(int i=0; i<inventoryList.tagCount(); i++) 
-			inventory.add(ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i)));
+		inventory = new ItemStack[36];
+		for(int i=0; i<inventoryList.tagCount(); i++) {
+			NBTTagCompound item = inventoryList.getCompoundTagAt(i);
+			inventory[item.getInteger("index")] = ItemStack.loadItemStackFromNBT(item);
+		}
 		
 		NBTTagList armorList = ntc.getTagList("armor", (byte)10);
-		armor = new ItemStack[armorList.tagCount()];
-		for(int i = 0; i<armorList.tagCount(); i++)
-			armor[i] = ItemStack.loadItemStackFromNBT(armorList.getCompoundTagAt(i));
+		armor = new ItemStack[4];
+		for(int i = 0; i<armorList.tagCount(); i++) {
+			NBTTagCompound item = armorList.getCompoundTagAt(i);
+			armor[item.getInteger("index")] = ItemStack.loadItemStackFromNBT(item);
+		}
 	}
 	
 	public static boolean isLeader(EntityPlayer p) {

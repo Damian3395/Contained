@@ -19,6 +19,8 @@ import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.handler.games.PVPEvents;
+import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
@@ -36,6 +38,15 @@ public class MiniGameUtil {
 		return false;
 	}
 	
+	public static int gameMode(int dimID) {
+		if (isPvP(dimID))
+			return Resources.PVP;
+		else if (isTreasure(dimID))
+			return Resources.TREASURE;
+		else
+			return Resources.OVERWORLD;
+	}
+	
 	public static boolean isDimensionEmpty(int dim) {
 		for(PlayerMiniGame games : Contained.miniGames)
 			if(games.getGameDimension() == dim)
@@ -44,25 +55,31 @@ public class MiniGameUtil {
 		return true;
 	}
 	
-	public static void startGame(int dimID, EntityPlayerMP player) {
-		//Create Timer
-		if (isPvP(dimID))
-			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Resources.PVP]*20;
-		else if (isTreasure(dimID))
-			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Resources.TREASURE]*20;
-		else
-			return;
-		
-		//Create MiniGame & Start It
-		Contained.gameActive[dimID] = true;
+	public static void startSPTestGame(int dimID, EntityPlayerMP player) {
 		PlayerMiniGame newGame = new PlayerMiniGame(dimID);
 		newGame.testLaunch(player);
 		Contained.miniGames.add(newGame);
+		startGame(dimID, newGame);
+	}
+	
+	public static void startGame(int dimID, PlayerMiniGame data) {
+		int mode = gameMode(dimID);
+		Contained.timeLeft[dimID] = Contained.configs.gameDuration[mode]*20;
+		Contained.gameActive[dimID] = true;
 		
-		//Sync MiniGame & Teams
+		if (mode == Resources.PVP)
+			PVPEvents.initializePVPGame(dimID);
+		else
+			TreasureEvents.initializeTreasureGame(dimID);
+		
+		WorldServer w = DimensionManager.getWorld(dimID);
+		if (w != null)
+			w.setWorldTime(0);
+		
+		//Sync MiniGame, Teams, and Timer
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_MINI_GAME);
 		NBTTagCompound miniGameData = new NBTTagCompound();
-		newGame.writeToNBT(miniGameData);
+		data.writeToNBT(miniGameData);
 		miniGamePacket.writeNBTTagCompound(miniGameData);
 		miniGamePacket.writeInt(dimID);
 		miniGamePacket.writeInt(Contained.getTeamList(dimID).size());
@@ -71,33 +88,8 @@ public class MiniGameUtil {
 			team.writeToNBT(teamData);
 			miniGamePacket.writeNBTTagCompound(teamData);
 		}
-		Contained.channel.sendTo(miniGamePacket.toPacket(), player);
-		
-		//Sync Timer
+		Contained.channel.sendToDimension(miniGamePacket.toPacket(), dimID);
 		ClientPacketHandlerUtil.syncMinigameTime(dimID);
-	}
-	
-	public static void stopGame(int dimID) {
-		Contained.gameActive[dimID] = false;
-		Contained.timeLeft[dimID] = 0;
-		ClientPacketHandlerUtil.syncMinigameTime(dimID);
-	}
-	
-	public static void resetGame(int dimID) {
-		// TODO: Kick any remaining people in this dimension (including offline
-		// players) back to the lobby, clear any stale data regarding this game,
-		// and regenerate the dimension.
-		stopGame(dimID);
-		WorldServer w = DimensionManager.getWorld(dimID);
-		if (w != null) {
-			ArrayList<EntityPlayer> toTeleport = new ArrayList<EntityPlayer>();
-			for(Object p : w.playerEntities) {
-				if (p instanceof EntityPlayer)
-					toTeleport.add((EntityPlayer)p);
-			}
-			for(EntityPlayer p : toTeleport)
-				Util.travelToDimension(0, p);
-		}
 	}
 	
 	public static PlayerMiniGame findOrCreateGame(int pendingPlayers){

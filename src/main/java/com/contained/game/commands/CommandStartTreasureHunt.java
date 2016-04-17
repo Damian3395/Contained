@@ -66,7 +66,7 @@ public class CommandStartTreasureHunt implements ICommand {
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
+						MiniGameUtil.startSPTestGame(dim, (EntityPlayerMP)sender);
 						
 						//Set Client GameMode
 						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
