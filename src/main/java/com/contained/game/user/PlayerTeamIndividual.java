@@ -103,23 +103,17 @@ public class PlayerTeamIndividual {
 	
 	public void joinMiniTeam(String teamID){
 		if (this.lobbyTeamID == null) {
-			this.lobbyTeamID = teamID;
+			this.lobbyTeamID = this.teamID;
 			this.lobbyLeader = isLeader;
 			this.teamID = teamID;
 		}
 	}
 	
 	public void revertMiniGameChanges(){
-		if (this.lobbyTeamID != null) {
-			this.teamID = lobbyTeamID;
-			this.isLeader = lobbyLeader;
-			this.lobbyTeamID = null;
-			this.lobbyLeader = false;
-			
-			this.armor = null;
-			this.inventory = null;
-			this.xp = 0;
-		}
+		this.teamID = lobbyTeamID;
+		this.isLeader = lobbyLeader;
+		this.lobbyTeamID = null;
+		this.lobbyLeader = false;
 	}
 	
 	public void setTeamLeader(){

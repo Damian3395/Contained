@@ -18,6 +18,8 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 
 public class CommandEndGame implements ICommand{
@@ -57,11 +59,11 @@ public class CommandEndGame implements ICommand{
 						
 						Util.displayMessage((EntityPlayer)sender, Util.infoCode + "Returning Player To Lobby");
 						
-						//Teleport Player
-						Util.travelToDimension(Resources.OVERWORLD, player);
-						
 						//Create & Sync MiniGame
 						MiniGameUtil.stopGame(dim, (EntityPlayerMP) sender);
+						
+						//Teleport Player
+						Util.travelToDimension(Resources.OVERWORLD, player);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);

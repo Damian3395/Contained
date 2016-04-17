@@ -78,6 +78,9 @@ public class ClientPacketHandlerUtil {
 	public static final int ADD_TREASURE_POINTS = 49;
 	public static final int REMOVE_TREASURE_POINTS = 50;
 	
+	public static final int SAVE_PLAYER = 51;
+	public static final int RESTORE_PLAYER = 52;
+	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
 		territoryPacket.writeInt(territoryData.size());

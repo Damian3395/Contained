@@ -62,18 +62,65 @@ public class MiniGameUtil {
 		}else
 			return;
 		
+		ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
+		startMiniGame.setGameMode(gameMode);
+		startMiniGame.setGame(true);
+		
 		//Create MiniGame & Start It
 		Contained.gameActive[dimID] = true;
 		PlayerMiniGame newGame = new PlayerMiniGame(dimID, gameMode);
 		newGame.testLaunch(player);
 		Contained.miniGames.add(newGame);
 		
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+		pdata.xp = player.experienceTotal;
+		pdata.armor = player.inventory.armorInventory;
+		pdata.inventory = player.inventory.mainInventory;
+		
+		int invSize = 0;
+		for(ItemStack item : pdata.inventory)
+			if(item != null){
+				System.out.println("Saving " + item.getDisplayName());
+				invSize++;
+			}
+		
+		int armorSize = 0;
+		for(ItemStack item : pdata.armor)
+			if(item != null){
+				System.out.println("Saving " + item.getDisplayName());
+				armorSize++;
+			}
+		
+		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SAVE_PLAYER);
+		miniGamePacket.writeInt(player.experienceTotal);
+		miniGamePacket.writeInt(armorSize);
+		int index = 0;
+		for(ItemStack item : pdata.armor)
+			if(item != null){
+				miniGamePacket.writeInt(index);
+				NBTTagCompound itemSave = new NBTTagCompound();
+				item.writeToNBT(itemSave);
+				miniGamePacket.writeNBTTagCompound(itemSave);
+			}
+		
+		index = 0;
+		miniGamePacket.writeInt(invSize);
+		for(ItemStack item : pdata.inventory)
+			if(item != null){
+				miniGamePacket.writeInt(index);
+				NBTTagCompound itemSave = new NBTTagCompound();
+				item.writeToNBT(itemSave);
+				miniGamePacket.writeNBTTagCompound(itemSave);
+				index++;
+			}
+		Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)player);
+		
 		player.experienceTotal = 0;
 		clearMainInventory(player);
 		clearArmorInventory(player);
 		
 		//Sync MiniGame & Teams
-		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+		miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 		miniGamePacket.writeInt(newGame.getGameMode());
 		NBTTagCompound miniGameData = new NBTTagCompound();
 		newGame.writeToNBT(miniGameData);
@@ -104,22 +151,62 @@ public class MiniGameUtil {
 		for(int i = 0; i < Contained.gameScores[dimID].length; i++)
 			Contained.gameScores[dimID][i] = 0;
 		
-		clearMainInventory(player);
-		clearArmorInventory(player);
+		MiniGameUtil.clearMainInventory(player);
+		MiniGameUtil.clearArmorInventory(player);
 		
 		PlayerTeamIndividual restorePdata = PlayerTeamIndividual.get(player.getDisplayName());
 		player.experienceTotal = restorePdata.xp;
 		player.inventory.armorInventory = restorePdata.armor;
 		player.inventory.mainInventory = restorePdata.inventory;
-		restorePdata.xp = 0;
-		restorePdata.armor = null;
-		restorePdata.inventory = null;
 		restorePdata.revertMiniGameChanges();
 		
 		if(MiniGameUtil.isTreasure(dimID))
-			Contained.getActiveTreasures(dimID).clear();
+			Contained.getActiveTreasures(0).clear();
 		
-		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+		System.out.println("Restoring Player Server Side");
+		int invSize = 0;
+		for(ItemStack item : restorePdata.inventory)
+			if(item != null){
+				System.out.println("Restore " + item.getDisplayName());
+				invSize++;
+			}
+		
+		int armorSize = 0;
+		for(ItemStack item : restorePdata.armor)
+			if(item != null){
+				System.out.println("Restore " + item.getDisplayName());
+				armorSize++;
+			}
+		
+		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
+		miniGamePacket.writeInt(restorePdata.xp);
+		miniGamePacket.writeInt(armorSize);
+		int index = 0;
+		for(ItemStack item : restorePdata.armor)
+			if(item != null){
+				miniGamePacket.writeInt(index);
+				NBTTagCompound itemSave = new NBTTagCompound();
+				item.writeToNBT(itemSave);
+				miniGamePacket.writeNBTTagCompound(itemSave);
+			}
+		
+		index = 0;
+		miniGamePacket.writeInt(invSize);
+		for(ItemStack item : restorePdata.inventory)
+			if(item != null){
+				miniGamePacket.writeInt(index);
+				NBTTagCompound itemSave = new NBTTagCompound();
+				item.writeToNBT(itemSave);
+				miniGamePacket.writeNBTTagCompound(itemSave);
+				index++;
+			}
+		Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)player);
+		
+		restorePdata.xp = 0;
+		restorePdata.armor = null;
+		restorePdata.inventory = null;
+		
+		miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 		miniGamePacket.writeInt(dimID);
 		Contained.channel.sendTo(miniGamePacket.toPacket(), player);
 		

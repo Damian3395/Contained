@@ -7,6 +7,8 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import codechicken.lib.packet.PacketCustom;
 
@@ -43,9 +45,6 @@ public class CommandStartPVP implements ICommand {
 					out = this.getCommandUsage(sender);
 				else{
 					try{
-						EntityPlayer player = (EntityPlayer) sender;
-						ExtendedPlayer properties = ExtendedPlayer.get((EntityPlayer)sender);
-						
 						//Check Valid PVP Dimension
 						int dim = Integer.parseInt(argString[0]);
 						if(!MiniGameUtil.isPvP(dim)){
@@ -60,13 +59,6 @@ public class CommandStartPVP implements ICommand {
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.PVP);
-						properties.setGame(true);
-						
-						PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-						pdata.xp = player.experienceTotal;
-						pdata.armor = player.inventory.armorInventory;
-						pdata.inventory = player.inventory.mainInventory;
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);

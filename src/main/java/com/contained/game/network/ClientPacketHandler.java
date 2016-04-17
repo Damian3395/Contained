@@ -478,15 +478,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.MINIGAME_STARTED:
-					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
-					storePdata.xp = mc.thePlayer.experienceTotal;
-					storePdata.armor = mc.thePlayer.inventory.armorInventory;
-					storePdata.inventory = mc.thePlayer.inventory.mainInventory;
-					
-					mc.thePlayer.experienceTotal = 0;
-					MiniGameUtil.clearMainInventory(mc.thePlayer);
-					MiniGameUtil.clearArmorInventory(mc.thePlayer);
-					
 					ExtendedPlayer startMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					startMiniGame.setGameMode(packet.readInt());
 					startMiniGame.setJoiningGame(false);
@@ -507,7 +498,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					endMiniGame.setGameMode(Resources.OVERWORLD);
 					endMiniGame.setGame(false);
-					System.out.println("Client Removing MiniGame & PlayerTeams");
 					int removeDim = packet.readInt();
 					Contained.getTeamList(removeDim).clear();
 					for(PlayerMiniGame game : Contained.miniGames)
@@ -517,18 +507,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						}
 					for(int i = 0; i < Contained.gameScores[removeDim].length; i++)
 						Contained.gameScores[removeDim][i] = 0;
-					
-					MiniGameUtil.clearMainInventory(mc.thePlayer);
-					MiniGameUtil.clearArmorInventory(mc.thePlayer);
-					
-					PlayerTeamIndividual restorePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
-					mc.thePlayer.experienceTotal = restorePdata.xp;
-					mc.thePlayer.inventory.armorInventory = restorePdata.armor;
-					mc.thePlayer.inventory.mainInventory = restorePdata.inventory;
-					restorePdata.xp = 0;
-					restorePdata.armor = null;
-					restorePdata.inventory = null;
-					restorePdata.revertMiniGameChanges();
 					
 					if(MiniGameUtil.isTreasure(removeDim))
 						Contained.getActiveTreasures(removeDim).clear();
@@ -569,6 +547,55 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					int numToRemove = packet.readInt();
 					for(int i=0; i<numToRemove; i++)
 						Contained.getActiveTreasures(0).remove(packet.readCoord());
+				break;
+				
+				case ClientPacketHandlerUtil.SAVE_PLAYER:
+					System.out.println("Saving Client Side Pdata");
+					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
+					storePdata.xp = packet.readInt();
+					storePdata.armor = new ItemStack[4];
+					int armorSize = packet.readInt();
+					for(int i = 0; i < armorSize; i++){
+						int index = packet.readInt();
+						ItemStack armor = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
+						storePdata.armor[index] = armor;
+					}
+					
+					storePdata.inventory = new ItemStack[36];
+					int invSize = packet.readInt();
+					for(int i = 0; i < invSize; i++){
+						int index = packet.readInt();
+						ItemStack itemStore = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
+						storePdata.inventory[index] = itemStore;
+					}
+					for(ItemStack itemCheck : storePdata.inventory)
+						if(itemCheck != null)
+							System.out.println("Save Item " + itemCheck.getDisplayName());
+					
+					mc.thePlayer.experienceTotal = 0;
+					MiniGameUtil.clearMainInventory(mc.thePlayer);
+					MiniGameUtil.clearArmorInventory(mc.thePlayer);
+				break;
+				
+				case ClientPacketHandlerUtil.RESTORE_PLAYER:
+					System.out.println("Restoring Client Side Pdata");
+					MiniGameUtil.clearMainInventory(mc.thePlayer);
+					MiniGameUtil.clearArmorInventory(mc.thePlayer);
+					
+					mc.thePlayer.experienceTotal = packet.readInt();
+					int armorSizeRestore = packet.readInt();
+					for(int i = 0; i < armorSizeRestore; i++){
+						int index = packet.readInt();
+						ItemStack armor = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
+						mc.thePlayer.inventory.armorInventory[index] = armor;
+					}
+					
+					int invSizeRestore = packet.readInt();
+					for(int i = 0; i < invSizeRestore; i++){
+						int index = packet.readInt();
+						ItemStack itemStore = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
+						mc.thePlayer.inventory.mainInventory[index] = itemStore;
+					}
 				break;
 			}
 		}

@@ -43,8 +43,6 @@ public class CommandStartTreasureHunt implements ICommand {
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
-						ExtendedPlayer properties = ExtendedPlayer.get((EntityPlayer)sender);
-						
 						//Check Valid Treasure Dimension
 						int dim = Integer.parseInt(argString[0]);
 						if(!MiniGameUtil.isTreasure(dim)){
@@ -59,8 +57,6 @@ public class CommandStartTreasureHunt implements ICommand {
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating Treasure Hunt Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.TREASURE);
-						properties.setGame(true);
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);
