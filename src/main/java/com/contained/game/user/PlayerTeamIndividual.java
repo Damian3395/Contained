@@ -34,8 +34,8 @@ public class PlayerTeamIndividual {
 	public String lobbyTeamID = null;
 	public boolean lobbyLeader;
 	public int xp;
-	public ItemStack[] inventory;
-	public ItemStack[] armor;
+	public ItemStack[] inventory = new ItemStack[36];
+	public ItemStack[] armor = new ItemStack[4];
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -130,8 +130,8 @@ public class PlayerTeamIndividual {
 			this.lobbyTeamID = null;
 			this.lobbyLeader = false;
 			
-			this.armor = null;
-			this.inventory = null;
+			this.armor = new ItemStack[4];
+			this.inventory = new ItemStack[36];
 			this.xp = 0;
 		}
 	}

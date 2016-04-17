@@ -8,6 +8,7 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -193,8 +194,6 @@ public class PlayerMiniGame {
 				player.inventory.mainInventory = pdata.getInventory();
 				player.experienceTotal = pdata.xp;
 				player.inventory.armorInventory = pdata.getArmor();
-				pdata.inventory = null;
-				pdata.armor = null;
 				pdata.revertMiniGameChanges();
 				
 				Util.travelToDimension(to, player);
