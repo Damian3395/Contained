@@ -2,13 +2,12 @@ package com.contained.game.util;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import java.util.Random;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
@@ -21,9 +20,10 @@ import codechicken.lib.vec.BlockCoord;
 import com.contained.game.Contained;
 import com.contained.game.handler.games.PVPEvents;
 import com.contained.game.handler.games.TreasureEvents;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 
 public class MiniGameUtil {
 	public static boolean isPvP(int dimID) {
@@ -76,22 +76,9 @@ public class MiniGameUtil {
 		if (w != null)
 			w.setWorldTime(0);
 		
-		//Sync MiniGame, Teams, and Timer
-		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_MINI_GAME);
-		NBTTagCompound miniGameData = new NBTTagCompound();
-		data.writeToNBT(miniGameData);
-		miniGamePacket.writeNBTTagCompound(miniGameData);
-		miniGamePacket.writeInt(dimID);
-		miniGamePacket.writeInt(Contained.getTeamList(dimID).size());
-		for(PlayerTeam team : Contained.getTeamList(dimID)){
-			NBTTagCompound teamData = new NBTTagCompound();
-			team.writeToNBT(teamData);
-			miniGamePacket.writeNBTTagCompound(teamData);
-		}
-		Contained.channel.sendToDimension(miniGamePacket.toPacket(), dimID);
 		ClientPacketHandlerUtil.syncMinigameTime(dimID);
 	}
-	
+
 	public static PlayerMiniGame findOrCreateGame(int pendingPlayers){
 		// Check for pending games.
 		for(PlayerMiniGame game : Contained.miniGames)

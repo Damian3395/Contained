@@ -74,10 +74,9 @@ public class ClientPacketHandlerUtil {
 	public static final int SYNC_PVP_STATS = 46;
 	public static final int SYNC_TEASURE_STATS = 47;
 	public static final int SYNC_GAME_SCORE = 48;
-	public static final int SYNC_MINI_GAME = 49;
 	
-	public static final int ADD_TREASURE_POINTS = 50;
-	public static final int REMOVE_TREASURE_POINTS = 51;
+	public static final int ADD_TREASURE_POINTS = 49;
+	public static final int REMOVE_TREASURE_POINTS = 50;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);

@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -53,6 +54,9 @@ public class GuiPVP extends Gui {
 	public void renderPVPHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
 			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
+			if((properties.gameMode != Resources.PVP || !properties.inGame())
+					&& !MiniGameUtil.isPvP(mc.thePlayer.dimension))
+				
 			if(properties.gameMode != Resources.PVP)
 				return;
 			

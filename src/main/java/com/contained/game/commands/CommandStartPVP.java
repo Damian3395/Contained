@@ -71,6 +71,7 @@ public class CommandStartPVP implements ICommand {
 						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 						syncLifePacket.writeInt(properties.gameMode);
 						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
+
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);

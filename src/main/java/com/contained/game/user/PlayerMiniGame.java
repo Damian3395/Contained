@@ -8,8 +8,6 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -22,7 +20,6 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
-import com.sun.corba.se.spi.activation.Server;
 
 public class PlayerMiniGame {
 	private String[] intro = {"The", "League of", "Demons of"
@@ -75,6 +72,12 @@ public class PlayerMiniGame {
 		gameID = Contained.GAME_COUNT;
 		Contained.GAME_COUNT++;
 	}
+	
+	public PlayerMiniGame(int dimID, int gameMode){
+		super();
+		this.dim = dimID;
+		this.gameMode = gameMode;
+	}
 
 	public PlayerMiniGame(NBTTagCompound ntc) {
 		this.readFromNBT(ntc);
@@ -123,14 +126,30 @@ public class PlayerMiniGame {
 
 	public void endGame(){	
 		Util.serverDebugMessage("Ending DIM"+dim+" game");
-		teleportPlayers(dim, 0);
+		
+		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+		miniGamePacket.writeInt(dim);
+		Contained.channel.sendToDimension(miniGamePacket.toPacket(), dim);		
+
 		Contained.gameActive[dim] = false;
 		Contained.timeLeft[dim] = 0;
 		ClientPacketHandlerUtil.syncMinigameTime(dim);
 		Contained.getActiveTreasures(dim).clear();
-		for(int i = 0; i < Contained.getTeamList(dim).size(); i++)
-			Contained.getTeamList(dim).remove(i);
-		Contained.miniGames.remove(this);
+		Contained.getTeamList(dim).clear();
+		for(PlayerMiniGame game : Contained.miniGames)
+			if(game.getGameDimension() == dim){
+				Contained.miniGames.remove(game);
+				break;
+			}
+		for(int i = 0; i < Contained.gameScores[dim].length; i++)
+			Contained.gameScores[dim][i] = 0;
+		
+		if(MiniGameUtil.isTreasure(dim))
+			Contained.getActiveTreasures(dim).clear();
+		
+		teleportPlayers(dim, 0);	
+		
+		ClientPacketHandlerUtil.syncMinigameTime(dim);
 	}
 
 	private void teleportPlayers(int from, int to){
@@ -148,18 +167,26 @@ public class PlayerMiniGame {
 				properties.setGame(true);
 				pdata.xp = player.experienceTotal;
 				pdata.setInventory(player);
-
 				clearInventory(player);
 				player.experienceLevel = 0;
 				player.experience = 0;
 
 				Util.travelToDimension(to, player);
 
-				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-				miniGamePacket.writeInt(gameMode);
-				Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+				PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+				startGamePacket.writeInt(gameMode);
+				NBTTagCompound miniGameData = new NBTTagCompound();
+				this.writeToNBT(miniGameData);
+				startGamePacket.writeNBTTagCompound(miniGameData);
+				startGamePacket.writeInt(dim);
+				startGamePacket.writeInt(Contained.getTeamList(dim).size());
+				for(PlayerTeam team : Contained.getTeamList(dim)){
+					NBTTagCompound teamData = new NBTTagCompound();
+					team.writeToNBT(teamData);
+					startGamePacket.writeNBTTagCompound(teamData);
+				}
+				Contained.channel.sendTo(startGamePacket.toPacket(), (EntityPlayerMP) player);
 			} else { //Ending MiniGame
-				Util.travelToDimension(to, player);
 				ExtendedPlayer properties = ExtendedPlayer.get(player);
 				properties.setGameMode(Resources.OVERWORLD);
 				properties.setGame(false);
@@ -168,10 +195,10 @@ public class PlayerMiniGame {
 				player.inventory.armorInventory = pdata.getArmor();
 				pdata.inventory = null;
 				pdata.armor = null;
-
-				//Sync GameMode
-				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
-				Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+				pdata.revertMiniGameChanges();
+				
+				Util.travelToDimension(to, player);
+				
 				//Sync Game Stats
 				if(gameMode == Resources.PVP) {
 					PacketCustom pvpStatsPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
