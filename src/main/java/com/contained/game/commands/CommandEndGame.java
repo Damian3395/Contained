@@ -3,30 +3,31 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import codechicken.lib.packet.PacketCustom;
+
+import com.contained.game.Contained;
+import com.contained.game.Settings;
+import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.util.MiniGameUtil;
+import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
-import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.Contained;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandlerUtil;
-import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.util.MiniGameUtil;
-import com.contained.game.util.Resources;
-import com.contained.game.util.Util;
-
-public class CommandStartPVP implements ICommand {
+public class CommandEndGame implements ICommand{
 	private final List<String> aliases;
 
 	@Override
 	public String getCommandName() {
-		return "startpvp";
+		return "endgame";
 	}
 
-	public CommandStartPVP() {
+	public CommandEndGame() {
 		aliases = new ArrayList<String>();
 		aliases.add(getCommandName());
 	}
@@ -43,29 +44,23 @@ public class CommandStartPVP implements ICommand {
 				else{
 					try{
 						ExtendedPlayer properties = ExtendedPlayer.get((EntityPlayer)sender);
+						EntityPlayer player = (EntityPlayer) sender;
 						
-						//Check Valid PVP Dimension
-						int dim = Integer.parseInt(argString[0]);
-						if(!MiniGameUtil.isPvP(dim)){
-							Util.displayMessage((EntityPlayer)sender, Util.errorCode + "Invalid Dimension Value. Please Enter Number Between ["+Resources.MIN_PVP_DIMID + "-" + Resources.MAX_PVP_DIMID + "]");
+						//Check If Player Is In MiniGame
+						int dim = player.dimension;
+						if(!MiniGameUtil.isPvP(dim) && !MiniGameUtil.isTreasure(dim)
+								&& !properties.inGame()){
+							Util.displayMessage((EntityPlayer)sender, Util.errorCode + "You Are Not In A Mini Game!");
 							return;
 						}
 						
-						//Check If Game Exists In That Dimension
-						if(!MiniGameUtil.isDimensionEmpty(dim)){
-							Util.displayMessage((EntityPlayer)sender, Util.errorCode + "Active Mini Game In That Dimension");
-							return;
-						}
-						
-						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.PVP_MODE);
-						properties.setGame(true);
+						Util.displayMessage((EntityPlayer)sender, Util.infoCode + "Returning Player To Lobby");
 						
 						//Teleport Player
-						Util.travelToDimension(dim, (EntityPlayer)sender);
+						Util.travelToDimension(Settings.OVERWORLD, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
+						MiniGameUtil.stopGame(dim, (EntityPlayerMP) sender);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
@@ -81,7 +76,7 @@ public class CommandStartPVP implements ICommand {
 
 	@Override
 	public String getCommandUsage(ICommandSender var1) {
-		return "/" + getCommandName() + " <dimension>";
+		return "/" + getCommandName();
 	}
 
 	@Override

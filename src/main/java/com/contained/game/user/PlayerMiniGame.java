@@ -20,6 +20,7 @@ import com.contained.game.Settings;
 import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -67,6 +68,10 @@ public class PlayerMiniGame {
 	public PlayerMiniGame(int dimID){
 		super();
 		this.dim = dimID;
+		if(MiniGameUtil.isPvP(dimID))
+			this.gameMode = Resources.PVP_MODE;
+		else if(MiniGameUtil.isTreasure(dimID))
+			this.gameMode = Resources.TREASURE_MODE;
 	}
 	
 	public PlayerMiniGame(NBTTagCompound ntc) {
@@ -135,16 +140,25 @@ public class PlayerMiniGame {
 					properties.setGame(true);
 					pdata.xp = player.experienceTotal;
 					pdata.setInventory(player.inventoryContainer.inventoryItemStacks);
-					clearInventory(player);
 					pdata.armor = player.inventory.armorInventory;
+					clearInventory(player);
 					
 					Util.travelToDimension(to, player);
 					
-					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-					miniGamePacket.writeInt(gameMode);
-					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+					PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+					startGamePacket.writeInt(gameMode);
+					NBTTagCompound miniGameData = new NBTTagCompound();
+					this.writeToNBT(miniGameData);
+					startGamePacket.writeNBTTagCompound(miniGameData);
+					startGamePacket.writeInt(dim);
+					startGamePacket.writeInt(Contained.getTeamList(dim).size());
+					for(PlayerTeam team : Contained.getTeamList(dim)){
+						NBTTagCompound teamData = new NBTTagCompound();
+						team.writeToNBT(teamData);
+						startGamePacket.writeNBTTagCompound(teamData);
+					}
+					Contained.channel.sendTo(startGamePacket.toPacket(), (EntityPlayerMP) player);
 				}else{ //Ending MiniGame
-					Util.travelToDimension(to, player);
 					ExtendedPlayer properties = ExtendedPlayer.get(player);
 					properties.setGameMode(Resources.FREE_PLAY);
 					properties.setGame(false);
@@ -154,9 +168,13 @@ public class PlayerMiniGame {
 					pdata.inventory = null;
 					pdata.armor = null;
 					
-					//Sync GameMode
+					Util.travelToDimension(to, player);
+					
+					//Sync MiniGames and Teams
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+					miniGamePacket.writeInt(dim);
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+					
 					//Sync Game Stats
 					if(gameMode == Resources.PVP_MODE){
 						PacketCustom pvpStatsPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);

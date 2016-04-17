@@ -115,6 +115,10 @@ public class PlayerTeamIndividual {
 			this.isLeader = lobbyLeader;
 			this.lobbyTeamID = null;
 			this.lobbyLeader = false;
+			
+			this.armor = null;
+			this.inventory = null;
+			this.xp = 0;
 		}
 	}
 	

@@ -3,6 +3,8 @@ package com.contained.game.network;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -26,6 +28,7 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -479,13 +482,46 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					startMiniGame.setGameMode(packet.readInt());
 					startMiniGame.setJoiningGame(false);
 					startMiniGame.setGame(true);
+					
+					PlayerMiniGame newGame = new PlayerMiniGame(packet.readNBTTagCompound());
+					Contained.miniGames.add(newGame);
+					int dimID = packet.readInt();
+					int teams = packet.readInt();
+					Contained.getTeamList(dimID).clear();
+					for(int i = 0; i < teams; i++){
+						PlayerTeam newTeam = new PlayerTeam(packet.readNBTTagCompound());
+						Contained.getTeamList(dimID).add(newTeam);
+					}
 				break;
 				
 				case ClientPacketHandlerUtil.MINIGAME_ENDED:
 					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					endMiniGame.setGameMode(Resources.FREE_PLAY);
 					endMiniGame.setGame(false);
-					Contained.getActiveTreasures(0).clear();
+					int removeDim = packet.readInt();
+					Contained.getTeamList(removeDim).clear();
+					for(PlayerMiniGame game : Contained.miniGames)
+						if(game.getGameDimension() == removeDim){
+							Contained.miniGames.remove(game);
+							break;
+						}
+					for(int i = 0; i < Contained.gameScores[removeDim].length; i++)
+						Contained.gameScores[removeDim][i] = 0;
+					
+					PlayerTeamIndividual restorePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
+					mc.thePlayer.experienceTotal = restorePdata.xp;
+					mc.thePlayer.inventory.armorInventory = restorePdata.armor;
+					List inventory = restorePdata.inventory;
+					Iterator iterator = inventory.iterator();
+					while(iterator.hasNext()){
+						ItemStack restoreItem = (ItemStack) iterator.next();
+						if(restoreItem != null)
+							mc.thePlayer.inventory.addItemStackToInventory(restoreItem);
+					}
+					restorePdata.revertMiniGameChanges();
+					
+					if(MiniGameUtil.isTreasure(removeDim))
+						Contained.getActiveTreasures(removeDim).clear();
 				break;
 				
 				case ClientPacketHandlerUtil.SYNC_PVP_STATS:
@@ -510,16 +546,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					Contained.gameScores[dim][teamNum] = score;
 				break;
 				
-				case ClientPacketHandlerUtil.SYNC_MINI_GAME:
-					PlayerMiniGame newGame = new PlayerMiniGame(packet.readNBTTagCompound());
-					Contained.miniGames.add(newGame);
-					int dimID = packet.readInt();
-					int teams = packet.readInt();
-					Contained.getTeamList(dimID).clear();
-					for(int i = 0; i < teams; i++){
-						PlayerTeam newTeam = new PlayerTeam(packet.readNBTTagCompound());
-						Contained.getTeamList(dimID).add(newTeam);
-					}
 				case ClientPacketHandlerUtil.ADD_TREASURE_POINTS:
 					int numToAdd = packet.readInt();
 					boolean clearFirst = packet.readBoolean();
