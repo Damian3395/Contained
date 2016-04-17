@@ -39,7 +39,7 @@ public class CommandStartTreasureHunt implements ICommand {
 			if(!ExtendedPlayer.get((EntityPlayer)sender).isAdmin()){
 				out = "You are not an Admin.";
 			}else{
-				if(argString.length != 2){
+				if(argString.length != 1){
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
@@ -67,13 +67,6 @@ public class CommandStartTreasureHunt implements ICommand {
 						
 						//Create & Sync MiniGame
 						MiniGameUtil.startSPTestGame(dim, (EntityPlayerMP)sender);
-						
-						//Set Client GameMode
-						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-						syncLifePacket.writeInt(properties.gameMode);
-						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
-						
-						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
@@ -89,7 +82,7 @@ public class CommandStartTreasureHunt implements ICommand {
 
 	@Override
 	public String getCommandUsage(ICommandSender var1) {
-		return "/" + getCommandName() + " <dimension> <chest_amount>";
+		return "/" + getCommandName() + " <dimension>";
 	}
 
 	@Override

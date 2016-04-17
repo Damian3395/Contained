@@ -53,14 +53,15 @@ public class Load {
 		/**
 		 * Territory & Team Data
 		 */
-		Contained.getTerritoryMap(dimID).clear();
-		Contained.getTeamList(dimID).clear();
-		Contained.teamMemberData.clear();
-		Contained.teamInvitations.clear();
-		Contained.getTradeList(dimID).clear();
 		
 		ntc = loadNBTFile("territoryInfo"+dimID+".dat");
 		if (ntc != null) {		
+			Contained.getTerritoryMap(dimID).clear();
+			Contained.getTeamList(dimID).clear();
+			Contained.teamMemberData.clear();
+			Contained.teamInvitations.clear();
+			Contained.getTradeList(dimID).clear();
+			
 			NBTTagList teamList = ntc.getTagList("teamList", (byte)10);
 			for(int i=0; i<teamList.tagCount(); i++) {
 				NBTTagCompound data = teamList.getCompoundTagAt(i);

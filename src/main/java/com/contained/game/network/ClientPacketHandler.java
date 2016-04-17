@@ -99,15 +99,15 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 					
 				case ClientPacketHandlerUtil.SYNC_TEAMS:
-					int numTeamsBefore = Contained.teamData.size();
-					Contained.teamData.clear();
+					int numTeamsBefore = Contained.getTeamList(0).size();
+					Contained.getTeamList(0).clear();
 					int numTeams = packet.readInt();
 					for(int i=0; i<numTeams; i++) {
 						PlayerTeam readTeam = new PlayerTeam(packet.readNBTTagCompound());
 						Contained.getTeamList(0).add(readTeam);
 					}
 						
-					if (Contained.teamData.size() < numTeamsBefore) {
+					if (Contained.getTeamList(0).size() < numTeamsBefore) {
 						//Some team got disbanded. Need to remove stale territory blocks.
 						ArrayList<Point> terrToRemove = new ArrayList<Point>();
 						for(Point p : Contained.getTerritoryMap(0).keySet()) {
@@ -477,21 +477,14 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						mc.displayGuiScreen(new GuiMiniGames());
 				break;
 				
-				case ClientPacketHandlerUtil.MINIGAME_STARTED:
-					ExtendedPlayer startMiniGame = ExtendedPlayer.get(mc.thePlayer);
-					startMiniGame.setGameMode(packet.readInt());
-					startMiniGame.setJoiningGame(false);
-					startMiniGame.setGame(true);
-					
+				case ClientPacketHandlerUtil.MINIGAME_STARTED:					
 					PlayerMiniGame newGame = new PlayerMiniGame(packet.readNBTTagCompound());
 					Contained.miniGames.add(newGame);
-					int dimID = packet.readInt();
-					int teams = packet.readInt();
-					Contained.getTeamList(dimID).clear();
-					for(int i = 0; i < teams; i++){
-						PlayerTeam newTeam = new PlayerTeam(packet.readNBTTagCompound());
-						Contained.getTeamList(dimID).add(newTeam);
-					}
+					
+					ExtendedPlayer startMiniGame = ExtendedPlayer.get(mc.thePlayer);
+					startMiniGame.setGameMode(newGame.getGameMode());
+					startMiniGame.setJoiningGame(false);
+					startMiniGame.setGame(true);
 				break;
 				
 				case ClientPacketHandlerUtil.MINIGAME_ENDED:
@@ -499,7 +492,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					endMiniGame.setGameMode(Resources.OVERWORLD);
 					endMiniGame.setGame(false);
 					int removeDim = packet.readInt();
-					Contained.getTeamList(removeDim).clear();
 					for(PlayerMiniGame game : Contained.miniGames)
 						if(game.getGameDimension() == removeDim){
 							Contained.miniGames.remove(game);
@@ -514,8 +506,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					mc.thePlayer.inventory.mainInventory = restorePdata.getInventory();
 					restorePdata.revertMiniGameChanges();
 					
-					if(MiniGameUtil.isTreasure(removeDim))
-						Contained.getActiveTreasures(removeDim).clear();
+					Contained.getActiveTreasures(0).clear();
 				break;
 				
 				case ClientPacketHandlerUtil.SYNC_PVP_STATS:

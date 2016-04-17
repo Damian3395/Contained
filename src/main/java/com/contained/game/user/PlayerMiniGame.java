@@ -121,7 +121,7 @@ public class PlayerMiniGame {
 			pickRandomTeamLeaders();
 			teleportPlayers(0, dim);
 			Contained.timeLeft[dim] = Contained.configs.gameDuration[gameMode]*20;	
-			MiniGameUtil.startGame(dim, this);
+			MiniGameUtil.startGame(this);
 		}
 	}
 
@@ -149,8 +149,6 @@ public class PlayerMiniGame {
 			Contained.getActiveTreasures(dim).clear();
 		
 		teleportPlayers(dim, 0);	
-		
-		ClientPacketHandlerUtil.syncMinigameTime(dim);
 	}
 
 	private void teleportPlayers(int from, int to){
@@ -171,22 +169,7 @@ public class PlayerMiniGame {
 				clearInventory(player);
 				player.experienceLevel = 0;
 				player.experience = 0;
-
 				Util.travelToDimension(to, player);
-
-				PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-				startGamePacket.writeInt(gameMode);
-				NBTTagCompound miniGameData = new NBTTagCompound();
-				this.writeToNBT(miniGameData);
-				startGamePacket.writeNBTTagCompound(miniGameData);
-				startGamePacket.writeInt(dim);
-				startGamePacket.writeInt(Contained.getTeamList(dim).size());
-				for(PlayerTeam team : Contained.getTeamList(dim)){
-					NBTTagCompound teamData = new NBTTagCompound();
-					team.writeToNBT(teamData);
-					startGamePacket.writeNBTTagCompound(teamData);
-				}
-				Contained.channel.sendTo(startGamePacket.toPacket(), (EntityPlayerMP) player);
 			} else { //Ending MiniGame
 				ExtendedPlayer properties = ExtendedPlayer.get(player);
 				properties.setGameMode(Resources.OVERWORLD);
@@ -357,9 +340,9 @@ public class PlayerMiniGame {
 	}
 
 	public void readFromNBT(NBTTagCompound ntc) {
-		ntc.getInteger("dimID");
-		ntc.getInteger("gameID");
-		ntc.getInteger("gameMode");
+		this.dim = ntc.getInteger("dimID");
+		this.gameID =  ntc.getInteger("gameID");
+		this.gameMode = ntc.getInteger("gameMode");
 	}
 
 	public static PlayerMiniGame get(int dim){

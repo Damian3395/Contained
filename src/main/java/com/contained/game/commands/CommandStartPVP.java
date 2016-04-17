@@ -66,11 +66,6 @@ public class CommandStartPVP implements ICommand {
 						
 						//Create & Sync MiniGame
 						MiniGameUtil.startSPTestGame(dim, (EntityPlayerMP)sender);
-						
-						//Set Client GameMode
-						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-						syncLifePacket.writeInt(properties.gameMode);
-						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
 
 					} catch (Exception e){
 						e.printStackTrace();

@@ -59,24 +59,25 @@ public class MiniGameUtil {
 		PlayerMiniGame newGame = new PlayerMiniGame(dimID);
 		newGame.testLaunch(player);
 		Contained.miniGames.add(newGame);
-		startGame(dimID, newGame);
+		startGame(newGame);
 	}
 	
-	public static void startGame(int dimID, PlayerMiniGame data) {
+	public static void startGame(PlayerMiniGame data) {
+		int dimID = data.getGameDimension();
 		int mode = gameMode(dimID);
 		Contained.timeLeft[dimID] = Contained.configs.gameDuration[mode]*20;
 		Contained.gameActive[dimID] = true;
 		
 		if (mode == Resources.PVP)
 			PVPEvents.initializePVPGame(dimID);
-		else
+		else if (mode == Resources.TREASURE)
 			TreasureEvents.initializeTreasureGame(dimID);
 		
 		WorldServer w = DimensionManager.getWorld(dimID);
 		if (w != null)
 			w.setWorldTime(0);
 		
-		ClientPacketHandlerUtil.syncMinigameTime(dimID);
+		ClientPacketHandlerUtil.syncMinigameStart(data);
 	}
 
 	public static PlayerMiniGame findOrCreateGame(int pendingPlayers){

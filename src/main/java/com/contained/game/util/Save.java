@@ -24,7 +24,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
 public class Save {
-	public static void saveWorldData(int dimID) {
+	public static void saveWorldData(int dimID) {		
 		//Save world generation data
 		NBTTagCompound ntc = new NBTTagCompound();
 		ntc.setInteger("worldRadius", Contained.configs.getWorldRadius(dimID));
