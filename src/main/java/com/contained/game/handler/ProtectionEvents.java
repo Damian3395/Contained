@@ -9,6 +9,7 @@ import com.contained.game.Settings;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
+import com.contained.game.util.EntityUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.HarvestedOre;
@@ -24,6 +25,7 @@ import net.minecraft.block.BlockFurnace;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
@@ -260,11 +262,23 @@ public class ProtectionEvents {
 	//Damage & Death Protection
 	public void onEntityDamaged(LivingHurtEvent event) {
 		Entity damageSource = event.source.getEntity();
-		if (!(damageSource instanceof EntityPlayer))
+		if (!(damageSource instanceof EntityPlayer)) {
+			if (damageSource instanceof EntityCreature) {
+				if (EntityUtil.isSameTeam((EntityCreature)damageSource, event.entityLiving))
+					event.setCanceled(true);
+			}
 			return;
+		}
 		EntityPlayer attacker = (EntityPlayer)damageSource;
 		
-		if (event.entityLiving != null && event.entityLiving instanceof EntityMob 
+		if (event.entityLiving instanceof EntityCreature && !(event.entityLiving instanceof EntityPlayer)) {
+			if (EntityUtil.isSameTeam(event.entityLiving, attacker)) {
+				event.setCanceled(true);
+				return;
+			}
+		}
+		
+		if (event.entityLiving instanceof EntityMob 
 				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
 				.mobDisable) {
 			Util.debugMessage(attacker, "monsterProtect");

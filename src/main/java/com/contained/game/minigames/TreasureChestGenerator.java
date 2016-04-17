@@ -84,10 +84,10 @@ public final class TreasureChestGenerator {
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.experience_bottle, 1, 0), 1, 12, 50));
 		
-		//"Creeper", "Skeleton", "Spider", "Zombie", "Slime", "CaveSpider", "Witch", "Blaze"
-		int[] spawnMeta = {50, 51, 52, 54, 55, 59, 66, 61};
-		int[] spawnRarities = {10, 10, 20, 20, 30, 15, 5, 5};
-		int[] spawnMax = {2, 2, 4, 4, 3, 4, 1, 1};
+		//"Creeper", "Skeleton", "Zombie", "Witch"
+		int[] spawnMeta = {50, 51, 54, 66};
+		int[] spawnRarities = {10, 10, 20, 5};
+		int[] spawnMax = {2, 2, 4, 1};
 		for(int i=0; i<spawnMeta.length; i++) {
 			hook.addItem(new WeightedRandomChestContent(
 					new ItemStack(Items.spawn_egg, 1, spawnMeta[i]), 1, spawnMax[i], spawnRarities[i]));
