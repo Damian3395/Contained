@@ -1,20 +1,27 @@
 package com.contained.game.util;
 
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.DimensionManager;
 import codechicken.lib.packet.PacketCustom;
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
-import com.contained.game.Settings;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
-import com.contained.game.user.PlayerTeamIndividual;
 
 public class MiniGameUtil {
 	public static boolean isPvP(int dimID) {
@@ -40,9 +47,9 @@ public class MiniGameUtil {
 	public static void startGame(int dimID, EntityPlayerMP player) {
 		//Create Timer
 		if (isPvP(dimID))
-			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Settings.PVP]*20;
+			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Resources.PVP]*20;
 		else if (isTreasure(dimID))
-			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Settings.TREASURE]*20;
+			Contained.timeLeft[dimID] = Contained.configs.gameDuration[Resources.TREASURE]*20;
 		else
 			return;
 		
@@ -91,5 +98,48 @@ public class MiniGameUtil {
 			for(EntityPlayer p : toTeleport)
 				Util.travelToDimension(0, p);
 		}
+	}
+	
+	public static PlayerMiniGame findOrCreateGame(int pendingPlayers){
+		// Check for pending games.
+		for(PlayerMiniGame game : Contained.miniGames)
+			if(!game.isGameReady() && game.getCapacity() <= pendingPlayers)
+				return game;
+		
+		// If no pending games, try creating a new game.
+		PlayerMiniGame newGame = new PlayerMiniGame(pendingPlayers);
+		if(newGame.getGameMode() == -1){
+			// Couldn't create new game, because all mini-game dimensions are
+			// already full.
+			return null;
+		}
+		Contained.miniGames.add(newGame);
+		return newGame;
+	}
+	
+	public static int getCapacity(int gameMode) {
+		return Contained.configs.maxTeamSize[gameMode]*Contained.configs.gameNumTeams[gameMode];
+	}
+	
+	public static void generateChest(World w, int chestAmount, ChestGenHooks hook){
+		if (w.isRemote)
+			return;
+		
+		int x,y,z;
+		Random r = new Random();		
+		ArrayList<BlockCoord> generatedPoints = new ArrayList<BlockCoord>();
+		for(int i=0;i<chestAmount;i++){
+			Point randomSpawnPoint = Util.getRandomLocation(w);
+			x=randomSpawnPoint.x;
+			z=randomSpawnPoint.y;			
+			y=w.getTopSolidOrLiquidBlock(x, z);		//coordinates to generate chests
+			
+			w.setBlock(x, y, z, Blocks.chest);		//generate a chest
+			TileEntity chest = w.getTileEntity(x, y, z);	
+			if (chest instanceof IInventory)
+				WeightedRandomChestContent.generateChestContents(r, hook.getItems(r), (IInventory)chest, hook.getCount(r));
+			generatedPoints.add(new BlockCoord(x, y, z));			
+		}		
+		ClientPacketHandlerUtil.addTreasureAndSync(w.provider.dimensionId, generatedPoints);
 	}
 }

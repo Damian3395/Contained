@@ -1,7 +1,14 @@
 package com.contained.game.util;
 
+import com.contained.game.item.ItemTerritory;
+import com.contained.game.world.block.TerritoryMachine;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraftforge.common.ChestGenHooks;
 
 public class Resources {
 	public static final String MOD_ID = "contained";
@@ -17,14 +24,13 @@ public class Resources {
 	public static final int MAX_PVP_DIMID = 5;
 	public static final int MIN_TREASURE_DIMID = 10;
 	public static final int MAX_TREASURE_DIMID = 13;
+	public static final int MAX_PVP_GAMES = MAX_PVP_DIMID-MIN_PVP_DIMID+1;
+	public static final int MAX_TREASURE_GAMES = MAX_TREASURE_DIMID-MIN_TREASURE_DIMID+1;
 	
-	public static final int MAX_MINI_GAME_TEAM_SIZE = 5;
-	public static final int MAX_PVP_GAMES = 3;
-	public static final int MAX_TREASURE_GAMES = 3;
-	
-	public static final int FREE_PLAY = -1;
-	public static final int PVP_MODE = 0;
-	public static final int TREASURE_MODE = 1;
+	public static final int OVERWORLD = 0;
+	public static final int MINIGAME = 1;
+	public static final int PVP = 1;
+	public static final int TREASURE = 2;
 	
 	public static final int COAL = 0;
 	public static final int IRON = 1;
@@ -46,4 +52,76 @@ public class Resources {
 		Blocks.emerald_ore,
 		Blocks.lapis_ore
 	};
+	
+	public static void definePossibleChestLoot(ChestGenHooks hook) {
+		hook.setMin(4);
+		hook.setMax(8);
+		
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.cooked_beef, 1, 0), 1, 3, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.rotten_flesh, 1, 0), 3, 8, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.bone, 1, 0), 3, 8, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.bread, 1, 0), 1, 5, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.arrow, 1, 0), 4, 16, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Blocks.torch, 1, 0), 6, 24, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Blocks.tnt, 1, 0), 1, 4, 20));
+		
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.bow, 1, 0), 1, 1, 50));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.stone_sword, 1, 0), 1, 1, 50));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.iron_sword, 1, 0), 1, 1, 20));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.diamond_sword, 1, 0), 1, 1, 5));	
+		
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.chainmail_helmet, 1, 0), 1, 1, 35));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.chainmail_boots, 1, 0), 1, 1, 35));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.chainmail_leggings, 1, 0), 1, 1, 35));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.chainmail_chestplate, 1, 0), 1, 1, 35));	
+		
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.iron_helmet, 1, 0), 1, 1, 10));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.iron_boots, 1, 0), 1, 1, 10));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.iron_leggings, 1, 0), 1, 1, 10));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.iron_chestplate, 1, 0), 1, 1, 10));
+		
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.diamond_helmet, 1, 0), 1, 1, 2));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.diamond_boots, 1, 0), 1, 1, 2));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.diamond_leggings, 1, 0), 1, 1, 2));	
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.diamond_chestplate, 1, 0), 1, 1, 2));	
+		
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(ItemTerritory.addTerritory, 1, 0), 4, 16, 25));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(TerritoryMachine.instance, 1, 0), 1, 1, 5));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Items.experience_bottle, 1, 0), 1, 12, 50));
+		
+		//"Creeper", "Skeleton", "Zombie", "Witch"
+		int[] spawnMeta = {50, 51, 54, 66};
+		int[] spawnRarities = {10, 10, 20, 5};
+		int[] spawnMax = {2, 2, 4, 1};
+		for(int i=0; i<spawnMeta.length; i++) {
+			hook.addItem(new WeightedRandomChestContent(
+					new ItemStack(Items.spawn_egg, 1, spawnMeta[i]), 1, spawnMax[i], spawnRarities[i]));
+		}
+	}
 }

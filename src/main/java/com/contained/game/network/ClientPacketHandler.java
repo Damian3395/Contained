@@ -483,7 +483,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				
 				case ClientPacketHandlerUtil.MINIGAME_ENDED:
 					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
-					endMiniGame.setGameMode(Resources.FREE_PLAY);
+					endMiniGame.setGameMode(Resources.OVERWORLD);
 					endMiniGame.setGame(false);
 					Contained.getActiveTreasures(0).clear();
 				break;

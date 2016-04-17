@@ -288,6 +288,15 @@ public class Util {
 		MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), "say "+msg);
 	}
 	
+	/**
+	 * Outputs a global message to chat, visible to all players, but only if
+	 * debug mode is enabled.
+	 */
+	public static void serverDebugMessage(String msg) {
+		if (Resources.DEBUG_ENABLED)
+			serverMessage(msg);
+	}
+	
 	public static void dimensionMessage(int dim, String msg) {
 		List players = MinecraftServer.getServer().worldServers[dim].playerEntities;
 		Iterator iterator = players.iterator();
