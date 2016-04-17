@@ -3,18 +3,24 @@ package com.contained.game.util;
 import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
+import com.contained.game.entity.ExtendedLivingBase;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.world.GameTeleporter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
+import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -280,6 +286,15 @@ public class Util {
 	 */
 	public static void serverMessage(String msg) {
 		MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), "say "+msg);
+	}
+	
+	/**
+	 * Outputs a global message to chat, visible to all players, but only if
+	 * debug mode is enabled.
+	 */
+	public static void serverDebugMessage(String msg) {
+		if (Resources.DEBUG_ENABLED)
+			serverMessage(msg);
 	}
 	
 	public static void dimensionMessage(int dim, String msg) {

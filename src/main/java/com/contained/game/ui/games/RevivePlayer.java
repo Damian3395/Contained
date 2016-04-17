@@ -32,7 +32,7 @@ public class RevivePlayer extends GuiScreen {
 	@Override
 	public void initGui(){
 		ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-		if(properties.inGame() && properties.gameMode != Resources.FREE_PLAY){
+		if(properties.inGame() && properties.gameMode != Resources.OVERWORLD){
 			mc.displayGuiScreen(null);
 			return;
 		}

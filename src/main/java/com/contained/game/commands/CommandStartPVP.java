@@ -58,7 +58,7 @@ public class CommandStartPVP implements ICommand {
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.PVP_MODE);
+						properties.setGameMode(Resources.PVP);
 						properties.setGame(true);
 						
 						//Teleport Player

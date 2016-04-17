@@ -23,7 +23,7 @@ public class PVPEvents {
 	public void onSpawn(Clone event){
 		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
 			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			if(properties.inGame() && properties.gameMode == Resources.PVP_MODE){				
+			if(properties.inGame() && properties.gameMode == Resources.PVP){				
 				properties.setLives(ExtendedPlayer.get(event.original).lives);
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
@@ -49,8 +49,8 @@ public class PVPEvents {
 			ExtendedPlayer victimProp = ExtendedPlayer.get(victim);
 			ExtendedPlayer killerProp = ExtendedPlayer.get(killer);
 			
-			if(victimProp.inGame() && victimProp.gameMode == Resources.PVP_MODE
-					&& killerProp.inGame() && killerProp.gameMode == Resources.PVP_MODE){
+			if(victimProp.inGame() && victimProp.gameMode == Resources.PVP
+					&& killerProp.inGame() && killerProp.gameMode == Resources.PVP){
 				victimProp.removeLife();
 				victimProp.deaths++;
 				killerProp.kills++;
@@ -64,7 +64,7 @@ public class PVPEvents {
 				if(miniGame == null)
 					return;
 				
-				int teamID = miniGame.getTeamID(killer.getDisplayName());
+				int teamID = miniGame.getTeamID(killerData);
 				Contained.gameScores[miniGame.getGameDimension()][teamID]++;
 				
 				if(Contained.gameScores[miniGame.getGameDimension()][teamID] == 50)
@@ -78,7 +78,7 @@ public class PVPEvents {
 		if(event.entityPlayer != null && event.item != null
 				&& !event.entityPlayer.worldObj.isRemote && event.item.getItem() instanceof ItemFood){
 			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			if(properties.inGame() && properties.gameMode == Resources.PVP_MODE 
+			if(properties.inGame() && properties.gameMode == Resources.PVP 
 					&& event.item.getDisplayName().equals("Apple of Life")){
 				properties.addLife();
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);

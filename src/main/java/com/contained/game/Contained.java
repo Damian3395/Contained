@@ -152,12 +152,12 @@ public class Contained{
 		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		miniGames = new ArrayList<PlayerMiniGame>(10);
 		gameScores = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1][];
-		gameScores[Settings.OVERWORLD] = new int[configs.gameNumTeams[Settings.OVERWORLD]];
+		gameScores[Resources.OVERWORLD] = new int[configs.gameNumTeams[Resources.OVERWORLD]];
 		vec3 = new Vector3d();
 		for(int i = Resources.MIN_PVP_DIMID; i < Resources.MAX_PVP_DIMID; i++)
-			gameScores[i] = new int[configs.gameNumTeams[Settings.PVP]];
+			gameScores[i] = new int[configs.gameNumTeams[Resources.PVP]];
 		for(int i = Resources.MIN_TREASURE_DIMID; i < Resources.MAX_TREASURE_DIMID; i++)
-			gameScores[i] = new int[configs.gameNumTeams[Settings.TREASURE]];
+			gameScores[i] = new int[configs.gameNumTeams[Resources.TREASURE]];
 		
 		MinecraftForge.EVENT_BUS.register(new WorldEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());

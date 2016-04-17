@@ -24,7 +24,7 @@ public class GuiGuild extends GuiScreen {
 	@Override
 	public void initGui(){
 		ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-		if(properties.gameMode != Resources.FREE_PLAY){
+		if(properties.gameMode != Resources.OVERWORLD){
 			mc.displayGuiScreen(null);
 			return;
 		}

@@ -1,12 +1,9 @@
 package com.contained.game.network;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import com.contained.game.Contained;
-import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ObjectGenerator;
@@ -209,7 +206,6 @@ public class ServerPacketHandler {
 				case ServerPacketHandlerUtil.ADMIN_CREATE:
 					int x,y,z;
 					String object,name;
-					Random r= new Random();
 					object=packet.readString();
 					name=packet.readString();
 					x = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posX;

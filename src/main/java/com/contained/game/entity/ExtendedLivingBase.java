@@ -1,9 +1,12 @@
 package com.contained.game.entity;
 
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.EntityUtil;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
@@ -16,6 +19,7 @@ public class ExtendedLivingBase implements IExtendedEntityProperties {
 	private final static String EXT_PROP_NAME = "ExtendedLivingBase";
 	private final EntityLivingBase entity;
 	private String teamID = null;
+	public boolean forceFireImmunity = false;
 	
 	public ExtendedLivingBase(EntityLivingBase entity) {
 		this.entity = entity;
@@ -31,14 +35,20 @@ public class ExtendedLivingBase implements IExtendedEntityProperties {
 	
 	public void setTeam(String teamID) {
 		this.teamID = teamID;
+		if (this.teamID != null && !(entity instanceof EntityPlayer) && entity instanceof EntityCreature) {
+			EntityCreature creature = (EntityCreature)entity;
+			EntityUtil.applyTeamAI(creature);
+			forceFireImmunity = true;
+			creature.func_110163_bv(); //Set persistent
+		}
 	}
 	
 	public void setTeamFromUsername(String playerName) {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(playerName);
 		if (pdata != null && pdata.teamID != null)
-			this.teamID = pdata.teamID;
+			setTeam(pdata.teamID);
 		else
-			this.teamID = null;
+			setTeam(null);
 	}
 	
 	public String getTeam() {
@@ -52,9 +62,9 @@ public class ExtendedLivingBase implements IExtendedEntityProperties {
 	@Override
 	public void loadNBTData(NBTTagCompound ntc) {
 		if (ntc.hasKey("extTeam"))
-			this.teamID = ntc.getString("extTeam");
+			setTeam(ntc.getString("extTeam"));
 		else
-			this.teamID = null;
+			setTeam(null);
 	}
 
 	@Override

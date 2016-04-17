@@ -13,12 +13,7 @@ import net.minecraftforge.common.config.Configuration;
 public class Settings {	
 	
 	public boolean creativeOverride;
-	
-	public static final int OVERWORLD = 0;
-	public static final int MINIGAME = 1;
-	public static final int PVP = 1;
-	public static final int TREASURE = 2;
-	
+		
 	public int[] maxTeamSize = new int[3];
 	public int[] worldRadius = new int[3];
 	public int[] numChunks = new int[3];
@@ -51,7 +46,7 @@ public class Settings {
 				
 		for(int i=0; i<=1; i++) {
 			String category = "lobby_settings";
-			if (i == MINIGAME)
+			if (i == Resources.MINIGAME)
 				category = "minigame_settings";
 			
 			largeTeamSize[i] = config.getInt("largeTeamRequirement", category, 
@@ -107,9 +102,9 @@ public class Settings {
 			String prefix = "";
 			if (i > 0)
 				category = "minigame_settings";
-			if (i == PVP)
+			if (i == Resources.PVP)
 				prefix = "pvp_";
-			if (i == TREASURE)
+			if (i == Resources.TREASURE)
 				prefix = "treasure_";
 			
 			worldRadius[i] = config.getInt(prefix+"worldSize", category, 
@@ -119,7 +114,7 @@ public class Settings {
 					defaultValue(i, 5, 5, 5), 1, 999, 
 					"What is the maximum player capacity of a team?");	
 			
-			if (i != OVERWORLD) {
+			if (i != Resources.OVERWORLD) {
 				gameDuration[i] = config.getInt(prefix+"Duration", category, 
 						defaultValue(i, 0, 2400, 2400), 1, 5000000, 
 						"Time (in seconds) that the mini-game lasts.");
@@ -136,23 +131,23 @@ public class Settings {
 	}
 	
 	private int defaultValue(int type, int overworldValue, int minigameValue) {
-		if (type == OVERWORLD)
+		if (type == Resources.OVERWORLD)
 			return overworldValue;
 		else
 			return minigameValue;
 	}
 	
 	private boolean defaultValue(int type, boolean overworldValue, boolean minigameValue) {
-		if (type == OVERWORLD)
+		if (type == Resources.OVERWORLD)
 			return overworldValue;
 		else
 			return minigameValue;
 	}
 	
 	private int defaultValue(int type, int overworldValue, int pvpValue, int treasureValue) {
-		if (type == OVERWORLD)
+		if (type == Resources.OVERWORLD)
 			return overworldValue;
-		else if (type == PVP)
+		else if (type == Resources.PVP)
 			return pvpValue;
 		else
 			return treasureValue;
@@ -160,52 +155,52 @@ public class Settings {
 	
 	public static int getDimConfig(int dimID) {
 		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID))
-			return MINIGAME;
+			return Resources.MINIGAME;
 		else
-			return OVERWORLD;
+			return Resources.OVERWORLD;
 	}
 	
 	public static int getGameConfig(int dimID) {
 		if (MiniGameUtil.isPvP(dimID))
-			return PVP;
+			return Resources.PVP;
 		else if (MiniGameUtil.isTreasure(dimID))
-			return TREASURE;
+			return Resources.TREASURE;
 		else
-			return OVERWORLD;
+			return Resources.OVERWORLD;
 	}
 	
 	public int getWorldRadius(int dimID) {
 		if (MiniGameUtil.isPvP(dimID))
-			return worldRadius[PVP];
+			return worldRadius[Resources.PVP];
 		else if (MiniGameUtil.isTreasure(dimID))
-			return worldRadius[TREASURE];
+			return worldRadius[Resources.TREASURE];
 		else
-			return worldRadius[OVERWORLD];
+			return worldRadius[Resources.OVERWORLD];
 	}
 	
 	public void setWorldRadius(int dimID, int radius) {
 		if (MiniGameUtil.isPvP(dimID))
-			worldRadius[PVP] = radius;
+			worldRadius[Resources.PVP] = radius;
 		else if (MiniGameUtil.isTreasure(dimID))
-			worldRadius[TREASURE] = radius;
+			worldRadius[Resources.TREASURE] = radius;
 		else
-			worldRadius[OVERWORLD] = radius;	
+			worldRadius[Resources.OVERWORLD] = radius;	
 		recalculateNumChunks();
 	}
 	
 	public int getNumChunks(int dimID) {
 		if (MiniGameUtil.isPvP(dimID))
-			return numChunks[PVP];
+			return numChunks[Resources.PVP];
 		else if (MiniGameUtil.isTreasure(dimID))
-			return numChunks[TREASURE];
+			return numChunks[Resources.TREASURE];
 		else
-			return numChunks[OVERWORLD];
+			return numChunks[Resources.OVERWORLD];
 	}
 	
 	private void recalculateNumChunks() {
 		for(int i=0; i<=2; i+=1) 
 			numChunks[i] = 0;
-		int maxRadius = Math.max(Math.max(worldRadius[OVERWORLD], worldRadius[PVP]), worldRadius[TREASURE]);
+		int maxRadius = Math.max(Math.max(worldRadius[Resources.OVERWORLD], worldRadius[Resources.PVP]), worldRadius[Resources.TREASURE]);
 		for(int chunkX=-(maxRadius+Resources.wastelandPadding); 
 				chunkX<=(maxRadius+Resources.wastelandPadding); chunkX++) {
 			for(int chunkZ=-(maxRadius+Resources.wastelandPadding); 

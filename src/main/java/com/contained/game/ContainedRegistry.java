@@ -11,7 +11,6 @@ import com.contained.game.entity.DeepBlaze;
 import com.contained.game.entity.DeepLavaSlime;
 import com.contained.game.entity.DeepWitherSkeleton;
 import com.contained.game.item.*;
-import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.ui.ToolPage;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.*;
@@ -95,6 +94,6 @@ public class ContainedRegistry {
 		for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++)
 			DimensionManager.registerDimension(i, 0);
 		
-		TreasureChestGenerator.definePossibleChestLoot(CUSTOM_CHEST_LOOT);
+		Resources.definePossibleChestLoot(CUSTOM_CHEST_LOOT);
 	}	
 }

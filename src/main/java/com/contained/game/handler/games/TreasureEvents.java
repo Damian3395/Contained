@@ -7,8 +7,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
-import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Util;
 
@@ -49,7 +49,7 @@ public class TreasureEvents {
 			if (Contained.getActiveTreasures(dimID).contains(eventLocation)) {
 				ClientPacketHandlerUtil.removeTreasureAndSync(dimID, eventLocation);
 				//TODO: Increase team score by 1.
-				TreasureChestGenerator.generateChest(w, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);
+				MiniGameUtil.generateChest(w, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);
 			}
 		}
 	}

@@ -159,6 +159,9 @@ public class WorldEvents {
 						}
 					}
 				}
+				
+				if (props.forceFireImmunity)
+					event.entity.extinguish();
 			}
 		}
 	}

@@ -57,7 +57,7 @@ public class CommandEndGame implements ICommand{
 						Util.displayMessage((EntityPlayer)sender, Util.infoCode + "Returning Player To Lobby");
 						
 						//Teleport Player
-						Util.travelToDimension(Settings.OVERWORLD, (EntityPlayer)sender);
+						Util.travelToDimension(Resources.OVERWORLD, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
 						MiniGameUtil.stopGame(dim, (EntityPlayerMP) sender);

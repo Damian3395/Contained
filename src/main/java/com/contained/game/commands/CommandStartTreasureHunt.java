@@ -8,8 +8,6 @@ import codechicken.lib.packet.PacketCustom;
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.handler.games.TreasureEvents;
-import com.contained.game.minigames.TreasureChestGenerator;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
@@ -20,7 +18,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.common.MinecraftForge;
 
 public class CommandStartTreasureHunt implements ICommand {
 	private final List<String> aliases;
@@ -62,7 +59,7 @@ public class CommandStartTreasureHunt implements ICommand {
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating Treasure Hunt Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.TREASURE_MODE);
+						properties.setGameMode(Resources.TREASURE);
 						properties.setGame(true);
 						
 						//Teleport Player
@@ -71,7 +68,12 @@ public class CommandStartTreasureHunt implements ICommand {
 						//Create & Sync MiniGame
 						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
 						
-						TreasureChestGenerator.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
+						//Set Client GameMode
+						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+						syncLifePacket.writeInt(properties.gameMode);
+						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
+						
+						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);

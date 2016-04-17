@@ -30,7 +30,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public boolean isSpectator = false;
 	private boolean inGame = false;
 	private boolean joiningGame = false;
-	public int gameMode = Resources.FREE_PLAY;
+	public int gameMode = Resources.OVERWORLD;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;

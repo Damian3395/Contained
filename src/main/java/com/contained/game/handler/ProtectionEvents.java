@@ -4,11 +4,15 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import codechicken.lib.vec.BlockCoord;
+
 import com.contained.game.Contained;
 import com.contained.game.Settings;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
+import com.contained.game.util.EntityUtil;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.HarvestedOre;
@@ -17,6 +21,7 @@ import com.contained.game.world.block.HarvestedOreTE;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
 import net.minecraft.block.BlockBrewingStand;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockEnchantmentTable;
@@ -24,6 +29,7 @@ import net.minecraft.block.BlockFurnace;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
@@ -109,10 +115,9 @@ public class ProtectionEvents {
 			}
 		}
 		
-		if (shouldCancel) {
-			Util.debugMessage(ev.getPlayer(), "breakProtect");
+		if (shouldCancel)
 			ev.setCanceled(true);
-		} else {
+		else {
 			//Is this a wilderness protected block?
 			Block check = ev.world.getBlock(ev.x, ev.y, ev.z);
 			boolean isSpecial = false;
@@ -250,26 +255,34 @@ public class ProtectionEvents {
     }
 	
 	public void placeProtection(EntityPlayer player, BlockEvent.PlaceEvent ev) {
-		if (getPermissions(ev.world, player, ev.x, ev.y, ev.z).buildDisable) {
-			Util.debugMessage(player, "placeProtect");
+		if (getPermissions(ev.world, player, ev.x, ev.y, ev.z).buildDisable)
 			ev.setCanceled(true);
-		}
 	}
 	
 	@SubscribeEvent
 	//Damage & Death Protection
 	public void onEntityDamaged(LivingHurtEvent event) {
 		Entity damageSource = event.source.getEntity();
-		if (!(damageSource instanceof EntityPlayer))
+		if (!(damageSource instanceof EntityPlayer)) {
+			if (damageSource instanceof EntityCreature) {
+				if (EntityUtil.isSameTeam((EntityCreature)damageSource, event.entityLiving))
+					event.setCanceled(true);
+			}
 			return;
+		}
 		EntityPlayer attacker = (EntityPlayer)damageSource;
 		
-		if (event.entityLiving != null && event.entityLiving instanceof EntityMob 
-				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
-				.mobDisable) {
-			Util.debugMessage(attacker, "monsterProtect");
-			event.setCanceled(true);
+		if (event.entityLiving instanceof EntityCreature && !(event.entityLiving instanceof EntityPlayer)) {
+			if (EntityUtil.isSameTeam(event.entityLiving, attacker)) {
+				event.setCanceled(true);
+				return;
+			}
 		}
+		
+		if (event.entityLiving instanceof EntityMob 
+				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
+				.mobDisable)
+			event.setCanceled(true);
 		else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer) {
 			// Player versus Player: Disable PvP in the following cases:
 			//    -Players cannot attack their own teammates.
@@ -297,59 +310,31 @@ public class ProtectionEvents {
 				}
 			}
 			
-			if (shouldCancel) {
-				Util.debugMessage(attacker, "playerProtect");
+			if (shouldCancel)
 				event.setCanceled(true);
-			}
 		}
 		else if (event.entityLiving != null && (event.entityLiving instanceof EntityAnimal 
 				|| event.entityLiving instanceof IMerchant
 				|| event.entityLiving instanceof EntityGolem)
 				&& getPermissions(attacker.worldObj, attacker, event.entityLiving.posX, event.entityLiving.posY, event.entityLiving.posZ)
-				.animalDisable) {
-			Util.debugMessage(attacker, "passiveEntityProtect");
+				.animalDisable)
 			event.setCanceled(true);
-		}
-	}
-	
-	@SubscribeEvent
-	//Container Protection
-	public void onContainerOpen(PlayerOpenContainerEvent ev) {
-		Container c = ev.entityPlayer.openContainer;
-		if (c != null && isProtectedContainer(c)
-				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				.containerDisable) 
-		{
-			Util.debugMessage(ev.entityPlayer, "containerProtect");
-			ev.setResult(Event.Result.DENY);
-		}
-		else if (c != null && c instanceof ContainerChest
-				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				.chestDisable) 
-		{
-			Util.debugMessage(ev.entityPlayer, "chestProtect");
-			ev.setResult(Event.Result.DENY);
-		}
 	}
 	
 	@SubscribeEvent
 	//Entity Interaction Protection
 	public void onEntityInteract(EntityInteractEvent ev) {
 		if (getPermissions(ev.entity.worldObj, ev.entityPlayer, ev.target.posX, ev.target.posY, ev.target.posZ)
-				.interactDisable) {
-			Util.debugMessage(ev.entityPlayer, "interactProtect");
+				.interactDisable) 
 			ev.setCanceled(true);
-		}
 	}
 	
 	@SubscribeEvent
 	//Bucket Protection
 	public void onBucketFill(FillBucketEvent ev) {
 		if (getPermissions(ev.world, ev.entityPlayer, ev.target.blockX, ev.target.blockY, ev.target.blockZ)
-				.bucketDisable) {
-			Util.debugMessage(ev.entityPlayer, "bucketProtect");
+				.bucketDisable) 
 			ev.setCanceled(true);
-		}
 	}
 	
 	@SubscribeEvent
@@ -365,24 +350,20 @@ public class ProtectionEvents {
 	
 	public boolean pickupProtection(PlayerEvent ev) {
 		if (getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				.itemDisable) {
-			Util.debugMessage(ev.entityPlayer, "pickupProtect");
+				.itemDisable) 
 			return true;
-		}
 		return false;
 	}
 	
 	@SubscribeEvent
-	//Harvest handling
+	//Harvest handling & Container Interaction
 	public void onBlockInteract(PlayerInteractEvent ev) {
 		if (ev.action == Action.RIGHT_CLICK_BLOCK && !ev.world.isRemote) {
 			Block b = ev.world.getBlock(ev.x, ev.y, ev.z);
 			if (b != null && b instanceof BlockCrops) {
 				if (getPermissions(ev.world, ev.entityPlayer, ev.x, ev.y, ev.z)
-						.harvestDisable) {
-					Util.debugMessage(ev.entityPlayer, "harvestProtect");
+						.harvestDisable) 
 					return;
-				}
 				else {
 					BlockCrops crop = (BlockCrops)b;
 					int meta = ev.world.getBlockMetadata(ev.x, ev.y, ev.z);
@@ -394,7 +375,28 @@ public class ProtectionEvents {
 					}
 				}
 			}
+			if (b != null && isProtectedContainerBlock(b) && getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.x, ev.y, ev.z)
+					.containerDisable)
+				ev.setResult(Event.Result.DENY);
+			if (b != null && b instanceof BlockChest && getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.x, ev.y, ev.z)
+					.chestDisable) {
+				// Protect chest UNLESS we're in the treasure mini-game and this chest
+				// is one of the auto-spawned ones.
+				if (!MiniGameUtil.isTreasure(ev.entityPlayer.dimension)
+						|| !Contained.getActiveTreasures(ev.entityPlayer.dimension).contains(new BlockCoord(ev.x, ev.y, ev.z)))
+					ev.setResult(Event.Result.DENY);
+			}
 		}
+	}
+	
+	@SubscribeEvent
+	//Container Protection
+	public void onContainerOpen(PlayerOpenContainerEvent ev) {
+		Container c = ev.entityPlayer.openContainer;
+		if (c != null && isProtectedContainer(c)
+				&& getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
+				.containerDisable) 
+			ev.setResult(Event.Result.DENY);
 	}
 	
 	/**
