@@ -63,14 +63,12 @@ public class CommandStartPVP implements ICommand {
 						properties.setGameMode(Resources.PVP);
 						properties.setGame(true);
 						
-						System.out.println("Saving Player PData");
 						PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 						pdata.xp = player.experienceTotal;
 						pdata.armor = player.inventory.armorInventory;
 						pdata.inventory = player.inventory.mainInventory;
 						
 						//Teleport Player
-						System.out.println("Teleporting Player");
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
