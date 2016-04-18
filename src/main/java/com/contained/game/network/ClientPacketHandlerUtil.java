@@ -12,6 +12,7 @@ import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -213,6 +214,19 @@ public class ClientPacketHandlerUtil {
 		if (playerServerEnt != null)
 			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(memberChanged).toPacket());
+	}
+	
+	public static void syncMinigameStart(PlayerMiniGame data) {
+		PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+		NBTTagCompound miniGameData = new NBTTagCompound();
+		data.writeToNBT(miniGameData);
+		startGamePacket.writeNBTTagCompound(miniGameData);
+		Contained.channel.sendToDimension(startGamePacket.toPacket(), data.getGameDimension());
+		
+		PacketCustom teamSync = packetSyncTeams(Contained.getTeamList(data.getGameDimension()));
+		Contained.channel.sendToDimension(teamSync.toPacket(), data.getGameDimension());
+		
+		syncMinigameTime(data.getGameDimension());
 	}
 	
 	public static void syncMinigameTime(int dimID) {

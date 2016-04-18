@@ -212,7 +212,6 @@ public class MiniGameUtil {
 		
 		ClientPacketHandlerUtil.syncMinigameTime(dimID);
 	}
-	
 	public static void resetGame(int dimID) {
 		// TODO: Kick any remaining people in this dimension (including offline
 		// players) back to the lobby, clear any stale data regarding this game,

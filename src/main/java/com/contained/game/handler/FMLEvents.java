@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FileDeleteStrategy;
+
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -80,11 +82,13 @@ public class FMLEvents {
 			//Tick the mini-game timers, and check for game-over.
 			for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++) {
 				processGameTick(i);
-				checkDimensionReset(i);
+				if (rand > 10 && rand < 15)
+					checkDimensionReset(i);
 			}
 			for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++) {
 				processGameTick(i);
-				checkDimensionReset(i);
+				if (rand > 5 && rand < 10)
+					checkDimensionReset(i);
 				
 				//Periodically see if any treasure chests are missing in the treasure
 				//mini-game (this can happen if they're blown up by TNT/Creepers/etc)

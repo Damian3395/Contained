@@ -39,7 +39,7 @@ public class CommandStartTreasureHunt implements ICommand {
 			if(!ExtendedPlayer.get((EntityPlayer)sender).isAdmin()){
 				out = "You are not an Admin.";
 			}else{
-				if(argString.length != 2){
+				if(argString.length != 1){
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
@@ -81,7 +81,7 @@ public class CommandStartTreasureHunt implements ICommand {
 
 	@Override
 	public String getCommandUsage(ICommandSender var1) {
-		return "/" + getCommandName() + " <dimension> <chest_amount>";
+		return "/" + getCommandName() + " <dimension>";
 	}
 
 	@Override
