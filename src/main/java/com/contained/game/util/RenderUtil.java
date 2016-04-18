@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class RenderUtil {	
@@ -33,6 +32,17 @@ public class RenderUtil {
 			bright = 1.0f + (hue - 0.5f);
 		}
 		return Color.getHSBColor(hue, sat, bright);
+	}
+	
+	public static void setupNonScaledOverlayRendering() {
+		Minecraft mc = Minecraft.getMinecraft();
+		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0.0D, mc.displayWidth, mc.displayHeight, 0.0D, 1000.0D, 3000.0D);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
+        GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
 	}
 	
     public static void drawNameTag(Entity ent, String tag, double x, double y, double z, int range)
