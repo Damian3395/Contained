@@ -42,6 +42,7 @@ public class DataEvents {
 			DataLogger.insertBuild(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					Util.getDimensionString(event.player.dimension),
+					Util.getGameID(event.player.dimension),
 					event.block.getLocalizedName(), 
 					event.x, 
 					event.y, 
@@ -56,6 +57,7 @@ public class DataEvents {
 			DataLogger.insertMine(Util.getServerID(), 
 					event.getPlayer().getDisplayName(), 
 					Util.getDimensionString(event.getPlayer().dimension),
+					Util.getGameID(event.getPlayer().dimension),
 					event.block.getLocalizedName(), 
 					event.x, 
 					event.y, 
@@ -103,6 +105,7 @@ public class DataEvents {
 				killer = event.source.getDamageType();
 			DataLogger.insertKill(Util.getServerID(), 
 					Util.getDimensionString(event.entity.dimension),
+					Util.getGameID(Util.getGameID(event.entity.dimension)),
 					killer, 
 					victim, 
 					Util.getDate());
@@ -115,6 +118,7 @@ public class DataEvents {
 			DataLogger.insertAnvil(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
 					Util.getDimensionString(event.entityPlayer.dimension),
+					Util.getGameID(event.entityPlayer.dimension),
 					event.left == null ? "" : event.left.getDisplayName(), 
 					event.left == null ? 0 : event.left.stackSize,
 					event.right == null ? "" : event.right.getDisplayName(), 
@@ -130,6 +134,7 @@ public class DataEvents {
 			DataLogger.insertUsed(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(),
 					Util.getDimensionString(event.entityPlayer.dimension),
+					Util.getGameID(event.entityPlayer.dimension),
 					event.original.getDisplayName(), 
 					Util.getDate());
 		}
@@ -152,6 +157,7 @@ public class DataEvents {
 			DataLogger.insertConsume(Util.getServerID(), 
 					event.entityPlayer.getDisplayName(), 
 					Util.getDimensionString(event.entityPlayer.dimension),
+					Util.getGameID(event.entityPlayer.dimension),
 					event.item.getDisplayName(), 
 					Util.getDate());
 		}
@@ -185,6 +191,7 @@ public class DataEvents {
 				DataLogger.insertMove(Util.getServerID(), 
 						player.getDisplayName(),
 						Util.getDimensionString(event.entityLiving.dimension),
+						Util.getGameID(event.entity.dimension),
 						x, y, z, 
 						Util.getDate());
 				properties.posX = x;

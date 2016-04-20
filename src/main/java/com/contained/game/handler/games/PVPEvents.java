@@ -53,7 +53,9 @@ public class PVPEvents {
 					&& killerProp.inGame() && killerProp.gameMode == Resources.PVP){
 				victimProp.removeLife();
 				victimProp.deaths++;
+				victimProp.curDeaths++;
 				killerProp.kills++;
+				killerProp.curKills++;
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(victimProp.lives);
@@ -66,6 +68,7 @@ public class PVPEvents {
 				
 				int teamID = miniGame.getTeamID(killerData);
 				Contained.gameScores[miniGame.getGameDimension()][teamID]++;
+				ClientPacketHandlerUtil.syncMiniGameScore(killer.dimension, teamID, Contained.gameScores[killer.dimension][teamID]);
 				
 				if(Contained.gameScores[miniGame.getGameDimension()][teamID] == 50)
 					miniGame.endGame();

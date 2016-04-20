@@ -12,6 +12,7 @@ import java.util.List;
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedLivingBase;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.world.GameTeleporter;
 
@@ -118,6 +119,23 @@ public class Util {
 		else if (MiniGameUtil.isTreasure(dimID))
 			return "Treasure";
 		else return "Unknown";
+	}
+	
+	public static int getGameID(int dimID) {
+		PlayerMiniGame miniGame = PlayerMiniGame.get(dimID);
+		if(miniGame == null)
+			return -1;
+		
+		return miniGame.getGameID();
+	}
+	
+	public static int getGameMode(int dimID) {
+		if(MiniGameUtil.isPvP(dimID))
+			return Resources.PVP;
+		if(MiniGameUtil.isTreasure(dimID))
+			return Resources.TREASURE;
+		
+		return Resources.OVERWORLD;
 	}
 	
 	public static void travelToDimension(int dimID, EntityPlayer player) {

@@ -6,15 +6,6 @@ import java.sql.SQLException;
 
 import com.contained.game.util.Resources;
 
-/* TODO:
- * Add Events:
- * Territory
- * Potion Brewing
- * Item Enchanted
- * Animal Tamed
- * MiniGames
- * Add Attribute GAMEID, GAMEMODE, DIMENSION to all tables
-*/
 public class DataLogger {
 	public static java.sql.Connection DB;
 	public static String USERNAME = "root";
@@ -27,56 +18,103 @@ public class DataLogger {
 		connectDataBase();
 	}
 	
-	public static void insertGameWon(String server, int gameID, int gameMode, String winningTeam, String losingTeam, int scoreWinning, int scoreLosing, String date){
+	public static void insertGameResults(String server, int gameID, int gameMode, String team, int score, int time, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO GAMERESULTS VALUES (?,?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO GAMERESULTS VALUES (?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setInt(3, gameMode);
-			preparedStatement.setString(4, winningTeam);
-			preparedStatement.setString(5, losingTeam);
-			preparedStatement.setInt(6, scoreWinning);
-			preparedStatement.setInt(7, scoreLosing);
-			preparedStatement.setString(8, date);
+			preparedStatement.setString(4, team);
+			preparedStatement.setInt(5, score);
+			preparedStatement.setInt(6, time);
+			preparedStatement.setString(7, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insetOpenTreasure(String server, int gameID, String player, String team, String date){
+	public static void insertTreasureScore(String server, int gameID, String player, String team, int score, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TREASURE VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SCORETREASURE VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setString(3, player);
 			preparedStatement.setString(4, team);
-			preparedStatement.setString(5, date);
+			preparedStatement.setInt(5, score);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertMiniGameTeam(String server, int gameID, int gameMode, String[] players, String team, String date){
+	public static void insertPVPScore(String server, int gameID, String player, String team, int kills, int deaths, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TREASURE VALUES (?,?,?,?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SCOREPVP VALUES (?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setString(3, player);
+			preparedStatement.setString(4, team);
+			preparedStatement.setInt(5, kills);
+			preparedStatement.setInt(6, deaths);
+			preparedStatement.setString(7, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertMiniGamePlayer(String server, int gameID, int gameMode, String player, String team, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO MINIGAMEPLAYER VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setInt(3, gameMode);
-			for(int i = 0; i < players.length; i++)
-				preparedStatement.setString(4+i, players[i]);
-			preparedStatement.setString(9, team);
-			preparedStatement.setString(10, date);
+			preparedStatement.setString(4, player);
+			preparedStatement.setString(5, team);
+			preparedStatement.setString(6, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void deleteMiniGamePlayer(String player){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("DELETE FROM MINIGAMEPLAYER WHERE PLAYER = ?");
+			preparedStatement.setString(1, player);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertNewMiniGame(String server, int gameID, int gameMode, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO MINIGAME VALUES (?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setInt(3, gameMode);
+			preparedStatement.setString(4, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -102,21 +140,22 @@ public class DataLogger {
 		}
 	}
 	
-	public static void insertTrade(String server, String creator, String world, String acceptor, String offer, int offerSize, String request, int requestSize, String date){
+	public static void insertTrade(String server, String creator, String world, int gameID, String acceptor, String offer, int offerSize, String request, int requestSize, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TRADE VALUES (?,?,?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TRADE VALUES (?,?,?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, creator);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, acceptor);
-			preparedStatement.setString(5, offer);
-			preparedStatement.setInt(6, offerSize);
-			preparedStatement.setString(7, request);
-			preparedStatement.setInt(8, requestSize);
-			preparedStatement.setString(9, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, acceptor);
+			preparedStatement.setString(6, offer);
+			preparedStatement.setInt(7, offerSize);
+			preparedStatement.setString(8, request);
+			preparedStatement.setInt(9, requestSize);
+			preparedStatement.setString(10, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -298,19 +337,20 @@ public class DataLogger {
 		}
 	}
 	
-	public static void insertMove(String server, String user, String world, int x, int y, int z, String date){
+	public static void insertMove(String server, String user, String world, int gameID, int x, int y, int z, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO POSITION VALUES (?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO POSITION VALUES (?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setInt(4, x);
-			preparedStatement.setInt(5, y);
-			preparedStatement.setInt(6, z);
-			preparedStatement.setString(7, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setInt(5, x);
+			preparedStatement.setInt(6, y);
+			preparedStatement.setInt(7, z);
+			preparedStatement.setString(8, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -334,147 +374,155 @@ public class DataLogger {
 		}
 	}
 	
-	public static void insertConsume(String server, String user, String world, String item, String date){
+	public static void insertConsume(String server, String user, String world, int gameID, String item, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CONSUME VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CONSUME VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, item);
-			preparedStatement.setString(5, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, item);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertUsed(String server, String user, String world, String item, String date){
+	public static void insertUsed(String server, String user, String world, int gameID,String item, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO USED VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO USED VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, item);
-			preparedStatement.setString(5, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, item);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertSmelt(String server, String user, String world, String item, String date){
+	public static void insertSmelt(String server, String user, String world, int gameID, String item, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SMELT VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SMELT VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, item);
-			preparedStatement.setString(5, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, item);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertCraft(String server, String user, String world, String item, String date){
+	public static void insertCraft(String server, String user, String world, int gameID, String item, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CRAFT VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO CRAFT VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, item);
-			preparedStatement.setString(5, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, item);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertAnvil(String server, String user, String world, String left, int l_size, String right, int r_size, String out, int o_size, String date){
+	public static void insertAnvil(String server, String user, String world, int gameID, String left, int l_size, String right, int r_size, String out, int o_size, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO ANVIL VALUES (?,?,?,?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO ANVIL VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, left);
-			preparedStatement.setInt(5, l_size);
-			preparedStatement.setString(6, right);
-			preparedStatement.setInt(7, r_size);
-			preparedStatement.setString(8, out);
-			preparedStatement.setInt(9, o_size);
-			preparedStatement.setString(10, date);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, left);
+			preparedStatement.setInt(6, l_size);
+			preparedStatement.setString(7, right);
+			preparedStatement.setInt(8, r_size);
+			preparedStatement.setString(9, out);
+			preparedStatement.setInt(10, o_size);
+			preparedStatement.setString(11, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertMine(String server, String user, String world, String block, int x, int y, int z, String date){
+	public static void insertMine(String server, String user, String world, int gameID, String block, int x, int y, int z, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO MINE VALUES (?,?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO MINE VALUES (?,?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
-			preparedStatement.setString(4, block);
+			preparedStatement.setInt(4, gameID);
+			preparedStatement.setString(5, block);
+			preparedStatement.setInt(6, x);
+			preparedStatement.setInt(7, y);
+			preparedStatement.setInt(8, z);
+			preparedStatement.setString(9, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertBuild(String server, String user, String world, int gameID, String block, int x, int y, int z, String date){
+		if (!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO BUILD VALUES (?,?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, user);
+			preparedStatement.setString(3, world);
+			preparedStatement.setInt(4, gameID);
 			preparedStatement.setInt(5, x);
 			preparedStatement.setInt(6, y);
 			preparedStatement.setInt(7, z);
-			preparedStatement.setString(8, date);
+			preparedStatement.setString(8, block);
+			preparedStatement.setString(9, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertBuild(String server, String user, String world, String block, int x, int y, int z, String date){
+	public static void insertKill(String server, String world, int gameID, String killer, String victim, String date){
 		if (!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO BUILD VALUES (?,?,?,?,?,?,?,?)");
-			preparedStatement.setString(1, server);
-			preparedStatement.setString(2, user);
-			preparedStatement.setString(3, world);
-			preparedStatement.setInt(4, x);
-			preparedStatement.setInt(5, y);
-			preparedStatement.setInt(6, z);
-			preparedStatement.setString(7, block);
-			preparedStatement.setString(8, date);
-			preparedStatement.executeUpdate();
-		}catch(SQLException e){
-			e.printStackTrace();
-		}
-	}
-	
-	public static void insertKill(String server, String world, String killer, String victim, String date){
-		if (!Resources.LOGGING_ENABLED)
-			return;
-		
-		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO KILLED VALUES (?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO KILLED VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, world);
-			preparedStatement.setString(3, killer);
-			preparedStatement.setString(4, victim);
-			preparedStatement.setString(5, date);
+			preparedStatement.setInt(3, gameID);
+			preparedStatement.setString(4, killer);
+			preparedStatement.setString(5, victim);
+			preparedStatement.setString(6, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();

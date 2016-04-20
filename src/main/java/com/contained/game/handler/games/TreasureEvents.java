@@ -7,7 +7,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Util;
@@ -33,7 +36,7 @@ public class TreasureEvents {
 	@SubscribeEvent
 	public void onTreasureChestOpen(PlayerInteractEvent event){
 		if(event.action == Action.RIGHT_CLICK_BLOCK && event.entityPlayer != null)
-			handleTreasureChest(event.world, event.entityPlayer, event.x, event.y, event.z);		
+			handleTreasureChest(event.world, event.entityPlayer, event.x, event.y, event.z);
 	}
 	
 	@SubscribeEvent
@@ -47,8 +50,17 @@ public class TreasureEvents {
 			BlockCoord eventLocation = new BlockCoord(x, y, z);
 			int dimID = w.provider.dimensionId;
 			if (Contained.getActiveTreasures(dimID).contains(eventLocation)) {
+				ExtendedPlayer properties = ExtendedPlayer.get(p);
+				properties.treasuresOpened++;
+				properties.curTreasuresOpened++;
+				
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+				PlayerMiniGame miniGame = PlayerMiniGame.get(pdata.teamID);
+				int teamID = miniGame.getTeamID(pdata);
+				Contained.gameScores[p.dimension][teamID]++;
+				ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
+				
 				ClientPacketHandlerUtil.removeTreasureAndSync(dimID, eventLocation);
-				//TODO: Increase team score by 1.
 				MiniGameUtil.generateChest(w, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);
 			}
 		}

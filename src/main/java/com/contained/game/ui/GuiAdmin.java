@@ -205,7 +205,7 @@ public class GuiAdmin extends GuiScreen{
     	if(b.enabled){
     		switch(b.id){
 	    	case BTN_LOGIN : 
-	    		if(this.tf_password.getText().equals("password")){
+	    		if(this.tf_password.getText().equals("GameScience2016")){
 	    			this.player.setInvisible(true);
 	    			this.player.capabilities.disableDamage = true;
 	    			this.player.capabilities.allowFlying = true;

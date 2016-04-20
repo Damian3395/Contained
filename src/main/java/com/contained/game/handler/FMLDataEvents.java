@@ -29,6 +29,7 @@ public class FMLDataEvents {
 			DataLogger.insertSmelt(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					Util.getDimensionString(event.player.dimension),
+					Util.getGameID(event.player.dimension),
 					event.smelting.getDisplayName(), 
 					Util.getDate());
 			System.out.println("Inserting Smelt " + event.smelting.getDisplayName());
@@ -41,6 +42,7 @@ public class FMLDataEvents {
 			DataLogger.insertCraft(Util.getServerID(), 
 					event.player.getDisplayName(), 
 					Util.getDimensionString(event.player.dimension),
+					Util.getGameID(event.player.dimension),
 					event.crafting.getDisplayName(), 
 					Util.getDate());
 			System.out.println("Inserting Craft " + event.crafting.getDisplayName());

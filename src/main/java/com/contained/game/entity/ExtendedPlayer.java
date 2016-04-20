@@ -41,6 +41,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int kills = 0;
 	public int deaths = 0;
 	public int treasuresOpened = 0;
+	public int curKills = 0;
+	public int curDeaths = 0;
+	public int curTreasuresOpened = 0;
 	public String world = "";
 	
 	public ExtendedPlayer(EntityPlayer entity) {
