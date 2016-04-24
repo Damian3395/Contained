@@ -346,4 +346,20 @@ public class Util {
             w.spawnEntityInWorld(entityitem);
         }
     }
+    
+    /**
+     * 	returns the list of EntityPlayer in a certain dimension
+     */
+    @SuppressWarnings("unchecked")
+	public static List<EntityPlayer> getPlayerListInDimension(int dimID){
+    	return MinecraftServer.getServer().worldServerForDimension(dimID).playerEntities;
+    }
+    
+    /**
+     * 	returns the list of EntityPlayer in the whole MinecraftServer
+     */
+    @SuppressWarnings("unchecked")
+	public static List<EntityPlayer> getPlayerListInMinecraftServer(){
+		return MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+    }
 }

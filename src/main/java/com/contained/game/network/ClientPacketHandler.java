@@ -445,7 +445,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					mc.thePlayer.capabilities.allowEdit = true;
 					mc.thePlayer.capabilities.isCreativeMode = false;
 					
-					if(playerState.isAdmin)
+					if(playerState.isAdmin())
 						playerState.setAdminRights(false);
 					if(playerState.isSpectator)
 						playerState.setSpectator(false);
