@@ -49,7 +49,7 @@ public class KeyBindings {
 		
 		// Admin GUI Container Keyboard Event Handler
 		toggleAdmin = new KeyBinding("key.adminGui"
-				, Keyboard.KEY_O
+				, Keyboard.KEY_M
 				, "key.categories."+Resources.MOD_ID);
 		ClientRegistry.registerKeyBinding(toggleAdmin);
 	}

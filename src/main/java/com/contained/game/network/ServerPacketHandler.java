@@ -6,7 +6,6 @@ import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
-import com.contained.game.util.ObjectGenerator;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -15,7 +14,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -32,6 +30,7 @@ public class ServerPacketHandler {
 	private PerkHandler perk = new PerkHandler();
 	private TradeHandler trade = new TradeHandler();
 	private MiniGameHandler games = new MiniGameHandler();
+	private AdminHandler admin = new AdminHandler();
 	
 	@SubscribeEvent
 	public void handlePacket(ServerCustomPacketEvent event) {		
@@ -195,54 +194,52 @@ public class ServerPacketHandler {
 				break;
 				
 				case ServerPacketHandlerUtil.BECOME_ADMIN:
-					player.setInvisible(true);
-					player.capabilities.allowFlying = true;
-					player.capabilities.disableDamage = true;
-					ExtendedPlayer.get(player).setAdminRights(true);
-					PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_ADMIN);
-					Contained.channel.sendTo(adminPacket.toPacket(),this.player);
+					admin.becomeAdmin(player);					
 				break;
 				
+				/**
+				 *  packet input:
+				 *  @String object: name of Object to generate
+				 *  @String name:	name of Player around whom generation occurs
+				 */
 				case ServerPacketHandlerUtil.ADMIN_CREATE:
-					int x,y,z;
-					String object,name;
-					object=packet.readString();
-					name=packet.readString();
-					x = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posX;
-					y = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posY;
-					z = this.player.getServerForPlayer().getPlayerEntityByName(name).getPlayerCoordinates().posZ;
-					ObjectGenerator og = new ObjectGenerator();
-					if(!og.generate(object, this.player.getServerForPlayer(), x, y, z)){
-						System.out.println("Server: Cannot generate <"+object+"> ");
-					}else{
-						System.out.println("Server: Generate <"+object+"> succedded");
-					}
+					admin.create(player, packet.readString(), packet.readString());
 				break;
-					
+				
+				/**
+				 *  packet input:
+				 *  @Int healthPercentage: the percentage of health to set 
+				 *  @Int hungerPercentage: the percentage of food level to set
+				 *  @String playerName: name of Player whose status is to change
+				 */
 				case ServerPacketHandlerUtil.ADMIN_CHANGE:
-					int healthPercentage,hungerPercentage;
-					String playerName;
-					healthPercentage=packet.readInt();
-					hungerPercentage=packet.readInt();
-					playerName=packet.readString();
-					try{
-	    				EntityPlayer target = this.player.getServerForPlayer().getPlayerEntityByName(playerName); 
-	    				if(healthPercentage!=-1){
-	    					
-	    					if(healthPercentage<=100 && healthPercentage>0){
-		    					target.setHealth(target.getMaxHealth()*healthPercentage/100);
-		    				}
-	    				}
-	    				if(hungerPercentage!=-1){
-	    					
-	    					if(hungerPercentage<=100 && hungerPercentage>0){
-		    					target.getFoodStats().setFoodLevel(20*hungerPercentage/100);
-		    				}
-	    				}
-					}catch(Exception e){
-						//handle exception, tell client side.
-					}
+					admin.change(player, packet.readInt(), packet.readInt(), packet.readString());
 				break;
+				
+				/**
+				 *  packet input:
+				 *  @Int dimension: the dimension the Admin wants to join
+				 */
+				case ServerPacketHandlerUtil.ADMIN_JOIN:
+					admin.join(player, packet.readInt());
+				break;
+				
+				/**
+				 *  packet input:
+				 *  @Int dimension: the dimension the Admin wants to join
+				 *  @String targetName: the player's name the Admin wants to spect
+				 */
+				case ServerPacketHandlerUtil.ADMIN_SPECT:
+					admin.spect(player, packet.readInt(), packet.readString());
+				break;
+				
+				/**
+				 *  packet input:
+				 *  @Int dimension: the current dimension of the target player to be kicked
+				 *  @String targetName: the target player's name
+				 */
+				case ServerPacketHandlerUtil.ADMIN_KICK:
+					admin.kick(player, packet.readInt(), packet.readString());
 			}
 		}
 	}

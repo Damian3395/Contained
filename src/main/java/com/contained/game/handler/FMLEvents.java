@@ -121,7 +121,7 @@ public class FMLEvents {
 				//
 				// This might be on the right track... but doesn't seem to solve
 				// the problem:
-				Util.serverDebugMessage("Deleting DIM"+dimID);
+				//Util.serverDebugMessage("Deleting DIM"+dimID);
 				RegionFileCache.clearRegionFileReferences();
 				
 				for (File file : dimDir.listFiles())
