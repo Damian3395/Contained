@@ -1,6 +1,8 @@
 package com.contained.game.user;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
@@ -33,9 +35,9 @@ public class PlayerTeamIndividual {
 	
 	public String lobbyTeamID = null;
 	public boolean lobbyLeader;
+	public ItemStack[] inventory;
+	public ItemStack[] armor;
 	public int xp;
-	public ItemStack[] inventory = new ItemStack[36];
-	public ItemStack[] armor = new ItemStack[4];
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -65,28 +67,12 @@ public class PlayerTeamIndividual {
 		this.readFromNBT(ntc);
 	}
 	
-	public void setInventory(EntityPlayer toCopy){
-		this.armor = copyItemStacks(toCopy.inventory.armorInventory);
-		this.inventory = copyItemStacks(toCopy.inventory.mainInventory);
+	public void setInventory(ItemStack[] inventory){
+		this.inventory = inventory;
 	}
 	
 	public ItemStack[] getInventory(){
-		return copyItemStacks(this.inventory);
-	}
-	
-	public ItemStack[] getArmor() {
-		return copyItemStacks(this.armor);
-	}
-	
-	private ItemStack[] copyItemStacks(ItemStack[] toCopy) {
-		ItemStack[] temp = new ItemStack[toCopy.length];
-		for(int i=0; i<temp.length; i++) {
-			if (toCopy[i] == null)
-				temp[i] = null;
-			else
-				temp[i] = toCopy[i].copy();
-		}
-		return temp;
+		return inventory;
 	}
 
 	/**
@@ -117,23 +103,17 @@ public class PlayerTeamIndividual {
 	
 	public void joinMiniTeam(String teamID){
 		if (this.lobbyTeamID == null) {
-			this.lobbyTeamID = teamID;
+			this.lobbyTeamID = this.teamID;
 			this.lobbyLeader = isLeader;
 			this.teamID = teamID;
 		}
 	}
 	
 	public void revertMiniGameChanges(){
-		if (this.lobbyTeamID != null) {
-			this.teamID = lobbyTeamID;
-			this.isLeader = lobbyLeader;
-			this.lobbyTeamID = null;
-			this.lobbyLeader = false;
-			
-			this.armor = new ItemStack[4];
-			this.inventory = new ItemStack[36];
-			this.xp = 0;
-		}
+		this.teamID = lobbyTeamID;
+		this.isLeader = lobbyLeader;
+		this.lobbyTeamID = null;
+		this.lobbyLeader = false;
 	}
 	
 	public void setTeamLeader(){
@@ -253,12 +233,10 @@ public class PlayerTeamIndividual {
 		}
 		NBTTagList inventoryList = new NBTTagList();
 		if(inventory != null){
-			for(int i=0; i<inventory.length; i++){
-				NBTTagCompound saveItem = new NBTTagCompound();
-				ItemStack item = (ItemStack)inventory[i];
+			for(ItemStack item : inventory){
 				if(item != null){
+					NBTTagCompound saveItem = new NBTTagCompound();
 					item.writeToNBT(saveItem);
-					saveItem.setInteger("index", i);
 					inventoryList.appendTag(saveItem);
 				}
 			}
@@ -268,10 +246,9 @@ public class PlayerTeamIndividual {
 		NBTTagList armorList = new NBTTagList();
 		if(armor != null){
 			for(int i = 0; i < armor.length; i++){
-				NBTTagCompound saveArmor = new NBTTagCompound();
-				if (armor[i] != null) {
+				if(armor[i] != null){
+					NBTTagCompound saveArmor = new NBTTagCompound();
 					armor[i].writeToNBT(saveArmor);
-					saveArmor.setInteger("index", i);
 					armorList.appendTag(saveArmor);
 				}
 			}
@@ -299,18 +276,14 @@ public class PlayerTeamIndividual {
 		else
 			this.lobbyTeamID = null;
 		NBTTagList inventoryList = ntc.getTagList("inventory", (byte)10);
-		inventory = new ItemStack[36];
-		for(int i=0; i<inventoryList.tagCount(); i++) {
-			NBTTagCompound item = inventoryList.getCompoundTagAt(i);
-			inventory[item.getInteger("index")] = ItemStack.loadItemStackFromNBT(item);
-		}
-		
+		this.inventory = new ItemStack[36];
+		for(int i=0; i<inventoryList.tagCount(); i++) 
+			inventory[i] = ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i));
+			
 		NBTTagList armorList = ntc.getTagList("armor", (byte)10);
 		armor = new ItemStack[4];
-		for(int i = 0; i<armorList.tagCount(); i++) {
-			NBTTagCompound item = armorList.getCompoundTagAt(i);
-			armor[item.getInteger("index")] = ItemStack.loadItemStackFromNBT(item);
-		}
+		for(int i = 0; i<armorList.tagCount(); i++)
+			armor[i] = ItemStack.loadItemStackFromNBT(armorList.getCompoundTagAt(i));
 	}
 	
 	public static boolean isLeader(EntityPlayer p) {

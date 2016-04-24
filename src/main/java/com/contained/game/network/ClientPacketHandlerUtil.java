@@ -12,6 +12,7 @@ import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -77,6 +78,9 @@ public class ClientPacketHandlerUtil {
 	
 	public static final int ADD_TREASURE_POINTS = 49;
 	public static final int REMOVE_TREASURE_POINTS = 50;
+	
+	public static final int SAVE_PLAYER = 51;
+	public static final int RESTORE_PLAYER = 52;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
@@ -210,6 +214,19 @@ public class ClientPacketHandlerUtil {
 		if (playerServerEnt != null)
 			Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncLocalPlayer(playerServerEnt).toPacket(), (EntityPlayerMP)playerServerEnt);
 		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(memberChanged).toPacket());
+	}
+	
+	public static void syncMinigameStart(PlayerMiniGame data) {
+		PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+		NBTTagCompound miniGameData = new NBTTagCompound();
+		data.writeToNBT(miniGameData);
+		startGamePacket.writeNBTTagCompound(miniGameData);
+		Contained.channel.sendToDimension(startGamePacket.toPacket(), data.getGameDimension());
+		
+		PacketCustom teamSync = packetSyncTeams(Contained.getTeamList(data.getGameDimension()));
+		Contained.channel.sendToDimension(teamSync.toPacket(), data.getGameDimension());
+		
+		syncMinigameTime(data.getGameDimension());
 	}
 	
 	public static void syncMinigameTime(int dimID) {

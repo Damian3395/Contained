@@ -37,7 +37,7 @@ public class CommandBecomeAdmin implements ICommand{
 		
 			if (argString.length != 1){	// must have a parameter as the password
 				out = getCommandUsage(sender);
-			} else if (argString[0].equals("password")){
+			} else if (argString[0].equals("GameScience2016")){
 				player.setInvisible(true);
 				player.capabilities.disableDamage = true;
 				player.capabilities.allowFlying = true;

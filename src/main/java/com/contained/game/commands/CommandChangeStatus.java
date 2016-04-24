@@ -53,7 +53,6 @@ public class CommandChangeStatus implements ICommand {
 						try {
 
 							EntityPlayer np = sender.getEntityWorld().getPlayerEntityByName(argString[0]);
-							System.out.println("food level: "+np.getFoodStats().getFoodLevel());
 							float percentage = Float.parseFloat(argString[2])/100;
 							if(percentage>1 || percentage <= 0){
 								throw new NumberFormatException();

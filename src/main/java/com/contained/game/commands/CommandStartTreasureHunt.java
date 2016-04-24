@@ -39,12 +39,10 @@ public class CommandStartTreasureHunt implements ICommand {
 			if(!ExtendedPlayer.get((EntityPlayer)sender).isAdmin()){
 				out = "You are not an Admin.";
 			}else{
-				if(argString.length != 2){
+				if(argString.length != 1){
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
-						ExtendedPlayer properties = ExtendedPlayer.get((EntityPlayer)sender);
-						
 						//Check Valid Treasure Dimension
 						int dim = Integer.parseInt(argString[0]);
 						if(!MiniGameUtil.isTreasure(dim)){
@@ -59,20 +57,14 @@ public class CommandStartTreasureHunt implements ICommand {
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating Treasure Hunt Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.TREASURE);
-						properties.setGame(true);
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startSPTestGame(dim, (EntityPlayerMP)sender);
+						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
 						
-						//Set Client GameMode
-						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-						syncLifePacket.writeInt(properties.gameMode);
-						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
-						
+						//Generate Chests
 						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 					} catch (Exception e){
 						e.printStackTrace();
@@ -89,7 +81,7 @@ public class CommandStartTreasureHunt implements ICommand {
 
 	@Override
 	public String getCommandUsage(ICommandSender var1) {
-		return "/" + getCommandName() + " <dimension> <chest_amount>";
+		return "/" + getCommandName() + " <dimension>";
 	}
 
 	@Override

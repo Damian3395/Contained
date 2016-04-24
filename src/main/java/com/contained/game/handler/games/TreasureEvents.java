@@ -7,7 +7,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Util;
@@ -17,9 +20,7 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -32,17 +33,10 @@ public class TreasureEvents {
 		this.mc = Minecraft.getMinecraft();
 	}
 	
-	public static void initializeTreasureGame(int dimID) {
-		WorldServer w = DimensionManager.getWorld(dimID);
-		Contained.getActiveTreasures(dimID).clear();
-		if (w != null)
-			MiniGameUtil.generateChest(w, 15, ContainedRegistry.CUSTOM_CHEST_LOOT);
-	}
-	
 	@SubscribeEvent
 	public void onTreasureChestOpen(PlayerInteractEvent event){
 		if(event.action == Action.RIGHT_CLICK_BLOCK && event.entityPlayer != null)
-			handleTreasureChest(event.world, event.entityPlayer, event.x, event.y, event.z);		
+			handleTreasureChest(event.world, event.entityPlayer, event.x, event.y, event.z);
 	}
 	
 	@SubscribeEvent
@@ -56,8 +50,17 @@ public class TreasureEvents {
 			BlockCoord eventLocation = new BlockCoord(x, y, z);
 			int dimID = w.provider.dimensionId;
 			if (Contained.getActiveTreasures(dimID).contains(eventLocation)) {
+				ExtendedPlayer properties = ExtendedPlayer.get(p);
+				properties.treasuresOpened++;
+				properties.curTreasuresOpened++;
+				
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+				PlayerMiniGame miniGame = PlayerMiniGame.get(pdata.teamID);
+				int teamID = miniGame.getTeamID(pdata);
+				Contained.gameScores[p.dimension][teamID]++;
+				ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
+				
 				ClientPacketHandlerUtil.removeTreasureAndSync(dimID, eventLocation);
-				//TODO: Increase team score by 1.
 				MiniGameUtil.generateChest(w, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);
 			}
 		}

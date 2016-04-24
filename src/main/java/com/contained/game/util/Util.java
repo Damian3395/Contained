@@ -12,6 +12,7 @@ import java.util.List;
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedLivingBase;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.world.GameTeleporter;
 
@@ -27,8 +28,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
@@ -122,15 +121,25 @@ public class Util {
 		else return "Unknown";
 	}
 	
-	//TODO:
-	// Use getRandomLocation() to pick the spawn points of the players in the dimension.
-	// However, this should be used so that each TEAM spawns in a different location,
-	// but all players within that team spawn close to each other.
+	public static int getGameID(int dimID) {
+		PlayerMiniGame miniGame = PlayerMiniGame.get(dimID);
+		if(miniGame == null)
+			return -1;
+		
+		return miniGame.getGameID();
+	}
+	
+	public static int getGameMode(int dimID) {
+		if(MiniGameUtil.isPvP(dimID))
+			return Resources.PVP;
+		if(MiniGameUtil.isTreasure(dimID))
+			return Resources.TREASURE;
+		
+		return Resources.OVERWORLD;
+	}
+	
 	public static void travelToDimension(int dimID, EntityPlayer player) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
-			player.addPotionEffect(new PotionEffect(Potion.regeneration.id, 300, 4));
-			player.addPotionEffect(new PotionEffect(Potion.resistance.id, 300, 4));
-			player.addPotionEffect(new PotionEffect(23, 300, 4));
 			EntityPlayerMP mpPlayer = (EntityPlayerMP)player;
 			MinecraftServer mcServer = MinecraftServer.getServer();
 			WorldServer newWorld = mcServer.worldServerForDimension(dimID);

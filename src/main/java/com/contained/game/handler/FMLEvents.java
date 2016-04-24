@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FileDeleteStrategy;
+
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -18,6 +19,7 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
+import com.contained.game.Settings;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
@@ -80,11 +82,13 @@ public class FMLEvents {
 			//Tick the mini-game timers, and check for game-over.
 			for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++) {
 				processGameTick(i);
-				checkDimensionReset(i);
+				if (rand > 10 && rand < 15)
+					checkDimensionReset(i);
 			}
 			for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++) {
 				processGameTick(i);
-				checkDimensionReset(i);
+				if (rand > 5 && rand < 10)
+					checkDimensionReset(i);
 				
 				//Periodically see if any treasure chests are missing in the treasure
 				//mini-game (this can happen if they're blown up by TNT/Creepers/etc)
@@ -121,12 +125,15 @@ public class FMLEvents {
 				//
 				// This might be on the right track... but doesn't seem to solve
 				// the problem:
-				//Util.serverDebugMessage("Deleting DIM"+dimID);
+
+				System.out.println("deleting "+dimID);
 				RegionFileCache.clearRegionFileReferences();
+				System.gc();
 				
-				for (File file : dimDir.listFiles())
-					FileDeleteStrategy.FORCE.deleteQuietly(file);
-				FileDeleteStrategy.FORCE.deleteQuietly(dimDir);
+				//System.out.println("Deleting DIM"+dimID);
+				try {
+					FileUtils.deleteDirectory(dimDir);
+				} catch (IOException e) { }
 				Save.removeDimFiles(dimID);
 				
 				//And remove data about it from memory.
@@ -161,11 +168,8 @@ public class FMLEvents {
 			int timeRemaining = Contained.timeLeft[dimID];
 			if (timeRemaining % 300 == 0 || timeRemaining == 0)
 				ClientPacketHandlerUtil.syncMinigameTime(dimID);
-			if (timeRemaining <= 0) {
-				PlayerMiniGame toEnd = PlayerMiniGame.get(dimID);
-				if (toEnd != null)
-					toEnd.endGame();
-			}
+			if (timeRemaining == 0)
+				MiniGameUtil.resetGame(dimID);
 		}
 	}
 	

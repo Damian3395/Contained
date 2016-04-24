@@ -19,6 +19,7 @@ import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -114,7 +115,8 @@ public class PlayerEvents {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetPlayerList(Contained.teamMemberData).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.getTradeList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
-				Contained.channel.sendTo(ClientPacketHandlerUtil.packetAddTreasures(Contained.getActiveTreasures(joined.dimension), true).toPacket(), (EntityPlayerMP)joined);
+				if (MiniGameUtil.isTreasure(joined.dimension))
+					Contained.channel.sendTo(ClientPacketHandlerUtil.packetAddTreasures(Contained.getActiveTreasures(joined.dimension), true).toPacket(), (EntityPlayerMP)joined);
 				
 				//Class Perks
 				ArrayList<Integer> perks = ExtendedPlayer.get(joined).perks;

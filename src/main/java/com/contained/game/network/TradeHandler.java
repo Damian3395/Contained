@@ -123,9 +123,9 @@ public class TradeHandler {
 		Contained.channel.sendToAll(addTrades.toPacket());
 			
 		//DataLog Trade
-		String world = Util.getDimensionString(player.dimension);
 		DataLogger.insertTrade("debug", creator.getDisplayName()
-				, world
+				, Util.getDimensionString(player.dimension)
+				, Util.getGameID(player.dimension)
 				, player.getDisplayName()
 				, transTrade.offer.getDisplayName()
 				, transTrade.offer.stackSize

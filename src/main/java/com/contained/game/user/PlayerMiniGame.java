@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import codechicken.lib.packet.PacketCustom;
@@ -108,29 +109,44 @@ public class PlayerMiniGame {
 	private void addPlayerToTeam(EntityPlayer player, int team) {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 		pdata.joinMiniTeam(Contained.getTeamList(dim).get(team).id);
+		DataLogger.insertMiniGamePlayer(Util.getServerID(), gameID, gameMode, player.getDisplayName(), Contained.getTeamList(dim).get(team).displayName, Util.getDate());
 	}
 
 	public void removePlayer(EntityPlayerMP player) {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-		if(getTeamID(pdata) != -1)
+		if(getTeamID(pdata) != -1){
 			pdata.revertMiniGameChanges();
-	}
-
-	public void launchGame(){
-		if(isGameReady()){
-			pickRandomTeamLeaders();
-			teleportPlayers(0, dim);
-			Contained.timeLeft[dim] = Contained.configs.gameDuration[gameMode]*20;	
-			MiniGameUtil.startGame(dim, this);
+			DataLogger.deleteMiniGamePlayer(player.getDisplayName());
 		}
 	}
 
-	public void endGame(){	
-		Util.serverDebugMessage("Ending DIM"+dim+" game");
+	public void launchGame(){
+		DataLogger.insertNewMiniGame(Util.getServerID(), gameID, gameMode, Util.getDate());
 		
-		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
-		miniGamePacket.writeInt(dim);
-		Contained.channel.sendToDimension(miniGamePacket.toPacket(), dim);		
+		Contained.gameActive[dim] = true;
+		if (MiniGameUtil.isPvP(dim)){
+			Contained.timeLeft[dim] = Contained.configs.gameDuration[Resources.PVP]*20;
+			gameMode = Resources.PVP;
+		}else if (MiniGameUtil.isTreasure(dim)){
+			Contained.timeLeft[dim] = Contained.configs.gameDuration[Resources.TREASURE]*20;
+			gameMode = Resources.TREASURE;
+		}
+		
+		if(isGameReady()){
+			pickRandomTeamLeaders();
+			teleportPlayers(0, dim);
+			ClientPacketHandlerUtil.syncMinigameTime(dim);
+		}
+	}
+
+	public void endGame(){
+		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
+		for(int i = 0; i < teams.size(); i++)
+			DataLogger.insertGameResults(Util.getServerID(), 
+					gameID, gameMode, teams.get(i).displayName, 
+					Contained.gameScores[dim][i], Contained.timeLeft[dim], Util.getDate());
+		
+		Util.serverDebugMessage("Ending DIM"+dim+" game");
 
 		Contained.gameActive[dim] = false;
 		Contained.timeLeft[dim] = 0;
@@ -148,70 +164,148 @@ public class PlayerMiniGame {
 		if(MiniGameUtil.isTreasure(dim))
 			Contained.getActiveTreasures(dim).clear();
 		
-		teleportPlayers(dim, 0);	
-		
-		ClientPacketHandlerUtil.syncMinigameTime(dim);
+		teleportPlayers(dim, 0);
 	}
 
 	private void teleportPlayers(int from, int to){
-		WorldServer lobby = DimensionManager.getWorld(from);
-		for(int i=0; i<Contained.teamMemberData.size(); i++) {
-			PlayerTeamIndividual pdata = Contained.teamMemberData.get(i);
-			EntityPlayer player = lobby.getPlayerEntityByName(pdata.playerName);
-			if (player == null)
-				continue;
-
-			if(to == dim) { //Starting New MiniGame
+		WorldServer lobby = MinecraftServer.getServer().worldServers[from];
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData){
+			if(getTeamID(pdata) != -1) {
+				EntityPlayerMP player = (EntityPlayerMP) lobby.getPlayerEntityByName(pdata.playerName);
 				ExtendedPlayer properties = ExtendedPlayer.get(player);
-				properties.setGameMode(gameMode);
-				properties.setJoiningGame(false);
-				properties.setGame(true);
-				pdata.xp = player.experienceTotal;
-				pdata.setInventory(player);
-				clearInventory(player);
-				player.experienceLevel = 0;
-				player.experience = 0;
-
-				Util.travelToDimension(to, player);
-
-				PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-				startGamePacket.writeInt(gameMode);
-				NBTTagCompound miniGameData = new NBTTagCompound();
-				this.writeToNBT(miniGameData);
-				startGamePacket.writeNBTTagCompound(miniGameData);
-				startGamePacket.writeInt(dim);
-				startGamePacket.writeInt(Contained.getTeamList(dim).size());
-				for(PlayerTeam team : Contained.getTeamList(dim)){
-					NBTTagCompound teamData = new NBTTagCompound();
-					team.writeToNBT(teamData);
-					startGamePacket.writeNBTTagCompound(teamData);
-				}
-				Contained.channel.sendTo(startGamePacket.toPacket(), (EntityPlayerMP) player);
-			} else { //Ending MiniGame
-				ExtendedPlayer properties = ExtendedPlayer.get(player);
-				properties.setGameMode(Resources.OVERWORLD);
-				properties.setGame(false);
-				player.inventory.mainInventory = pdata.getInventory();
-				player.experienceTotal = pdata.xp;
-				player.inventory.armorInventory = pdata.getArmor();
-				pdata.revertMiniGameChanges();
-				
-				Util.travelToDimension(to, player);
-				
-				//Sync Game Stats
-				if(gameMode == Resources.PVP) {
-					PacketCustom pvpStatsPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
-					pvpStatsPacket.writeInt(properties.pvpWon);
-					pvpStatsPacket.writeInt(properties.pvpLost);
-					pvpStatsPacket.writeInt(properties.kills);
-					pvpStatsPacket.writeInt(properties.deaths);
-					Contained.channel.sendTo(pvpStatsPacket.toPacket(), (EntityPlayerMP) player);
-				} else {
-					PacketCustom treasureStatsPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
-					treasureStatsPacket.writeInt(properties.treasureWon);
-					treasureStatsPacket.writeInt(properties.treasureLost);
-					treasureStatsPacket.writeInt(properties.treasuresOpened);
-					Contained.channel.sendTo(treasureStatsPacket.toPacket(), (EntityPlayerMP) player);
+				if(to == dim){ //Starting New MiniGame
+					Util.travelToDimension(dim, player);
+					
+					properties.setGameMode(gameMode);
+					properties.setGame(true);
+					pdata.xp = player.experienceTotal;
+					pdata.armor = player.inventory.armorInventory;
+					pdata.inventory = player.inventory.mainInventory;
+					
+					int invSize = 0;
+					for(ItemStack item : pdata.inventory)
+						if(item != null){
+							System.out.println("Saving " + item.getDisplayName());
+							invSize++;
+						}
+					
+					int armorSize = 0;
+					for(ItemStack item : pdata.armor)
+						if(item != null){
+							System.out.println("Saving " + item.getDisplayName());
+							armorSize++;
+						}
+					
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SAVE_PLAYER);
+					miniGamePacket.writeInt(player.experienceTotal);
+					miniGamePacket.writeInt(armorSize);
+					int index = 0;
+					for(ItemStack item : pdata.armor)
+						if(item != null){
+							miniGamePacket.writeInt(index);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							item.writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+						}
+					
+					index = 0;
+					miniGamePacket.writeInt(invSize);
+					for(ItemStack item : pdata.inventory)
+						if(item != null){
+							miniGamePacket.writeInt(index);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							item.writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+							index++;
+						}
+					Contained.channel.sendTo(miniGamePacket.toPacket(), player);
+					
+					player.experienceTotal = 0;
+					MiniGameUtil.clearMainInventory(player);
+					MiniGameUtil.clearArmorInventory(player);
+					
+					//Sync MiniGame & Teams
+					miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+					miniGamePacket.writeInt(gameMode);
+					NBTTagCompound miniGameData = new NBTTagCompound();
+					this.writeToNBT(miniGameData);
+					miniGamePacket.writeNBTTagCompound(miniGameData);
+					miniGamePacket.writeInt(dim);
+					miniGamePacket.writeInt(Contained.getTeamList(dim).size());
+					for(PlayerTeam team : Contained.getTeamList(dim)){
+						NBTTagCompound teamData = new NBTTagCompound();
+						team.writeToNBT(teamData);
+						miniGamePacket.writeNBTTagCompound(teamData);
+					}
+					Contained.channel.sendTo(miniGamePacket.toPacket(), player);
+				}else{ //Ending MiniGame
+					if(MiniGameUtil.isPvP(dim)){
+						DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
+					}else if(MiniGameUtil.isTreasure(dim)){
+						DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
+					}
+					
+					properties.setGameMode(Resources.OVERWORLD);
+					properties.setGame(false);
+					properties.curDeaths = 0;
+					properties.curKills = 0;
+					properties.curTreasuresOpened = 0;
+					
+					MiniGameUtil.clearMainInventory(player);
+					MiniGameUtil.clearArmorInventory(player);
+					
+					player.experienceTotal = pdata.xp;
+					player.inventory.armorInventory = pdata.armor;
+					player.inventory.mainInventory = pdata.inventory;
+					pdata.revertMiniGameChanges();
+					
+					int invSize = 0;
+					for(ItemStack item : pdata.inventory)
+						if(item != null){
+							System.out.println("Restore " + item.getDisplayName());
+							invSize++;
+						}
+					
+					int armorSize = 0;
+					for(ItemStack item : pdata.armor)
+						if(item != null){
+							System.out.println("Restore " + item.getDisplayName());
+							armorSize++;
+						}
+					
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
+					miniGamePacket.writeInt(pdata.xp);
+					miniGamePacket.writeInt(armorSize);
+					int index = 0;
+					for(ItemStack item : pdata.armor)
+						if(item != null){
+							miniGamePacket.writeInt(index);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							item.writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+						}
+					
+					index = 0;
+					miniGamePacket.writeInt(invSize);
+					for(ItemStack item : pdata.inventory)
+						if(item != null){
+							miniGamePacket.writeInt(index);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							item.writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+							index++;
+						}
+					Contained.channel.sendTo(miniGamePacket.toPacket(), player);
+					
+					pdata.xp = 0;
+					pdata.armor = null;
+					pdata.inventory = null;
+					
+					miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+					miniGamePacket.writeInt(dim);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), player);
+					
+					Util.travelToDimension(to, player);
 				}
 			}
 		}
@@ -277,13 +371,6 @@ public class PlayerMiniGame {
 		}			
 	}
 
-	private void clearInventory(EntityPlayer player){
-		for(int i = 0; i < player.inventory.getSizeInventory(); i++){
-			if(player.inventory.getStackInSlot(i) != null)
-				player.inventory.setInventorySlotContents(i, null);
-		}
-	}
-
 	private String generateName(){
 		Random rand = new Random();
 		String teamName = intro[rand.nextInt(intro.length)] + " " + words[rand.nextInt(words.length)];
@@ -341,7 +428,7 @@ public class PlayerMiniGame {
 		pdata.joinMiniTeam(newTeam.id);	
 
 		String world = Util.getDimensionString(dim);
-		DataLogger.insertCreateTeam(Util.getServerID(), pdata.playerName, world, newTeam.displayName, Util.getDate());
+		DataLogger.insertMiniGamePlayer(Util.getServerID(), gameID, gameMode, player.getDisplayName(), teamName, Util.getDate());
 	}
 
 	public void testLaunch(EntityPlayer player){
@@ -357,9 +444,9 @@ public class PlayerMiniGame {
 	}
 
 	public void readFromNBT(NBTTagCompound ntc) {
-		ntc.getInteger("dimID");
-		ntc.getInteger("gameID");
-		ntc.getInteger("gameMode");
+		this.dim = ntc.getInteger("dimID");
+		this.gameID =  ntc.getInteger("gameID");
+		this.gameMode = ntc.getInteger("gameMode");
 	}
 
 	public static PlayerMiniGame get(int dim){

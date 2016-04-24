@@ -7,6 +7,8 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import codechicken.lib.packet.PacketCustom;
 
@@ -14,6 +16,7 @@ import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -42,8 +45,6 @@ public class CommandStartPVP implements ICommand {
 					out = this.getCommandUsage(sender);
 				else{
 					try{
-						ExtendedPlayer properties = ExtendedPlayer.get((EntityPlayer)sender);
-						
 						//Check Valid PVP Dimension
 						int dim = Integer.parseInt(argString[0]);
 						if(!MiniGameUtil.isPvP(dim)){
@@ -58,20 +59,12 @@ public class CommandStartPVP implements ICommand {
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimesnion " + dim);
-						properties.setGameMode(Resources.PVP);
-						properties.setGame(true);
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startSPTestGame(dim, (EntityPlayerMP)sender);
-						
-						//Set Client GameMode
-						PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-						syncLifePacket.writeInt(properties.gameMode);
-						Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) sender);
-
+						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
