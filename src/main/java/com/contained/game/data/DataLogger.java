@@ -126,7 +126,7 @@ public class DataLogger {
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TREASURE VALUES (?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO MINIGAMECHAT VALUES (?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setInt(3, gameMode);
@@ -271,7 +271,7 @@ public class DataLogger {
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO PROMOTEPALYER VALUES (?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO PROMOTEPLAYER VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);
@@ -289,7 +289,7 @@ public class DataLogger {
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO DEMOTEPALYER VALUES (?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO DEMOTEPLAYER VALUES (?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setString(2, user);
 			preparedStatement.setString(3, world);

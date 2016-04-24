@@ -2,9 +2,9 @@ package com.contained.game.util;
 
 import java.awt.Color;
 
-import org.lwjgl.opengl.GL11;
+import javax.vecmath.Vector3d;
 
-import com.contained.game.Contained;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,7 +14,9 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class RenderUtil {	
+public class RenderUtil {
+	public static Vector3d vec3 = new Vector3d();;
+	
 	//Generate a color code from a String
 	public static int colorHash(String s) {
         return (s.hashCode() & 11184810) + 4473924;
@@ -97,21 +99,21 @@ public class RenderUtil {
         double xClamp = x;
         double yClamp = y;
         double zClamp = z;
-        Contained.vec3.x = player.posX-x;
-        Contained.vec3.y = player.posY-y;
-        Contained.vec3.z = player.posZ-z;
-        if (Contained.vec3.length() > maxDist) {
-        	Contained.vec3.normalize();
-        	Contained.vec3.scale(maxDist);
-        	xClamp = player.posX-Contained.vec3.x;
-        	yClamp = player.posY-Contained.vec3.y;
-        	zClamp = player.posZ-Contained.vec3.z;
+        vec3.x = player.posX-x;
+        vec3.y = player.posY-y;
+        vec3.z = player.posZ-z;
+        if (vec3.length() > maxDist) {
+        	vec3.normalize();
+        	vec3.scale(maxDist);
+        	xClamp = player.posX-vec3.x;
+        	yClamp = player.posY-vec3.y;
+        	zClamp = player.posZ-vec3.z;
         }
         xClamp -= ox;
         yClamp -= oy;
         zClamp -= oz;
         
-        float scale = 0.16666668F * Math.max(0.2f, ((float)Contained.vec3.length()/50f));        
+        float scale = 0.16666668F * Math.max(0.2f, ((float)vec3.length()/50f));        
         
         GL11.glPushMatrix();
         GL11.glTranslatef((float)xClamp+0.5f, (float)yClamp+0.5f, (float)zClamp+0.5f);

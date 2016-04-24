@@ -19,6 +19,10 @@ import com.contained.game.util.Resources;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class PVPEvents {
+	public static void initializePVPGame(int dimID) {
+		
+	}
+	
 	@SubscribeEvent
 	public void onSpawn(Clone event){
 		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
