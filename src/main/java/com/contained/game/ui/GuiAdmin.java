@@ -42,10 +42,10 @@ public class GuiAdmin extends GuiScreen {
 
 	private int pageID = 0; // default page is Login page
 
-	private final int LOGIN_PAGE = 0;
-	private final int WORLD_PAGE = 1;
-	private final int PLAYER_PAGE = 2;
-	private final int CONFIRM_PAGE = 3;
+	public final int LOGIN_PAGE = 0;
+	public final int WORLD_PAGE = 1;
+	public final int PLAYER_PAGE = 2;
+	public final int CONFIRM_PAGE = 3;
 
 	// TextFields
 	private GuiTextField tf_password;
@@ -440,50 +440,52 @@ public class GuiAdmin extends GuiScreen {
 
 				break;
 			case BTN_WORLD_INFO:
+				
+				/*
+				 * send the packet to server
+				 * the server retrive the player list in requested dimension
+				 * and then send the list back to player(client side)
+				 * the player displays the player info GUI
+				 */
+				
 				this.onlinePlayerNames.clear();
 				if (this.dimensionInfo.isElementSelected) {
+					PacketCustom worldInfoPacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_WORLD_INFO);
 					if (this.dimensionInfo.getText().equals("Whole Server")) {
 						// selected to view whole server players
 						this.selectedDimID = -100;
-						for (EntityPlayer ep : Util.getPlayerListInMinecraftServer()) {
-							if (!ep.getDisplayName().equals(this.player.getDisplayName())) {
-								this.onlinePlayerNames.add(ep.getDisplayName().toString());
-							}
-						}
+						worldInfoPacket.writeInt(this.selectedDimID);
+						Contained.channel.sendToServer(worldInfoPacket.toPacket());	
 					} else { // selected to view players in a certain dimension
-							this.selectedDimID = this.dimID.get(this.dimensionInfo.getText());
-							if(DimensionManager.getWorld(this.selectedDimID) != null){
-								for (EntityPlayer ep : Util.getPlayerListInDimension(this.selectedDimID)) {
-									if (!ep.getDisplayName().equals(this.player.getDisplayName())) {
-										this.onlinePlayerNames.add(ep.getDisplayName().toString());
-									}
-								}
-							}
+						this.selectedDimID = this.dimID.get(this.dimensionInfo.getText());
+						worldInfoPacket.writeInt(this.selectedDimID);
+						Contained.channel.sendToServer(worldInfoPacket.toPacket());
 					}
 				}
-
-				this.playerInfo = new GuiScrollPane(this, x - 120, y - 5, this.onlinePlayerNames);
-				this.pageID = this.PLAYER_PAGE;
+				
 				break;
 
 			case BTN_KICK:
 				if(this.playerInfo.isElementSelected){
-					this.pageID++;
-					this.selectedPlayer = this.playerInfo.getText();
+					if(this.playerInfo.getText().contains(" (YOU)")){
+						Util.displayMessage(this.player, "You cannot kick yourself!");
+					} else {
+						this.pageID++;
+						this.selectedPlayer = this.playerInfo.getText();	
+					}
 				}
 				break;
 			
 			case BTN_SPECT:
 				if (this.playerInfo.isElementSelected) {
-					PacketCustom adminSpectPacket = new PacketCustom(Resources.MOD_ID,
-							ServerPacketHandlerUtil.ADMIN_SPECT);
-					if(this.selectedDimID != -100){
-						adminSpectPacket.writeInt(this.selectedDimID);	
+					if(this.playerInfo.getText().contains(" (YOU)")){
+						Util.displayMessage(this.player, "You cannot spect yourself!");
 					} else {
-						adminSpectPacket.writeInt(Util.getOnlinePlayer(this.playerInfo.getText()).dimension);
+						PacketCustom adminSpectPacket = new PacketCustom(Resources.MOD_ID,
+								ServerPacketHandlerUtil.ADMIN_SPECT);
+						adminSpectPacket.writeString(this.playerInfo.getText());
+						Contained.channel.sendToServer(adminSpectPacket.toPacket());	
 					}
-					adminSpectPacket.writeString(this.playerInfo.getText());
-					Contained.channel.sendToServer(adminSpectPacket.toPacket());
 				} else {
 					Util.displayMessage(this.player, "Please select a player to spect");
 				}
@@ -496,7 +498,6 @@ public class GuiAdmin extends GuiScreen {
 			case BTN_CONFIRM:
 				if(this.playerInfo.isElementSelected){
 					PacketCustom adminKickPacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_KICK);
-					adminKickPacket.writeInt(Util.getOnlinePlayer(this.selectedPlayer).dimension);
 					adminKickPacket.writeString(this.selectedPlayer);
 					Contained.channel.sendToServer(adminKickPacket.toPacket());
 				}
@@ -552,15 +553,32 @@ public class GuiAdmin extends GuiScreen {
 		this.tf_targetPlayer.drawTextBox();
 		this.fontRendererObj.drawString("HP(%)  FP(%)   Object", x - 120, y - 85, Color.WHITE.hashCode());
 		this.fontRendererObj.drawString("Target Player", x + 40, y - 85, Color.WHITE.hashCode());
-		this.fontRendererObj.drawString("Players in "+this.dimensionInfo.getText(), x - 120, y - 25, Color.WHITE.hashCode());
+		if(this.selectedDimID == -100){
+			this.fontRendererObj.drawString("Players in whole server:", x - 120, y - 25, Color.WHITE.hashCode());
+		} else {
+			this.fontRendererObj.drawString("Players in Dimension "+this.selectedDimID+":", x - 120, y - 25, Color.WHITE.hashCode());	
+		}
+		
 		this.playerInfo.render();
 	}
 
 	private void renderConfirmDialog() {
 		this.fontRendererObj.drawString("Are You Sure To Kick "+this.selectedPlayer, x - 85, y - 50, 0);
-		this.fontRendererObj.drawString("out of Dimension"+Util.getOnlinePlayer(this.selectedPlayer).dimension+"?", x - 85, y - 30, 0);
+		this.fontRendererObj.drawString("back to Overworld?", x - 85, y - 30, 0);
 	}
-
+	
+	public void setPlayerInfoPanel(List<String> playerNames){
+		this.playerInfo = new GuiScrollPane(this, x - 120, y - 5, playerNames);
+	}
+	
+	public void setPage(int pageID){
+		this.pageID = pageID;
+	}
+	
+	public void setSelectedDimID(int dimID){
+		this.selectedDimID = dimID;
+	}
+	
 	@Override
 	public boolean doesGuiPauseGame() {
 		return false;

@@ -226,20 +226,27 @@ public class ServerPacketHandler {
 				
 				/**
 				 *  packet input:
-				 *  @Int dimension: the dimension the Admin wants to join
-				 *  @String targetName: the player's name the Admin wants to spect
+				 *  @Int dimension: the dimension the Admin wants to view info of
 				 */
-				case ServerPacketHandlerUtil.ADMIN_SPECT:
-					admin.spect(player, packet.readInt(), packet.readString());
+				case ServerPacketHandlerUtil.ADMIN_WORLD_INFO:
+					admin.viewWorldInfo(player, packet.readInt());
 				break;
 				
 				/**
 				 *  packet input:
-				 *  @Int dimension: the current dimension of the target player to be kicked
+				 *  @Int dimension: the dimension the Admin wants to join
+				 *  @String targetName: the player's name the Admin wants to spect
+				 */
+				case ServerPacketHandlerUtil.ADMIN_SPECT:
+					admin.spect(player, packet.readString());
+				break;
+				
+				/**
+				 *  packet input:
 				 *  @String targetName: the target player's name
 				 */
 				case ServerPacketHandlerUtil.ADMIN_KICK:
-					admin.kick(player, packet.readInt(), packet.readString());
+					admin.kick(player, packet.readString());
 			}
 		}
 	}

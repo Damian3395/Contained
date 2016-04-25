@@ -1,5 +1,8 @@
 package com.contained.game.network;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerTeam;
@@ -11,6 +14,7 @@ import com.contained.game.util.Util;
 import codechicken.lib.packet.PacketCustom;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.common.DimensionManager;
 
 public class AdminHandler {
 	public void becomeAdmin(EntityPlayerMP player){
@@ -72,9 +76,53 @@ public class AdminHandler {
 		Contained.channel.sendTo(adminPacket.toPacket(),player);
 		
 	}
-	public void spect(EntityPlayerMP player, int dimID , String targetPlayer){
-		if(player.dimension != dimID){
-			Util.travelToDimension(dimID, player);
+	
+	/*
+	 * write dimID,playerCount,playerNames to client
+	 */
+	public void viewWorldInfo(EntityPlayerMP player, int dimID){
+		List<String> playerNames = new ArrayList<String>();
+		PacketCustom worldInfoPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADMIN_WORLD_INFO);
+		worldInfoPacket.writeInt(dimID);
+		if (dimID == -100) {
+			// selected to view whole server players
+			for (EntityPlayer ep : Util.getPlayerListInMinecraftServer()) {
+				if (!ep.getDisplayName().equals(player.getDisplayName())) {
+					playerNames.add(ep.getDisplayName().toString());
+				} else {
+					playerNames.add(ep.getDisplayName().toString()+" (YOU)");
+				}
+			}
+			worldInfoPacket.writeInt(playerNames.size());
+			for(int i=0; i<playerNames.size();i++){
+				worldInfoPacket.writeString(playerNames.get(i));
+			}
+			Contained.channel.sendTo(worldInfoPacket.toPacket(),player);
+		} else { // selected to view players in a certain dimension
+				if(DimensionManager.getWorld(dimID) != null){
+					for (EntityPlayer ep : Util.getPlayerListInDimension(dimID)) {
+						if (!ep.getDisplayName().equals(player.getDisplayName())) {
+							playerNames.add(ep.getDisplayName().toString());
+						} else {
+							playerNames.add(ep.getDisplayName().toString()+" (YOU)");
+						}
+					}
+					worldInfoPacket.writeInt(playerNames.size());
+					for(int i=0; i<playerNames.size();i++){
+						worldInfoPacket.writeString(playerNames.get(i));
+					}
+					Contained.channel.sendTo(worldInfoPacket.toPacket(),player);
+				} else {
+					Util.displayMessage(player, "Dimension"+dimID+" is empty!");
+				}
+				
+		}
+		
+	}
+	
+	public void spect(EntityPlayerMP player, String targetPlayer){
+		if(player.dimension != Util.getOnlinePlayer(targetPlayer).dimension){
+			Util.travelToDimension(Util.getOnlinePlayer(targetPlayer).dimension, player);
 		}
 		int x,y,z;
 		x = 2+Util.getOnlinePlayer(targetPlayer).getPlayerCoordinates().posX;
@@ -97,10 +145,8 @@ public class AdminHandler {
 		Contained.channel.sendTo(adminPacket.toPacket(),player);
 		
 	}
-	public void kick(EntityPlayerMP player, int dimID, String targetPlayer){
-		if(Util.getOnlinePlayer(targetPlayer).dimension == dimID){
-			PlayerTeamIndividual.get(targetPlayer).leaveTeam();
-		}
+	public void kick(EntityPlayerMP player, String targetPlayer){
+		PlayerTeamIndividual.get(targetPlayer).leaveTeam();
 		Util.travelToDimension(0, Util.getOnlinePlayer(targetPlayer));
 		Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 		Util.displayMessage(Util.getOnlinePlayer(targetPlayer), "You've been kicked back to Overworld by Admin");
