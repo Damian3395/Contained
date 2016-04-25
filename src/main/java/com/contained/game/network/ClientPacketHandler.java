@@ -13,7 +13,9 @@ import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
+import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.GuiTownManage;
+import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
 import com.contained.game.ui.guild.GuiGuild;
@@ -593,6 +595,22 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						int index = packet.readInt();
 						ItemStack itemStore = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
 						mc.thePlayer.inventory.mainInventory[index] = itemStore;
+					}
+				break;
+				
+				case ClientPacketHandlerUtil.ADMIN_WORLD_INFO:
+					int selectedDimID = packet.readInt();
+					int playerCount=packet.readInt();
+					ArrayList<String> playerNames = new ArrayList<String>();
+					for(int i=0; i<playerCount; i++){
+						playerNames.add(packet.readString());
+					}
+					if(mc.currentScreen instanceof GuiAdmin){
+						GuiAdmin newGuiAdmin = new GuiAdmin();
+						mc.displayGuiScreen(newGuiAdmin);
+						newGuiAdmin.setPage(newGuiAdmin.PLAYER_PAGE);
+						newGuiAdmin.setSelectedDimID(selectedDimID);
+						newGuiAdmin.setPlayerInfoPanel(playerNames);
 					}
 				break;
 			}

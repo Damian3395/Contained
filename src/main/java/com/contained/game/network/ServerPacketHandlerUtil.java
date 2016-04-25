@@ -48,6 +48,8 @@ public class ServerPacketHandlerUtil {
 	public static final int ADMIN_JOIN = 29;
 	public static final int ADMIN_KICK = 30;
 	public static final int ADMIN_SPECT = 31;
+	public static final int ADMIN_WORLD_INFO = 32;
+	
 	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);
