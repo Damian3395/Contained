@@ -1,8 +1,12 @@
 package com.contained.game.ui.games;
 
+import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
+
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
@@ -19,6 +23,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 public class GuiTreasure extends Gui {
@@ -159,5 +164,50 @@ public class GuiTreasure extends Gui {
 		}
 		
 		return 0;
+	}
+	
+	@SubscribeEvent
+	public void onRenderScreen(RenderWorldLastEvent ev) {
+		Minecraft mc = Minecraft.getMinecraft();
+		if (mc.theWorld != null) {
+			renderChests(RenderUtil.getOriginX(mc, ev.partialTicks),
+						 RenderUtil.getOriginY(mc, ev.partialTicks),
+						 RenderUtil.getOriginZ(mc, ev.partialTicks), ev.partialTicks);
+		}
+	}
+	
+	public void renderChests(float ox, float oy, float oz, float dt) {
+		Minecraft mc = Minecraft.getMinecraft();
+		
+		ArrayList<BlockCoord> chestPositions = Contained.getActiveTreasures(0);
+	
+		for (BlockCoord point : chestPositions) {	
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_CULL_FACE);
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glDepthMask(false);
+			GL11.glEnable(GL11.GL_BLEND);
+			//GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );
+			RenderUtil.drawPillar(point.x, point.z, 0.4f, Color.yellow.hashCode(),
+									RenderUtil.getOriginX(mc, dt),
+									RenderUtil.getOriginY(mc, dt),
+									RenderUtil.getOriginZ(mc, dt));
+			RenderUtil.drawPillar(point.x, point.z, 0.15f, Color.white.hashCode(),
+									RenderUtil.getOriginX(mc, dt),
+									RenderUtil.getOriginY(mc, dt),
+									RenderUtil.getOriginZ(mc, dt));
+			int dist = (int)Util.euclidDist((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, 
+											(float)point.x, (float)point.y, (float)point.z);
+			RenderUtil.drawClampedWorldLabel("["+dist+"m]", point.x, point.y+1, point.z, 50,
+					RenderUtil.getOriginX(mc, dt),
+					RenderUtil.getOriginY(mc, dt),
+					RenderUtil.getOriginZ(mc, dt));
+		}
+		
+		GL11.glDepthMask(true);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_CULL_FACE);	
+		GL11.glEnable(GL11.GL_LIGHTING);
 	}
 }

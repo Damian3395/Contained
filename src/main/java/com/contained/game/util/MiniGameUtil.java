@@ -25,6 +25,8 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.handler.games.PVPEvents;
+import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
@@ -49,6 +51,33 @@ public class MiniGameUtil {
 				return false;
 		
 		return true;
+	}
+	
+	public static int gameMode(int dimID) {
+		if (isPvP(dimID))
+			return Resources.PVP;
+		else if (isTreasure(dimID))
+			return Resources.TREASURE;
+		else
+			return Resources.OVERWORLD;
+	}
+	
+	public static void startGame(PlayerMiniGame data) {
+		int dimID = data.getGameDimension();
+		int mode = gameMode(dimID);
+		Contained.timeLeft[dimID] = Contained.configs.gameDuration[mode]*20;
+		Contained.gameActive[dimID] = true;
+		
+		if (mode == Resources.PVP)
+			PVPEvents.initializePVPGame(dimID);
+		else if (mode == Resources.TREASURE)
+			TreasureEvents.initializeTreasureGame(dimID);
+		
+		WorldServer w = DimensionManager.getWorld(dimID);
+		if (w != null)
+			w.setWorldTime(0);
+		
+		ClientPacketHandlerUtil.syncMinigameStart(data);
 	}
 	
 	public static void startGame(int dimID, EntityPlayerMP player) {

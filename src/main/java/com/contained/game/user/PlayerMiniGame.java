@@ -3,6 +3,7 @@ package com.contained.game.user;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -16,6 +17,7 @@ import net.minecraftforge.common.DimensionManager;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
 import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
@@ -86,7 +88,10 @@ public class PlayerMiniGame {
 	}
 
 	//Game Player To Random Team
-	public void addPlayer(EntityPlayer player){		
+	public void addPlayer(EntityPlayer player){
+		if(player == null)
+			return;
+		
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
 		if (teams.size() < Contained.configs.gameNumTeams[gameMode])
 			createTeam(player);
@@ -103,6 +108,9 @@ public class PlayerMiniGame {
 				addPlayerToTeam(player, candidateTeams.get(0));
 		}
 
+		if(PlayerTeamIndividual.get(player) != null 
+				&& PlayerTeamIndividual.get(player).teamID != null
+				&& PlayerTeam.get(PlayerTeamIndividual.get(player).teamID) != null)
 		Util.serverDebugMessage(player.getDisplayName()+" is now on team "+PlayerTeam.get(PlayerTeamIndividual.get(player).teamID).displayName);
 	}
 
@@ -123,19 +131,11 @@ public class PlayerMiniGame {
 	public void launchGame(){
 		DataLogger.insertNewMiniGame(Util.getServerID(), gameID, gameMode, Util.getDate());
 		
-		Contained.gameActive[dim] = true;
-		if (MiniGameUtil.isPvP(dim)){
-			Contained.timeLeft[dim] = Contained.configs.gameDuration[Resources.PVP]*20;
-			gameMode = Resources.PVP;
-		}else if (MiniGameUtil.isTreasure(dim)){
-			Contained.timeLeft[dim] = Contained.configs.gameDuration[Resources.TREASURE]*20;
-			gameMode = Resources.TREASURE;
-		}
-		
 		if(isGameReady()){
 			pickRandomTeamLeaders();
 			teleportPlayers(0, dim);
-			ClientPacketHandlerUtil.syncMinigameTime(dim);
+			Contained.timeLeft[dim] = Contained.configs.gameDuration[gameMode]*20;	
+			MiniGameUtil.startGame(this);
 		}
 	}
 
@@ -310,6 +310,28 @@ public class PlayerMiniGame {
 			}
 		}
 	}
+	
+	/*
+	private ItemStack rewardItem(int score, int totalScore){
+		ItemStack reward = null;
+		
+		Random rand = new Random();
+		double probability = ((double) score/(double) totalScore);
+		Iterator<Item> items = GameData.getItemRegistry().iterator();
+		while(reward == null){
+			while(items.hasNext()){
+				Item item = items.next();
+				
+			}
+		}
+		
+		return reward;
+	}
+	
+	private int rewardXP(int curScore, int score, int totalScore){
+		return (curScore) * (score/totalScore);
+	}
+	*/
 
 	public boolean isGameReady() {		
 		int teamPlayerCount = 0;
