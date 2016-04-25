@@ -9,6 +9,7 @@ import com.contained.game.Contained;
 import com.contained.game.Settings;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
@@ -60,10 +61,7 @@ public class CommandEndGame implements ICommand{
 						Util.displayMessage((EntityPlayer)sender, Util.infoCode + "Returning Player To Lobby");
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.stopGame(dim, (EntityPlayerMP) sender);
-						
-						//Teleport Player
-						Util.travelToDimension(Resources.OVERWORLD, player);
+						PlayerMiniGame.get(dim).endGame();
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);

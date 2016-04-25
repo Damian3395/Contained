@@ -3,12 +3,8 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import codechicken.lib.packet.PacketCustom;
-
-import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -62,7 +58,7 @@ public class CommandStartTreasureHunt implements ICommand {
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
+						MiniGameUtil.testStartGame(dim, (EntityPlayerMP)sender);
 						
 						//Generate Chests
 						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
