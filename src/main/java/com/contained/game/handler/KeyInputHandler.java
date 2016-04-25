@@ -47,6 +47,11 @@ public class KeyInputHandler {
 			territory.doRender = !territory.doRender;
 		
 		if(KeyBindings.toggleAdmin.isPressed())
-			mc.displayGuiScreen(new GuiAdmin(mc.thePlayer));
+			if(mc.currentScreen == null){
+				mc.displayGuiScreen(new GuiAdmin());	
+			}else{
+				mc.thePlayer.closeScreen();
+			}
+			
 	}
 }

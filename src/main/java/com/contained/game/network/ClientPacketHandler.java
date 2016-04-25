@@ -13,7 +13,9 @@ import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
+import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.GuiTownManage;
+import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
 import com.contained.game.ui.guild.GuiGuild;
@@ -66,13 +68,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				case ClientPacketHandlerUtil.OCCUPATIONAL_DATA:
 					for(int i=0; i<Data.occupationNames.length; i++)
 						ExtendedPlayer.get(mc.thePlayer).setOccupation(i, packet.readInt());
-					break;
+				break;
 					
 				case ClientPacketHandlerUtil.ITEM_USAGE_DATA:
 					ExtendedPlayer.get(mc.thePlayer).usedOwnItems = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).usedOthersItems = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).usedByOthers = packet.readInt();
-					break;
+				break;
 					
 				case ClientPacketHandlerUtil.FULL_TERRITORY_SYNC:
 					int numBlocks = packet.readInt();
@@ -445,7 +447,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					mc.thePlayer.capabilities.allowEdit = true;
 					mc.thePlayer.capabilities.isCreativeMode = false;
 					
-					if(playerState.isAdmin)
+					if(playerState.isAdmin())
 						playerState.setAdminRights(false);
 					if(playerState.isSpectator)
 						playerState.setSpectator(false);
@@ -548,7 +550,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.SAVE_PLAYER:
-					System.out.println("Saving Client Side Pdata");
 					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
 					storePdata.xp = packet.readInt();
 					storePdata.armor = new ItemStack[4];
@@ -593,6 +594,22 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						int index = packet.readInt();
 						ItemStack itemStore = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
 						mc.thePlayer.inventory.mainInventory[index] = itemStore;
+					}
+				break;
+				
+				case ClientPacketHandlerUtil.ADMIN_WORLD_INFO:
+					int selectedDimID = packet.readInt();
+					int playerCount=packet.readInt();
+					ArrayList<String> playerNames = new ArrayList<String>();
+					for(int i=0; i<playerCount; i++){
+						playerNames.add(packet.readString());
+					}
+					if(mc.currentScreen instanceof GuiAdmin){
+						GuiAdmin newGuiAdmin = new GuiAdmin();
+						mc.displayGuiScreen(newGuiAdmin);
+						newGuiAdmin.setPage(newGuiAdmin.PLAYER_PAGE);
+						newGuiAdmin.setSelectedDimID(selectedDimID);
+						newGuiAdmin.setPlayerInfoPanel(playerNames);
 					}
 				break;
 			}

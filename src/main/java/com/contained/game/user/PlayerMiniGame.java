@@ -3,6 +3,7 @@ package com.contained.game.user;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -16,6 +17,7 @@ import net.minecraftforge.common.DimensionManager;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
+import com.contained.game.ContainedRegistry;
 import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
@@ -86,7 +88,10 @@ public class PlayerMiniGame {
 	}
 
 	//Game Player To Random Team
-	public void addPlayer(EntityPlayer player){		
+	public void addPlayer(EntityPlayer player){
+		if(player == null)
+			return;
+		
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
 		if (teams.size() < Contained.configs.gameNumTeams[gameMode])
 			createTeam(player);
@@ -103,6 +108,9 @@ public class PlayerMiniGame {
 				addPlayerToTeam(player, candidateTeams.get(0));
 		}
 
+		if(PlayerTeamIndividual.get(player) != null 
+				&& PlayerTeamIndividual.get(player).teamID != null
+				&& PlayerTeam.get(PlayerTeamIndividual.get(player).teamID) != null)
 		Util.serverDebugMessage(player.getDisplayName()+" is now on team "+PlayerTeam.get(PlayerTeamIndividual.get(player).teamID).displayName);
 	}
 
@@ -228,7 +236,9 @@ public class PlayerMiniGame {
 					miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 					miniGamePacket.writeInt(gameMode);
 					NBTTagCompound miniGameData = new NBTTagCompound();
-					this.writeToNBT(miniGameData);
+					for(PlayerMiniGame game : Contained.miniGames)
+						if(game.dim == dim)
+							game.writeToNBT(miniGameData);
 					miniGamePacket.writeNBTTagCompound(miniGameData);
 					miniGamePacket.writeInt(dim);
 					miniGamePacket.writeInt(Contained.getTeamList(dim).size());
@@ -310,6 +320,28 @@ public class PlayerMiniGame {
 			}
 		}
 	}
+	
+	/*
+	private ItemStack rewardItem(int score, int totalScore){
+		ItemStack reward = null;
+		
+		Random rand = new Random();
+		double probability = ((double) score/(double) totalScore);
+		Iterator<Item> items = GameData.getItemRegistry().iterator();
+		while(reward == null){
+			while(items.hasNext()){
+				Item item = items.next();
+				
+			}
+		}
+		
+		return reward;
+	}
+	
+	private int rewardXP(int curScore, int score, int totalScore){
+		return (curScore) * (score/totalScore);
+	}
+	*/
 
 	public boolean isGameReady() {		
 		int teamPlayerCount = 0;

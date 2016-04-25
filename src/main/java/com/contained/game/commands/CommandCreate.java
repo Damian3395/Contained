@@ -191,8 +191,7 @@ public class CommandCreate implements ICommand {
 					else
 						out = getCommandUsage(sender);
 
-					ObjectGenerator og=new ObjectGenerator();
-					if(!og.generate(argString[0], sender.getEntityWorld(), targetX, targetY, targetZ)){
+					if(!ObjectGenerator.generate(argString[0], sender.getEntityWorld(), targetX, targetY, targetZ)){
 						out = this.getCommandUsage(sender);
 					}
 				}
