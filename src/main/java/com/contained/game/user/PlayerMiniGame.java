@@ -131,11 +131,19 @@ public class PlayerMiniGame {
 	public void launchGame(){
 		DataLogger.insertNewMiniGame(Util.getServerID(), gameID, gameMode, Util.getDate());
 		
+		Contained.gameActive[dim] = true;
+		if (MiniGameUtil.isPvP(dim)){
+			Contained.timeLeft[dim] = Contained.configs.gameDuration[Resources.PVP]*20;
+			gameMode = Resources.PVP;
+		}else if (MiniGameUtil.isTreasure(dim)){
+			Contained.timeLeft[dim] = Contained.configs.gameDuration[Resources.TREASURE]*20;
+			gameMode = Resources.TREASURE;
+		}
+		
 		if(isGameReady()){
 			pickRandomTeamLeaders();
 			teleportPlayers(0, dim);
-			Contained.timeLeft[dim] = Contained.configs.gameDuration[gameMode]*20;	
-			MiniGameUtil.startGame(this);
+			ClientPacketHandlerUtil.syncMinigameTime(dim);
 		}
 	}
 
@@ -228,7 +236,9 @@ public class PlayerMiniGame {
 					miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 					miniGamePacket.writeInt(gameMode);
 					NBTTagCompound miniGameData = new NBTTagCompound();
-					this.writeToNBT(miniGameData);
+					for(PlayerMiniGame game : Contained.miniGames)
+						if(game.dim == dim)
+							game.writeToNBT(miniGameData);
 					miniGamePacket.writeNBTTagCompound(miniGameData);
 					miniGamePacket.writeInt(dim);
 					miniGamePacket.writeInt(Contained.getTeamList(dim).size());

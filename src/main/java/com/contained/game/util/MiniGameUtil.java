@@ -108,17 +108,13 @@ public class MiniGameUtil {
 		
 		int invSize = 0;
 		for(ItemStack item : pdata.inventory)
-			if(item != null){
-				System.out.println("Saving " + item.getDisplayName());
+			if(item != null)
 				invSize++;
-			}
 		
 		int armorSize = 0;
 		for(ItemStack item : pdata.armor)
-			if(item != null){
-				System.out.println("Saving " + item.getDisplayName());
+			if(item != null)
 				armorSize++;
-			}
 		
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SAVE_PLAYER);
 		miniGamePacket.writeInt(player.experienceTotal);
@@ -192,20 +188,15 @@ public class MiniGameUtil {
 		if(MiniGameUtil.isTreasure(dimID))
 			Contained.getActiveTreasures(0).clear();
 		
-		System.out.println("Restoring Player Server Side");
 		int invSize = 0;
 		for(ItemStack item : restorePdata.inventory)
-			if(item != null){
-				System.out.println("Restore " + item.getDisplayName());
+			if(item != null)
 				invSize++;
-			}
 		
 		int armorSize = 0;
 		for(ItemStack item : restorePdata.armor)
-			if(item != null){
-				System.out.println("Restore " + item.getDisplayName());
+			if(item != null)
 				armorSize++;
-			}
 		
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
 		miniGamePacket.writeInt(restorePdata.xp);

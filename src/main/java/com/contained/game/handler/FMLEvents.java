@@ -5,9 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FileDeleteStrategy;
-
+import org.apache.commons.io.FileUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -19,7 +18,6 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
-import com.contained.game.Settings;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
@@ -130,10 +128,10 @@ public class FMLEvents {
 				RegionFileCache.clearRegionFileReferences();
 				System.gc();
 				
-				//System.out.println("Deleting DIM"+dimID);
-				try {
-					FileUtils.deleteDirectory(dimDir);
-				} catch (IOException e) { }
+				for(File file : dimDir.listFiles())
+					FileDeleteStrategy.FORCE.deleteQuietly(file);
+				FileDeleteStrategy.FORCE.deleteQuietly(dimDir);
+				
 				Save.removeDimFiles(dimID);
 				
 				//And remove data about it from memory.
