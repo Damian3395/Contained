@@ -567,9 +567,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						ItemStack itemStore = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
 						storePdata.inventory[index] = itemStore;
 					}
-					for(ItemStack itemCheck : storePdata.inventory)
-						if(itemCheck != null)
-							System.out.println("Save Item " + itemCheck.getDisplayName());
 					
 					mc.thePlayer.experienceTotal = 0;
 					MiniGameUtil.clearMainInventory(mc.thePlayer);

@@ -49,7 +49,7 @@ public class TreasureEvents {
 				properties.curTreasuresOpened++;
 				
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
-				PlayerMiniGame miniGame = PlayerMiniGame.get(pdata.teamID);
+				PlayerMiniGame miniGame = PlayerMiniGame.get(p.dimension);
 				int teamID = miniGame.getTeamID(pdata);
 				Contained.gameScores[p.dimension][teamID]++;
 				ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
