@@ -67,7 +67,7 @@ public class FMLEvents {
 							}
 						}
 						
-						toEnter.launchGame(playersToJoin);								
+						toEnter.launchGame();								
 						// TODO: Right now this will instantaneously start a game and teleport
 						// everyone into the dimension as soon as a game is ready. Change this
 						// so that there's a 30-60 second delay, and send a chat message to
@@ -167,7 +167,7 @@ public class FMLEvents {
 			if (timeRemaining % 300 == 0 || timeRemaining == 0)
 				ClientPacketHandlerUtil.syncMinigameTime(dimID);
 			if (timeRemaining == 0)
-				PlayerMiniGame.get(dimID).endGame();
+				MiniGameUtil.resetGame(dimID);
 		}
 	}
 	
