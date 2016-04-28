@@ -22,6 +22,7 @@ import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.ui.perks.ClassPerks;
+import com.contained.game.ui.survey.GuiSurvey;
 import com.contained.game.ui.territory.TerritoryRender;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
@@ -608,6 +609,11 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						newGuiAdmin.setSelectedDimID(selectedDimID);
 						newGuiAdmin.setPlayerInfoPanel(playerNames);
 					}
+				break;
+				
+				case ClientPacketHandlerUtil.START_SURVEY:
+					if(!(mc.currentScreen instanceof GuiSurvey))
+						mc.displayGuiScreen(new GuiSurvey(PlayerTeamIndividual.get(mc.thePlayer)));
 				break;
 			}
 		}

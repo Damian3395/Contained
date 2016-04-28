@@ -7,6 +7,7 @@ import codechicken.lib.packet.PacketCustom;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.components.Container;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;
@@ -26,7 +27,8 @@ public class GuiMiniGames extends GuiScreen {
 	@Override
 	public void initGui(){
 		ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-		if(properties.inGame() || properties.gameMode != Resources.OVERWORLD){
+		if(properties.inGame() || properties.gameMode != Resources.OVERWORLD ||
+				MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
 			mc.displayGuiScreen(null);
 			return;
 		}
