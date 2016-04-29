@@ -2,19 +2,24 @@ package com.contained.game.ui.survey;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
+import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.packet.PacketCustom;
 
+import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.survey.SurveyData.Q;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiSurvey extends GuiScreen {
@@ -28,6 +33,8 @@ public class GuiSurvey extends GuiScreen {
     private GuiButton buttonFinish;
 	private GuiButton buttonStart;
 	private GuiButton buttonNext;
+	private GuiButton buttonLeft;
+	private GuiButton buttonRight;
 	private GuiButton buttonMale;
 	private GuiButton buttonFemale;
 	private GuiButton buttonOptionA;
@@ -45,6 +52,9 @@ public class GuiSurvey extends GuiScreen {
 	public static final int PAGE_ETHNICITY = 3;
 	public static final int PAGE_MINECRAFT = 4;
 	public static final int PAGE_PERSONALITY = 5;
+	
+	private String[] ethnicities = {"Hispanic", "Latino", "American Indian", "Alaska Native", "Asian", "African American", "Native Hawaiian", "Pacific Islander", "White"};
+	private int ethnicityIndex;
 	
 	public GuiSurvey(PlayerTeamIndividual pdata) {
 		playerCopy = new PlayerTeamIndividual(pdata);
@@ -68,6 +78,8 @@ public class GuiSurvey extends GuiScreen {
     	this.buttonOptionD = new GuiButton(5, this.width / 2 - 50 + leftMargin, bottomMargin-(20*1) + this.bookImageHeight, 100, 16, "Disagree");
     	this.buttonOptionE = new GuiButton(6, this.width / 2 - 50 + leftMargin, bottomMargin-(20*0) + this.bookImageHeight, 100, 16, "Strongly Disagree");
     	this.buttonNext = new GuiButton(1, this.width / 2 - 50 + leftMargin, bottomMargin + this.bookImageHeight, 100, 20, "Next");
+    	this.buttonLeft = new GuiButton(9, this.width / 2 - 40 + leftMargin, bottomMargin + this.bookImageHeight - 60, 30, 20, "<");
+    	this.buttonRight = new GuiButton(10, this.width / 2 + 20 + leftMargin, bottomMargin + this.bookImageHeight - 60, 30, 20, ">");
     	this.buttonMale = new GuiButton(7, this.width / 2 - 50 + leftMargin, bottomMargin-(24*3) + this.bookImageHeight, 100, 20, "Male");
     	this.buttonFemale = new GuiButton(8, this.width / 2 - 50 + leftMargin, bottomMargin-(24*2) + this.bookImageHeight, 100, 20, "Female");
     	
@@ -85,15 +97,17 @@ public class GuiSurvey extends GuiScreen {
     	this.textResponseB.setText("");
     	this.textResponseB.setFocused(false);
     	
-    	if(properties.lives == 0 && lastProgress <= SurveyData.getSurveyLength())
+    	if(lastProgress <= SurveyData.getSurveyLength())
     		buttonFinish.enabled = false;
+    	
+    	ethnicityIndex = new Random().nextInt(ethnicities.length);
     	
     	this.updateButtons();
     }
 	
 	public boolean isTextFieldAEnabled() {
 		int page = playerCopy.surveyResponses.progress;
-		if (page == PAGE_AGE || page == PAGE_ETHNICITY || page == PAGE_MINECRAFT)
+		if (page == PAGE_AGE || page == PAGE_MINECRAFT)
 			return true;
 		return false;
 	}
@@ -109,6 +123,9 @@ public class GuiSurvey extends GuiScreen {
     public void updateScreen()
     {
         super.updateScreen();
+        if(lastProgress <= SurveyData.getSurveyLength())
+    		buttonFinish.enabled = false;
+        
         if (!this.buttonOptionA.enabled) {
         	this.disableTime--;
         	if (this.disableTime <= 0) {
@@ -144,9 +161,6 @@ public class GuiSurvey extends GuiScreen {
         		this.buttonNext.enabled = false;
         	}
         }
-        if (playerCopy.surveyResponses.progress == PAGE_ETHNICITY
-        		&& this.textResponseA.getText().trim().length() == 0)
-        	this.buttonNext.enabled = false;
     }
     
     @Override
@@ -160,10 +174,7 @@ public class GuiSurvey extends GuiScreen {
 	}
 	
     @Override
-	public void keyTyped(char c, int i){
-    	if(properties.lives > 0)
-    		super.keyTyped(c, i);
-    	
+	public void keyTyped(char c, int i){    	
     	if (isTextFieldAEnabled() && this.textResponseA.isFocused())
 			this.textResponseA.textboxKeyTyped(c, i);
 		if (isTextFieldBEnabled() && this.textResponseB.isFocused())
@@ -182,8 +193,12 @@ public class GuiSurvey extends GuiScreen {
     		//Gender Page
     		this.buttonList.add(this.buttonMale);
     		this.buttonList.add(this.buttonFemale);
-    	}
-    	else if (playerCopy.surveyResponses.progress <= SurveyData.getSurveyLength()
+    	} else if (playerCopy.surveyResponses.progress == PAGE_ETHNICITY) {
+    		this.buttonList.add(this.buttonLeft);
+    		this.buttonList.add(this.buttonRight);
+    		this.buttonList.add(this.buttonNext);
+    		this.buttonNext.enabled = false;
+    	} else if (playerCopy.surveyResponses.progress <= SurveyData.getSurveyLength()
     				&& playerCopy.surveyResponses.progress >= PAGE_PERSONALITY) {
     		//Personality Question Page
     		this.buttonList.add(this.buttonOptionA);
@@ -196,6 +211,8 @@ public class GuiSurvey extends GuiScreen {
     	}
     	
     	this.buttonList.add(this.buttonFinish);
+    	if(lastProgress <= SurveyData.getSurveyLength())
+    		buttonFinish.enabled = false;
     }
     
     @Override
@@ -210,9 +227,7 @@ public class GuiSurvey extends GuiScreen {
     			playerCopy.surveyResponses.isMale = false;
     		
     		if (b.id == 0){ //Done Button
-    			if(properties.lives > 0)
-    				this.mc.displayGuiScreen(null);
-    			else if(playerCopy.surveyResponses.progress > SurveyData.getSurveyLength())
+    			if(playerCopy.surveyResponses.progress > SurveyData.getSurveyLength())
     				this.mc.displayGuiScreen(null);
     		}
     		else if (b.id == 1 || b.id == 7 || b.id == 8) //Start/Next Button 
@@ -220,7 +235,7 @@ public class GuiSurvey extends GuiScreen {
     			if (playerCopy.surveyResponses.progress == PAGE_AGE) 
     				playerCopy.surveyResponses.age = Integer.parseInt(this.textResponseA.getText().trim());
     			else if (playerCopy.surveyResponses.progress == PAGE_ETHNICITY) 
-    				playerCopy.surveyResponses.ethnicity = this.textResponseA.getText().trim();
+    				playerCopy.surveyResponses.ethnicity = ethnicities[ethnicityIndex];
     			else if (playerCopy.surveyResponses.progress == PAGE_MINECRAFT) { 
     				playerCopy.surveyResponses.mcMonths = Integer.parseInt(this.textResponseA.getText().trim());
     				playerCopy.surveyResponses.mcYears = Integer.parseInt(this.textResponseB.getText().trim());
@@ -238,8 +253,23 @@ public class GuiSurvey extends GuiScreen {
     				this.buttonOptionE.enabled = false;
     			}
     			updateButtons();
-    		}
-    		else if (b.id >= 2 && b.id <= 6) //Option buttons
+    		} else if(b.id == 9){ //Left Button
+    			if (this.ethnicityIndex > 0)
+    				this.ethnicityIndex--;
+    			else
+    				this.ethnicityIndex = this.ethnicities.length-1;
+    			
+    			if(!this.buttonNext.enabled)
+    				this.buttonNext.enabled = true;
+    		} else if(b.id == 10){ //Right Button
+    			if (this.ethnicityIndex < this.ethnicities.length-1)
+    				this.ethnicityIndex++;
+    			else 
+    				this.ethnicityIndex = 0;
+    			
+    			if(!this.buttonNext.enabled)
+    				this.buttonNext.enabled = true;
+    		} else if (b.id >= 2 && b.id <= 6) //Option buttons
     		{
     			playerCopy.surveyResponses.personality[playerCopy.surveyResponses.progress-PAGE_PERSONALITY] = b.id-2;
     			playerCopy.surveyResponses.progress++;
@@ -257,6 +287,9 @@ public class GuiSurvey extends GuiScreen {
 			
 			PlayerTeamIndividual localPData = PlayerTeamIndividual.get(playerCopy.playerName);
 			localPData.surveyResponses = playerCopy.surveyResponses;
+			
+			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LOG_PERSONALITY);
+			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	
@@ -292,9 +325,10 @@ public class GuiSurvey extends GuiScreen {
     			question = SurveyData.data[playerCopy.surveyResponses.progress-PAGE_PERSONALITY].question;
     		else if (playerCopy.surveyResponses.progress == PAGE_AGE)
     			question = "How old are you?";
-    		else if (playerCopy.surveyResponses.progress == PAGE_ETHNICITY)
+    		else if (playerCopy.surveyResponses.progress == PAGE_ETHNICITY){
     			question = "What is your ethnicity?";
-    		else if (playerCopy.surveyResponses.progress == PAGE_GENDER)
+    			this.fontRendererObj.drawString(this.ethnicities[this.ethnicityIndex], x+36, y+64, 0);
+    		}else if (playerCopy.surveyResponses.progress == PAGE_GENDER)
     			question = "Which gender do you identify as?";
     		else if (playerCopy.surveyResponses.progress == PAGE_MINECRAFT)
     			question = "How long have you been playing Minecraft?";

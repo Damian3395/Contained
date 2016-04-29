@@ -15,6 +15,7 @@ import com.contained.game.item.DowsingRod;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.ui.survey.GuiSurvey;
 import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -29,6 +30,7 @@ import com.contained.game.world.block.TerritoryMachineTE;
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -162,6 +164,12 @@ public class PlayerEvents {
 					usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);
 					Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)player);
+					
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength()){
+						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.START_SURVEY);
+						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
+					}
 				}
 			}
 			
