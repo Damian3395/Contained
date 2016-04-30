@@ -166,6 +166,8 @@ public class PlayerMiniGame {
 		WorldServer w = DimensionManager.getWorld(dim);
 		for(PlayerTeamIndividual pdata : getGamePlayers()){
 			EntityPlayerMP player = (EntityPlayerMP)w.getPlayerEntityByName(pdata.playerName);
+			if (player == null)
+				continue;
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 
 			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null)
@@ -257,6 +259,14 @@ public class PlayerMiniGame {
 			if(getTeamID(pdata) != -1)
 				count++;
 		return count;
+	}
+	
+	public int numOnlinePlayers() {
+		WorldServer w = DimensionManager.getWorld(dim);
+		if (w != null && w.playerEntities != null)
+			return Math.min(w.playerEntities.size(), numPlayers());
+		else
+			return 0;
 	}
 
 	private void pickRandomTeamLeaders(){
