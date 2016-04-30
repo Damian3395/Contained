@@ -1,12 +1,10 @@
 package com.contained.game.handler;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileDeleteStrategy;
-import org.apache.commons.io.FileUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -143,7 +141,7 @@ public class FMLEvents {
 			}
 		}
 		else if (DimensionManager.getWorld(dimID) != null) {
-			List players = DimensionManager.getWorld(dimID).playerEntities;
+			List<EntityPlayer> players = DimensionManager.getWorld(dimID).playerEntities;
 			if (players == null || players.size() == 0) 
 				DimensionManager.setWorld(dimID, null);
 		}

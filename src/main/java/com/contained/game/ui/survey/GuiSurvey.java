@@ -8,18 +8,13 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.Contained;
-import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.network.ServerPacketHandlerUtil;
-import com.contained.game.ui.survey.SurveyData.Q;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiSurvey extends GuiScreen {
@@ -45,7 +40,6 @@ public class GuiSurvey extends GuiScreen {
 	private GuiTextField textResponseA;
 	private GuiTextField textResponseB;
 	private PlayerTeamIndividual playerCopy;
-	private ExtendedPlayer properties;
 	
 	public static final int PAGE_GENDER = 1;
 	public static final int PAGE_AGE = 2;
@@ -65,7 +59,6 @@ public class GuiSurvey extends GuiScreen {
     public void initGui()
     {
 		super.initGui();
-		properties = ExtendedPlayer.get(mc.thePlayer);
 		
 		int bottomMargin = -42;
 		int leftMargin = -6;
@@ -181,7 +174,8 @@ public class GuiSurvey extends GuiScreen {
 			this.textResponseB.textboxKeyTyped(c, i);
 	}
 	
-    private void updateButtons() {    	
+    @SuppressWarnings("unchecked")
+	private void updateButtons() {    	
     	this.buttonList.clear();
     	this.textResponseA.setText("");
     	this.textResponseB.setText("");

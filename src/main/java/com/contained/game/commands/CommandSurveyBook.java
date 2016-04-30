@@ -3,7 +3,7 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.contained.game.ContainedRegistry;
+import com.contained.game.item.SurveyClipboard;
 import com.contained.game.util.Util;
 
 import net.minecraft.command.ICommand;
@@ -13,9 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 
 public class CommandSurveyBook implements ICommand{
-	private List aliases;
+	private List<String> aliases;
 	public CommandSurveyBook(){
-		this.aliases = new ArrayList();
+		this.aliases = new ArrayList<String>();
 		this.aliases.add("survey");
 		this.aliases.add("surveybook");
 	}
@@ -31,7 +31,7 @@ public class CommandSurveyBook implements ICommand{
 	}
 	
 	@Override
-	public List getCommandAliases(){
+	public List<String> getCommandAliases(){
 		return this.aliases;
 	}
 	
@@ -40,17 +40,19 @@ public class CommandSurveyBook implements ICommand{
 		if (!sender.getEntityWorld().isRemote && sender instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) sender;
 			int emptySlot = player.inventory.getFirstEmptyStack();
-			if(emptySlot >= 0 && !player.inventory.hasItemStack(new ItemStack(ContainedRegistry.surveyItem.instance)))
-				player.inventory.addItemStackToInventory(new ItemStack(ContainedRegistry.surveyItem.instance, 1));
+			if(emptySlot >= 0 && !player.inventory.hasItemStack(new ItemStack(SurveyClipboard.instance)))
+				player.inventory.addItemStackToInventory(new ItemStack(SurveyClipboard.instance, 1));
 			else
 				sender.addChatMessage(new ChatComponentText(Util.errorCode + "Error: Already Have Item Or No Inventory Space Available"));
 		}
 	}
 
-	@Override
-	public int compareTo(Object o) {
-		return 0;
-	}
+	@Override 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
+		return 0; 
+	} 
 
 	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender sender) {
@@ -58,7 +60,7 @@ public class CommandSurveyBook implements ICommand{
 	}
 
 	@Override
-	public List addTabCompletionOptions(ICommandSender sender, String[] astring) {
+	public List<String> addTabCompletionOptions(ICommandSender sender, String[] astring) {
 		return null;
 	}
 

@@ -3,29 +3,29 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.util.Util;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 
 /**
  * Teleport to the world spawn of a specific dimension.
  */
 public class CommandTPX implements ICommand {
-	private final List aliases;
+	private final List<String> aliases;
 
 	protected String fullEntityName; 
 	protected Entity conjuredEntity; 
 
 	public CommandTPX() 
 	{ 
-		aliases = new ArrayList(); 
+		aliases = new ArrayList<String>(); 
 		aliases.add("tpx"); 
 		aliases.add("tpd"); 
 	} 
@@ -50,7 +50,7 @@ public class CommandTPX implements ICommand {
 	} 
 
 	@Override 
-	public List getCommandAliases() 
+	public List<String> getCommandAliases() 
 	{ 
 		return this.aliases;
 	} 
@@ -87,17 +87,15 @@ public class CommandTPX implements ICommand {
 	} 
 
 	@Override 
-	public boolean canCommandSenderUseCommand(ICommandSender var1) 
+	public boolean canCommandSenderUseCommand(ICommandSender sender) 
 	{ 
-		if (var1 instanceof EntityPlayerMP) {
-			EntityPlayerMP player = (EntityPlayerMP)var1;
-			return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
-		}
+		if(!ExtendedPlayer.get((EntityPlayer)sender).isAdmin())
+			return false;
 		return true;
 	} 
 
 	@Override  
-	public List addTabCompletionOptions(ICommandSender var1, String[] var2) 
+	public List<String> addTabCompletionOptions(ICommandSender var1, String[] var2) 
 	{ 
 		return null; 
 	} 

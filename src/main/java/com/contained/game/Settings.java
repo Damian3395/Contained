@@ -63,7 +63,7 @@ public class Settings {
 					defaultValue(i, 90, 10), 1, 60000, 
 					"How long, in seconds, does it take for the Territory Machine to claim a block of land?");
 			antiClaimRadius[i] = config.getInt("antiClaimRadius", category, 
-					defaultValue(i, 2, 3), 0, 10, 
+					defaultValue(i, 2, 2), 0, 10, 
 					"What is the radius, in blocks, that the Anti-Territory Machines can steal land?");
 			antiClaimDelay[i] = config.getInt("antiClaimDelay", category, 
 					defaultValue(i, 90, 15), 1, 60000, 

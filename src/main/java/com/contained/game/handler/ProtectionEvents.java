@@ -43,7 +43,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerBrewingStand;
-import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.ContainerDispenser;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.inventory.ContainerFurnace;

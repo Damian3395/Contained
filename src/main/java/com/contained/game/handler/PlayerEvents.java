@@ -192,8 +192,16 @@ public class PlayerEvents {
 			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(killed);
 			if (playerData.teamID != null) {
 				int amount = 1;
-				if (playerData.isLeader) //Leaders drop more anti-gems on death.
-					amount = 4;				
+				if (MiniGameUtil.isPvP(event.entityLiving.dimension)) {
+					int territoryCount = (int)Math.pow(Contained.configs.pvpTerritorySize*2+1, 2);
+					amount = Util.randomRange(
+							(int)Math.ceil(Math.sqrt(territoryCount/2D)), 
+							(int)Math.sqrt(territoryCount));
+				}
+				else {
+					if (playerData.isLeader) //Leaders drop more anti-gems on death.
+						amount = 4;
+				}
 				ItemStack toDrop = new ItemStack(ItemTerritory.removeTerritory, amount);
 				NBTTagCompound itemData = Data.getTagCompound(toDrop);
 				itemData.setString("teamOwner", playerData.teamID);

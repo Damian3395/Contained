@@ -3,25 +3,19 @@ package com.contained.game.util;
 import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
-import com.contained.game.entity.ExtendedLivingBase;
 import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.world.GameTeleporter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -195,7 +189,6 @@ public class Util {
 			return hours+":"+String.format("%02d", minutes%60)+":"+String.format("%02d", seconds%60);
 	}
 	
-	@SuppressWarnings("unused")
 	public static String getServerID() {
 		if(Resources.LOGGING_ENABLED && MinecraftServer.getServer() != null)
 			return MinecraftServer.getServer().getServerHostname();
@@ -321,10 +314,11 @@ public class Util {
 	}
 	
 	public static void dimensionMessage(int dim, String msg) {
-		List players = MinecraftServer.getServer().worldServers[dim].playerEntities;
-		Iterator iterator = players.iterator();
+		@SuppressWarnings("unchecked")
+		List<EntityPlayer> players = MinecraftServer.getServer().worldServers[dim].playerEntities;
+		Iterator<EntityPlayer> iterator = players.iterator();
 		while(iterator.hasNext()){
-			EntityPlayer player = (EntityPlayer) iterator.next();
+			EntityPlayer player = iterator.next();
 			player.addChatComponentMessage(new ChatComponentText(msg));
 		}
 	}

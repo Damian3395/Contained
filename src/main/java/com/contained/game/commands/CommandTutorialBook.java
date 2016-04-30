@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.ContainedRegistry;
-import com.contained.game.item.TutorialBook;
 import com.contained.game.util.Util;
 
 import net.minecraft.command.ICommand;
@@ -14,9 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 
 public class CommandTutorialBook implements ICommand {
-	private List aliases;
+	private List<String> aliases;
 	public CommandTutorialBook(){
-		this.aliases = new ArrayList();
+		this.aliases = new ArrayList<String>();
 		this.aliases.add("tutorial");
 		this.aliases.add("tutorialbook");
 		this.aliases.add("howtoplay");
@@ -33,7 +32,7 @@ public class CommandTutorialBook implements ICommand {
 	}
 	
 	@Override
-	public List getCommandAliases(){
+	public List<String> getCommandAliases(){
 		return this.aliases;
 	}
 	
@@ -50,10 +49,12 @@ public class CommandTutorialBook implements ICommand {
 		}
 	}
 
-	@Override
-	public int compareTo(Object o) {
-		return 0;
-	}
+	@Override 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
+		return 0; 
+	} 
 
 	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender sender) {
@@ -61,7 +62,7 @@ public class CommandTutorialBook implements ICommand {
 	}
 
 	@Override
-	public List addTabCompletionOptions(ICommandSender sender, String[] astring) {
+	public List<String> addTabCompletionOptions(ICommandSender sender, String[] astring) {
 		return null;
 	}
 

@@ -15,7 +15,6 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.GuiTownManage;
-import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
 import com.contained.game.ui.guild.GuiGuild;
