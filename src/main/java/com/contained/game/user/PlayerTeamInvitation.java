@@ -47,7 +47,7 @@ public class PlayerTeamInvitation {
 					myInvites.add(invite);
 				else if (invite.direction == FROM && p.teamID == null) {
 					PlayerTeam request = PlayerTeam.get(invite.teamID);
-					if (request == null || request.numMembers() >= Contained.configs.maxTeamSize[Settings.getDimConfig(request.dimID)])
+					if (request == null || request.numMembers() >= Contained.configs.maxTeamSize[Settings.getGameConfig(request.dimID)])
 						// Exclude this invite if the team has reached member capacity 
 						// since the time the invite was sent.
 						continue;

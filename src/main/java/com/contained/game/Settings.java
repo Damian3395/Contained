@@ -33,6 +33,7 @@ public class Settings {
 	public int[] bulkGemEXPCost = new int[2];
 	public int[] bulkGemCount = new int[2];
 	public int[] terrMachineEXPCost = new int[2];
+	public int pvpTerritorySize;
 	
 	public boolean[] harvestRequiresTerritory = new boolean[2];
 	public boolean[] enableDowsing = new boolean[2];
@@ -102,8 +103,12 @@ public class Settings {
 			String prefix = "";
 			if (i > 0)
 				category = "minigame_settings";
-			if (i == Resources.PVP)
+			if (i == Resources.PVP) {
 				prefix = "pvp_";
+				pvpTerritorySize = config.getInt(prefix+"territorySize", category, 
+						3, 1, 99, 
+						"What is the radius of the territory that the team starts with?");	
+			}
 			if (i == Resources.TREASURE)
 				prefix = "treasure_";
 			

@@ -285,6 +285,7 @@ public class ProtectionEvents {
 			event.setCanceled(true);
 		else if (event.entityLiving != null && event.entityLiving instanceof EntityPlayer) {
 			// Player versus Player: Disable PvP in the following cases:
+			//	  -Playing the Treasure Hunt mini-game.
 			//    -Players cannot attack their own teammates.
 			//    -Players not in a team cannot be attacked nor can they attack
 			//      other players.
@@ -297,6 +298,8 @@ public class ProtectionEvents {
 			Point check = new Point((int)event.entityLiving.posX, (int)event.entityLiving.posZ);
 			boolean shouldCancel = false;
 			
+			if (MiniGameUtil.isTreasure(event.entityLiving.dimension))
+				shouldCancel = true;
 			if (victimTeam == null || attackerTeam == null)
 				shouldCancel = true;
 			else if (victimTeam.equals(attackerTeam))

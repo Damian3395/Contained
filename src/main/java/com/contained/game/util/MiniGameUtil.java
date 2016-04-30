@@ -2,6 +2,7 @@ package com.contained.game.util;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,6 +14,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -81,8 +83,9 @@ public class MiniGameUtil {
 		Contained.gameActive[dimID] = true;
 		Contained.miniGames.add(game);
 		
+		HashMap<String, Point> teamSpawnLocations = null;
 		if (gameMode == Resources.PVP)
-			PVPEvents.initializePVPGame(dimID);
+			teamSpawnLocations = PVPEvents.initializePVPGame(dimID);
 		else if (gameMode == Resources.TREASURE)
 			TreasureEvents.initializeTreasureGame(dimID);
 		
@@ -91,12 +94,26 @@ public class MiniGameUtil {
 			w.setWorldTime(0);
 		
 		for (EntityPlayer player: playersJoining) {
+			//Send the player to the dimension, and set their spawn location correctly.
 			Util.travelToDimension(dimID, player);
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+			
+			if (teamSpawnLocations == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
+				Point p = Util.getRandomLocation(w);
+				player.setLocationAndAngles(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y, player.rotationYaw, player.rotationPitch);
+				if (teamSpawnLocations != null)
+					Util.serverDebugMessage("[Error] Failed to get spawn location for "+player.getDisplayName()+"!");
+			} else {
+				Point spawnPos = teamSpawnLocations.get(pdata.teamID);
+				spawnPos.x += Util.randomBoth(3);
+				spawnPos.y += Util.randomBoth(3);
+				player.setLocationAndAngles(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y, player.rotationYaw, player.rotationPitch);
+			}
+			
 			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
 			startMiniGame.setGameMode(gameMode);
 			startMiniGame.setGame(true);
 			
-			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			pdata.xp = player.experienceTotal;
 			pdata.armor = player.inventory.armorInventory;
 			pdata.inventory = player.inventory.mainInventory;
