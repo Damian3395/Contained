@@ -14,7 +14,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -60,6 +59,17 @@ public class MiniGameUtil {
 			return Resources.TREASURE;
 		else
 			return Resources.OVERWORLD;
+	}
+	
+	public static void teamWins(String teamID, int dimID) {
+		// TODO: When this function is called, a team has won the game. If teamID
+		// is null, then the game was a tie.
+		//
+		// The game should now be over. Display a message saying who won. Maybe wait 
+		// a short period of time (~10 seconds?) and then terminate the dimension 
+		// and send everyone back to the overworld.
+		
+		PlayerMiniGame.get(dimID).endGame();
 	}
 	
 	public static void testStartGame(int dimID, EntityPlayer player) {
@@ -217,6 +227,25 @@ public class MiniGameUtil {
 			generatedPoints.add(new BlockCoord(x, y, z));			
 		}		
 		ClientPacketHandlerUtil.addTreasureAndSync(w.provider.dimensionId, generatedPoints);
+	}
+	
+	public static void removeTerritoryBlock(Point p, int dimID) {
+		Contained.getTerritoryMap(dimID).remove(p);
+		
+		if (isPvP(dimID)) {
+			// Check if this removal caused a team to have lost the very last
+			// of their territory, and if so, end the game.
+			String winningTeam = null;
+			boolean isGameOver = false;
+			for(PlayerTeam team : Contained.getTeamList(dimID)) {
+				if (!Contained.getTerritoryMap(dimID).containsValue(team.id))
+					isGameOver = true;
+				else
+					winningTeam = team.id;	
+			}
+			if (isGameOver)
+				teamWins(winningTeam, dimID);
+		}
 	}
 	
 	public static void clearMainInventory(EntityPlayer player){

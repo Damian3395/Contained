@@ -16,9 +16,11 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
+import com.contained.game.Settings;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Save;
@@ -107,6 +109,35 @@ public class FMLEvents {
 		}
 	}
 	
+	// Check if any of the teams in a PvP mini-game have had all of their players
+	// lose all of their lives (or just has no one online anymore that has lives)
+	// ... if so, end the game.
+	public void checkPvPFinished(int dimID) {
+		WorldServer w = DimensionManager.getWorld(dimID);
+		PlayerMiniGame game = PlayerMiniGame.get(dimID);
+		if (MiniGameUtil.isPvP(dimID) && w != null && game != null && Contained.gameActive[dimID]) {
+			List<EntityPlayer> players = w.playerEntities;
+			String winningTeam = null;
+			boolean[] teamHasAlivePlayers = new boolean[Contained.configs.gameNumTeams[Resources.PVP]];
+			
+			for (EntityPlayer p : players) {
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+				int teamInd = game.getTeamID(pdata);
+				if (teamInd != -1) {
+					teamHasAlivePlayers[teamInd] = true;
+					winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
+				}
+			}
+			
+			for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
+				if (teamHasAlivePlayers[ind] == false) {
+					MiniGameUtil.teamWins(winningTeam, dimID);
+					break;
+				}
+			}
+		}
+	}
+	
 	public void checkDimensionReset(int dimID) {		
 		if (DimensionManager.getWorld(dimID) == null && !Contained.gameActive[dimID]) {
 			//Dimension is empty and the game is over.
@@ -164,8 +195,22 @@ public class FMLEvents {
 			int timeRemaining = Contained.timeLeft[dimID];
 			if (timeRemaining % 300 == 0 || timeRemaining == 0)
 				ClientPacketHandlerUtil.syncMinigameTime(dimID);
-			if (timeRemaining == 0)
-				PlayerMiniGame.get(dimID).endGame();
+			if (timeRemaining == 0) {
+				// Time is up, end the mini-game!
+				PlayerMiniGame game = PlayerMiniGame.get(dimID);
+				int highestScore = -1;
+				String maxTeam = null;
+				for(int i=0;i<Contained.configs.gameNumTeams[Settings.getGameConfig(dimID)];i++) {
+					if (Contained.gameScores[game.getGameDimension()][i] > highestScore) {
+						highestScore = Contained.gameScores[game.getGameDimension()][i];
+						maxTeam = Contained.getTeamList(dimID).get(i).id;
+					}
+					else if (Contained.gameScores[game.getGameDimension()][i] == highestScore)
+						maxTeam = null; //Currently a tie
+				}
+				
+				MiniGameUtil.teamWins(maxTeam, dimID);
+			}
 		}
 	}
 	

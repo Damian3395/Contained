@@ -2,6 +2,7 @@ package com.contained.game.entity;
 
 import java.util.ArrayList;
 
+import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.ui.perks.ClassPerks;
 import com.contained.game.util.Resources;
@@ -17,7 +18,7 @@ import net.minecraftforge.common.util.Constants;
 public class ExtendedPlayer implements IExtendedEntityProperties {
 	private final static String EXT_PROP_NAME = "ExtendedPlayer";
 	private final EntityPlayer entity;
-	public int lives = 10;
+	public int lives = Contained.configs.pvpMaxLives;
 	private int[] occupationValues = null;
 	public int occupationClass = ClassPerks.NONE;
 	public int occupationLevel = 0;
@@ -129,13 +130,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	}
 	
 	public void addLife(){
-		if(this.lives < 10)
+		if(this.lives < Contained.configs.pvpMaxLives)
 			this.lives++;
 	}
 	
 	public void resurrect(){
 		if(this.lives == 0)
-			this.lives = 5;
+			this.lives = Contained.configs.pvpResurrectLives;
 	}
 	
 	public void setLives(int lives){

@@ -34,6 +34,8 @@ public class Settings {
 	public int[] bulkGemCount = new int[2];
 	public int[] terrMachineEXPCost = new int[2];
 	public int pvpTerritorySize;
+	public int pvpMaxLives;
+	public int pvpResurrectLives;
 	
 	public boolean[] harvestRequiresTerritory = new boolean[2];
 	public boolean[] enableDowsing = new boolean[2];
@@ -108,6 +110,12 @@ public class Settings {
 				pvpTerritorySize = config.getInt(prefix+"territorySize", category, 
 						3, 1, 99, 
 						"What is the radius of the territory that the team starts with?");	
+				pvpMaxLives = config.getInt(prefix+"maxLives", category, 
+						5, 1, 99, 
+						"What is the lives cap for a player (also the amount they start with)?");
+				pvpResurrectLives = config.getInt(prefix+"resurrectLives", category, 
+						3, 1, 99, 
+						"How many lives does a player get back if resurrected with the life rod?");
 			}
 			if (i == Resources.TREASURE)
 				prefix = "treasure_";

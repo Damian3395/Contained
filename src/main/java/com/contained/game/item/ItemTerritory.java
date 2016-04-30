@@ -9,6 +9,7 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ErrorCase;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -131,7 +132,7 @@ public class ItemTerritory {
 					}
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
-					Contained.getTerritoryMap(p.dimension).remove(blockToRemove);
+					MiniGameUtil.removeTerritoryBlock(blockToRemove, p.dimension);
 					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());
 				}
 			}
