@@ -158,6 +158,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	@Override
 	public void loadNBTData(NBTTagCompound load) {
 		this.lives = load.getInteger("lives_pt");
+		this.inGame = load.getBoolean("inGame");
+		this.joiningGame = load.getBoolean("joiningGame");
+		this.gameMode = load.getInteger("gameMode");
+		this.curKills = load.getInteger("curKills");
+		this.curDeaths = load.getInteger("curDeaths");
+		this.curTreasuresOpened = load.getInteger("curTreasuresOpened");
+		this.world = load.getString("world");
 		
 		this.occupationValues = load.getIntArray("occupationValues");
 		this.occupationClass = load.getInteger("occupationClass");
@@ -175,6 +182,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		}
 		
 		int[] temp = load.getIntArray("perks");
+		this.perks.clear();
 		for(int i = 0; i < temp.length; i++)
 			perks.add(temp[i]);
 		
@@ -197,6 +205,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	@Override
 	public void saveNBTData(NBTTagCompound save) {
 		save.setInteger("lives_pt", this.lives);
+		save.setBoolean("inGame", this.inGame);
+		save.setBoolean("joiningGame", this.joiningGame);
+		save.setInteger("gameMode", this.gameMode);
+		save.setInteger("curKills", this.curKills);
+		save.setInteger("curDeaths", this.curDeaths);
+		save.setInteger("curTreasuresOpened", this.curTreasuresOpened);
+		save.setString("world", this.world);
 		
 		save.setIntArray("occupationValues", getOccupationValues());
 		save.setInteger("occupationClass", getOccupationClass());

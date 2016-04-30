@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -31,8 +32,15 @@ public class Load {
 			Contained.configs.setWorldRadius(dimID, ntc.getInteger("worldRadius"));
 			if (ntc.hasKey("gameTime"))
 				Contained.timeLeft[dimID] = ntc.getInteger("gameTime");
-			if (ntc.hasKey("isActive"))
+			if (ntc.hasKey("isActive")) {
 				Contained.gameActive[dimID] = ntc.getBoolean("isActive");
+				
+				if (Contained.gameActive[dimID] && PlayerMiniGame.get(dimID) == null) {
+					PlayerMiniGame game = new PlayerMiniGame(ntc);
+					Contained.miniGames.add(game);
+					Contained.gameScores[dimID] = ntc.getIntArray("scores");
+				}
+			}
 			ArrayList<BlockCoord> activeTreasure = Contained.getActiveTreasures(dimID);
 			activeTreasure.clear();
 			if (ntc.hasKey("treasureX")) {
