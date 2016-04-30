@@ -80,10 +80,13 @@ public class FMLEvents {
 			// Periodically see if a mini-game has no more online players, in which case
 			// it should be forced to end.
 			if (rand == 35) {
+				ArrayList<PlayerMiniGame> gamesToEnd = new ArrayList<PlayerMiniGame>();
 				for(PlayerMiniGame game : Contained.miniGames) {
 					if (game.numOnlinePlayers() == 0)
-						game.endGame();
+						gamesToEnd.add(game);
 				}
+				for (PlayerMiniGame game : gamesToEnd)
+					game.endGame();
 			}
 			
 			//Tick the mini-game timers, and check for game-over.
