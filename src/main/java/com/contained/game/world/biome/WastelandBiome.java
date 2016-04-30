@@ -2,11 +2,12 @@ package com.contained.game.world.biome;
 
 import java.awt.Color;
 
+import com.contained.game.world.block.WastelandBlock;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.*;
 import net.minecraftforge.common.*;
 
@@ -24,8 +25,8 @@ public class WastelandBiome {
 		{
 			super(0);
 			setBiomeName("Wasteland");
-			topBlock = Blocks.air;
-			fillerBlock = Blocks.water;
+			topBlock = WastelandBlock.instance;
+			fillerBlock = WastelandBlock.instance;
 			theBiomeDecorator.generateLakes = false;
 			theBiomeDecorator.treesPerChunk = 0;
 			theBiomeDecorator.flowersPerChunk = 0;

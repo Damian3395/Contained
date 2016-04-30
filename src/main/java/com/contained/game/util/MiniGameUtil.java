@@ -127,8 +127,8 @@ public class MiniGameUtil {
 			startMiniGame.setGame(true);
 			
 			pdata.xp = player.experienceTotal;
-			pdata.armor = player.inventory.armorInventory;
-			pdata.inventory = player.inventory.mainInventory;
+			pdata.armor = player.inventory.armorInventory.clone();
+			pdata.inventory = player.inventory.mainInventory.clone();
 			
 			int invSize = 0;
 			for(ItemStack item : pdata.inventory)

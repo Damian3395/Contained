@@ -3,7 +3,6 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
@@ -35,7 +34,7 @@ public class CommandStartTreasureHunt implements ICommand {
 			if(!ExtendedPlayer.get((EntityPlayer)sender).isAdmin()){
 				out = "You are not an Admin.";
 			}else{
-				if(argString.length != 2){
+				if(argString.length != 1){
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
@@ -59,9 +58,6 @@ public class CommandStartTreasureHunt implements ICommand {
 						
 						//Create & Sync MiniGame
 						MiniGameUtil.testStartGame(dim, (EntityPlayerMP)sender);
-						
-						//Generate Chests
-						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
@@ -77,7 +73,7 @@ public class CommandStartTreasureHunt implements ICommand {
 
 	@Override
 	public String getCommandUsage(ICommandSender var1) {
-		return "/" + getCommandName() + " <dimension> <chests>";
+		return "/" + getCommandName() + " <dimension>";
 	}
 
 	@Override 

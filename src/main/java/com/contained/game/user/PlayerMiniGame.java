@@ -168,67 +168,10 @@ public class PlayerMiniGame {
 			EntityPlayerMP player = (EntityPlayerMP)w.getPlayerEntityByName(pdata.playerName);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 
-			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
+			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null)
 				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
-			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
+			else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null)
 				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
-			}
-
-			properties.setGameMode(Resources.OVERWORLD);
-			properties.setGame(false);
-			properties.curDeaths = 0;
-			properties.curKills = 0;
-			properties.curTreasuresOpened = 0;
-
-			MiniGameUtil.clearMainInventory(player);
-			MiniGameUtil.clearArmorInventory(player);
-
-			player.experienceTotal = pdata.xp;
-			player.inventory.armorInventory = pdata.armor;
-			player.inventory.mainInventory = pdata.inventory;
-			pdata.revertMiniGameChanges();
-
-			int invSize = 0;
-			for(ItemStack item : pdata.inventory)
-				if(item != null){
-					System.out.println("Restore " + item.getDisplayName());
-					invSize++;
-				}
-
-			int armorSize = 0;
-			for(ItemStack item : pdata.armor)
-				if(item != null){
-					System.out.println("Restore " + item.getDisplayName());
-					armorSize++;
-				}
-
-			PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
-			miniGamePacket.writeInt(pdata.xp);
-			miniGamePacket.writeInt(armorSize);
-			int index = 0;
-			for(ItemStack item : pdata.armor)
-				if(item != null){
-					miniGamePacket.writeInt(index);
-					NBTTagCompound itemSave = new NBTTagCompound();
-					item.writeToNBT(itemSave);
-					miniGamePacket.writeNBTTagCompound(itemSave);
-				}
-
-			index = 0;
-			miniGamePacket.writeInt(invSize);
-			for(ItemStack item : pdata.inventory)
-				if(item != null){
-					miniGamePacket.writeInt(index);
-					NBTTagCompound itemSave = new NBTTagCompound();
-					item.writeToNBT(itemSave);
-					miniGamePacket.writeNBTTagCompound(itemSave);
-					index++;
-				}
-			Contained.channel.sendTo(miniGamePacket.toPacket(), player);
-
-			pdata.xp = 0;
-			pdata.armor = null;
-			pdata.inventory = null;
 
 			Util.travelToDimension(0, player);
 		}

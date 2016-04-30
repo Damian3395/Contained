@@ -7,9 +7,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import codechicken.lib.packet.PacketCustom;
+
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
+import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.world.GameTeleporter;
 
 import net.minecraft.block.Block;
@@ -139,9 +144,73 @@ public class Util {
 			player.addPotionEffect(new PotionEffect(Potion.regeneration.id, 300, 4));
 			player.addPotionEffect(new PotionEffect(Potion.resistance.id, 300, 4));
 			player.addPotionEffect(new PotionEffect(23, 300, 4));
-			EntityPlayerMP mpPlayer = (EntityPlayerMP)player;
+			
 			MinecraftServer mcServer = MinecraftServer.getServer();
 			WorldServer newWorld = mcServer.worldServerForDimension(dimID);
+			
+			EntityPlayerMP mpPlayer = (EntityPlayerMP)player;
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+			ExtendedPlayer properties = ExtendedPlayer.get(player);
+			
+			if (properties.inGame()) {
+				// Player is currently participating in a mini-game... make them leave
+				// the game before teleporting out of the dimension.	
+				properties.setGameMode(Resources.OVERWORLD);
+				properties.setGame(false);
+				properties.curDeaths = 0;
+				properties.curKills = 0;
+				properties.curTreasuresOpened = 0;
+	
+				MiniGameUtil.clearMainInventory(player);
+				MiniGameUtil.clearArmorInventory(player);
+	
+				player.experienceTotal = pdata.xp;
+				player.inventory.armorInventory = pdata.armor.clone();
+				player.inventory.mainInventory = pdata.inventory.clone();
+				pdata.revertMiniGameChanges();
+	
+				int invSize = 0;
+				for(ItemStack item : pdata.inventory)
+					if(item != null){
+						System.out.println("Restore " + item.getDisplayName());
+						invSize++;
+					}
+	
+				int armorSize = 0;
+				for(ItemStack item : pdata.armor)
+					if(item != null){
+						System.out.println("Restore " + item.getDisplayName());
+						armorSize++;
+					}
+	
+				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
+				miniGamePacket.writeInt(pdata.xp);
+				miniGamePacket.writeInt(armorSize);
+				int index = 0;
+				for(ItemStack item : pdata.armor)
+					if(item != null){
+						miniGamePacket.writeInt(index);
+						NBTTagCompound itemSave = new NBTTagCompound();
+						item.writeToNBT(itemSave);
+						miniGamePacket.writeNBTTagCompound(itemSave);
+					}
+	
+				index = 0;
+				miniGamePacket.writeInt(invSize);
+				for(ItemStack item : pdata.inventory)
+					if(item != null){
+						miniGamePacket.writeInt(index);
+						NBTTagCompound itemSave = new NBTTagCompound();
+						item.writeToNBT(itemSave);
+						miniGamePacket.writeNBTTagCompound(itemSave);
+						index++;
+					}
+				Contained.channel.sendTo(miniGamePacket.toPacket(), mpPlayer);
+	
+				pdata.xp = 0;
+				pdata.armor = null;
+				pdata.inventory = null;	
+			}
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 						mpPlayer, dimID, new GameTeleporter(newWorld));

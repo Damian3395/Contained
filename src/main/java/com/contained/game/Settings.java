@@ -36,6 +36,7 @@ public class Settings {
 	public int pvpTerritorySize;
 	public int pvpMaxLives;
 	public int pvpResurrectLives;
+	public int treasureChests;
 	
 	public boolean[] harvestRequiresTerritory = new boolean[2];
 	public boolean[] enableDowsing = new boolean[2];
@@ -117,8 +118,12 @@ public class Settings {
 						3, 1, 99, 
 						"How many lives does a player get back if resurrected with the life rod?");
 			}
-			if (i == Resources.TREASURE)
+			if (i == Resources.TREASURE) {
 				prefix = "treasure_";
+				treasureChests = config.getInt(prefix+"numChests", category, 
+						15, 1, 200, 
+						"How many chests are actively spawned at any time during the treasure game?");
+			}
 			
 			worldRadius[i] = config.getInt(prefix+"worldSize", category, 
 					defaultValue(i, 40, 10, 20), 0, 500, 
