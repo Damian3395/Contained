@@ -82,31 +82,31 @@ public class Resources {
 				  new ItemStack(Items.diamond_sword, 1, 0), 1, 1, 5));	
 		
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.chainmail_helmet, 1, 0), 1, 1, 35));	
+				  new ItemStack(Items.chainmail_helmet, 1, 0), 1, 1, 15));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.chainmail_boots, 1, 0), 1, 1, 35));	
+				  new ItemStack(Items.chainmail_boots, 1, 0), 1, 1, 15));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.chainmail_leggings, 1, 0), 1, 1, 35));	
+				  new ItemStack(Items.chainmail_leggings, 1, 0), 1, 1, 15));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.chainmail_chestplate, 1, 0), 1, 1, 35));	
+				  new ItemStack(Items.chainmail_chestplate, 1, 0), 1, 1, 15));	
 		
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.iron_helmet, 1, 0), 1, 1, 10));	
+				  new ItemStack(Items.iron_helmet, 1, 0), 1, 1, 5));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.iron_boots, 1, 0), 1, 1, 10));	
+				  new ItemStack(Items.iron_boots, 1, 0), 1, 1, 5));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.iron_leggings, 1, 0), 1, 1, 10));	
+				  new ItemStack(Items.iron_leggings, 1, 0), 1, 1, 5));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.iron_chestplate, 1, 0), 1, 1, 10));
+				  new ItemStack(Items.iron_chestplate, 1, 0), 1, 1, 5));
 		
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.diamond_helmet, 1, 0), 1, 1, 2));	
+				  new ItemStack(Items.diamond_helmet, 1, 0), 1, 1, 1));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.diamond_boots, 1, 0), 1, 1, 2));	
+				  new ItemStack(Items.diamond_boots, 1, 0), 1, 1, 1));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.diamond_leggings, 1, 0), 1, 1, 2));	
+				  new ItemStack(Items.diamond_leggings, 1, 0), 1, 1, 1));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.diamond_chestplate, 1, 0), 1, 1, 2));	
+				  new ItemStack(Items.diamond_chestplate, 1, 0), 1, 1, 1));	
 		
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(ItemTerritory.addTerritory, 1, 0), 4, 16, 25));

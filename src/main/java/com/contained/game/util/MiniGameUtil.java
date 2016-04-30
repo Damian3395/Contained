@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.Random;
@@ -26,6 +27,7 @@ import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.games.PVPEvents;
 import com.contained.game.handler.games.TreasureEvents;
+import com.contained.game.item.TreasureGem;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
@@ -222,8 +224,20 @@ public class MiniGameUtil {
 			
 			w.setBlock(x, y, z, Blocks.chest);		//generate a chest
 			TileEntity chest = w.getTileEntity(x, y, z);	
-			if (chest instanceof IInventory)
-				WeightedRandomChestContent.generateChestContents(r, hook.getItems(r), (IInventory)chest, hook.getCount(r));
+			if (chest instanceof IInventory) {
+				IInventory chestInv = (IInventory)chest;
+				WeightedRandomChestContent.generateChestContents(r, hook.getItems(r), chestInv, hook.getCount(r));
+				for(int j=0; j<36; j++) {
+					if (chestInv.getStackInSlot(j) == null) {
+						chestInv.setInventorySlotContents(j, 
+							new ItemStack((Item)Item.itemRegistry.getObject(
+								 Resources.MOD_ID+":"+TreasureGem.getUnlocalizedName(
+								 Util.choose(TreasureGem.GREEN, TreasureGem.BLUE, TreasureGem.WHITE, TreasureGem.RED)
+								,Util.choose(TreasureGem.TOP, TreasureGem.BOTTOM, TreasureGem.LEFT, TreasureGem.RIGHT, TreasureGem.CENTER))), 1));
+						break;
+					}
+				}
+			}
 			generatedPoints.add(new BlockCoord(x, y, z));			
 		}		
 		ClientPacketHandlerUtil.addTreasureAndSync(w.provider.dimensionId, generatedPoints);

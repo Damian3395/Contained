@@ -34,6 +34,7 @@ public class ContainedRegistry {
 	public static TerritoryFlag claimFlag;
 	public static SurveyClipboard surveyItem;
 	public static TutorialBook book;
+	public static TreasureGem tgem;
 	
 	public static DeepBlaze mobBlaze;
 	public static DeepLavaSlime mobMagma;
@@ -49,6 +50,7 @@ public class ContainedRegistry {
 		townHall = new TownManageBlock(); 		  townHall.preInit(event);
 		claimMachine = new TerritoryMachine();    claimMachine.preInit(event);
 		antiMachine = new AntiTerritoryMachine(); antiMachine.preInit(event);
+		tgem = new TreasureGem(); 				  tgem.preInit(event);
 		
 		mobBlaze = new DeepBlaze(); 
 		mobBlaze.instance = Contained.instance;
@@ -69,12 +71,15 @@ public class ContainedRegistry {
 		surveyItem = new SurveyClipboard();
 		book = new TutorialBook();
 		GameRegistry.registerItem(ContainedRegistry.book, "tutorialBook");
+		
 	}
 	
 	public void init(FMLInitializationEvent event) {
 		ItemLife.defineRecipe();
 		TerritoryFlag.defineRecipe();
 		TownManageBlock.defineRecipe();
+		for(int i=1; i<=4; i++)
+			TreasureGem.defineRecipe(i);
 		MantleClientRegistry.registerManualIcon(ItemTerritory.addTerritoryName, new ItemStack(ItemTerritory.addTerritory, 1));
 		MantleClientRegistry.registerManualIcon(ItemTerritory.removeTerritoryName, new ItemStack(ItemTerritory.removeTerritory, 1));
 		MantleClientRegistry.registerManualIcon(AntiTerritoryMachine.blockName, new ItemStack(AntiTerritoryMachine.instance, 1));

@@ -175,6 +175,10 @@ public class Util {
 		return (Math.random()*range*2.0)-range;
 	}
 	
+	public static int choose(int... values) {
+		return values[randomRange(0, values.length)];
+	}
+	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 	}
