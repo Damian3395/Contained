@@ -51,7 +51,7 @@ public class CommandStartPVP implements ICommand {
 							return;
 						}
 						
-						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimesnion " + dim);
+						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimension " + dim);
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);

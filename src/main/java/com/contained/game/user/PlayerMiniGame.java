@@ -168,9 +168,9 @@ public class PlayerMiniGame {
 			EntityPlayerMP player = (EntityPlayerMP)w.getPlayerEntityByName(pdata.playerName);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 
-			if(MiniGameUtil.isPvP(dim)){
+			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
 				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
-			}else if(MiniGameUtil.isTreasure(dim)){
+			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
 				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
 			}
 

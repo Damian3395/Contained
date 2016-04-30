@@ -116,6 +116,11 @@ public class ItemTerritory {
 					ErrorCase.Error testRemove = 
 							canRemove(teamToRemove, blockToRemove, probe, p.dimension);				
 					
+					
+					if (testRemove == ErrorCase.Error.TEAM_ONLY) {
+						Util.displayError(p, "You must be in a team to use this item.");
+						return;
+					} 
 					if (testRemove == ErrorCase.Error.WRONG_TEAM) {
 						Util.displayError(p, "This item can only remove territory from the team it's linked to.");
 						return;

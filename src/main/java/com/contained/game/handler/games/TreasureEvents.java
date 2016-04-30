@@ -51,8 +51,10 @@ public class TreasureEvents {
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
 				PlayerMiniGame miniGame = PlayerMiniGame.get(p.dimension);
 				int teamID = miniGame.getTeamID(pdata);
-				Contained.gameScores[p.dimension][teamID]++;
-				ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
+				if (teamID != -1) {
+					Contained.gameScores[p.dimension][teamID]++;
+					ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
+				}
 				
 				ClientPacketHandlerUtil.removeTreasureAndSync(dimID, eventLocation);
 				MiniGameUtil.generateChest(w, 1, ContainedRegistry.CUSTOM_CHEST_LOOT);

@@ -18,7 +18,7 @@ public class Resources {
 	public static int wastelandPadding = 5; //Number of "transition" chunks between world and wasteland.
 	
 	public static final boolean DEBUG_ENABLED = true;
-	public static final boolean LOGGING_ENABLED = true;
+	public static final boolean LOGGING_ENABLED = false;
 	
 	public static final int MIN_PVP_DIMID = 2;
 	public static final int MAX_PVP_DIMID = 5;
@@ -54,8 +54,8 @@ public class Resources {
 	};
 	
 	public static void definePossibleChestLoot(ChestGenHooks hook) {
-		hook.setMin(4);
-		hook.setMax(8);
+		hook.setMin(2);
+		hook.setMax(4);
 		
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.cooked_beef, 1, 0), 1, 3, 100));

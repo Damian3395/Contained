@@ -82,6 +82,8 @@ public class FMLEvents {
 				processGameTick(i);
 				if (rand > 10 && rand < 15)
 					checkDimensionReset(i);
+				if (rand == 20+i)
+					checkPvPFinished(i);
 			}
 			for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++) {
 				processGameTick(i);
@@ -123,7 +125,8 @@ public class FMLEvents {
 			for (EntityPlayer p : players) {
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
 				int teamInd = game.getTeamID(pdata);
-				if (teamInd != -1) {
+				ExtendedPlayer pExtData = ExtendedPlayer.get(p);
+				if (teamInd != -1 && pExtData.lives > 0) {
 					teamHasAlivePlayers[teamInd] = true;
 					winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
 				}

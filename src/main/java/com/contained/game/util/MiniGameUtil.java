@@ -110,7 +110,7 @@ public class MiniGameUtil {
 			Util.travelToDimension(dimID, player);
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			
-			if (teamSpawnLocations == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
+			if (teamSpawnLocations == null || pdata.teamID == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
 				Point p = Util.getRandomLocation(w);
 				player.setLocationAndAngles(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y, player.rotationYaw, player.rotationPitch);
 				if (teamSpawnLocations != null)
