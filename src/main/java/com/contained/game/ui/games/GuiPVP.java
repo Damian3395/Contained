@@ -51,10 +51,7 @@ public class GuiPVP extends Gui {
 	public void renderPVPHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
 			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-			if((properties.gameMode != Resources.PVP || !properties.inGame())
-					&& !MiniGameUtil.isPvP(mc.thePlayer.dimension))
-				
-			if(properties.gameMode != Resources.PVP)
+			if(!MiniGameUtil.isPvP(mc.thePlayer.dimension))
 				return;
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);

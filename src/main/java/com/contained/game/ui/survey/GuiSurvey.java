@@ -273,6 +273,10 @@ public class GuiSurvey extends GuiScreen {
     		{
     			playerCopy.surveyResponses.personality[playerCopy.surveyResponses.progress-PAGE_PERSONALITY] = b.id-2;
     			playerCopy.surveyResponses.progress++;
+    			if(playerCopy.surveyResponses.progress > SurveyData.getSurveyLength()){
+    				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LOG_PERSONALITY);
+    				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
+    			}
     			updateButtons();
     		}
     	}
@@ -287,9 +291,6 @@ public class GuiSurvey extends GuiScreen {
 			
 			PlayerTeamIndividual localPData = PlayerTeamIndividual.get(playerCopy.playerName);
 			localPData.surveyResponses = playerCopy.surveyResponses;
-			
-			packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LOG_PERSONALITY);
-			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 		}
 	}
 	

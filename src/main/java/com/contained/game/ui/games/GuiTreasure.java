@@ -53,11 +53,7 @@ public class GuiTreasure extends Gui {
 	@SubscribeEvent
 	public void renderAllHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
-			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-			if((properties.gameMode != Resources.TREASURE || !properties.inGame())
-					&& !MiniGameUtil.isTreasure(mc.thePlayer.dimension))
-				
-			if(properties.gameMode != Resources.TREASURE)
+			if(!MiniGameUtil.isTreasure(mc.thePlayer.dimension))
 				return;
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
@@ -68,8 +64,8 @@ public class GuiTreasure extends Gui {
 			if(teamID == -1)
 				return;
 					
-			//renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID]);
-			renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID]);
+			renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID]);
+			//renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID]);
 		}
 	}
 	
