@@ -14,7 +14,6 @@ import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.EmblemBlock;
 import com.contained.game.world.block.EmblemBlockTE;
-
 import codechicken.lib.vec.BlockCoord;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -32,6 +31,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 public class TreasureEvents {
 	public static HashMap<String, Point> initializeTreasureGame(int dimID) {
 		WorldServer w = DimensionManager.getWorld(dimID);
+		
 		Contained.getActiveTreasures(dimID).clear();
 		if (w != null)
 			MiniGameUtil.generateChest(w, Contained.configs.treasureChests, ContainedRegistry.CUSTOM_CHEST_LOOT);

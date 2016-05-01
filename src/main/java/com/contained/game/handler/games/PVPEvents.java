@@ -30,6 +30,7 @@ public class PVPEvents {
 		// Find spawn points for each of the teams. They should be placed as far
 		// separated from each other as possible.
 		WorldServer w = DimensionManager.getWorld(dimID);
+		
 		ChunkCoordinates spawn = w.getSpawnPoint();
 		float angle = 0;
 		HashMap<String, Point> teamSpawnPoints = new HashMap<String, Point>();

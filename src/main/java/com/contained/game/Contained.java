@@ -134,6 +134,7 @@ public class Contained{
 		event.registerServerCommand(new CommandStartTreasureHunt());
 		event.registerServerCommand(new CommandStartPVP());
 		event.registerServerCommand(new CommandEndGame());
+		event.registerServerCommand(new CommandTime());
 	}
 	
 	@EventHandler

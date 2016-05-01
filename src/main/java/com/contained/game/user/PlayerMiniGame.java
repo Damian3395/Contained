@@ -134,6 +134,9 @@ public class PlayerMiniGame {
 		if(isGameReady()){
 			pickRandomTeamLeaders();
 			MiniGameUtil.startGame(this, playersJoining);
+			
+			WorldServer w = DimensionManager.getWorld(dim);
+			w.setWorldTime(18000);
 		}
 	}
 
