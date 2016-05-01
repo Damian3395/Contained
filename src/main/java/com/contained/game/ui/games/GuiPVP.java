@@ -44,7 +44,7 @@ public class GuiPVP extends Gui {
 	public GuiPVP(Minecraft mc){
 		super();
 		this.mc = mc;
-		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games");
+		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games.png");
 	}
 		
 	@SubscribeEvent

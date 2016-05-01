@@ -1,8 +1,6 @@
 package com.contained.game.user;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
@@ -88,7 +86,7 @@ public class PlayerTeamIndividual {
 			PlayerTeam requestedTeam = PlayerTeam.get(teamID);
 			if (requestedTeam == null)
 				return Error.NOT_EXISTS; //Team doesn't exist.
-			else if (requestedTeam.numMembers() >= Contained.configs.maxTeamSize[Settings.getDimConfig(requestedTeam.dimID)])
+			else if (requestedTeam.numMembers() >= Contained.configs.maxTeamSize[Settings.getGameConfig(requestedTeam.dimID)])
 				return Error.TEAM_FULL; //Team is full.
 			
 			this.teamID = teamID;

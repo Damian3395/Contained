@@ -42,6 +42,7 @@ public class TutorialBook extends CraftingItem {
 		Document mainDoc = loadBookDocument("/assets/"+Resources.MOD_ID+"/books/main.xml", dbf);
 		mainBook = initBook(mainBook, Resources.MOD_ID+".book.main", "Tutorial"
 							   , side == Side.CLIENT ? mainDoc : null, Resources.MOD_ID+":"+bookTextures[0]);
+		maxStackSize = 64;
 	}
 	
 	@SideOnly(Side.CLIENT)

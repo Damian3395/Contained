@@ -1,9 +1,15 @@
 package com.contained.game.handler.games;
 
+import java.awt.Point;
+import java.util.HashMap;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemFood;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
@@ -13,14 +19,37 @@ import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class PVPEvents {
-	public static void initializePVPGame(int dimID) {
+	public static HashMap<String, Point> initializePVPGame(int dimID) {
+		// Find spawn points for each of the teams. They should be placed as far
+		// separated from each other as possible.
+		WorldServer w = DimensionManager.getWorld(dimID);
+		ChunkCoordinates spawn = w.getSpawnPoint();
+		float angle = 0;
+		HashMap<String, Point> teamSpawnPoints = new HashMap<String, Point>();
+		Contained.getTerritoryMap(dimID).clear();
 		
+		for (PlayerTeam team : Contained.getTeamList(dimID)) {
+			Point newSpawnLocation = new Point(
+					(int)(spawn.posX+Contained.configs.getWorldRadius(dimID)*Math.cos(angle)),
+					(int)(spawn.posZ+Contained.configs.getWorldRadius(dimID)*Math.sin(angle)));	
+			teamSpawnPoints.put(team.id, newSpawnLocation);
+			angle += (2.0*Math.PI)/Contained.configs.maxTeamSize[Resources.PVP];
+			
+			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) {
+				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) {
+					Contained.getTerritoryMap(dimID).put(new Point(newSpawnLocation.x+i, newSpawnLocation.y+j), team.id);
+				}
+			}
+		}
+		
+		return teamSpawnPoints;
 	}
 	
 	@SubscribeEvent
@@ -71,8 +100,10 @@ public class PVPEvents {
 					return;
 				
 				int teamID = miniGame.getTeamID(killerData);
-				Contained.gameScores[miniGame.getGameDimension()][teamID]++;
-				ClientPacketHandlerUtil.syncMiniGameScore(killer.dimension, teamID, Contained.gameScores[killer.dimension][teamID]);
+				if (teamID != -1) {
+					Contained.gameScores[miniGame.getGameDimension()][teamID]++;
+					ClientPacketHandlerUtil.syncMiniGameScore(killer.dimension, teamID, Contained.gameScores[killer.dimension][teamID]);
+				}
 			}
 		}
 	}

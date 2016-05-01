@@ -3,12 +3,7 @@ package com.contained.game.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import codechicken.lib.packet.PacketCustom;
-
-import com.contained.game.Contained;
-import com.contained.game.ContainedRegistry;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -39,7 +34,7 @@ public class CommandStartTreasureHunt implements ICommand {
 			if(!ExtendedPlayer.get((EntityPlayer)sender).isAdmin()){
 				out = "You are not an Admin.";
 			}else{
-				if(argString.length != 2){
+				if(argString.length != 1){
 					out = this.getCommandUsage(sender);
 				}else{
 					try{
@@ -56,16 +51,13 @@ public class CommandStartTreasureHunt implements ICommand {
 							return;
 						}
 						
-						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating Treasure Hunt Game in Dimesnion " + dim);
+						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating Treasure Hunt Game in Dimension " + dim);
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
-						
-						//Generate Chests
-						MiniGameUtil.generateChest(sender.getEntityWorld(), Integer.parseInt(argString[1]), ContainedRegistry.CUSTOM_CHEST_LOOT);
+						MiniGameUtil.testStartGame(dim, (EntityPlayerMP)sender);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
@@ -81,13 +73,15 @@ public class CommandStartTreasureHunt implements ICommand {
 
 	@Override
 	public String getCommandUsage(ICommandSender var1) {
-		return "/" + getCommandName() + " <dimension> <chests>";
+		return "/" + getCommandName() + " <dimension>";
 	}
 
-	@Override
-	public int compareTo(Object o) {
-		return 0;
-	}
+	@Override 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
+		return 0; 
+	} 
 
 	@Override
 	public List<String> getCommandAliases() {

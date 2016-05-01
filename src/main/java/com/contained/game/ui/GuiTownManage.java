@@ -20,6 +20,7 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
 import com.contained.game.user.PlayerTrade;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.AntiTerritoryMachine;
@@ -200,40 +201,59 @@ public class GuiTownManage extends GuiContainer {
 			listCounts[tabPermission] = localTeams.size()-1;
 		
 			//Territory Purchase Declarations
-			listItems[tabTerritory][0] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.smallGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
-			listItems[tabTerritory][1] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.bulkGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
-			listItems[tabTerritory][2] = new ItemStack(ItemTerritory.removeTerritory, 1);
-			NBTTagCompound itemData = Data.getTagCompound(listItems[tabTerritory][2]);
-			if (this.blockTeamID == null)
-				itemData.setString("teamOwner", "");
-			else
-				itemData.setString("teamOwner", this.blockTeamID);
-			listItems[tabTerritory][2].setTagCompound(itemData);
-			listItems[tabTerritory][3] = new ItemStack(TerritoryMachine.instance, 1);
-			
 			//TODO: Do some testing with this on the server. I think if the config
 			// file on the client and the config file on the server are not the
 			// same, this will allow the player to override the server configs.
-			xpCosts[tabTerritory][0] = Contained.configs.smallGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
-			xpCosts[tabTerritory][1] = Contained.configs.bulkGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
-			xpCosts[tabTerritory][2] = -1;
-			xpCosts[tabTerritory][3] = Contained.configs.terrMachineEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+			int i=0;
+			NBTTagCompound itemData = null;
 			
-			itemCosts[tabTerritory][0] = null;
-			itemCosts[tabTerritory][1] = null;
-			itemCosts[tabTerritory][2] = new ItemStack(Items.dye, 4, 4);
-			itemCosts[tabTerritory][3] = null;
+			if (!MiniGameUtil.isPvP(mc.thePlayer.dimension)) {
+				// Territory Gem
+				listItems[tabTerritory][i] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.smallGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
+				xpCosts[tabTerritory][i] = Contained.configs.smallGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+				itemCosts[tabTerritory][i] = null;
+				i++;
+				
+				// Territory Gems in Bulk
+				listItems[tabTerritory][i] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.bulkGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
+				xpCosts[tabTerritory][i] = Contained.configs.bulkGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+				itemCosts[tabTerritory][i] = null;
+				i++;
+				
+				// Anti-territory gem (refund style -- for own team)
+				listItems[tabTerritory][i] = new ItemStack(ItemTerritory.removeTerritory, 1);
+				itemData = Data.getTagCompound(listItems[tabTerritory][i]);
+				if (this.blockTeamID == null)
+					itemData.setString("teamOwner", "");
+				else
+					itemData.setString("teamOwner", this.blockTeamID);
+				listItems[tabTerritory][i].setTagCompound(itemData);
+				xpCosts[tabTerritory][i] = -1;
+				itemCosts[tabTerritory][i] = new ItemStack(Items.dye, 4, 4);
+				i++;
+				
+				// Territory Machine
+				listItems[tabTerritory][i] = new ItemStack(TerritoryMachine.instance, 1);			
+				xpCosts[tabTerritory][i] = Contained.configs.terrMachineEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];			
+				itemCosts[tabTerritory][i] = null;
+				i++;
+			}
 			
-			for(int i=0; i<availableAntiTeams.size(); i++) {
-				listItems[tabTerritory][4+i] = new ItemStack(AntiTerritoryMachine.instance, 1);
-				itemData = Data.getTagCompound(listItems[tabTerritory][4+i]);
-				itemData.setString("teamOwner", availableAntiTeams.get(i));
-				listItems[tabTerritory][4+i].setTagCompound(itemData);
-				xpCosts[tabTerritory][4+i] = 30;
-				itemCosts[tabTerritory][4+i] = new ItemStack(ItemTerritory.removeTerritory, 4);
-				itemData = Data.getTagCompound(itemCosts[tabTerritory][4+i]);
-				itemData.setString("teamOwner", availableAntiTeams.get(i));
-				itemCosts[tabTerritory][4+i].setTagCompound(itemData);
+			// Anti-Territory Machines
+			int antiCost = 4;
+			if (MiniGameUtil.isPvP(mc.thePlayer.dimension))
+				antiCost = Contained.configs.pvpTerritorySize*4+2;
+			
+			for(int j=0; j<availableAntiTeams.size(); j++) {
+				listItems[tabTerritory][j+i] = new ItemStack(AntiTerritoryMachine.instance, 1);
+				itemData = Data.getTagCompound(listItems[tabTerritory][j+i]);
+				itemData.setString("teamOwner", availableAntiTeams.get(j));
+				listItems[tabTerritory][j+i].setTagCompound(itemData);
+				xpCosts[tabTerritory][j+i] = 30;
+				itemCosts[tabTerritory][j+i] = new ItemStack(ItemTerritory.removeTerritory, antiCost);
+				itemData = Data.getTagCompound(itemCosts[tabTerritory][j+i]);
+				itemData.setString("teamOwner", availableAntiTeams.get(j));
+				itemCosts[tabTerritory][j+i].setTagCompound(itemData);
 			}
 		}
 		

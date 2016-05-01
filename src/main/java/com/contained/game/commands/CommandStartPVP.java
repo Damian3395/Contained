@@ -7,16 +7,9 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
-import codechicken.lib.packet.PacketCustom;
 
-import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.network.ClientPacketHandlerUtil;
-import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -58,13 +51,13 @@ public class CommandStartPVP implements ICommand {
 							return;
 						}
 						
-						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimesnion " + dim);
+						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimension " + dim);
 						
 						//Teleport Player
 						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
-						MiniGameUtil.startGame(dim, (EntityPlayerMP)sender);
+						MiniGameUtil.testStartGame(dim, (EntityPlayerMP)sender);
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
@@ -83,10 +76,12 @@ public class CommandStartPVP implements ICommand {
 		return "/" + getCommandName() + " <dimension>";
 	}
 
-	@Override
-	public int compareTo(Object o) {
-		return 0;
-	}
+	@Override 
+	public int compareTo(Object o) { 
+		if (o instanceof ICommand)
+			return this.getCommandName().compareTo(((ICommand)o).getCommandName());
+		return 0; 
+	} 
 
 	@Override
 	public List<String> getCommandAliases() {

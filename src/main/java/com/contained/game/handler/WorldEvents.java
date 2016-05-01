@@ -173,6 +173,15 @@ public class WorldEvents {
 	public void init(WorldEvent.Load event) {
 		if (Util.isOverworld(event.world.provider.dimensionId) && !event.world.isRemote)
 			Load.loadWorldData(event.world, event.world.provider.dimensionId);
+		
+		//Default Game Rules
+		// We handle what happens to a player's inventory on death manually.
+		event.world.getGameRules().setOrCreateGameRule("keepInventory", "true");
+		
+		// TODO: We turn this off because these death messages are visible across all
+		// dimensions... but we may want to replicate this system ourselves to show
+		// death messages locally within a dimension.
+		event.world.getGameRules().setOrCreateGameRule("showDeathMessages", "false");
 	}
 	
 	@SubscribeEvent

@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ObjectGenerator;
 import com.contained.game.util.Resources;

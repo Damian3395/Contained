@@ -4,15 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.contained.game.Contained;
-import com.contained.game.ui.GuiHandler;
-import com.contained.game.util.Resources;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 
 /*
  * Server Side Handlers

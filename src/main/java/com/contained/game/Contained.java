@@ -221,8 +221,8 @@ public class Contained{
 	public static void tickTimeLeft(int dimID) {
 		if (gameActive[dimID]) {
 			timeLeft[dimID] -= 1;
-			if (timeLeft[dimID] < 0)
-				timeLeft[dimID] = 0;
+			if (timeLeft[dimID] < -1)
+				timeLeft[dimID] = -1;
 		}
 	}
 }
