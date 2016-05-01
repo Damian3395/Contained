@@ -74,9 +74,9 @@ public class PlayerMiniGame {
 	}
 
 	public PlayerMiniGame(int dimID, int gameMode){
-		super();
 		this.dim = dimID;
 		this.gameMode = gameMode;
+		this.gameID = -1;
 	}
 
 	public PlayerMiniGame(NBTTagCompound ntc) {

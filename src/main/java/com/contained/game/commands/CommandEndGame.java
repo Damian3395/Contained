@@ -6,6 +6,7 @@ import java.util.List;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.util.MiniGameUtil;
+import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import net.minecraft.command.ICommand;
@@ -42,15 +43,23 @@ public class CommandEndGame implements ICommand{
 						
 						//Check If Player Is In MiniGame
 						int dim = player.dimension;
-						if(!MiniGameUtil.isPvP(dim) && !MiniGameUtil.isTreasure(dim)
-								&& !properties.inGame()){
+						if((!MiniGameUtil.isPvP(dim) && !MiniGameUtil.isTreasure(dim))
+								|| !properties.inGame()){
 							Util.displayMessage((EntityPlayer)sender, Util.errorCode + "You Are Not In A Mini Game!");
 							return;
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.infoCode + "Returning Player To Lobby");
 						
-						PlayerMiniGame.get(dim).endGame();
+						PlayerMiniGame toEnd = PlayerMiniGame.get(dim);
+						if (toEnd != null)
+							toEnd.endGame();
+						else {
+							if (MiniGameUtil.isPvP(dim))
+								new PlayerMiniGame(dim,Resources.PVP).endGame();
+							else
+								new PlayerMiniGame(dim,Resources.TREASURE).endGame();
+						}
 					} catch (Exception e){
 						e.printStackTrace();
 						out = this.getCommandUsage(sender);
