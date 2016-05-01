@@ -4,6 +4,14 @@ tile.RemoveTerritoryMachine.name=Anti-Territory Machine
 tile.wasteland.name=Wasteland
 tile.wastelandBush.name=Dead Bush
 tile.harvestedOre.name=Harvested Ore
+tile.fireEmblemBlock.name=Fire Emblem Altar
+tile.earthEmblemBlock.name=Earth Emblem Altar
+tile.waterEmblemBlock.name=Water Emblem Altar
+tile.windEmblemBlock.name=Wind Emblem Altar
+tile.fireEmblemBlockActive.name=Fire Emblem Altar
+tile.earthEmblemBlockActive.name=Earth Emblem Altar
+tile.waterEmblemBlockActive.name=Water Emblem Altar
+tile.windEmblemBlockActive.name=Wind Emblem Altar
 
 item.StickofLife.name=Stick of Life
 item.AppleofLife.name=Apple of Life

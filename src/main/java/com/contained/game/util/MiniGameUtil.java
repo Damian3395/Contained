@@ -99,7 +99,7 @@ public class MiniGameUtil {
 		if (gameMode == Resources.PVP)
 			teamSpawnLocations = PVPEvents.initializePVPGame(dimID);
 		else if (gameMode == Resources.TREASURE)
-			TreasureEvents.initializeTreasureGame(dimID);
+			teamSpawnLocations = TreasureEvents.initializeTreasureGame(dimID);
 		
 		WorldServer w = DimensionManager.getWorld(dimID);
 		if (w != null)
@@ -117,8 +117,8 @@ public class MiniGameUtil {
 					Util.serverDebugMessage("[Error] Failed to get spawn location for "+player.getDisplayName()+"!");
 			} else {
 				Point spawnPos = teamSpawnLocations.get(pdata.teamID);
-				spawnPos.x += Util.randomBoth(3);
-				spawnPos.y += Util.randomBoth(3);
+				spawnPos.x += Util.randomBoth(2);
+				spawnPos.y += Util.randomBoth(2);
 				player.setLocationAndAngles(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y, player.rotationYaw, player.rotationPitch);
 			}
 			

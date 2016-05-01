@@ -12,10 +12,14 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
+import com.contained.game.world.block.EmblemBlock;
+import com.contained.game.world.block.EmblemBlockTE;
 
 import codechicken.lib.vec.BlockCoord;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -46,12 +50,44 @@ public class TreasureEvents {
 			angle += (2.0*Math.PI)/Contained.configs.maxTeamSize[Resources.PVP];
 			
 			int territoryRadius = 8;
-			for (int i=territoryRadius;i<=territoryRadius;i++)
+			for (int i=-territoryRadius;i<=territoryRadius;i++)
 				for (int j=-territoryRadius;j<=territoryRadius;j++)
 					Contained.getTerritoryMap(dimID).put(new Point(newSpawnLocation.x+i, newSpawnLocation.y+j), team.id);
-		}
 		
-		// Generate Emblem Receivers
+			// Generate Emblem Altars
+			int maxY = 0;
+			for(int i=-1; i<=1; i+=2) {
+				for(int j=-1; j<=1; j+=2) {					
+					int x = newSpawnLocation.x+i*3;
+					int z = newSpawnLocation.y+j*3; 
+					int y = w.getTopSolidOrLiquidBlock(x, z);
+					if (y+1 > maxY)
+						maxY = y+1;
+				}
+			}
+			for(int i=-1; i<=1; i+=2) {
+				for(int j=-1; j<=1; j+=2) {
+					Block toSpawn = EmblemBlock.fireEmblemInact;
+					if (i == -1 && j == -1)
+						toSpawn = EmblemBlock.earthEmblemInact;
+					else if (i == -1 && j == 1)
+						toSpawn = EmblemBlock.waterEmblemInact;
+					else if (i == 1 && j == -1)
+						toSpawn = EmblemBlock.windEmblemInact;
+					
+					int x = newSpawnLocation.x+i*3;
+					int z = newSpawnLocation.y+j*3; 
+					int y = w.getTopSolidOrLiquidBlock(x, z);
+					for(int k=y; k<maxY; k++)
+						w.setBlock(x, k, z, Blocks.nether_brick_fence);
+					w.setBlock(x, maxY, z, toSpawn);
+					
+					EmblemBlockTE embData = EmblemBlock.getEmblemTE(w, x, maxY, z);
+					if (embData != null)
+						embData.teamID = team.id;
+				}
+			}
+		}
 		
 		return teamSpawnPoints;
 	}

@@ -35,6 +35,7 @@ public class ContainedRegistry {
 	public static SurveyClipboard surveyItem;
 	public static TutorialBook book;
 	public static TreasureGem tgem;
+	public static EmblemBlock emblemBlock;
 	
 	public static DeepBlaze mobBlaze;
 	public static DeepLavaSlime mobMagma;
@@ -51,6 +52,7 @@ public class ContainedRegistry {
 		claimMachine = new TerritoryMachine();    claimMachine.preInit(event);
 		antiMachine = new AntiTerritoryMachine(); antiMachine.preInit(event);
 		tgem = new TreasureGem(); 				  tgem.preInit(event);
+		emblemBlock = new EmblemBlock();		  emblemBlock.preInit(event);
 		
 		mobBlaze = new DeepBlaze(); 
 		mobBlaze.instance = Contained.instance;
@@ -93,6 +95,7 @@ public class ContainedRegistry {
 		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");
 		GameRegistry.registerTileEntity(TownManageTE.class, "TownManageTE");
 		GameRegistry.registerTileEntity(HarvestedOreTE.class, "harvestedOreTE");
+		GameRegistry.registerTileEntity(EmblemBlockTE.class, "EmblemBlockTE");
 		
 		for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++)
 			DimensionManager.registerDimension(i, 0);

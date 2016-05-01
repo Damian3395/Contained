@@ -272,6 +272,10 @@ public class PlayerTeam {
 		return formatCodes[this.colorID];
 	}
 	
+	public String formattedName() {
+		return getFormatCode()+"§l"+displayName;
+	}
+	
 	public int getColor() {
 		return formatColors[this.colorID];
 	}
