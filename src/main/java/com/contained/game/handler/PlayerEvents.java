@@ -59,7 +59,7 @@ public class PlayerEvents {
 	public void onJoin(EntityJoinWorldEvent event) {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
-				
+
 			boolean completedSurvey = false;
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
@@ -147,6 +147,21 @@ public class PlayerEvents {
 		if (event.entity != null && event.entity instanceof EntityPlayer
 				&& !event.entity.worldObj.isRemote) {
 			EntityPlayer player = (EntityPlayer)event.entity;
+			ExtendedPlayer properties = ExtendedPlayer.get(player);
+			
+			//Update Admin Rights When Logging Back In Or Changing Dimensions
+			if(properties.isAdmin()){
+				if(!player.isInvisible() ||
+						!player.capabilities.allowFlying || 
+						!player.capabilities.disableDamage){
+					player.setInvisible(true);
+					player.capabilities.allowFlying = true;
+					player.capabilities.disableDamage = true;
+					
+					PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_ADMIN);
+					Contained.channel.sendTo(adminPacket.toPacket(), (EntityPlayerMP)player);
+				}
+			}
 			
 			//Intermittently sync data logging information with the client
 			//so the visualizations can be updated.

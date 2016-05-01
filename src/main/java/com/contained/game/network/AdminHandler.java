@@ -150,4 +150,13 @@ public class AdminHandler {
 		Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 		Util.displayMessage(Util.getOnlinePlayer(targetPlayer), "You've been kicked back to Overworld by Admin");
 	}
+	
+	public void becomeRegularPlayer(EntityPlayerMP player){
+		ExtendedPlayer.get(player).setAdminRights(false);
+		player.setInvisible(false);
+		player.capabilities.allowFlying = false;
+		player.capabilities.disableDamage = false;
+		PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_NORMAL);
+		Contained.channel.sendTo(adminPacket.toPacket(),player);
+	}
 }

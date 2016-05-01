@@ -251,6 +251,10 @@ public class ServerPacketHandler {
 					admin.kick(player, packet.readString());
 				break;
 				
+				case ServerPacketHandlerUtil.ADMIN_REGULAR_PLAYER:
+					admin.becomeRegularPlayer(player);
+				break;
+				
 				case ServerPacketHandlerUtil.LOG_PERSONALITY:
 					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 					DataLogger.insertPersonality(Util.getServerID(), player.getDisplayName(), 

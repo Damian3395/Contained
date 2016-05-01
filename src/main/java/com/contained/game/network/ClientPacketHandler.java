@@ -440,6 +440,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.PLAYER_NORMAL:
+					if(mc.currentScreen instanceof GuiAdmin)
+						mc.thePlayer.closeScreen();
+					
 					ExtendedPlayer playerState = ExtendedPlayer.get(mc.thePlayer);
 					mc.thePlayer.setInvisible(false);
 					mc.thePlayer.capabilities.allowFlying = false;

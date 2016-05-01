@@ -4,13 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.entity.ExtendedPlayer;
-<<<<<<< HEAD
-import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
-import com.contained.game.user.PlayerTeamIndividual;
-=======
-import com.contained.game.user.PlayerMiniGame;
->>>>>>> c98d9e24f34011ca334fc84b40a7196c54be3044
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Util;
 
