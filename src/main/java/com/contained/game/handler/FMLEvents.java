@@ -140,26 +140,28 @@ public class FMLEvents {
 	// ... if so, end the game.
 	public void checkPvPFinished(int dimID) {
 		WorldServer w = DimensionManager.getWorld(dimID);
-		PlayerMiniGame game = PlayerMiniGame.get(dimID);
-		if (MiniGameUtil.isPvP(dimID) && w != null && game != null && Contained.gameActive[dimID]) {
-			List<EntityPlayer> players = w.playerEntities;
-			String winningTeam = null;
-			boolean[] teamHasAlivePlayers = new boolean[Contained.configs.gameNumTeams[Resources.PVP]];
-			
-			for (EntityPlayer p : players) {
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
-				int teamInd = game.getTeamID(pdata);
-				ExtendedPlayer pExtData = ExtendedPlayer.get(p);
-				if (teamInd != -1 && pExtData.lives > 0) {
-					teamHasAlivePlayers[teamInd] = true;
-					winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
+		if (w != null) {
+			PlayerMiniGame game = PlayerMiniGame.get(dimID);
+			if (MiniGameUtil.isPvP(dimID) && w != null && game != null && Contained.gameActive[dimID]) {
+				List<EntityPlayer> players = w.playerEntities;
+				String winningTeam = null;
+				boolean[] teamHasAlivePlayers = new boolean[Contained.configs.gameNumTeams[Resources.PVP]];
+				
+				for (EntityPlayer p : players) {
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+					int teamInd = game.getTeamID(pdata);
+					ExtendedPlayer pExtData = ExtendedPlayer.get(p);
+					if (teamInd != -1 && pExtData.lives > 0) {
+						teamHasAlivePlayers[teamInd] = true;
+						winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
+					}
 				}
-			}
-			
-			for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
-				if (teamHasAlivePlayers[ind] == false) {
-					MiniGameUtil.teamWins(winningTeam, dimID);
-					break;
+				
+				for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
+					if (teamHasAlivePlayers[ind] == false) {
+						MiniGameUtil.teamWins(winningTeam, dimID);
+						break;
+					}
 				}
 			}
 		}

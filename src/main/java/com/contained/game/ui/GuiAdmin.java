@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.handler.KeyBindings;
 import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.ui.components.Container;
 import com.contained.game.ui.components.GuiScrollPane;
@@ -239,7 +240,10 @@ public class GuiAdmin extends GuiScreen {
 			} else {
 				this.tf_targetPlayer.textboxKeyTyped(c, i);
 			}
+		} else if(i == KeyBindings.toggleAdmin.getKeyCode()){
+			this.mc.thePlayer.closeScreen();
 		} else {
+		
 			// handle other keyTyped events
 			super.keyTyped(c, i);
 		}
@@ -505,6 +509,7 @@ public class GuiAdmin extends GuiScreen {
 			break;
 			
 			case BTN_CANCEL:
+				this.mc.thePlayer.closeScreen();
 				this.pageID--;
 			break;
 			

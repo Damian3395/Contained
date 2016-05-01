@@ -1,5 +1,7 @@
 package com.contained.game.world;
 
+import com.contained.game.util.Util;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.Teleporter;
@@ -23,8 +25,9 @@ public class GameTeleporter extends Teleporter {
 	
 	@Override
 	public void placeInPortal(Entity player, double x, double y, double z, float rot) {
-		ChunkCoordinates c = this.worldServer.provider.getRandomizedSpawnPoint();
-		player.setLocationAndAngles(c.posX, worldServer.getTopSolidOrLiquidBlock(c.posX, c.posZ)+1, c.posZ, rot, 0);
+		int posX = (int)Util.getRandomLocation(this.worldServer).getX();
+		int posZ = (int)Util.getRandomLocation(this.worldServer).getY();
+		player.setLocationAndAngles(posX, this.worldServer.getTopSolidOrLiquidBlock(posX, posZ), posZ, rot, 0);
 		player.motionX = player.motionY = player.motionZ = 0;
 	}
 	

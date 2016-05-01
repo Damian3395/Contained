@@ -102,6 +102,8 @@ public class MiniGameUtil {
 			teamSpawnLocations = TreasureEvents.initializeTreasureGame(dimID);
 		
 		WorldServer w = DimensionManager.getWorld(dimID);
+		w.setWorldTime(0);
+		
 		for (EntityPlayer player: playersJoining) {
 			//Send the player to the dimension, and set their spawn location correctly.
 			Util.travelToDimension(dimID, player);
