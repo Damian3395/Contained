@@ -182,7 +182,19 @@ public class PlayerEvents {
 					
 					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength()){
+						if(!player.isInvisible() || !player.capabilities.disableDamage){
+							player.setInvisible(true);
+							player.capabilities.disableDamage = true;
+						}
+						
 						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.START_SURVEY);
+						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
+					}else if(!ExtendedPlayer.get(player).isAdmin() 
+							&& (player.isInvisible() || player.capabilities.disableDamage)){
+						player.setInvisible(false);
+						player.capabilities.disableDamage = false;
+						
+						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_NORMAL);
 						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
 					}
 				}

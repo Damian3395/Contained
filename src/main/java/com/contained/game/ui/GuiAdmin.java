@@ -156,13 +156,11 @@ public class GuiAdmin extends GuiScreen {
 		this.buttonList.clear();
 		switch (this.pageID) {
 		case LOGIN_PAGE:
-			System.out.println("Admin Status: " + ExtendedPlayer.get(mc.thePlayer).isAdmin());
 			if (!ExtendedPlayer.get(this.player).isAdmin()) {
 				// Login Page
 				this.buttonList.add(this.btn_login);
 				this.buttonList.add(this.btn_loginCancel);
 			} else { // no need to login again
-				System.out.println("Setting Admin World Page");
 				setPage(WORLD_PAGE);
 			}
 			break;

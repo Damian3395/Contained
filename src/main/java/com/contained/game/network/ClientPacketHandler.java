@@ -614,6 +614,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.START_SURVEY:
+					if(!mc.thePlayer.isInvisible() || !mc.thePlayer.capabilities.disableDamage){
+						mc.thePlayer.setInvisible(true);
+						mc.thePlayer.capabilities.disableDamage = true;
+					}
 					if(!(mc.currentScreen instanceof GuiSurvey))
 						mc.displayGuiScreen(new GuiSurvey(PlayerTeamIndividual.get(mc.thePlayer)));
 				break;
