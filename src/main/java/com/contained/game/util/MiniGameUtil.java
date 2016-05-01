@@ -222,6 +222,18 @@ public class MiniGameUtil {
 			z=randomSpawnPoint.y;			
 			y=w.getTopSolidOrLiquidBlock(x, z);		//coordinates to generate chests
 			
+			// Try to see if there's any caves underneath the chest's position,
+			// and spawn the chest down there instead.
+			boolean foundAir = false;
+			for (int newY=y-1; newY>=20; newY--) {
+				if (w.isAirBlock(x, newY, z))
+					foundAir = true;
+				else if (foundAir) {
+					y = newY+1;
+					break;
+				}
+			}
+			
 			w.setBlock(x, y, z, Blocks.chest);		//generate a chest
 			TileEntity chest = w.getTileEntity(x, y, z);	
 			if (chest instanceof IInventory) {

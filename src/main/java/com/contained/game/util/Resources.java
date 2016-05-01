@@ -64,20 +64,22 @@ public class Resources {
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.bone, 1, 0), 3, 8, 100));
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.bread, 1, 0), 1, 5, 100));
+				  new ItemStack(Blocks.web, 1, 0), 2, 6, 50));
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.arrow, 1, 0), 4, 16, 100));
+				  new ItemStack(Items.bread, 1, 0), 1, 3, 100));
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Blocks.torch, 1, 0), 6, 24, 100));
+				  new ItemStack(Items.arrow, 1, 0), 4, 8, 100));
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Blocks.tnt, 1, 0), 1, 4, 20));
+				  new ItemStack(Blocks.torch, 1, 0), 4, 12, 100));
+		hook.addItem(new WeightedRandomChestContent(
+				  new ItemStack(Blocks.tnt, 1, 0), 1, 3, 20));
 		
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.bow, 1, 0), 1, 1, 50));
+				  new ItemStack(Items.bow, 1, 0), 1, 1, 20));
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.stone_sword, 1, 0), 1, 1, 50));	
 		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(Items.iron_sword, 1, 0), 1, 1, 20));	
+				  new ItemStack(Items.iron_sword, 1, 0), 1, 1, 15));	
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.diamond_sword, 1, 0), 1, 1, 5));	
 		
@@ -108,10 +110,6 @@ public class Resources {
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.diamond_chestplate, 1, 0), 1, 1, 1));	
 		
-		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(ItemTerritory.addTerritory, 1, 0), 4, 16, 25));
-		hook.addItem(new WeightedRandomChestContent(
-				  new ItemStack(TerritoryMachine.instance, 1, 0), 1, 1, 5));
 		hook.addItem(new WeightedRandomChestContent(
 				  new ItemStack(Items.experience_bottle, 1, 0), 1, 12, 50));
 		

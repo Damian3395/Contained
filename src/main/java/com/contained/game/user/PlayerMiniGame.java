@@ -7,7 +7,6 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -28,7 +27,7 @@ public class PlayerMiniGame {
 
 	private String[] words = {"Greater", "Lesser", "Beast", "Demon", "Your Mother", "My Mother", "His Mother"
 			, "Your Father", "My Father", "Family Matters", "Nerds", "PvP", "Treasures", "His Father"
-			, "Unforgiven", "Guards", "Oblivian", "Wrath", "Sin", "War", "Prophecy", "Creepers", "Notch"};
+			, "Unforgiven", "Guards", "Oblivion", "Wrath", "Sin", "War", "Prophecy", "Creepers", "Notch"};
 
 	private String[] combine = {"And", "Or", "With", "Rather Than", "In Contrast", "But", "Besides"
 			, "Coupled With", "Beyond", "Under", "Above", "Nearly", "Aside From", "In Essence"};
@@ -163,7 +162,6 @@ public class PlayerMiniGame {
 		if(MiniGameUtil.isTreasure(dim))
 			Contained.getActiveTreasures(dim).clear();
 
-		WorldServer w = DimensionManager.getWorld(dim);
 		for(EntityPlayer player : getOnlinePlayers()){
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
@@ -286,10 +284,12 @@ public class PlayerMiniGame {
 
 	private String generateName(){
 		Random rand = new Random();
-		String teamName = intro[rand.nextInt(intro.length)] + " " + words[rand.nextInt(words.length)];
-
-		if(rand.nextBoolean())
-			teamName += " " + combine[rand.nextInt(combine.length)] + " " + words[rand.nextInt(words.length)];
+		String teamName = "";
+		do {
+			teamName = intro[rand.nextInt(intro.length)] + " " + words[rand.nextInt(words.length)];
+			if(rand.nextBoolean())
+				teamName += " " + combine[rand.nextInt(combine.length)] + " " + words[rand.nextInt(words.length)];
+		} while(teamName.length() > 20);
 
 		return teamName;
 	}

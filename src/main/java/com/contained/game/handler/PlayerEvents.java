@@ -175,9 +175,15 @@ public class PlayerEvents {
 			//have no owner to be owned by them
 			if (player != null) {
 				ItemStack[] inventory = player.inventory.mainInventory;
-				for(ItemStack stack : inventory)
-					if (stack != null)
-						processNewOwnership(player, stack);
+				for(int i=0; i<inventory.length; i++)
+					if (inventory[i] != null) {
+						if (processNewOwnership(player, inventory[i])) {
+							event.entity.worldObj.spawnEntityInWorld(new EntityItem(event.entity.worldObj, 
+									event.entity.posX, event.entity.posY+1, event.entity.posZ, 
+									inventory[i]));
+							inventory[i] = null;
+						}
+					}
 			}
 		}
 	}
@@ -323,7 +329,7 @@ public class PlayerEvents {
 	
 	//Handle all data collection procedures for when a player becomes
 	//the owner of a new item.
-	public void processNewOwnership(EntityPlayer newOwner, ItemStack item) {
+	public boolean processNewOwnership(EntityPlayer newOwner, ItemStack item) {
 		//First make sure this item isn't owned by someone already...
 		NBTTagCompound itemData = Data.getTagCompound(item);	
 		String owner = itemData.getString("owner");
@@ -343,7 +349,10 @@ public class PlayerEvents {
 			//If the item is a spawn egg, set its display name to match the owner.
 			if (item.getItem() instanceof ItemMonsterPlacer)
 				item.setStackDisplayName(newOwner.getDisplayName());
+			
+			return true;
 		}
+		return false;
 	}
 	
 	@SubscribeEvent
