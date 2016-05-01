@@ -65,6 +65,7 @@ public class FMLEvents {
 						for(EntityPlayer player : lobbyPlayers) {
 							if (ExtendedPlayer.get(player).isWaitingForMiniGame()) {
 								toEnter.addPlayer(player);
+								playersToJoin.add(player);
 								count++;
 								if (count >= toEnter.getCapacity())
 									break;
