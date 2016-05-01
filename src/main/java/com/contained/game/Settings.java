@@ -121,7 +121,7 @@ public class Settings {
 			if (i == Resources.TREASURE) {
 				prefix = "treasure_";
 				treasureChests = config.getInt(prefix+"numChests", category, 
-						15, 1, 200, 
+						10, 1, 200, 
 						"How many chests are actively spawned at any time during the treasure game?");
 			}
 			

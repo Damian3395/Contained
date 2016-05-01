@@ -119,7 +119,7 @@ public class EmblemBlock {
 				else
 					Util.displayError(p, "You must be holding a completed emblem of the same color.");
 			}
-			else
+			else if (!te.isActive)
 				Util.displayError(p, "This Emblem Altar does not belong to your team!");
 			return false;
 		}

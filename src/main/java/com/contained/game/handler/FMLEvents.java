@@ -33,10 +33,14 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
 public class FMLEvents {
 
+	int tick = 0;
+	int[] inactivityChecks = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
+	
 	@SubscribeEvent
 	public void onTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == Phase.START) {
 			int rand = Util.randomRange(0, 100);
+			tick++;
 			
 			//Periodically see if a pending mini-game has enough players to start.
 			if (rand == 2) {
@@ -79,11 +83,19 @@ public class FMLEvents {
 			
 			// Periodically see if a mini-game has no more online players, in which case
 			// it should be forced to end.
-			if (rand == 35) {
+			if (tick % 300 == 0) {
 				ArrayList<PlayerMiniGame> gamesToEnd = new ArrayList<PlayerMiniGame>();
 				for(PlayerMiniGame game : Contained.miniGames) {
-					if (game.numOnlinePlayers() == 0)
-						gamesToEnd.add(game);
+					if (game.numOnlinePlayers() == 0) {
+						// Wait at least 60 seconds after it goes inactive to actually end it, though
+						inactivityChecks[game.getGameDimension()] += 1;
+						Util.serverDebugMessage("DIM"+game.getGameDimension()+" has been inactive for "+(inactivityChecks[game.getGameDimension()]*15)+" seconds...");
+						if (inactivityChecks[game.getGameDimension()] >= 4) {
+							gamesToEnd.add(game);
+							inactivityChecks[game.getGameDimension()] = 0;
+						}
+					} else
+						inactivityChecks[game.getGameDimension()] = 0;
 				}
 				for (PlayerMiniGame game : gamesToEnd)
 					game.endGame();

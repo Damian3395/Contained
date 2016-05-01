@@ -164,10 +164,8 @@ public class PlayerMiniGame {
 			Contained.getActiveTreasures(dim).clear();
 
 		WorldServer w = DimensionManager.getWorld(dim);
-		for(PlayerTeamIndividual pdata : getGamePlayers()){
-			EntityPlayerMP player = (EntityPlayerMP)w.getPlayerEntityByName(pdata.playerName);
-			if (player == null)
-				continue;
+		for(EntityPlayer player : getOnlinePlayers()){
+			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 
 			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null)
@@ -190,6 +188,14 @@ public class PlayerMiniGame {
 				players.add(pdata);	
 
 		return players;
+	}
+	
+	public List<EntityPlayer> getOnlinePlayers() {
+		WorldServer w = DimensionManager.getWorld(dim);
+		if (w != null && w.playerEntities != null)
+			return w.playerEntities;
+		else
+			return new ArrayList<EntityPlayer>();
 	}
 
 	/*
@@ -262,11 +268,7 @@ public class PlayerMiniGame {
 	}
 	
 	public int numOnlinePlayers() {
-		WorldServer w = DimensionManager.getWorld(dim);
-		if (w != null && w.playerEntities != null)
-			return Math.min(w.playerEntities.size(), numPlayers());
-		else
-			return 0;
+		return Math.min(getOnlinePlayers().size(), numPlayers());
 	}
 
 	private void pickRandomTeamLeaders(){
