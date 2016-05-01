@@ -2,6 +2,7 @@ package com.contained.game.handler;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
@@ -30,6 +31,7 @@ import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -191,9 +193,11 @@ public class PlayerEvents {
 	@SubscribeEvent
 	public void onEntityDeath(LivingDeathEvent event) {
 		Entity source = event.source.getSourceOfDamage();
+		if (event.entityLiving == null || source == null || event.entityLiving.worldObj.isRemote)
+			return;
+		
 		// Players in teams should drop anti-territory gems when they are killed by other players.
-		if (event.entityLiving != null && source != null && !event.entityLiving.worldObj.isRemote
-		 && event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
+		if (event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
 			EntityPlayer killed = (EntityPlayer)event.entityLiving;
 			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(killed);
 			if (playerData.teamID != null) {
@@ -213,6 +217,23 @@ public class PlayerEvents {
 				itemData.setString("teamOwner", playerData.teamID);
 				toDrop.setTagCompound(itemData);
 				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
+			}
+		}
+		
+		//Players should drop only a small portion of their inventory on death.
+		if (event.entityLiving instanceof EntityPlayer && source instanceof EntityLivingBase) {
+			EntityPlayer killed = (EntityPlayer)event.entityLiving;
+			ArrayList<Integer> definedSlots = new ArrayList<Integer>();
+			for(int i=0; i<killed.inventory.mainInventory.length; i++) {
+				if (killed.inventory.mainInventory[i] != null)
+					definedSlots.add(i);
+			}
+			Collections.shuffle(definedSlots);
+			int numStacksToRemove = (int)Math.ceil((float)definedSlots.size()/8F);
+			for (int i=0; i<numStacksToRemove; i++) {
+				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, 
+						killed.inventory.mainInventory[definedSlots.get(i)]));
+				killed.inventory.mainInventory[definedSlots.get(i)] = null;
 			}
 		}
 	}

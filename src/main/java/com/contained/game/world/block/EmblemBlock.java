@@ -1,5 +1,6 @@
 package com.contained.game.world.block;
 
+import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TreasureGem;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -79,7 +80,8 @@ public class EmblemBlock {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
 			if (pdata.teamID != null && !te.isActive && te.teamID != null && pdata.teamID.equals(te.teamID)) {
 				ItemStack holding = p.getHeldItem();
-				if (holding != null && holding.getItem().equals((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+TreasureGem.getUnlocalizedName(myColor,TreasureGem.FULL)))) 
+				Item compareItem = (Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+TreasureGem.getUnlocalizedName(myColor,TreasureGem.FULL));
+				if (holding != null && holding.getItem().equals(compareItem)) 
 				{
 					if (myColor == TreasureGem.RED)
 						w.setBlock(x, y, z, fireEmblemAct);
@@ -90,6 +92,8 @@ public class EmblemBlock {
 					else
 						w.setBlock(x, y, z, windEmblemAct);
 
+					p.inventory.consumeInventoryItem(compareItem);
+					
 					EmblemBlockTE newTE = getEmblemTE(w, x, y, z);
 					if (newTE != null && newTE.isActive) {
 						// Count nearby activated emblem altars, to determine
