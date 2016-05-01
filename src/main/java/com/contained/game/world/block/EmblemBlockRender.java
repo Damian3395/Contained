@@ -25,7 +25,7 @@ public class EmblemBlockRender extends TileEntitySpecialRenderer {
     {
         float f1 = 1.0F;
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
-
+        
         if (f1 > 0.0F && te.isActive)
         {
             Tessellator tessellator = Tessellator.instance;

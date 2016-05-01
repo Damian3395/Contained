@@ -193,7 +193,7 @@ public class PlayerMiniGame {
 	public List<EntityPlayer> getOnlinePlayers() {
 		WorldServer w = DimensionManager.getWorld(dim);
 		if (w != null && w.playerEntities != null)
-			return w.playerEntities;
+			return new ArrayList<EntityPlayer>(w.playerEntities);
 		else
 			return new ArrayList<EntityPlayer>();
 	}

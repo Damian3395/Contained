@@ -5,6 +5,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 
 public class EmblemBlockTE extends TileEntity {
 
@@ -50,6 +51,17 @@ public class EmblemBlockTE extends TileEntity {
 		else
 			this.teamID = null;
 	}
+	
+	@Override
+	public AxisAlignedBB getRenderBoundingBox() {
+		return INFINITE_EXTENT_AABB;
+	}
+	
+	@Override
+    public double getMaxRenderDistanceSquared()
+    {
+        return 65536.0D;
+    }
 	
 	@Override
 	public Packet getDescriptionPacket() {

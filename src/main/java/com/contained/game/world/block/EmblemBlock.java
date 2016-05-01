@@ -123,7 +123,7 @@ public class EmblemBlock {
 				Util.displayError(p, "This Emblem Altar does not belong to your team!");
 			return false;
 		}
-
+		
 		@SideOnly(Side.CLIENT)
 		@Override
 		public IIcon getIcon(int i, int par2){
