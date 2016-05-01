@@ -274,8 +274,6 @@ public class GuiSurvey extends GuiScreen {
     				
     				PacketCustom personalityPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LOG_PERSONALITY);
     				ServerPacketHandlerUtil.sendToServer(personalityPacket.toPacket());
-    				
-    				
     			}
     			
     			updateButtons();

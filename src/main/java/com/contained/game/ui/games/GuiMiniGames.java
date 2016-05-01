@@ -27,9 +27,8 @@ public class GuiMiniGames extends GuiScreen {
 	@Override
 	public void initGui(){
 		ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-		if(properties.inGame() || properties.gameMode != Resources.OVERWORLD ||
-				MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
-			mc.displayGuiScreen(null);
+		if(MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
+			mc.thePlayer.closeScreen();
 			return;
 		}
 		
