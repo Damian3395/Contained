@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.contained.game.Contained;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.util.MiniGameUtil;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -114,7 +115,7 @@ public class PlayerTeam {
 				territoryToRemove.add(p);
 		}
 		for (Point p : territoryToRemove) //Second pass, to avoid concurrent modification.
-			Contained.getTerritoryMap(dimID).remove(p); 
+			MiniGameUtil.removeTerritoryBlock(p, dimID);
 		
 		//Remove any pending invitations involving this team.
 		ArrayList<PlayerTeamInvitation> invitationsToRemove = new ArrayList<PlayerTeamInvitation>();
@@ -269,6 +270,10 @@ public class PlayerTeam {
 	
 	public String getFormatCode() {
 		return formatCodes[this.colorID];
+	}
+	
+	public String formattedName() {
+		return getFormatCode()+"§l"+displayName;
 	}
 	
 	public int getColor() {

@@ -31,7 +31,7 @@ public class EntityUtil {
 	}
 	
 	public static EntityPlayer getNearestTeamPlayer(EntityLivingBase src, double range, Comparator sortMethod, IEntitySelector filter) {
-        List<EntityPlayer> nearbyPlayers = src.worldObj.selectEntitiesWithinAABB(EntityPlayer.class, src.boundingBox.expand(range, 4.0D, range), filter);
+		List<EntityPlayer> nearbyPlayers = src.worldObj.selectEntitiesWithinAABB(EntityPlayer.class, src.boundingBox.expand(range, 4.0D, range), filter);
         Collections.sort(nearbyPlayers, sortMethod);
         
         String myTeam = ExtendedLivingBase.get(src).getTeam();

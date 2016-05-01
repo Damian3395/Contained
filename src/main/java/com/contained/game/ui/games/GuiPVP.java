@@ -44,17 +44,14 @@ public class GuiPVP extends Gui {
 	public GuiPVP(Minecraft mc){
 		super();
 		this.mc = mc;
-		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games");
+		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games.png");
 	}
 		
 	@SubscribeEvent
 	public void renderPVPHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
 			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-			if((properties.gameMode != Resources.PVP || !properties.inGame())
-					&& !MiniGameUtil.isPvP(mc.thePlayer.dimension))
-				
-			if(properties.gameMode != Resources.PVP)
+			if(!MiniGameUtil.isPvP(mc.thePlayer.dimension))
 				return;
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);

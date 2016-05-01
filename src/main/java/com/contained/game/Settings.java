@@ -33,6 +33,10 @@ public class Settings {
 	public int[] bulkGemEXPCost = new int[2];
 	public int[] bulkGemCount = new int[2];
 	public int[] terrMachineEXPCost = new int[2];
+	public int pvpTerritorySize;
+	public int pvpMaxLives;
+	public int pvpResurrectLives;
+	public int treasureChests;
 	
 	public boolean[] harvestRequiresTerritory = new boolean[2];
 	public boolean[] enableDowsing = new boolean[2];
@@ -62,7 +66,7 @@ public class Settings {
 					defaultValue(i, 90, 10), 1, 60000, 
 					"How long, in seconds, does it take for the Territory Machine to claim a block of land?");
 			antiClaimRadius[i] = config.getInt("antiClaimRadius", category, 
-					defaultValue(i, 2, 3), 0, 10, 
+					defaultValue(i, 2, 2), 0, 10, 
 					"What is the radius, in blocks, that the Anti-Territory Machines can steal land?");
 			antiClaimDelay[i] = config.getInt("antiClaimDelay", category, 
 					defaultValue(i, 90, 15), 1, 60000, 
@@ -102,10 +106,24 @@ public class Settings {
 			String prefix = "";
 			if (i > 0)
 				category = "minigame_settings";
-			if (i == Resources.PVP)
+			if (i == Resources.PVP) {
 				prefix = "pvp_";
-			if (i == Resources.TREASURE)
+				pvpTerritorySize = config.getInt(prefix+"territorySize", category, 
+						3, 1, 99, 
+						"What is the radius of the territory that the team starts with?");	
+				pvpMaxLives = config.getInt(prefix+"maxLives", category, 
+						5, 1, 99, 
+						"What is the lives cap for a player (also the amount they start with)?");
+				pvpResurrectLives = config.getInt(prefix+"resurrectLives", category, 
+						3, 1, 99, 
+						"How many lives does a player get back if resurrected with the life rod?");
+			}
+			if (i == Resources.TREASURE) {
 				prefix = "treasure_";
+				treasureChests = config.getInt(prefix+"numChests", category, 
+						10, 1, 200, 
+						"How many chests are actively spawned at any time during the treasure game?");
+			}
 			
 			worldRadius[i] = config.getInt(prefix+"worldSize", category, 
 					defaultValue(i, 40, 10, 20), 0, 500, 

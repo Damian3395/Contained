@@ -18,6 +18,30 @@ public class DataLogger {
 		connectDataBase();
 	}
 	
+	public static void insertPersonality(String server, String player, int age, int year, int month, String ethnicity, double openness, double conscientiousness, double extraversion, double agreeableness, double neuroticism, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO PERSONALITY VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, player);
+			preparedStatement.setInt(3, age);
+			preparedStatement.setInt(4, year);
+			preparedStatement.setInt(5, month);
+			preparedStatement.setString(6, ethnicity);
+			preparedStatement.setDouble(7, openness);
+			preparedStatement.setDouble(8, conscientiousness);
+			preparedStatement.setDouble(9, extraversion);
+			preparedStatement.setDouble(10, agreeableness);
+			preparedStatement.setDouble(11, neuroticism);
+			preparedStatement.setString(12, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
 	public static void insertGameResults(String server, int gameID, int gameMode, String team, int score, int time, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;

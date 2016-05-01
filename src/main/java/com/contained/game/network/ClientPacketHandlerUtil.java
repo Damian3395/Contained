@@ -84,6 +84,8 @@ public class ClientPacketHandlerUtil {
 	
 	public static final int ADMIN_WORLD_INFO = 53;
 	
+	public static final int START_SURVEY = 54;
+	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
 		territoryPacket.writeInt(territoryData.size());
@@ -238,7 +240,9 @@ public class ClientPacketHandlerUtil {
 	}
 	
 	public static void syncMiniGameScore(int dimID, int teamID, int score){
-		for(PlayerTeamIndividual pdata : Contained.teamMemberData)
+		for(PlayerTeamIndividual pdata : Contained.teamMemberData) {
+			if (pdata.teamID == null)
+				continue;
 			if(pdata.teamID.equals(Contained.getTeamList(dimID).get(teamID).displayName)){
 				EntityPlayerMP miniGamePlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(pdata.playerName);
 				PacketCustom syncGameScorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_GAME_SCORE);
@@ -247,6 +251,7 @@ public class ClientPacketHandlerUtil {
 				syncGameScorePacket.writeInt(score);
 				Contained.channel.sendTo(syncGameScorePacket.toPacket(), miniGamePlayer);
 			} 	
+		}
 	}
 	
 	public static void addTreasureAndSync(int dimID, ArrayList<BlockCoord> points) {

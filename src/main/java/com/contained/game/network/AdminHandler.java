@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ObjectGenerator;
 import com.contained.game.util.Resources;
@@ -150,5 +149,14 @@ public class AdminHandler {
 		Util.travelToDimension(0, Util.getOnlinePlayer(targetPlayer));
 		Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 		Util.displayMessage(Util.getOnlinePlayer(targetPlayer), "You've been kicked back to Overworld by Admin");
+	}
+	
+	public void becomeRegularPlayer(EntityPlayerMP player){
+		ExtendedPlayer.get(player).setAdminRights(false);
+		player.setInvisible(false);
+		player.capabilities.allowFlying = false;
+		player.capabilities.disableDamage = false;
+		PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_NORMAL);
+		Contained.channel.sendTo(adminPacket.toPacket(),player);
 	}
 }

@@ -270,7 +270,7 @@ public class GuildLeader {
 		disband.visible = true;
 		teamColor.visible = true;
 		invite.visible = true;
-		if(team.numMembers() == Contained.configs.maxTeamSize[Settings.getDimConfig(team.dimID)]){
+		if(team.numMembers() == Contained.configs.maxTeamSize[Settings.getGameConfig(team.dimID)]){
 			invite.enabled = false;
 			renderFont(0, -80, "Max Players Reached", Color.YELLOW);
 		}

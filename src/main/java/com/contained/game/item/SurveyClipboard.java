@@ -27,7 +27,7 @@ public class SurveyClipboard {
 	public static class ItemSurveyClipboard extends Item {
 		public ItemSurveyClipboard(){
 			setMaxDamage(0);
-			maxStackSize = 1;
+			maxStackSize = 64;
 			setUnlocalizedName(unlocName);
 			setTextureName(texName);
 			setCreativeTab(CreativeTabs.tabTools);

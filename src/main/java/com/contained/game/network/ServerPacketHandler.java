@@ -3,7 +3,9 @@ package com.contained.game.network;
 import java.util.ArrayList;
 
 import com.contained.game.Contained;
+import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
@@ -247,6 +249,23 @@ public class ServerPacketHandler {
 				 */
 				case ServerPacketHandlerUtil.ADMIN_KICK:
 					admin.kick(player, packet.readString());
+				break;
+				
+				case ServerPacketHandlerUtil.ADMIN_REGULAR_PLAYER:
+					admin.becomeRegularPlayer(player);
+				break;
+				
+				case ServerPacketHandlerUtil.LOG_PERSONALITY:
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+					DataLogger.insertPersonality(Util.getServerID(), player.getDisplayName(), 
+							pdata.surveyResponses.age, pdata.surveyResponses.mcYears, pdata.surveyResponses.mcMonths, 
+							pdata.surveyResponses.ethnicity, 
+							SurveyData.scoreResponses(SurveyData.Q.OPENNESS, pdata.surveyResponses.personality), 
+							SurveyData.scoreResponses(SurveyData.Q.CONSCIENTIOUSNESS, pdata.surveyResponses.personality),
+							SurveyData.scoreResponses(SurveyData.Q.EXTRAVERSION, pdata.surveyResponses.personality), 
+							SurveyData.scoreResponses(SurveyData.Q.AGREEABLENESS, pdata.surveyResponses.personality), 
+							SurveyData.scoreResponses(SurveyData.Q.NEUROTICISM, pdata.surveyResponses.personality), Util.getDate());
+				break;
 			}
 		}
 	}

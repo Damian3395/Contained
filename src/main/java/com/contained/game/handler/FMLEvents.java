@@ -1,13 +1,10 @@
 package com.contained.game.handler;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FileDeleteStrategy;
-
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -23,6 +20,7 @@ import com.contained.game.Settings;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Save;
@@ -35,10 +33,14 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
 public class FMLEvents {
 
+	int tick = 0;
+	int[] inactivityChecks = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
+	
 	@SubscribeEvent
 	public void onTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == Phase.START) {
 			int rand = Util.randomRange(0, 100);
+			tick++;
 			
 			//Periodically see if a pending mini-game has enough players to start.
 			if (rand == 2) {
@@ -69,7 +71,7 @@ public class FMLEvents {
 							}
 						}
 						
-						toEnter.launchGame();								
+						toEnter.launchGame(playersToJoin);								
 						// TODO: Right now this will instantaneously start a game and teleport
 						// everyone into the dimension as soon as a game is ready. Change this
 						// so that there's a 30-60 second delay, and send a chat message to
@@ -79,11 +81,33 @@ public class FMLEvents {
 				}
 			}
 			
+			// Periodically see if a mini-game has no more online players, in which case
+			// it should be forced to end.
+			if (tick % 300 == 0) {
+				ArrayList<PlayerMiniGame> gamesToEnd = new ArrayList<PlayerMiniGame>();
+				for(PlayerMiniGame game : Contained.miniGames) {
+					if (game.numOnlinePlayers() == 0) {
+						// Wait at least 60 seconds after it goes inactive to actually end it, though
+						inactivityChecks[game.getGameDimension()] += 1;
+						Util.serverDebugMessage("DIM"+game.getGameDimension()+" has been inactive for "+(inactivityChecks[game.getGameDimension()]*15)+" seconds...");
+						if (inactivityChecks[game.getGameDimension()] >= 4) {
+							gamesToEnd.add(game);
+							inactivityChecks[game.getGameDimension()] = 0;
+						}
+					} else
+						inactivityChecks[game.getGameDimension()] = 0;
+				}
+				for (PlayerMiniGame game : gamesToEnd)
+					game.endGame();
+			}
+			
 			//Tick the mini-game timers, and check for game-over.
 			for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++) {
 				processGameTick(i);
 				if (rand > 10 && rand < 15)
 					checkDimensionReset(i);
+				if (rand == 20+i)
+					checkPvPFinished(i);
 			}
 			for(int i=Resources.MIN_TREASURE_DIMID; i<=Resources.MAX_TREASURE_DIMID; i++) {
 				processGameTick(i);
@@ -111,6 +135,36 @@ public class FMLEvents {
 		}
 	}
 	
+	// Check if any of the teams in a PvP mini-game have had all of their players
+	// lose all of their lives (or just has no one online anymore that has lives)
+	// ... if so, end the game.
+	public void checkPvPFinished(int dimID) {
+		WorldServer w = DimensionManager.getWorld(dimID);
+		PlayerMiniGame game = PlayerMiniGame.get(dimID);
+		if (MiniGameUtil.isPvP(dimID) && w != null && game != null && Contained.gameActive[dimID]) {
+			List<EntityPlayer> players = w.playerEntities;
+			String winningTeam = null;
+			boolean[] teamHasAlivePlayers = new boolean[Contained.configs.gameNumTeams[Resources.PVP]];
+			
+			for (EntityPlayer p : players) {
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+				int teamInd = game.getTeamID(pdata);
+				ExtendedPlayer pExtData = ExtendedPlayer.get(p);
+				if (teamInd != -1 && pExtData.lives > 0) {
+					teamHasAlivePlayers[teamInd] = true;
+					winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
+				}
+			}
+			
+			for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
+				if (teamHasAlivePlayers[ind] == false) {
+					MiniGameUtil.teamWins(winningTeam, dimID);
+					break;
+				}
+			}
+		}
+	}
+	
 	public void checkDimensionReset(int dimID) {		
 		if (DimensionManager.getWorld(dimID) == null && !Contained.gameActive[dimID]) {
 			//Dimension is empty and the game is over.
@@ -130,10 +184,10 @@ public class FMLEvents {
 				RegionFileCache.clearRegionFileReferences();
 				System.gc();
 				
-				//System.out.println("Deleting DIM"+dimID);
-				try {
-					FileUtils.deleteDirectory(dimDir);
-				} catch (IOException e) { }
+				for(File file : dimDir.listFiles())
+					FileDeleteStrategy.FORCE.deleteQuietly(file);
+				FileDeleteStrategy.FORCE.deleteQuietly(dimDir);
+				
 				Save.removeDimFiles(dimID);
 				
 				//And remove data about it from memory.
@@ -145,7 +199,7 @@ public class FMLEvents {
 			}
 		}
 		else if (DimensionManager.getWorld(dimID) != null) {
-			List players = DimensionManager.getWorld(dimID).playerEntities;
+			List<EntityPlayer> players = DimensionManager.getWorld(dimID).playerEntities;
 			if (players == null || players.size() == 0) 
 				DimensionManager.setWorld(dimID, null);
 		}
@@ -168,8 +222,22 @@ public class FMLEvents {
 			int timeRemaining = Contained.timeLeft[dimID];
 			if (timeRemaining % 300 == 0 || timeRemaining == 0)
 				ClientPacketHandlerUtil.syncMinigameTime(dimID);
-			if (timeRemaining == 0)
-				MiniGameUtil.resetGame(dimID);
+			if (timeRemaining == 0) {
+				// Time is up, end the mini-game!
+				PlayerMiniGame game = PlayerMiniGame.get(dimID);
+				int highestScore = -1;
+				String maxTeam = null;
+				for(int i=0;i<Contained.configs.gameNumTeams[Settings.getGameConfig(dimID)];i++) {
+					if (Contained.gameScores[game.getGameDimension()][i] > highestScore) {
+						highestScore = Contained.gameScores[game.getGameDimension()][i];
+						maxTeam = Contained.getTeamList(dimID).get(i).id;
+					}
+					else if (Contained.gameScores[game.getGameDimension()][i] == highestScore)
+						maxTeam = null; //Currently a tie
+				}
+				
+				MiniGameUtil.teamWins(maxTeam, dimID);
+			}
 		}
 	}
 	

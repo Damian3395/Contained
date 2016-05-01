@@ -14,6 +14,7 @@ import net.minecraftforge.common.DimensionManager;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -31,6 +32,12 @@ public class Save {
 		if (MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID)) {
 			ntc.setInteger("gameTime", Contained.timeLeft[dimID]);
 			ntc.setBoolean("isActive", Contained.gameActive[dimID]);
+			if (Contained.gameActive[dimID]) {
+				PlayerMiniGame game = PlayerMiniGame.get(dimID);
+				if (game != null)
+					game.writeToNBT(ntc);
+				ntc.setIntArray("scores", Contained.gameScores[dimID]);
+			}
 		}
 		
 		//Active Treasure

@@ -45,6 +45,10 @@ public class RevivePlayer extends GuiScreen {
 		teamPlayers = new ArrayList<String>();
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(mc.thePlayer);
 		miniGameTeam = pdata.teamID;
+		if (miniGameTeam == null) {
+			mc.displayGuiScreen(null);
+			return;			
+		}
 		
 		int index = 1;
 		int yOffset = 0;

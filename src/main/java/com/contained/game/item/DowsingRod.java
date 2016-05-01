@@ -30,7 +30,7 @@ public class DowsingRod {
 	public static class ItemDousingRod extends Item {
 		public ItemDousingRod(){
 			setMaxDamage(0);
-			maxStackSize = 1;
+			maxStackSize = 64;
 			setUnlocalizedName(unlocName);
 			setTextureName(texName);
 			setCreativeTab(CreativeTabs.tabTools);

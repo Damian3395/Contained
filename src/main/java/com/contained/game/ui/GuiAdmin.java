@@ -20,7 +20,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.DimensionManager;
 
 public class GuiAdmin extends GuiScreen {
 
@@ -71,6 +70,7 @@ public class GuiAdmin extends GuiScreen {
 	private GuiButton btn_back;
 	private GuiButton btn_confirm;
 	private GuiButton btn_cancel;
+	private GuiButton btn_regular;
 
 	// Button ID
 	private final int BTN_LOGIN = 0;
@@ -88,10 +88,10 @@ public class GuiAdmin extends GuiScreen {
 	private final int BTN_BACK = 12;
 	private final int BTN_CONFIRM = 13;
 	private final int BTN_CANCEL = 14;
+	private final int BTN_REGULAR = 15;
 
 	public GuiAdmin() {
 		this.player = FMLClientHandler.instance().getClient().thePlayer;
-
 	}
 
 	@Override
@@ -147,9 +147,9 @@ public class GuiAdmin extends GuiScreen {
 		this.btn_back = new GuiButton(BTN_BACK, x + 35, y + 75, 80, 20, "Back");
 		this.btn_confirm = new GuiButton(BTN_CONFIRM, x - 65, y, 50, 20, "Confirm");
 		this.btn_cancel = new GuiButton(BTN_CANCEL, x + 15, y, 50, 20, "Cancel");
+		this.btn_regular = new GuiButton(BTN_REGULAR, x-110, y-90, 60, 20, "Regular");
 		
 		this.updateButtons();
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -162,14 +162,14 @@ public class GuiAdmin extends GuiScreen {
 				this.buttonList.add(this.btn_login);
 				this.buttonList.add(this.btn_loginCancel);
 			} else { // no need to login again
-				this.pageID++;
-
+				setPage(WORLD_PAGE);
 			}
 			break;
 		case WORLD_PAGE:
 			// World Selection Page
 			this.buttonList.add(this.btn_enter);
 			this.buttonList.add(this.btn_worldInfo);
+			this.buttonList.add(this.btn_regular);
 			break;
 		case PLAYER_PAGE:
 			// Player Selection Page
@@ -512,9 +512,17 @@ public class GuiAdmin extends GuiScreen {
 				this.mc.thePlayer.closeScreen();
 				this.pageID--;
 			break;
-			}
 			
-
+			case BTN_REGULAR:
+				this.player.setInvisible(false);
+				this.player.capabilities.disableDamage = false;
+				this.player.capabilities.allowFlying = false;
+				ExtendedPlayer.get(this.player).setAdminRights(false);
+				
+				PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_REGULAR_PLAYER);
+				Contained.channel.sendToServer(spectatorPacket.toPacket());
+			break;
+			}
 		}
 	}
 

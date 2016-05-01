@@ -9,6 +9,8 @@ import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.games.GuiPVP;
 import com.contained.game.ui.games.GuiTreasure;
 import com.contained.game.ui.territory.TerritoryRender;
+import com.contained.game.world.block.EmblemBlockRender;
+import com.contained.game.world.block.EmblemBlockTE;
 import com.contained.game.world.block.TerritoryMachineRender;
 import com.contained.game.world.block.TerritoryMachineTE;
 
@@ -38,7 +40,8 @@ public class ClientProxy extends CommonProxy{
 		KeyBindings.init();
 		
 		MinecraftForgeClient.registerItemRenderer(ItemTerritory.removeTerritory, new AntiTerritoryRender());
-		ClientRegistry.bindTileEntitySpecialRenderer(TerritoryMachineTE.class, new TerritoryMachineRender());	
+		ClientRegistry.bindTileEntitySpecialRenderer(TerritoryMachineTE.class, new TerritoryMachineRender());
+		ClientRegistry.bindTileEntitySpecialRenderer(EmblemBlockTE.class, new EmblemBlockRender());
 	}
 	
 	public void init(FMLInitializationEvent event) {

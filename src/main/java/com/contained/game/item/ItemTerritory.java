@@ -9,6 +9,7 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ErrorCase;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -115,6 +116,11 @@ public class ItemTerritory {
 					ErrorCase.Error testRemove = 
 							canRemove(teamToRemove, blockToRemove, probe, p.dimension);				
 					
+					
+					if (testRemove == ErrorCase.Error.TEAM_ONLY) {
+						Util.displayError(p, "You must be in a team to use this item.");
+						return;
+					} 
 					if (testRemove == ErrorCase.Error.WRONG_TEAM) {
 						Util.displayError(p, "This item can only remove territory from the team it's linked to.");
 						return;
@@ -131,7 +137,7 @@ public class ItemTerritory {
 					}
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
-					Contained.getTerritoryMap(p.dimension).remove(blockToRemove);
+					MiniGameUtil.removeTerritoryBlock(blockToRemove, p.dimension);
 					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());
 				}
 			}

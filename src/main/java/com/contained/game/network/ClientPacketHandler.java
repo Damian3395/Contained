@@ -15,13 +15,13 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.GuiTownManage;
-import com.contained.game.ui.components.GuiScrollPane;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
 import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
 import com.contained.game.ui.perks.ClassPerks;
+import com.contained.game.ui.survey.GuiSurvey;
 import com.contained.game.ui.territory.TerritoryRender;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
@@ -68,13 +68,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				case ClientPacketHandlerUtil.OCCUPATIONAL_DATA:
 					for(int i=0; i<Data.occupationNames.length; i++)
 						ExtendedPlayer.get(mc.thePlayer).setOccupation(i, packet.readInt());
-					break;
+				break;
 					
 				case ClientPacketHandlerUtil.ITEM_USAGE_DATA:
 					ExtendedPlayer.get(mc.thePlayer).usedOwnItems = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).usedOthersItems = packet.readInt();
 					ExtendedPlayer.get(mc.thePlayer).usedByOthers = packet.readInt();
-					break;
+				break;
 					
 				case ClientPacketHandlerUtil.FULL_TERRITORY_SYNC:
 					int numBlocks = packet.readInt();
@@ -440,6 +440,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.PLAYER_NORMAL:
+					if(mc.currentScreen instanceof GuiAdmin)
+						mc.thePlayer.closeScreen();
+					
 					ExtendedPlayer playerState = ExtendedPlayer.get(mc.thePlayer);
 					mc.thePlayer.setInvisible(false);
 					mc.thePlayer.capabilities.allowFlying = false;
@@ -550,7 +553,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				break;
 				
 				case ClientPacketHandlerUtil.SAVE_PLAYER:
-					System.out.println("Saving Client Side Pdata");
 					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
 					storePdata.xp = packet.readInt();
 					storePdata.armor = new ItemStack[4];
@@ -568,9 +570,6 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						ItemStack itemStore = ItemStack.loadItemStackFromNBT(packet.readNBTTagCompound());
 						storePdata.inventory[index] = itemStore;
 					}
-					for(ItemStack itemCheck : storePdata.inventory)
-						if(itemCheck != null)
-							System.out.println("Save Item " + itemCheck.getDisplayName());
 					
 					mc.thePlayer.experienceTotal = 0;
 					MiniGameUtil.clearMainInventory(mc.thePlayer);
@@ -612,6 +611,15 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						newGuiAdmin.setSelectedDimID(selectedDimID);
 						newGuiAdmin.setPlayerInfoPanel(playerNames);
 					}
+				break;
+				
+				case ClientPacketHandlerUtil.START_SURVEY:
+					if(!mc.thePlayer.isInvisible() || !mc.thePlayer.capabilities.disableDamage){
+						mc.thePlayer.setInvisible(true);
+						mc.thePlayer.capabilities.disableDamage = true;
+					}
+					if(!(mc.currentScreen instanceof GuiSurvey))
+						mc.displayGuiScreen(new GuiSurvey(PlayerTeamIndividual.get(mc.thePlayer)));
 				break;
 			}
 		}

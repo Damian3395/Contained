@@ -11,6 +11,7 @@ import com.contained.game.Settings;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.util.ErrorCase;
@@ -86,7 +87,7 @@ public class TerritoryMachineTE extends TileEntity {
 						sendParticlePacket("crit"); //success
 						Collections.shuffle(candidates);
 						Point toRemove = candidates.get(0);
-						Contained.getTerritoryMap(this.worldObj.provider.dimensionId).remove(toRemove);
+						MiniGameUtil.removeTerritoryBlock(toRemove, this.worldObj.provider.dimensionId);
 						Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(toRemove.x, toRemove.y).toPacket());
 					} else
 						sendParticlePacket("smoke"); //fail

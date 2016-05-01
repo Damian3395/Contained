@@ -2,6 +2,7 @@ package com.contained.game.handler;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.contained.game.Contained;
 import com.contained.game.ContainedRegistry;
@@ -30,6 +31,7 @@ import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -57,7 +59,7 @@ public class PlayerEvents {
 	public void onJoin(EntityJoinWorldEvent event) {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
-				
+
 			boolean completedSurvey = false;
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
@@ -145,6 +147,21 @@ public class PlayerEvents {
 		if (event.entity != null && event.entity instanceof EntityPlayer
 				&& !event.entity.worldObj.isRemote) {
 			EntityPlayer player = (EntityPlayer)event.entity;
+			ExtendedPlayer properties = ExtendedPlayer.get(player);
+			
+			//Update Admin Rights When Logging Back In Or Changing Dimensions
+			if(properties.isAdmin()){
+				if(!player.isInvisible() ||
+						!player.capabilities.allowFlying || 
+						!player.capabilities.disableDamage){
+					player.setInvisible(true);
+					player.capabilities.allowFlying = true;
+					player.capabilities.disableDamage = true;
+					
+					PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_ADMIN);
+					Contained.channel.sendTo(adminPacket.toPacket(), (EntityPlayerMP)player);
+				}
+			}
 			
 			//Intermittently sync data logging information with the client
 			//so the visualizations can be updated.
@@ -162,6 +179,24 @@ public class PlayerEvents {
 					usePacket.writeInt(ExtendedPlayer.get(player).usedOthersItems);
 					usePacket.writeInt(ExtendedPlayer.get(player).usedByOthers);
 					Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)player);
+					
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength()){
+						if(!player.isInvisible() || !player.capabilities.disableDamage){
+							player.setInvisible(true);
+							player.capabilities.disableDamage = true;
+						}
+						
+						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.START_SURVEY);
+						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
+					}else if(!ExtendedPlayer.get(player).isAdmin() 
+							&& (player.isInvisible() || player.capabilities.disableDamage)){
+						player.setInvisible(false);
+						player.capabilities.disableDamage = false;
+						
+						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_NORMAL);
+						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
+					}
 				}
 			}
 			
@@ -169,9 +204,15 @@ public class PlayerEvents {
 			//have no owner to be owned by them
 			if (player != null) {
 				ItemStack[] inventory = player.inventory.mainInventory;
-				for(ItemStack stack : inventory)
-					if (stack != null)
-						processNewOwnership(player, stack);
+				for(int i=0; i<inventory.length; i++)
+					if (inventory[i] != null) {
+						if (processNewOwnership(player, inventory[i])) {
+							event.entity.worldObj.spawnEntityInWorld(new EntityItem(event.entity.worldObj, 
+									event.entity.posX, event.entity.posY+1, event.entity.posZ, 
+									inventory[i]));
+							inventory[i] = null;
+						}
+					}
 			}
 		}
 	}
@@ -179,20 +220,47 @@ public class PlayerEvents {
 	@SubscribeEvent
 	public void onEntityDeath(LivingDeathEvent event) {
 		Entity source = event.source.getSourceOfDamage();
+		if (event.entityLiving == null || source == null || event.entityLiving.worldObj.isRemote)
+			return;
+		
 		// Players in teams should drop anti-territory gems when they are killed by other players.
-		if (event.entityLiving != null && source != null && !event.entityLiving.worldObj.isRemote
-		 && event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
+		if (event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
 			EntityPlayer killed = (EntityPlayer)event.entityLiving;
 			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(killed);
 			if (playerData.teamID != null) {
 				int amount = 1;
-				if (playerData.isLeader) //Leaders drop more anti-gems on death.
-					amount = 4;				
+				if (MiniGameUtil.isPvP(event.entityLiving.dimension)) {
+					int territoryCount = (int)Math.pow(Contained.configs.pvpTerritorySize*2+1, 2);
+					amount = Util.randomRange(
+							(int)Math.ceil(Math.sqrt(territoryCount/2D)), 
+							(int)Math.sqrt(territoryCount));
+				}
+				else {
+					if (playerData.isLeader) //Leaders drop more anti-gems on death.
+						amount = 4;
+				}
 				ItemStack toDrop = new ItemStack(ItemTerritory.removeTerritory, amount);
 				NBTTagCompound itemData = Data.getTagCompound(toDrop);
 				itemData.setString("teamOwner", playerData.teamID);
 				toDrop.setTagCompound(itemData);
 				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
+			}
+		}
+		
+		//Players should drop only a small portion of their inventory on death.
+		if (event.entityLiving instanceof EntityPlayer && source instanceof EntityLivingBase) {
+			EntityPlayer killed = (EntityPlayer)event.entityLiving;
+			ArrayList<Integer> definedSlots = new ArrayList<Integer>();
+			for(int i=0; i<killed.inventory.mainInventory.length; i++) {
+				if (killed.inventory.mainInventory[i] != null)
+					definedSlots.add(i);
+			}
+			Collections.shuffle(definedSlots);
+			int numStacksToRemove = (int)Math.ceil((float)definedSlots.size()/8F);
+			for (int i=0; i<numStacksToRemove; i++) {
+				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, 
+						killed.inventory.mainInventory[definedSlots.get(i)]));
+				killed.inventory.mainInventory[definedSlots.get(i)] = null;
 			}
 		}
 	}
@@ -309,7 +377,7 @@ public class PlayerEvents {
 	
 	//Handle all data collection procedures for when a player becomes
 	//the owner of a new item.
-	public void processNewOwnership(EntityPlayer newOwner, ItemStack item) {
+	public boolean processNewOwnership(EntityPlayer newOwner, ItemStack item) {
 		//First make sure this item isn't owned by someone already...
 		NBTTagCompound itemData = Data.getTagCompound(item);	
 		String owner = itemData.getString("owner");
@@ -329,7 +397,10 @@ public class PlayerEvents {
 			//If the item is a spawn egg, set its display name to match the owner.
 			if (item.getItem() instanceof ItemMonsterPlacer)
 				item.setStackDisplayName(newOwner.getDisplayName());
+			
+			return true;
 		}
+		return false;
 	}
 	
 	@SubscribeEvent
