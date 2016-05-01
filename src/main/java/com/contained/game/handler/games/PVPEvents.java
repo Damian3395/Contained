@@ -9,7 +9,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
@@ -22,6 +21,7 @@ import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -29,7 +29,7 @@ public class PVPEvents {
 	public static HashMap<String, Point> initializePVPGame(int dimID) {
 		// Find spawn points for each of the teams. They should be placed as far
 		// separated from each other as possible.
-		WorldServer w = DimensionManager.getWorld(dimID);
+		WorldServer w = Util.getWorldOrInitialize(dimID);
 		ChunkCoordinates spawn = w.getSpawnPoint();
 		float angle = 0;
 		HashMap<String, Point> teamSpawnPoints = new HashMap<String, Point>();

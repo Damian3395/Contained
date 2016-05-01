@@ -34,6 +34,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.DimensionManager;
 
 public class Util {	
 	public static String errorCode = "§4§l";
@@ -106,6 +107,19 @@ public class Util {
 		if (dimID == 0  || MiniGameUtil.isPvP(dimID) || MiniGameUtil.isTreasure(dimID))
 			return true;
 		return false;
+	}
+	
+	/**
+	 * Functions like DimensionManager.getWorld, but will additionally take the
+	 * action of initializing the world if it doesn't exist.
+	 */
+	public static WorldServer getWorldOrInitialize(int dimID) {
+		WorldServer w = DimensionManager.getWorld(dimID);
+		if (w == null) {
+			DimensionManager.initDimension(dimID);
+			w = DimensionManager.getWorld(dimID);
+		}
+		return w;
 	}
 	
 	public static String getDimensionString(int dimID) {
