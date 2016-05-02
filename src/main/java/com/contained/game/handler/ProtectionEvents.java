@@ -8,6 +8,7 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
+import com.contained.game.data.Data;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
@@ -357,9 +358,7 @@ public class ProtectionEvents {
 			if (item != null) {
 				// If this item belongs to the person trying to pick it up, allow them
 				// to, regardless of territory permissions.
-				ItemStack stack = item.getEntityItem();
-				NBTTagCompound ntc = new NBTTagCompound();
-				stack.writeToNBT(ntc);
+				NBTTagCompound ntc = Data.getTagCompound(item.getEntityItem());
 				if (ntc.hasKey("owner") && ntc.getString("owner").equals(ev.entityPlayer.getDisplayName()))
 					return false;
 			}
