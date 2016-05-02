@@ -47,10 +47,12 @@ public class FMLEvents {
 			//Handle any players that are pending to be kicked back to the overworld.
 			if (!Contained.playersToKick.isEmpty()) {
 				for (EntityPlayer p : Contained.playersToKick) {
+					int remdimension = p.dimension;
 					Util.travelToDimension(Resources.OVERWORLD, p);
-					if (MiniGameUtil.isPvP(p.dimension) || MiniGameUtil.isTreasure(p.dimension)) {
+					
+					if (MiniGameUtil.isPvP(remdimension) || MiniGameUtil.isTreasure(remdimension)) {
 						PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
-						miniGamePacket.writeInt(p.dimension);
+						miniGamePacket.writeInt(remdimension);
 						Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)p);
 					}
 				}
