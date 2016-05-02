@@ -166,6 +166,14 @@ public class Util {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
+			if (dimID == 0) {
+				try {
+					throw new Exception();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
 			if (properties.inGame()) {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	
@@ -211,30 +219,26 @@ public class Util {
 				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
 				miniGamePacket.writeInt(pdata.xp);
 				miniGamePacket.writeInt(armorSize);
-				int index = 0;
 				if (pdata.armor != null) {
-					for(ItemStack item : pdata.armor) {
-						if(item != null){
-							miniGamePacket.writeInt(index);
+					for(int i=0; i<pdata.armor.length; i++) {
+						if(pdata.armor[i] != null){
+							miniGamePacket.writeInt(i);
 							NBTTagCompound itemSave = new NBTTagCompound();
-							item.writeToNBT(itemSave);
+							pdata.armor[i].writeToNBT(itemSave);
 							miniGamePacket.writeNBTTagCompound(itemSave);
-							index++;
 						}
 					}
 					pdata.armor = null;
 				}
 	
-				index = 0;
 				miniGamePacket.writeInt(invSize);
 				if (pdata.inventory != null) {
-					for(ItemStack item : pdata.inventory) {
-						if(item != null){
-							miniGamePacket.writeInt(index);
+					for(int i=0; i<pdata.inventory.length; i++) {
+						if(pdata.inventory[i] != null){
+							miniGamePacket.writeInt(i);
 							NBTTagCompound itemSave = new NBTTagCompound();
-							item.writeToNBT(itemSave);
+							pdata.inventory[i].writeToNBT(itemSave);
 							miniGamePacket.writeNBTTagCompound(itemSave);
-							index++;
 						}
 					}
 					pdata.inventory = null;	
