@@ -29,6 +29,7 @@ import com.contained.game.handler.games.PVPEvents;
 import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.item.TreasureGem;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.network.MiniGameHandler;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -46,12 +47,10 @@ public class MiniGameUtil {
 		return false;
 	}
 	
-	public static boolean isDimensionEmpty(int dim) {
-		for(PlayerMiniGame games : Contained.miniGames)
-			if(games.getGameDimension() == dim)
-				return false;
-		
-		return true;
+	public static boolean isDimensionInactive(int dim) {
+		if(PlayerMiniGame.get(dim) == null)
+			return true;
+		return false;
 	}
 	
 	public static int gameMode(int dimID) {
@@ -71,6 +70,12 @@ public class MiniGameUtil {
 		// a short period of time (~10 seconds?) and then terminate the dimension 
 		// and send everyone back to the overworld.
 		
+		if (teamID == null)
+			System.out.println("Game was a tie.");
+		else {
+			PlayerTeam t = PlayerTeam.get(teamID);
+			System.out.println(t.displayName+" wins!");
+		}
 		PlayerMiniGame.get(dimID).endGame();
 	}
 	
@@ -102,13 +107,20 @@ public class MiniGameUtil {
 			teamSpawnLocations = TreasureEvents.initializeTreasureGame(dimID);
 		
 		WorldServer w = DimensionManager.getWorld(dimID);
-		if (w != null)
-			w.setWorldTime(0);
+		w.setWorldTime(0);
 		
 		for (EntityPlayer player: playersJoining) {
+			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
+			startMiniGame.gameID = game.getGameID();
+			startMiniGame.setGameMode(gameMode);
+			
+			//Set the player to not be waiting for a mini-game anymore.
+			MiniGameHandler.cancelMiniGame((EntityPlayerMP)player);
+			
 			//Send the player to the dimension, and set their spawn location correctly.
 			Util.travelToDimension(dimID, player);
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+			startMiniGame.setGame(true);
 			
 			if (teamSpawnLocations == null || pdata.teamID == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
 				Point p = Util.getRandomLocation(w);
@@ -121,10 +133,6 @@ public class MiniGameUtil {
 				spawnPos.y += Util.randomBoth(2);
 				player.setLocationAndAngles(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y, player.rotationYaw, player.rotationPitch);
 			}
-			
-			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
-			startMiniGame.setGameMode(gameMode);
-			startMiniGame.setGame(true);
 			
 			pdata.xp = player.experienceTotal;
 			pdata.armor = player.inventory.armorInventory.clone();
@@ -172,6 +180,7 @@ public class MiniGameUtil {
 		//Sync MiniGame & Teams
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 		miniGamePacket.writeInt(gameMode);
+		miniGamePacket.writeInt(game.getGameID());
 		NBTTagCompound miniGameData = new NBTTagCompound();
 		game.writeToNBT(miniGameData);
 		miniGamePacket.writeNBTTagCompound(miniGameData);

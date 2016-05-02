@@ -63,8 +63,8 @@ public class GuiPVP extends Gui {
 			if(teamID == -1)
 				return;
 			
-			renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);
-			//renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);		
+			//renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);
+			renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);		
 		}
 	}
 	
@@ -126,6 +126,7 @@ public class GuiPVP extends Gui {
 		mc.fontRenderer.drawStringWithShadow(mode, sw-fr.getStringWidth(mode), mar, 0xFFFFFF);
 		mc.fontRenderer.drawStringWithShadow(timeLeft, sw-fr.getStringWidth(timeLeft), mar+12, 0xFFFFFF);
 		mc.fontRenderer.drawStringWithShadow("Lives: "+Integer.toString(theLives), mar, sh-12, 0xFFFFFF);
+		mc.fontRenderer.drawStringWithShadow("Score: "+teamScore, mar, sh-24, 0xFFFFFF);
 	}
 	
 	private int renderNumber(String number, int x, int y, boolean leftAlign){

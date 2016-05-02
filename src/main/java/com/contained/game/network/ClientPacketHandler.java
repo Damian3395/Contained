@@ -483,6 +483,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				case ClientPacketHandlerUtil.MINIGAME_STARTED:					
 					ExtendedPlayer startMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					startMiniGame.setGameMode(packet.readInt());
+					startMiniGame.gameID = packet.readInt();
 					startMiniGame.setJoiningGame(false);
 					startMiniGame.setGame(true);
 					
@@ -500,6 +501,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				case ClientPacketHandlerUtil.MINIGAME_ENDED:
 					ExtendedPlayer endMiniGame = ExtendedPlayer.get(mc.thePlayer);
 					endMiniGame.setGameMode(Resources.OVERWORLD);
+					endMiniGame.gameID = -1;
 					endMiniGame.setGame(false);
 					int removeDim = packet.readInt();
 					Contained.getTeamList(removeDim).clear();

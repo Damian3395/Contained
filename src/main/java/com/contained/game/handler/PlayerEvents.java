@@ -17,6 +17,7 @@ import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.SurveyClipboard;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.ui.survey.SurveyData;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -54,12 +55,13 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
 public class PlayerEvents {
+	
+	
 	@SubscribeEvent
 	//When a player joins the server, send their client the territory & team data.
 	public void onJoin(EntityJoinWorldEvent event) {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
-
 			boolean completedSurvey = false;
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
@@ -163,6 +165,21 @@ public class PlayerEvents {
 				}
 			}
 			
+			//Check If Player Is In A Valid MiniGame Dimension
+			if(MiniGameUtil.isPvP(player.dimension) || MiniGameUtil.isTreasure(player.dimension)){
+				int dim = player.dimension;
+				PlayerMiniGame miniGame = PlayerMiniGame.get(player.dimension);
+				
+				if(miniGame != null && miniGame.getGameID() != properties.gameID){
+					Util.displayMessage(player, "The MiniGame You Were In Has Ended, We Are Sending You Back To Where You Belong!");
+					Util.travelToDimension(Resources.OVERWORLD, player);
+					
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+					miniGamePacket.writeInt(dim);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+				}
+			}
+			
 			//Intermittently sync data logging information with the client
 			//so the visualizations can be updated.
 			if (player != null && Math.random() <= 1.0/20.0) {
@@ -181,7 +198,7 @@ public class PlayerEvents {
 					Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)player);
 					
 					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength()){
+					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength() && Resources.MANDATORY_SURVEY){
 						if(!player.isInvisible() || !player.capabilities.disableDamage){
 							player.setInvisible(true);
 							player.capabilities.disableDamage = true;
@@ -189,7 +206,7 @@ public class PlayerEvents {
 						
 						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.START_SURVEY);
 						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
-					}else if(!ExtendedPlayer.get(player).isAdmin() 
+					} else if(!ExtendedPlayer.get(player).isAdmin() 
 							&& (player.isInvisible() || player.capabilities.disableDamage)){
 						player.setInvisible(false);
 						player.capabilities.disableDamage = false;
@@ -206,7 +223,7 @@ public class PlayerEvents {
 				ItemStack[] inventory = player.inventory.mainInventory;
 				for(int i=0; i<inventory.length; i++)
 					if (inventory[i] != null) {
-						if (processNewOwnership(player, inventory[i])) {
+						if (processNewOwnership(player, inventory[i], false)) {
 							event.entity.worldObj.spawnEntityInWorld(new EntityItem(event.entity.worldObj, 
 									event.entity.posX, event.entity.posY+1, event.entity.posZ, 
 									inventory[i]));
@@ -226,6 +243,7 @@ public class PlayerEvents {
 		// Players in teams should drop anti-territory gems when they are killed by other players.
 		if (event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
 			EntityPlayer killed = (EntityPlayer)event.entityLiving;
+			EntityPlayer killer = (EntityPlayer)source;
 			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(killed);
 			if (playerData.teamID != null) {
 				int amount = 1;
@@ -243,6 +261,7 @@ public class PlayerEvents {
 				NBTTagCompound itemData = Data.getTagCompound(toDrop);
 				itemData.setString("teamOwner", playerData.teamID);
 				toDrop.setTagCompound(itemData);
+				processNewOwnership(killer, toDrop, true);
 				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
 			}
 		}
@@ -258,8 +277,10 @@ public class PlayerEvents {
 			Collections.shuffle(definedSlots);
 			int numStacksToRemove = (int)Math.ceil((float)definedSlots.size()/8F);
 			for (int i=0; i<numStacksToRemove; i++) {
-				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, 
-						killed.inventory.mainInventory[definedSlots.get(i)]));
+				ItemStack toDrop = killed.inventory.mainInventory[definedSlots.get(i)];
+				if (source instanceof EntityPlayer)
+					processNewOwnership((EntityPlayer)source, toDrop, true);
+				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
 				killed.inventory.mainInventory[definedSlots.get(i)] = null;
 			}
 		}
@@ -377,11 +398,11 @@ public class PlayerEvents {
 	
 	//Handle all data collection procedures for when a player becomes
 	//the owner of a new item.
-	public boolean processNewOwnership(EntityPlayer newOwner, ItemStack item) {
+	public boolean processNewOwnership(EntityPlayer newOwner, ItemStack item, boolean forceOwner) {
 		//First make sure this item isn't owned by someone already...
 		NBTTagCompound itemData = Data.getTagCompound(item);	
 		String owner = itemData.getString("owner");
-		if ((owner == null || owner.equals("")) && newOwner != null) {			
+		if ((owner == null || owner.equals("") || forceOwner) && newOwner != null) {			
 			//Check if this item corresponds to an "occupation", and update
 			//player's values accordingly
 			OccupationRank occ = Data.occupationMap.get(new DataItemStack(item));
@@ -407,7 +428,7 @@ public class PlayerEvents {
 	//When an unowned item is collected, it is owned by the collector.
 	public void onItemCollected(EntityItemPickupEvent event) {
 		if (event.entityPlayer != null)
-			processNewOwnership(event.entityPlayer, event.item.getEntityItem());
+			processNewOwnership(event.entityPlayer, event.item.getEntityItem(), false);
 	}
 	
 	@SubscribeEvent
@@ -415,7 +436,7 @@ public class PlayerEvents {
 	public void onItemHarvested(HarvestDropsEvent event) {
 		ArrayList<ItemStack> drops = event.drops;
 		for (ItemStack stack : drops)
-			processNewOwnership(event.harvester, stack);
+			processNewOwnership(event.harvester, stack, false);
 	}
 	
 	@SubscribeEvent
@@ -428,7 +449,7 @@ public class PlayerEvents {
 			EntityPlayer killer = (EntityPlayer)ds.getEntity();
 			ArrayList<EntityItem> drops = event.drops;
 			for (EntityItem item : drops)
-				processNewOwnership(killer, item.getEntityItem());
+				processNewOwnership(killer, item.getEntityItem(), false);
 		}
 	}
 	

@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 public class MiniGameHandler {
 	public MiniGameHandler(){}
 	
-	public void joinMiniGame(EntityPlayerMP player){
+	public static void joinMiniGame(EntityPlayerMP player){
 		ExtendedPlayer properties = ExtendedPlayer.get(player);
 		properties.setJoiningGame(true);
 		
@@ -18,7 +18,7 @@ public class MiniGameHandler {
 		Contained.channel.sendTo(packet.toPacket(), player);
 	}
 	
-	public void cancelMiniGame(EntityPlayerMP player){
+	public static void cancelMiniGame(EntityPlayerMP player){
 		ExtendedPlayer properties = ExtendedPlayer.get(player);
 		properties.setJoiningGame(false);
 		

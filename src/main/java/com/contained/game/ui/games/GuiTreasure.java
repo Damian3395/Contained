@@ -47,7 +47,7 @@ public class GuiTreasure extends Gui {
 	public GuiTreasure(Minecraft mc){
 		super();
 		this.mc = mc;
-		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games");
+		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games.png");
 	}
 	
 	@SubscribeEvent
@@ -107,9 +107,11 @@ public class GuiTreasure extends Gui {
 		mc.entityRenderer.setupOverlayRendering();
 		int mar = 5;
 		int sw = event.resolution.getScaledWidth()-mar;
+		int sh = event.resolution.getScaledHeight()-mar;
 		
 		mc.fontRenderer.drawStringWithShadow(mode, sw-fr.getStringWidth(mode), mar, 0xFFFFFF);
 		mc.fontRenderer.drawStringWithShadow(timeLeft, sw-fr.getStringWidth(timeLeft), mar+12, 0xFFFFFF);
+		mc.fontRenderer.drawStringWithShadow("Score: "+teamScore, mar, sh-12, 0xFFFFFF);
 	}
 	
 	private int renderNumber(String number, int x, int y, boolean leftAlign){

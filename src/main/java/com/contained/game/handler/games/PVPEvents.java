@@ -9,7 +9,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
@@ -21,7 +20,9 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -29,7 +30,8 @@ public class PVPEvents {
 	public static HashMap<String, Point> initializePVPGame(int dimID) {
 		// Find spawn points for each of the teams. They should be placed as far
 		// separated from each other as possible.
-		WorldServer w = DimensionManager.getWorld(dimID);
+		WorldServer w = Util.getWorldOrInitialize(dimID);
+		
 		ChunkCoordinates spawn = w.getSpawnPoint();
 		float angle = 0;
 		HashMap<String, Point> teamSpawnPoints = new HashMap<String, Point>();
@@ -37,16 +39,14 @@ public class PVPEvents {
 		
 		for (PlayerTeam team : Contained.getTeamList(dimID)) {
 			Point newSpawnLocation = new Point(
-					(int)(spawn.posX+Contained.configs.getWorldRadius(dimID)*Math.cos(angle)),
-					(int)(spawn.posZ+Contained.configs.getWorldRadius(dimID)*Math.sin(angle)));	
+					(int)(spawn.posX+(double)Contained.configs.getWorldRadius(dimID)*8D*Math.cos(angle)),
+					(int)(spawn.posZ+(double)Contained.configs.getWorldRadius(dimID)*8D*Math.sin(angle)));	
 			teamSpawnPoints.put(team.id, newSpawnLocation);
-			angle += (2.0*Math.PI)/Contained.configs.maxTeamSize[Resources.PVP];
+			angle += (2.0F*Math.PI)/(float)Contained.configs.gameNumTeams[Resources.PVP];			
 			
-			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) {
-				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) {
+			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) 
+				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) 
 					Contained.getTerritoryMap(dimID).put(new Point(newSpawnLocation.x+i, newSpawnLocation.y+j), team.id);
-				}
-			}
 		}
 		
 		return teamSpawnPoints;
@@ -56,8 +56,22 @@ public class PVPEvents {
 	public void onSpawn(Clone event){
 		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
 			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			if(properties.inGame() && properties.gameMode == Resources.PVP){				
-				properties.setLives(ExtendedPlayer.get(event.original).lives);
+			ExtendedPlayer old = ExtendedPlayer.get(event.original);
+			if(properties.inGame() && properties.gameMode == Resources.PVP 
+					&& (MiniGameUtil.isPvP(event.entityPlayer.dimension) || MiniGameUtil.isTreasure(event.entityPlayer.dimension))){
+				properties.setLives(old.lives);
+				/*
+				if(MiniGameUtil.isPvP(event.entityPlayer.dimension)){
+					properties.curDeaths = old.curDeaths;
+					properties.curKills = old.curKills;
+					properties.deaths = old.deaths;
+					properties.kills = old.kills;
+				}
+				if(MiniGameUtil.isTreasure(event.entityPlayer.dimension)){
+					properties.curTreasuresOpened = old.curTreasuresOpened;
+					properties.treasuresOpened = old.treasuresOpened;
+				}
+				*/
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(properties.lives);

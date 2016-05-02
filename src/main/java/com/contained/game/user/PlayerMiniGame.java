@@ -7,6 +7,7 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -73,9 +74,9 @@ public class PlayerMiniGame {
 	}
 
 	public PlayerMiniGame(int dimID, int gameMode){
-		super();
 		this.dim = dimID;
 		this.gameMode = gameMode;
+		this.gameID = -1;
 	}
 
 	public PlayerMiniGame(NBTTagCompound ntc) {
@@ -139,10 +140,20 @@ public class PlayerMiniGame {
 
 	public void endGame(){
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
-		for(int i = 0; i < teams.size(); i++)
+		String winningTeam = "";
+		int largestScore = 0;
+		for(int i = 0; i < teams.size(); i++){
+			if(winningTeam.equals("")){
+				largestScore = Contained.gameScores[dim][i];
+				winningTeam = teams.get(i).id;
+			}else if(largestScore < Contained.gameScores[dim][i]){
+				largestScore = Contained.gameScores[dim][i];
+				winningTeam = teams.get(i).id;
+			}
 			DataLogger.insertGameResults(Util.getServerID(), 
 					gameID, gameMode, teams.get(i).displayName, 
 					Contained.gameScores[dim][i], Contained.timeLeft[dim], Util.getDate());
+		}
 
 		Util.serverDebugMessage("Ending DIM"+dim+" game");
 
@@ -165,13 +176,37 @@ public class PlayerMiniGame {
 		for(EntityPlayer player : getOnlinePlayers()){
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
-
-			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null)
+			
+			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
 				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
-			else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null)
+				if(pdata.teamID.equalsIgnoreCase(winningTeam))
+					properties.pvpWon++;
+				else
+					properties.pvpLost++;
+			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
 				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
-
+				if(pdata.teamID.equalsIgnoreCase(winningTeam))
+					properties.treasureWon++;
+				else
+					properties.treasureLost++;
+			}			
+			
 			Util.travelToDimension(0, player);
+			
+			if(MiniGameUtil.isPvP(dim)){
+				PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
+				syncScore.writeInt(properties.pvpWon);
+				syncScore.writeInt(properties.pvpLost);
+				syncScore.writeInt(properties.kills);
+				syncScore.writeInt(properties.deaths);
+				Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+			}else if(MiniGameUtil.isTreasure(dim)){
+				PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
+				syncScore.writeInt(properties.treasureWon);
+				syncScore.writeInt(properties.treasureLost);
+				syncScore.writeInt(properties.treasuresOpened);
+				Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+			}
 		}
 
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);

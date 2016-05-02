@@ -46,15 +46,12 @@ public class CommandStartPVP implements ICommand {
 						}
 						
 						//Check If Game Exists In That Dimension
-						if(!MiniGameUtil.isDimensionEmpty(dim)){
+						if(!MiniGameUtil.isDimensionInactive(dim)){
 							Util.displayMessage((EntityPlayer)sender, Util.errorCode + "Active Mini Game In That Dimension");
 							return;
 						}
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating PVP Game in Dimension " + dim);
-						
-						//Teleport Player
-						Util.travelToDimension(dim, (EntityPlayer)sender);
 						
 						//Create & Sync MiniGame
 						MiniGameUtil.testStartGame(dim, (EntityPlayerMP)sender);

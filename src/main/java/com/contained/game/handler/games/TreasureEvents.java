@@ -12,9 +12,9 @@ import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 import com.contained.game.world.block.EmblemBlock;
 import com.contained.game.world.block.EmblemBlockTE;
-
 import codechicken.lib.vec.BlockCoord;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -23,7 +23,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -31,7 +30,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 
 public class TreasureEvents {
 	public static HashMap<String, Point> initializeTreasureGame(int dimID) {
-		WorldServer w = DimensionManager.getWorld(dimID);
+		WorldServer w = Util.getWorldOrInitialize(dimID);
+		
 		Contained.getActiveTreasures(dimID).clear();
 		if (w != null)
 			MiniGameUtil.generateChest(w, Contained.configs.treasureChests, ContainedRegistry.CUSTOM_CHEST_LOOT);
@@ -44,10 +44,10 @@ public class TreasureEvents {
 		
 		for (PlayerTeam team : Contained.getTeamList(dimID)) {
 			Point newSpawnLocation = new Point(
-					(int)(spawn.posX+Contained.configs.getWorldRadius(dimID)*Math.cos(angle)),
-					(int)(spawn.posZ+Contained.configs.getWorldRadius(dimID)*Math.sin(angle)));	
+					(int)(spawn.posX+(double)Contained.configs.getWorldRadius(dimID)*8D*Math.cos(angle)),
+					(int)(spawn.posZ+(double)Contained.configs.getWorldRadius(dimID)*8D*Math.sin(angle)));	
 			teamSpawnPoints.put(team.id, newSpawnLocation);
-			angle += (2.0*Math.PI)/Contained.configs.maxTeamSize[Resources.PVP];
+			angle += (2.0F*Math.PI)/(float)Contained.configs.gameNumTeams[Resources.PVP];
 			
 			int territoryRadius = 8;
 			for (int i=-territoryRadius;i<=territoryRadius;i++)

@@ -65,6 +65,7 @@ public class FMLEvents {
 						for(EntityPlayer player : lobbyPlayers) {
 							if (ExtendedPlayer.get(player).isWaitingForMiniGame()) {
 								toEnter.addPlayer(player);
+								playersToJoin.add(player);
 								count++;
 								if (count >= toEnter.getCapacity())
 									break;
@@ -86,7 +87,7 @@ public class FMLEvents {
 			if (tick % 300 == 0) {
 				ArrayList<PlayerMiniGame> gamesToEnd = new ArrayList<PlayerMiniGame>();
 				for(PlayerMiniGame game : Contained.miniGames) {
-					if (game.numOnlinePlayers() == 0) {
+					if (game.numOnlinePlayers() == 0 && game.getGameDimension() != Resources.OVERWORLD) {
 						// Wait at least 60 seconds after it goes inactive to actually end it, though
 						inactivityChecks[game.getGameDimension()] += 1;
 						Util.serverDebugMessage("DIM"+game.getGameDimension()+" has been inactive for "+(inactivityChecks[game.getGameDimension()]*15)+" seconds...");
@@ -140,26 +141,28 @@ public class FMLEvents {
 	// ... if so, end the game.
 	public void checkPvPFinished(int dimID) {
 		WorldServer w = DimensionManager.getWorld(dimID);
-		PlayerMiniGame game = PlayerMiniGame.get(dimID);
-		if (MiniGameUtil.isPvP(dimID) && w != null && game != null && Contained.gameActive[dimID]) {
-			List<EntityPlayer> players = w.playerEntities;
-			String winningTeam = null;
-			boolean[] teamHasAlivePlayers = new boolean[Contained.configs.gameNumTeams[Resources.PVP]];
-			
-			for (EntityPlayer p : players) {
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
-				int teamInd = game.getTeamID(pdata);
-				ExtendedPlayer pExtData = ExtendedPlayer.get(p);
-				if (teamInd != -1 && pExtData.lives > 0) {
-					teamHasAlivePlayers[teamInd] = true;
-					winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
+		if (w != null) {
+			PlayerMiniGame game = PlayerMiniGame.get(dimID);
+			if (MiniGameUtil.isPvP(dimID) && w != null && game != null && Contained.gameActive[dimID]) {
+				List<EntityPlayer> players = w.playerEntities;
+				String winningTeam = null;
+				boolean[] teamHasAlivePlayers = new boolean[Contained.configs.gameNumTeams[Resources.PVP]];
+				
+				for (EntityPlayer p : players) {
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);
+					int teamInd = game.getTeamID(pdata);
+					ExtendedPlayer pExtData = ExtendedPlayer.get(p);
+					if (teamInd != -1 && pExtData.lives > 0) {
+						teamHasAlivePlayers[teamInd] = true;
+						winningTeam = Contained.getTeamList(dimID).get(teamInd).id;
+					}
 				}
-			}
-			
-			for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
-				if (teamHasAlivePlayers[ind] == false) {
-					MiniGameUtil.teamWins(winningTeam, dimID);
-					break;
+				
+				for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
+					if (teamHasAlivePlayers[ind] == false) {
+						MiniGameUtil.teamWins(winningTeam, dimID);
+						break;
+					}
 				}
 			}
 		}
