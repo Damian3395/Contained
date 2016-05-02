@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.contained.game.Contained;
+import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.ObjectGenerator;
@@ -145,8 +148,59 @@ public class AdminHandler {
 		Contained.channel.sendTo(adminPacket.toPacket(),player);
 		
 	}
+	
+	/*
+	 * the kick takes 3 steps:
+	 * 1.log the player's data
+	 * 2.check if he's the team leader, if yes, reassign a leader. Then kick the player out of team
+	 * 3.end the mini game if there's only one team left
+	 * 4.kick the player back to lobby
+	 */
 	public void kick(EntityPlayerMP player, String targetPlayer){
-		PlayerTeamIndividual.get(targetPlayer).leaveTeam();
+		
+		EntityPlayer playerToKick = Util.getOnlinePlayer(targetPlayer);
+		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(playerToKick);	
+		ExtendedPlayer properties = ExtendedPlayer.get(playerToKick);
+
+		/*
+		 * if it's a treasure hunt game, simply end the game if playerToKick is the only one in his team
+		 * be careful not to log his info twice
+		 * 
+		 * if it's a PvP game, log the player's data and kick him
+		 * the game will automatically end if there's no one else in his team
+		 * 
+		 * 
+		 */
+		
+		if(playerToKick != null){
+			if(MiniGameUtil.isTreasure(playerToKick.dimension) && pdata.teamID != null) {
+				if(PlayerTeam.get(pdata.teamID).numMembers() == 1){
+					PlayerMiniGame.get(playerToKick.dimension).endGame();
+					Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
+					Util.displayMessage(playerToKick, "You've been kicked back to Overworld by Admin");
+					return;
+				} else {
+					DataLogger.insertTreasureScore(Util.getServerID(), PlayerMiniGame.get(playerToKick.dimension).getGameID(), player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
+				}
+			} else if(MiniGameUtil.isPvP(playerToKick.dimension) && pdata.teamID != null)
+				DataLogger.insertPVPScore(Util.getServerID(), PlayerMiniGame.get(playerToKick.dimension).getGameID(), player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
+			
+			PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+			miniGamePacket.writeInt(playerToKick.dimension);
+			Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)playerToKick);
+			pdata.leaveTeam();
+			Util.travelToDimension(Resources.OVERWORLD, playerToKick);	
+			Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
+			Util.displayMessage(playerToKick, "You've been kicked back to Overworld by Admin");
+		} else {
+			Util.displayMessage(player, "Cannot find player <"+targetPlayer+"> !");
+		}
+		/*
+		 * 
+		 * merge conflict
+		 * previous code
+		 * 
+		 * PlayerTeamIndividual.get(targetPlayer).leaveTeam();
 		EntityPlayer toKick = Util.getOnlinePlayer(targetPlayer);
 		if (toKick != null) {
 			int remdimension = toKick.dimension;
@@ -161,6 +215,8 @@ public class AdminHandler {
 			Util.displayMessage(toKick, "You've been kicked back to Overworld by Admin");
 		} else
 			Util.displayMessage(player, "Couldn't find the requested player");
+		 */
+
 	}
 	
 	public void becomeRegularPlayer(EntityPlayerMP player){

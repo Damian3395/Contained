@@ -8,6 +8,7 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
+import com.contained.game.data.Data;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamPermission;
@@ -50,6 +51,7 @@ import net.minecraft.inventory.ContainerHopper;
 import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -342,18 +344,26 @@ public class ProtectionEvents {
 	@SubscribeEvent
 	//Item Pickup Protection
 	public void onItemCollect(EntityItemPickupEvent event) {
-		event.setCanceled(pickupProtection(event));
+		event.setCanceled(pickupProtection(event, event.item));
 	}
 	
 	@SubscribeEvent
 	public void onEXPCollect(PlayerPickupXpEvent event) {
-		event.setCanceled(pickupProtection(event));
+		event.setCanceled(pickupProtection(event, null));
 	}
 	
-	public boolean pickupProtection(PlayerEvent ev) {
+	public boolean pickupProtection(PlayerEvent ev, EntityItem item) {
 		if (getPermissions(ev.entityPlayer.worldObj, ev.entityPlayer, ev.entity.posX, ev.entity.posY, ev.entity.posZ)
-				.itemDisable) 
+				.itemDisable) {
+			if (item != null) {
+				// If this item belongs to the person trying to pick it up, allow them
+				// to, regardless of territory permissions.
+				NBTTagCompound ntc = Data.getTagCompound(item.getEntityItem());
+				if (ntc.hasKey("owner") && ntc.getString("owner").equals(ev.entityPlayer.getDisplayName()))
+					return false;
+			}
 			return true;
+		}
 		return false;
 	}
 	

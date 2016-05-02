@@ -223,7 +223,7 @@ public class PlayerEvents {
 				ItemStack[] inventory = player.inventory.mainInventory;
 				for(int i=0; i<inventory.length; i++)
 					if (inventory[i] != null) {
-						if (processNewOwnership(player, inventory[i])) {
+						if (processNewOwnership(player, inventory[i], false)) {
 							event.entity.worldObj.spawnEntityInWorld(new EntityItem(event.entity.worldObj, 
 									event.entity.posX, event.entity.posY+1, event.entity.posZ, 
 									inventory[i]));
@@ -243,6 +243,7 @@ public class PlayerEvents {
 		// Players in teams should drop anti-territory gems when they are killed by other players.
 		if (event.entityLiving instanceof EntityPlayer && source instanceof EntityPlayer) {
 			EntityPlayer killed = (EntityPlayer)event.entityLiving;
+			EntityPlayer killer = (EntityPlayer)source;
 			PlayerTeamIndividual playerData = PlayerTeamIndividual.get(killed);
 			if (playerData.teamID != null) {
 				int amount = 1;
@@ -260,6 +261,7 @@ public class PlayerEvents {
 				NBTTagCompound itemData = Data.getTagCompound(toDrop);
 				itemData.setString("teamOwner", playerData.teamID);
 				toDrop.setTagCompound(itemData);
+				processNewOwnership(killer, toDrop, true);
 				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
 			}
 		}
@@ -275,8 +277,10 @@ public class PlayerEvents {
 			Collections.shuffle(definedSlots);
 			int numStacksToRemove = (int)Math.ceil((float)definedSlots.size()/8F);
 			for (int i=0; i<numStacksToRemove; i++) {
-				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, 
-						killed.inventory.mainInventory[definedSlots.get(i)]));
+				ItemStack toDrop = killed.inventory.mainInventory[definedSlots.get(i)];
+				if (source instanceof EntityPlayer)
+					processNewOwnership((EntityPlayer)source, toDrop, true);
+				killed.worldObj.spawnEntityInWorld(new EntityItem(killed.worldObj, killed.posX, killed.posY+1, killed.posZ, toDrop));
 				killed.inventory.mainInventory[definedSlots.get(i)] = null;
 			}
 		}
@@ -394,11 +398,11 @@ public class PlayerEvents {
 	
 	//Handle all data collection procedures for when a player becomes
 	//the owner of a new item.
-	public boolean processNewOwnership(EntityPlayer newOwner, ItemStack item) {
+	public boolean processNewOwnership(EntityPlayer newOwner, ItemStack item, boolean forceOwner) {
 		//First make sure this item isn't owned by someone already...
 		NBTTagCompound itemData = Data.getTagCompound(item);	
 		String owner = itemData.getString("owner");
-		if ((owner == null || owner.equals("")) && newOwner != null) {			
+		if ((owner == null || owner.equals("") || forceOwner) && newOwner != null) {			
 			//Check if this item corresponds to an "occupation", and update
 			//player's values accordingly
 			OccupationRank occ = Data.occupationMap.get(new DataItemStack(item));
@@ -424,7 +428,7 @@ public class PlayerEvents {
 	//When an unowned item is collected, it is owned by the collector.
 	public void onItemCollected(EntityItemPickupEvent event) {
 		if (event.entityPlayer != null)
-			processNewOwnership(event.entityPlayer, event.item.getEntityItem());
+			processNewOwnership(event.entityPlayer, event.item.getEntityItem(), false);
 	}
 	
 	@SubscribeEvent
@@ -432,7 +436,7 @@ public class PlayerEvents {
 	public void onItemHarvested(HarvestDropsEvent event) {
 		ArrayList<ItemStack> drops = event.drops;
 		for (ItemStack stack : drops)
-			processNewOwnership(event.harvester, stack);
+			processNewOwnership(event.harvester, stack, false);
 	}
 	
 	@SubscribeEvent
@@ -445,7 +449,7 @@ public class PlayerEvents {
 			EntityPlayer killer = (EntityPlayer)ds.getEntity();
 			ArrayList<EntityItem> drops = event.drops;
 			for (EntityItem item : drops)
-				processNewOwnership(killer, item.getEntityItem());
+				processNewOwnership(killer, item.getEntityItem(), false);
 		}
 	}
 	
