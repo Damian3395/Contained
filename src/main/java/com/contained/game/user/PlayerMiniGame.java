@@ -135,9 +135,6 @@ public class PlayerMiniGame {
 		if(isGameReady()){
 			pickRandomTeamLeaders();
 			MiniGameUtil.startGame(this, playersJoining);
-			
-			WorldServer w = DimensionManager.getWorld(dim);
-			w.setWorldTime(18000);
 		}
 	}
 
@@ -177,6 +174,11 @@ public class PlayerMiniGame {
 
 			Util.travelToDimension(0, player);
 			
+			properties.gameMode = Resources.OVERWORLD;
+			properties.inGameID = -1;
+			properties.setGame(false);
+			
+			/*
 			PacketCustom restorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
 			restorePacket.writeInt(pdata.xp);
 			
@@ -208,6 +210,8 @@ public class PlayerMiniGame {
 				}
 			}
 			Contained.channel.sendTo(restorePacket.toPacket(), (EntityPlayerMP) player);
+			pdata.revertMiniGameChanges();
+			*/
 		}
 
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);

@@ -32,6 +32,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	private boolean inGame = false;
 	private boolean joiningGame = false;
 	public int gameMode = Resources.OVERWORLD;
+	public int inGameID = -1;
 	public int posX = 0;
 	public int posY = 0;
 	public int posZ = 0;
@@ -161,6 +162,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.inGame = load.getBoolean("inGame");
 		this.joiningGame = load.getBoolean("joiningGame");
 		this.gameMode = load.getInteger("gameMode");
+		this.inGameID = load.getInteger("gameID");
 		this.curKills = load.getInteger("curKills");
 		this.curDeaths = load.getInteger("curDeaths");
 		this.curTreasuresOpened = load.getInteger("curTreasuresOpened");
@@ -208,6 +210,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setBoolean("inGame", this.inGame);
 		save.setBoolean("joiningGame", this.joiningGame);
 		save.setInteger("gameMode", this.gameMode);
+		save.setInteger("gameID", this.inGameID);
 		save.setInteger("curKills", this.curKills);
 		save.setInteger("curDeaths", this.curDeaths);
 		save.setInteger("curTreasuresOpened", this.curTreasuresOpened);

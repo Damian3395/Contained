@@ -124,6 +124,7 @@ public class MiniGameUtil {
 			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
 			startMiniGame.setGameMode(gameMode);
 			startMiniGame.setGame(true);
+			startMiniGame.inGameID = game.getGameID();
 			
 			pdata.xp = player.experienceTotal;
 			pdata.armor = player.inventory.armorInventory.clone();

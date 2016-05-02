@@ -42,8 +42,8 @@ public class CommandEndGame implements ICommand{
 						
 						//Check If Player Is In MiniGame
 						int dim = player.dimension;
-						if(!MiniGameUtil.isPvP(dim) && !MiniGameUtil.isTreasure(dim)
-								&& !properties.inGame()){
+						System.out.println("Dimension " + dim);
+						if(!MiniGameUtil.isPvP(dim) && !MiniGameUtil.isTreasure(dim)){
 							Util.displayMessage((EntityPlayer)sender, Util.errorCode + "You Are Not In A Mini Game!");
 							return;
 						}
