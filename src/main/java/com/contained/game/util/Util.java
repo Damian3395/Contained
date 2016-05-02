@@ -36,6 +36,9 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
 
+// TODO: Players still being brought into mini-games after being sent back to 
+// the overworld, even though they're no longer (or should not longer be) in
+// a "waiting for minigame" state.
 public class Util {	
 	public static String errorCode = "§4§l";
 	public static String warningCode = "§6§l";

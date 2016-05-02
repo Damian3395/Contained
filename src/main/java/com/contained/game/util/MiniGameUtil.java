@@ -29,6 +29,7 @@ import com.contained.game.handler.games.PVPEvents;
 import com.contained.game.handler.games.TreasureEvents;
 import com.contained.game.item.TreasureGem;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.network.MiniGameHandler;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -107,6 +108,9 @@ public class MiniGameUtil {
 			startMiniGame.gameID = game.getGameID();
 			startMiniGame.setGameMode(gameMode);
 			startMiniGame.setGame(true);
+			
+			//Set the player to not be waiting for a mini-game anymore.
+			MiniGameHandler.cancelMiniGame((EntityPlayerMP)player);
 			
 			//Send the player to the dimension, and set their spawn location correctly.
 			Util.travelToDimension(dimID, player);
