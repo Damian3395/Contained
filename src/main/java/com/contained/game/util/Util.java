@@ -166,14 +166,6 @@ public class Util {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
-			if (dimID == 0) {
-				try {
-					throw new Exception();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
 			if (properties.inGame()) {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	

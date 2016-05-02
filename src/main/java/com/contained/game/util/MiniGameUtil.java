@@ -103,6 +103,11 @@ public class MiniGameUtil {
 		w.setWorldTime(0);
 		
 		for (EntityPlayer player: playersJoining) {
+			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
+			startMiniGame.gameID = game.getGameID();
+			startMiniGame.setGameMode(gameMode);
+			startMiniGame.setGame(true);
+			
 			//Send the player to the dimension, and set their spawn location correctly.
 			Util.travelToDimension(dimID, player);
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
@@ -118,11 +123,6 @@ public class MiniGameUtil {
 				spawnPos.y += Util.randomBoth(2);
 				player.setLocationAndAngles(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y, player.rotationYaw, player.rotationPitch);
 			}
-			
-			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
-			startMiniGame.gameID = game.getGameID();
-			startMiniGame.setGameMode(gameMode);
-			startMiniGame.setGame(true);
 			
 			pdata.xp = player.experienceTotal;
 			pdata.armor = player.inventory.armorInventory.clone();

@@ -71,7 +71,7 @@ public class PlayerEvents {
 				ExtendedPlayer ext = ExtendedPlayer.get(joined);
 				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
 				
-				if(miniGame == null || miniGame.getGameID() != ext.gameID){
+				if(miniGame == null || miniGame.getGameID() != ext.gameID){					
 					// Trying to update the player's position during the EntityJoinWorldEvent
 					// will crash the game, as it'll desync the player's chunk position and
 					// cause the game to try to spawn the player inside a different chunk than

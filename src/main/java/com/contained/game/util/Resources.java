@@ -16,7 +16,7 @@ public class Resources {
 	
 	public static final boolean DEBUG_ENABLED = true;
 	public static final boolean LOGGING_ENABLED = false;
-	public static final boolean MANDATORY_SURVEY = false;
+	public static final boolean MANDATORY_SURVEY = true;
 	
 	public static final int MIN_PVP_DIMID = 2;
 	public static final int MAX_PVP_DIMID = 5;
