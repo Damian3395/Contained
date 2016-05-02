@@ -145,10 +145,10 @@ public class PlayerMiniGame {
 		for(int i = 0; i < teams.size(); i++){
 			if(winningTeam.equals("")){
 				largestScore = Contained.gameScores[dim][i];
-				winningTeam = teams.get(i).displayName;
+				winningTeam = teams.get(i).id;
 			}else if(largestScore < Contained.gameScores[dim][i]){
 				largestScore = Contained.gameScores[dim][i];
-				winningTeam = teams.get(i).displayName;
+				winningTeam = teams.get(i).id;
 			}
 			DataLogger.insertGameResults(Util.getServerID(), 
 					gameID, gameMode, teams.get(i).displayName, 
@@ -179,13 +179,13 @@ public class PlayerMiniGame {
 			
 			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
 				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
-				if(pdata.teamID.equals(winningTeam))
+				if(pdata.teamID.equalsIgnoreCase(winningTeam))
 					properties.pvpWon++;
 				else
 					properties.pvpLost++;
 			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
 				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
-				if(pdata.teamID.equals(winningTeam))
+				if(pdata.teamID.equalsIgnoreCase(winningTeam))
 					properties.treasureWon++;
 				else
 					properties.treasureLost++;
