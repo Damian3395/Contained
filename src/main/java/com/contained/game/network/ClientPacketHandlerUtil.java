@@ -227,18 +227,11 @@ public class ClientPacketHandlerUtil {
 	}
 	
 	public static void syncMiniGameScore(int dimID, int teamID, int score){
-		for(PlayerTeamIndividual pdata : Contained.teamMemberData) {
-			if (pdata.teamID == null)
-				continue;
-			if(pdata.teamID.equals(Contained.getTeamList(dimID).get(teamID).displayName)){
-				EntityPlayerMP miniGamePlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(pdata.playerName);
-				PacketCustom syncGameScorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_GAME_SCORE);
-				syncGameScorePacket.writeInt(dimID);
-				syncGameScorePacket.writeInt(teamID);
-				syncGameScorePacket.writeInt(score);
-				Contained.channel.sendTo(syncGameScorePacket.toPacket(), miniGamePlayer);
-			} 	
-		}
+		PacketCustom scorePacket = new PacketCustom(Resources.MOD_ID, SYNC_GAME_SCORE);
+		scorePacket.writeInt(dimID);
+		scorePacket.writeInt(teamID);
+		scorePacket.writeInt(score);
+		Contained.channel.sendToDimension(scorePacket.toPacket(), dimID);
 	}
 	
 	public static void addTreasureAndSync(int dimID, ArrayList<BlockCoord> points) {

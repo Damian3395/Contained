@@ -60,18 +60,6 @@ public class PVPEvents {
 			if(properties.inGame() && properties.gameMode == Resources.PVP 
 					&& (MiniGameUtil.isPvP(event.entityPlayer.dimension) || MiniGameUtil.isTreasure(event.entityPlayer.dimension))){
 				properties.setLives(old.lives);
-				/*
-				if(MiniGameUtil.isPvP(event.entityPlayer.dimension)){
-					properties.curDeaths = old.curDeaths;
-					properties.curKills = old.curKills;
-					properties.deaths = old.deaths;
-					properties.kills = old.kills;
-				}
-				if(MiniGameUtil.isTreasure(event.entityPlayer.dimension)){
-					properties.curTreasuresOpened = old.curTreasuresOpened;
-					properties.treasuresOpened = old.treasuresOpened;
-				}
-				*/
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(properties.lives);
