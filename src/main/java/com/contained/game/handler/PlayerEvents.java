@@ -68,11 +68,10 @@ public class PlayerEvents {
 			//Check If Player Is In A Valid MiniGame Dimension
 			if(MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension)){
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined.getDisplayName());
+				ExtendedPlayer ext = ExtendedPlayer.get(joined);
 				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
 				
-				if(MiniGameUtil.isDimensionEmpty(joined.dimension) || miniGame == null ||
-						miniGame.numPlayers() == miniGame.getCapacity() ||
-						miniGame.getTeamID(pdata) == -1){
+				if(miniGame == null || miniGame.getGameID() != ext.gameID){
 					// Trying to update the player's position during the EntityJoinWorldEvent
 					// will crash the game, as it'll desync the player's chunk position and
 					// cause the game to try to spawn the player inside a different chunk than
@@ -202,7 +201,7 @@ public class PlayerEvents {
 					Contained.channel.sendTo(usePacket.toPacket(), (EntityPlayerMP)player);
 					
 					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
-					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength()){
+					if(pdata.surveyResponses.progress < SurveyData.getSurveyLength() && Resources.MANDATORY_SURVEY){
 						if(!player.isInvisible() || !player.capabilities.disableDamage){
 							player.setInvisible(true);
 							player.capabilities.disableDamage = true;
@@ -210,7 +209,7 @@ public class PlayerEvents {
 						
 						PacketCustom perkPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.START_SURVEY);
 						Contained.channel.sendTo(perkPacket.toPacket(), (EntityPlayerMP) player);
-					}else if(!ExtendedPlayer.get(player).isAdmin() 
+					} else if(!ExtendedPlayer.get(player).isAdmin() 
 							&& (player.isInvisible() || player.capabilities.disableDamage)){
 						player.setInvisible(false);
 						player.capabilities.disableDamage = false;

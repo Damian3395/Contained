@@ -178,6 +178,7 @@ public class Util {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	
 				properties.setGameMode(Resources.OVERWORLD);
+				properties.gameID = -1;
 				properties.setGame(false);
 				properties.curDeaths = 0;
 				properties.curKills = 0;
