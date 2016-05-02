@@ -36,9 +36,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
 
-// TODO: Players still being brought into mini-games after being sent back to 
-// the overworld, even though they're no longer (or should not longer be) in
-// a "waiting for minigame" state.
 public class Util {	
 	public static String errorCode = "§4§l";
 	public static String warningCode = "§6§l";
@@ -187,13 +184,9 @@ public class Util {
 				int armorSize = 0;
 				if (pdata.armor != null) {
 					player.inventory.armorInventory = pdata.armor.clone();
-					
-					for(ItemStack item : pdata.armor) {
-						if(item != null){
-							System.out.println("Restore " + item.getDisplayName());
+					for(ItemStack item : pdata.armor) 
+						if(item != null)
 							armorSize++;
-						}
-					}
 				}
 				else
 					player.inventory.armorInventory = new ItemStack[4];
@@ -201,13 +194,9 @@ public class Util {
 				int invSize = 0;
 				if (pdata.inventory != null) {
 					player.inventory.mainInventory = pdata.inventory.clone();
-					
-					for(ItemStack item : pdata.inventory) {
-						if(item != null){
-							System.out.println("Restore " + item.getDisplayName());
+					for(ItemStack item : pdata.inventory)
+						if(item != null)
 							invSize++;
-						}
-					}
 				}
 				else
 					player.inventory.mainInventory = new ItemStack[36];

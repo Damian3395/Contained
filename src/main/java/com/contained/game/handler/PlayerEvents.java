@@ -62,25 +62,7 @@ public class PlayerEvents {
 	public void onJoin(EntityJoinWorldEvent event) {
 		if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
 			EntityPlayer joined = (EntityPlayer)event.entity;
-
 			boolean completedSurvey = false;
-			
-			//Check If Player Is In A Valid MiniGame Dimension
-			if(MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension)){
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined.getDisplayName());
-				ExtendedPlayer ext = ExtendedPlayer.get(joined);
-				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
-				
-				if(miniGame == null || miniGame.getGameID() != ext.gameID){					
-					// Trying to update the player's position during the EntityJoinWorldEvent
-					// will crash the game, as it'll desync the player's chunk position and
-					// cause the game to try to spawn the player inside a different chunk than
-					// the one the player is actually located in.
-					//
-					// So, we use this list to defer the position update until the next tick.
-					Contained.playersToKick.add(joined);
-				}
-			}
 			
 			if (PlayerTeamIndividual.get(joined) == null) {
 				// Server has no info about this player, this must be their first
@@ -186,53 +168,15 @@ public class PlayerEvents {
 			//Check If Player Is In A Valid MiniGame Dimension
 			if(MiniGameUtil.isPvP(player.dimension) || MiniGameUtil.isTreasure(player.dimension)){
 				int dim = player.dimension;
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player.getDisplayName());
 				PlayerMiniGame miniGame = PlayerMiniGame.get(player.dimension);
 				
 				if(miniGame != null && miniGame.getGameID() != properties.gameID){
 					Util.displayMessage(player, "The MiniGame You Were In Has Ended, We Are Sending You Back To Where You Belong!");
-					
 					Util.travelToDimension(Resources.OVERWORLD, player);
-					
-					PacketCustom restorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
-					restorePacket.writeInt(pdata.xp);
-					
-					int count = 0;
-					for(ItemStack armor : pdata.armor)
-						if(armor != null)
-							count++;
-					restorePacket.writeInt(count);
-					for(int i = 0; i < pdata.armor.length; i++){
-						if(pdata.armor[i] != null){
-							restorePacket.writeInt(i);
-							NBTTagCompound armor = new NBTTagCompound();
-							pdata.armor[i].writeToNBT(armor);
-							restorePacket.writeNBTTagCompound(armor);
-						}
-					}
-					
-					count = 0;
-					for(ItemStack item : pdata.inventory)
-						if(item != null)
-							count++;
-					restorePacket.writeInt(count);
-					for(int i = 0; i < pdata.inventory.length; i++){
-						if(pdata.inventory[i] != null){
-							restorePacket.writeInt(i);
-							NBTTagCompound item = new NBTTagCompound();
-							pdata.inventory[i].writeToNBT(item);
-							restorePacket.writeNBTTagCompound(item);
-						}
-					}
-					Contained.channel.sendTo(restorePacket.toPacket(), (EntityPlayerMP) player);
 					
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 					miniGamePacket.writeInt(dim);
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
-					
-					pdata.revertMiniGameChanges();
-				}else{
-					
 				}
 			}
 			
