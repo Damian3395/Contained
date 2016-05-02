@@ -24,6 +24,7 @@ import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.games.PVPEvents;
 import com.contained.game.handler.games.TreasureEvents;
@@ -62,7 +63,7 @@ public class MiniGameUtil {
 			return Resources.OVERWORLD;
 	}
 	
-	public static void teamWins(String teamID, int dimID) {
+	public static void teamWins(String teamID, int dimID, String winCondition) {
 		// TODO: When this function is called, a team has won the game. If teamID
 		// is null, then the game was a tie.
 		//
@@ -70,12 +71,14 @@ public class MiniGameUtil {
 		// a short period of time (~10 seconds?) and then terminate the dimension 
 		// and send everyone back to the overworld.
 		
-		if (teamID == null)
+		if (teamID == null){
 			System.out.println("Game was a tie.");
-		else {
+			teamID = "TIE";
+		}else {
 			PlayerTeam t = PlayerTeam.get(teamID);
 			System.out.println(t.displayName+" wins!");
 		}
+		DataLogger.insertWinningTeam(Util.getServerID(), Util.getGameID(dimID), Util.getGameMode(dimID), teamID, winCondition, Util.getDate());
 		PlayerMiniGame.get(dimID).endGame();
 	}
 	
@@ -279,7 +282,7 @@ public class MiniGameUtil {
 					winningTeam = team.id;	
 			}
 			if (isGameOver)
-				teamWins(winningTeam, dimID);
+				teamWins(winningTeam, dimID, "TERRITORY");
 		}
 	}
 	

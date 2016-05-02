@@ -12,6 +12,7 @@ import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -232,6 +233,21 @@ public class ClientPacketHandlerUtil {
 		scorePacket.writeInt(teamID);
 		scorePacket.writeInt(score);
 		Contained.channel.sendToDimension(scorePacket.toPacket(), dimID);
+	}
+	
+	public static void syncPlayerStats(ExtendedPlayer properties, EntityPlayerMP player){
+		PacketCustom pvpStatsPacket = new PacketCustom(Resources.MOD_ID, SYNC_PVP_STATS);
+		pvpStatsPacket.writeInt(properties.pvpWon);
+		pvpStatsPacket.writeInt(properties.pvpLost);
+		pvpStatsPacket.writeInt(properties.kills);
+		pvpStatsPacket.writeInt(properties.deaths);		
+		Contained.channel.sendTo(pvpStatsPacket.toPacket(), player);
+		
+		PacketCustom treasureStatsPacket = new PacketCustom(Resources.MOD_ID, SYNC_TEASURE_STATS);
+		treasureStatsPacket.writeInt(properties.treasureWon);
+		treasureStatsPacket.writeInt(properties.treasureLost);
+		treasureStatsPacket.writeInt(properties.treasuresOpened);
+		Contained.channel.sendTo(treasureStatsPacket.toPacket(), player);
 	}
 	
 	public static void addTreasureAndSync(int dimID, ArrayList<BlockCoord> points) {

@@ -1,5 +1,6 @@
 package com.contained.game.world.block;
 
+import com.contained.game.data.DataLogger;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TreasureGem;
 import com.contained.game.user.PlayerTeam;
@@ -115,8 +116,10 @@ public class EmblemBlock {
 								Util.displayMessage((EntityPlayer)player, "[*] "+team.formattedName()+"§f has activated "+count+" of 3 altars!");
 						}
 						
+						DataLogger.insertAlter(Util.getServerID(), Util.getGameID(p.dimension), pdata.teamID, p.getDisplayName(), Util.getDate());
+						
 						if (count >= 3)
-							MiniGameUtil.teamWins(pdata.teamID, p.dimension);
+							MiniGameUtil.teamWins(pdata.teamID, p.dimension, "EMBLEMS");
 					}
 					return true;
 				}

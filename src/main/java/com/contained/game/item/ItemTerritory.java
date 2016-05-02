@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
+import com.contained.game.data.DataLogger;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -83,6 +84,12 @@ public class ItemTerritory {
 					p.inventory.consumeInventoryItem(ItemTerritory.addTerritory);
 				Contained.getTerritoryMap(p.dimension).put(toClaim, playerData.teamID);
 				Contained.channel.sendToAll(ClientPacketHandlerUtil.packetAddTerrBlock(playerData.teamID, x, z).toPacket());
+				DataLogger.insertAddTerritory(Util.getServerID(), 
+						Util.getDimensionString(p.dimension), 
+						Util.getGameID(p.dimension), 
+						MiniGameUtil.gameMode(p.dimension), 
+						playerData.teamID, 
+						p.getDisplayName(), x, z, Util.getDate());
 			}
 		}
 	}
@@ -139,6 +146,7 @@ public class ItemTerritory {
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
 					MiniGameUtil.removeTerritoryBlock(blockToRemove, p.dimension);
 					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());
+					DataLogger.insertRemoveTerritory(Util.getServerID(), Util.getDimensionString(p.dimension), Util.getGameID(p.dimension), MiniGameUtil.gameMode(p.dimension), teamToRemove, playerData.teamID, p.getDisplayName(), x, z, Util.getDate());
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -164,6 +165,10 @@ public class ServerPacketHandler {
 					String revivePlayer = packet.readString();
 					EntityPlayerMP teamPlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(revivePlayer);
 					ExtendedPlayer deadProperties = ExtendedPlayer.get(teamPlayer);
+					
+					if(!MiniGameUtil.isPvP(dimID))
+						return;
+					
 					if(deadProperties.lives == 0){
 						//Revive Player
 						deadProperties.resurrect();
@@ -191,6 +196,8 @@ public class ServerPacketHandler {
 						PacketCustom removeLifeStickPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_ITEM);
 						syncLifePacket.writeInt(slotID);
 						Contained.channel.sendTo(removeLifeStickPacket.toPacket(), teamPlayer);
+						
+						DataLogger.insertRestoreLife(Util.getServerID(), Util.getDimensionString(dimID), Util.getGameID(dimID), PlayerTeamIndividual.get(player.getDisplayName()).teamID, player.getDisplayName(), revivePlayer, Util.getDate());
 					}else
 						Util.displayMessage(player, "Selected Team-Player Is Already Alive!");
 				break;

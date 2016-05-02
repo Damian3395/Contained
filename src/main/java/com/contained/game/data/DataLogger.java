@@ -42,18 +42,116 @@ public class DataLogger {
 		}
 	}
 	
-	public static void insertGameResults(String server, int gameID, int gameMode, String team, int score, int time, String date){
+	public static void insertGameScore(String server, int gameID, int gameMode, String team, int score, int time, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO GAMERESULTS VALUES (?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TEAMSCORE VALUES (?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setInt(3, gameMode);
 			preparedStatement.setString(4, team);
 			preparedStatement.setInt(5, score);
 			preparedStatement.setInt(6, time);
+			preparedStatement.setString(7, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	//Conditions: TIE, TERRITORY, HIGHEST_SCORE, MAX_KILLS, EMBLEMS
+	public static void insertWinningTeam(String server, int gameID, int gameMode, String team, String condition, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO TEAMWON VALUES (?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setInt(3, gameMode);
+			preparedStatement.setString(4, team);
+			preparedStatement.setString(5, condition);
+			preparedStatement.setString(6, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertAlter(String server, int gameID, String team, String player, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO ALTER VALUES (?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setInt(2, gameID);
+			preparedStatement.setString(3, team);
+			preparedStatement.setString(4, player);
+			preparedStatement.setString(5, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertRemoveTerritory(String server, String world, int gameID, int gameMode, String owner, String attacker, String player, int x, int z, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO REMOVETERRITORY VALUES (?,?,?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, world);
+			preparedStatement.setInt(3, gameID);
+			preparedStatement.setInt(4, gameMode);
+			preparedStatement.setString(5, owner);
+			preparedStatement.setString(6, attacker);
+			preparedStatement.setString(7, player);
+			preparedStatement.setInt(8, x);
+			preparedStatement.setInt(9, z);
+			preparedStatement.setString(10, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertAddTerritory(String server, String world, int gameID, int gameMode, String team, String player, int x, int z, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO ADDTERRITORY VALUES (?,?,?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, world);
+			preparedStatement.setInt(3, gameID);
+			preparedStatement.setInt(4, gameMode);
+			preparedStatement.setString(5, team);
+			preparedStatement.setString(6, player);
+			preparedStatement.setInt(7, x);
+			preparedStatement.setInt(8, z);
+			preparedStatement.setString(9, date);
+			preparedStatement.executeUpdate();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void insertRestoreLife(String server, String world, int gameID, String team, String player, String revive, String date){
+		if(!Resources.LOGGING_ENABLED)
+			return;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO REVIVE VALUES (?,?,?,?,?,?,?)");
+			preparedStatement.setString(1, server);
+			preparedStatement.setString(2, world);
+			preparedStatement.setInt(3, gameID);
+			preparedStatement.setString(4, team);
+			preparedStatement.setString(5, player);
+			preparedStatement.setString(6, revive);
 			preparedStatement.setString(7, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){

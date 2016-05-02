@@ -150,7 +150,7 @@ public class PlayerMiniGame {
 				largestScore = Contained.gameScores[dim][i];
 				winningTeam = teams.get(i).id;
 			}
-			DataLogger.insertGameResults(Util.getServerID(), 
+			DataLogger.insertGameScore(Util.getServerID(), 
 					gameID, gameMode, teams.get(i).displayName, 
 					Contained.gameScores[dim][i], Contained.timeLeft[dim], Util.getDate());
 		}

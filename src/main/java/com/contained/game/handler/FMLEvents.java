@@ -160,7 +160,7 @@ public class FMLEvents {
 				
 				for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
 					if (teamHasAlivePlayers[ind] == false) {
-						MiniGameUtil.teamWins(winningTeam, dimID);
+						MiniGameUtil.teamWins(winningTeam, dimID, "MAX_KILLS");
 						break;
 					}
 				}
@@ -239,7 +239,7 @@ public class FMLEvents {
 						maxTeam = null; //Currently a tie
 				}
 				
-				MiniGameUtil.teamWins(maxTeam, dimID);
+				MiniGameUtil.teamWins(maxTeam, dimID, "HIGHEST_SCORE");
 			}
 		}
 	}
