@@ -45,6 +45,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = Resources.MOD_ID, name=Resources.NAME, version=Resources.VERSION)
@@ -121,6 +122,9 @@ public class Contained{
 	
 	public static int[][] gameScores;
 	
+	// See EntityJoinWorldEvent in PlayerEvents.java to know why we need this list
+	public static ArrayList<EntityPlayer> playersToKick;
+	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
 		event.registerServerCommand(new CommandTeamChat());
@@ -144,6 +148,7 @@ public class Contained{
 		teamMemberData = new ArrayList<PlayerTeamIndividual>();
 		teamInvitations = new ArrayList<PlayerTeamInvitation>();
 		trades = new HashMap<Integer, ArrayList<PlayerTrade>>();
+		playersToKick = new ArrayList<EntityPlayer>();
 		activeTreasures = new HashMap<Integer, ArrayList<BlockCoord>>();
 		timeLeft = new int[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];
 		gameActive = new boolean[Math.max(Resources.MAX_PVP_DIMID, Resources.MAX_TREASURE_DIMID)+1];

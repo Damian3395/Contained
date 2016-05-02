@@ -55,6 +55,8 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
 public class PlayerEvents {
+	
+	
 	@SubscribeEvent
 	//When a player joins the server, send their client the territory & team data.
 	public void onJoin(EntityJoinWorldEvent event) {
@@ -71,11 +73,13 @@ public class PlayerEvents {
 				if(MiniGameUtil.isDimensionEmpty(joined.dimension) || miniGame == null ||
 						miniGame.numPlayers() == miniGame.getCapacity() ||
 						miniGame.getTeamID(pdata) == -1){
-					Util.travelToDimension(Resources.OVERWORLD, joined);
-					
-					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
-					miniGamePacket.writeInt(miniGame.getGameDimension());
-					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
+					// Trying to update the player's position during the EntityJoinWorldEvent
+					// will crash the game, as it'll desync the player's chunk position and
+					// cause the game to try to spawn the player inside a different chunk than
+					// the one the player is actually located in.
+					//
+					// So, we use this list to defer the position update until the next tick.
+					Contained.playersToKick.add(joined);
 				}
 			}
 			

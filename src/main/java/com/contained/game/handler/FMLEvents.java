@@ -9,9 +9,11 @@ import org.apache.commons.io.FileDeleteStrategy;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
@@ -41,6 +43,19 @@ public class FMLEvents {
 		if (event.phase == Phase.START) {
 			int rand = Util.randomRange(0, 100);
 			tick++;
+			
+			//Handle any players that are pending to be kicked back to the overworld.
+			if (!Contained.playersToKick.isEmpty()) {
+				for (EntityPlayer p : Contained.playersToKick) {
+					Util.travelToDimension(Resources.OVERWORLD, p);
+					if (MiniGameUtil.isPvP(p.dimension) || MiniGameUtil.isTreasure(p.dimension)) {
+						PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+						miniGamePacket.writeInt(p.dimension);
+						Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)p);
+					}
+				}
+				Contained.playersToKick.clear();
+			}
 			
 			//Periodically see if a pending mini-game has enough players to start.
 			if (rand == 2) {
