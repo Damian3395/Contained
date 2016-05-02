@@ -179,9 +179,16 @@ public class Util {
 				MiniGameUtil.clearArmorInventory(player);
 	
 				player.experienceTotal = pdata.xp;
-				player.inventory.armorInventory = pdata.armor.clone();
-				player.inventory.mainInventory = pdata.inventory.clone();
-				pdata.revertMiniGameChanges();
+				
+				if (pdata.armor != null)
+					player.inventory.armorInventory = pdata.armor.clone();
+				else
+					player.inventory.armorInventory = new ItemStack[4];
+				
+				if (pdata.inventory != null)
+					player.inventory.mainInventory = pdata.inventory.clone();
+				else
+					player.inventory.mainInventory = new ItemStack[36];
 	
 				int invSize = 0;
 				for(ItemStack item : pdata.inventory) {
@@ -228,6 +235,7 @@ public class Util {
 				pdata.xp = 0;
 				pdata.armor = null;
 				pdata.inventory = null;	
+				pdata.revertMiniGameChanges();
 			}
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(

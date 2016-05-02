@@ -73,49 +73,9 @@ public class PlayerEvents {
 						miniGame.getTeamID(pdata) == -1){
 					Util.travelToDimension(Resources.OVERWORLD, joined);
 					
-					PacketCustom restorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
-					restorePacket.writeInt(pdata.xp);
-					
-					int count = 0;
-					if (pdata.armor != null) {
-						for(ItemStack armor : pdata.armor)
-							if(armor != null)
-								count++;
-						restorePacket.writeInt(count);
-						for(int i = 0; i < pdata.armor.length; i++){
-							if(pdata.armor[i] != null){
-								restorePacket.writeInt(i);
-								NBTTagCompound armor = new NBTTagCompound();
-								pdata.armor[i].writeToNBT(armor);
-								restorePacket.writeNBTTagCompound(armor);
-							}
-						}
-					} else
-						restorePacket.writeInt(0);
-					
-					count = 0;
-					if (pdata.inventory != null) {
-						for(ItemStack item : pdata.inventory)
-							if(item != null)
-								count++;
-						restorePacket.writeInt(count);
-						for(int i = 0; i < pdata.inventory.length; i++){
-							if(pdata.inventory[i] != null){
-								restorePacket.writeInt(i);
-								NBTTagCompound item = new NBTTagCompound();
-								pdata.inventory[i].writeToNBT(item);
-								restorePacket.writeNBTTagCompound(item);
-							}
-						}
-					} else
-						restorePacket.writeInt(0);
-					Contained.channel.sendTo(restorePacket.toPacket(), (EntityPlayerMP) joined);
-					
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 					miniGamePacket.writeInt(miniGame.getGameDimension());
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
-					
-					pdata.revertMiniGameChanges();
 				}
 			}
 			

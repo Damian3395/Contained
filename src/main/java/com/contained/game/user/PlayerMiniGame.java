@@ -176,38 +176,6 @@ public class PlayerMiniGame {
 				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
 
 			Util.travelToDimension(0, player);
-			
-			PacketCustom restorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
-			restorePacket.writeInt(pdata.xp);
-			
-			int count = 0;
-			for(ItemStack armor : pdata.armor)
-				if(armor != null)
-					count++;
-			restorePacket.writeInt(count);
-			for(int i = 0; i < pdata.armor.length; i++){
-				if(pdata.armor[i] != null){
-					restorePacket.writeInt(i);
-					NBTTagCompound armor = new NBTTagCompound();
-					pdata.armor[i].writeToNBT(armor);
-					restorePacket.writeNBTTagCompound(armor);
-				}
-			}
-			
-			count = 0;
-			for(ItemStack item : pdata.inventory)
-				if(item != null)
-					count++;
-			restorePacket.writeInt(count);
-			for(int i = 0; i < pdata.inventory.length; i++){
-				if(pdata.inventory[i] != null){
-					restorePacket.writeInt(i);
-					NBTTagCompound item = new NBTTagCompound();
-					pdata.inventory[i].writeToNBT(item);
-					restorePacket.writeNBTTagCompound(item);
-				}
-			}
-			Contained.channel.sendTo(restorePacket.toPacket(), (EntityPlayerMP) player);
 		}
 
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
