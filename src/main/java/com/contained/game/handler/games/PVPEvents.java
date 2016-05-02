@@ -39,16 +39,14 @@ public class PVPEvents {
 		
 		for (PlayerTeam team : Contained.getTeamList(dimID)) {
 			Point newSpawnLocation = new Point(
-					(int)(spawn.posX+Contained.configs.getWorldRadius(dimID)*Math.cos(angle)),
-					(int)(spawn.posZ+Contained.configs.getWorldRadius(dimID)*Math.sin(angle)));	
+					(int)(spawn.posX+(double)Contained.configs.getWorldRadius(dimID)*8D*Math.cos(angle)),
+					(int)(spawn.posZ+(double)Contained.configs.getWorldRadius(dimID)*8D*Math.sin(angle)));	
 			teamSpawnPoints.put(team.id, newSpawnLocation);
-			angle += (2.0*Math.PI)/Contained.configs.maxTeamSize[Resources.PVP];
+			angle += (2.0F*Math.PI)/(float)Contained.configs.gameNumTeams[Resources.PVP];			
 			
-			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) {
-				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) {
+			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) 
+				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) 
 					Contained.getTerritoryMap(dimID).put(new Point(newSpawnLocation.x+i, newSpawnLocation.y+j), team.id);
-				}
-			}
 		}
 		
 		return teamSpawnPoints;

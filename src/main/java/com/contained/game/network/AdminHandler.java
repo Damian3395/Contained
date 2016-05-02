@@ -6,6 +6,7 @@ import java.util.List;
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.ObjectGenerator;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
@@ -148,7 +149,14 @@ public class AdminHandler {
 		PlayerTeamIndividual.get(targetPlayer).leaveTeam();
 		EntityPlayer toKick = Util.getOnlinePlayer(targetPlayer);
 		if (toKick != null) {
-			Contained.playersToKick.add(toKick);
+			int remdimension = toKick.dimension;
+			Util.travelToDimension(Resources.OVERWORLD, toKick);
+			
+			if (MiniGameUtil.isPvP(remdimension) || MiniGameUtil.isTreasure(remdimension)) {
+				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+				miniGamePacket.writeInt(remdimension);
+				Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)toKick);
+			}
 			Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 			Util.displayMessage(toKick, "You've been kicked back to Overworld by Admin");
 		} else

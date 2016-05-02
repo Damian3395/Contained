@@ -166,14 +166,6 @@ public class Util {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
-			if (dimID == 0) {
-				try {
-					throw new Exception();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
 			if (properties.inGame()) {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	
@@ -192,13 +184,9 @@ public class Util {
 				int armorSize = 0;
 				if (pdata.armor != null) {
 					player.inventory.armorInventory = pdata.armor.clone();
-					
-					for(ItemStack item : pdata.armor) {
-						if(item != null){
-							System.out.println("Restore " + item.getDisplayName());
+					for(ItemStack item : pdata.armor) 
+						if(item != null)
 							armorSize++;
-						}
-					}
 				}
 				else
 					player.inventory.armorInventory = new ItemStack[4];
@@ -206,13 +194,9 @@ public class Util {
 				int invSize = 0;
 				if (pdata.inventory != null) {
 					player.inventory.mainInventory = pdata.inventory.clone();
-					
-					for(ItemStack item : pdata.inventory) {
-						if(item != null){
-							System.out.println("Restore " + item.getDisplayName());
+					for(ItemStack item : pdata.inventory)
+						if(item != null)
 							invSize++;
-						}
-					}
 				}
 				else
 					player.inventory.mainInventory = new ItemStack[36];

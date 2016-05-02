@@ -53,9 +53,6 @@ public class CommandStartTreasureHunt implements ICommand {
 						
 						Util.displayMessage((EntityPlayer)sender, Util.successCode + "Creating Treasure Hunt Game in Dimension " + dim);
 						
-						//Teleport Player
-						Util.travelToDimension(dim, (EntityPlayer)sender);
-						
 						//Create & Sync MiniGame
 						MiniGameUtil.testStartGame(dim, (EntityPlayerMP)sender);
 					} catch (Exception e){
