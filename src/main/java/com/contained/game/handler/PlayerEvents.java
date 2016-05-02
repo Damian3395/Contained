@@ -65,23 +65,6 @@ public class PlayerEvents {
 
 			boolean completedSurvey = false;
 			
-			//Check If Player Is In A Valid MiniGame Dimension
-			if(MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension)){
-				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(joined.getDisplayName());
-				ExtendedPlayer ext = ExtendedPlayer.get(joined);
-				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
-				
-				if(miniGame == null || miniGame.getGameID() != ext.gameID){
-					// Trying to update the player's position during the EntityJoinWorldEvent
-					// will crash the game, as it'll desync the player's chunk position and
-					// cause the game to try to spawn the player inside a different chunk than
-					// the one the player is actually located in.
-					//
-					// So, we use this list to defer the position update until the next tick.
-					Contained.playersToKick.add(joined);
-				}
-			}
-			
 			if (PlayerTeamIndividual.get(joined) == null) {
 				// Server has no info about this player, this must be their first
 				// time joining. Initialize their custom data.

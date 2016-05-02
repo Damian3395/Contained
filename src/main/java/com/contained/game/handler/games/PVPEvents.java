@@ -20,6 +20,7 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
@@ -57,8 +58,22 @@ public class PVPEvents {
 	public void onSpawn(Clone event){
 		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
 			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			if(properties.inGame() && properties.gameMode == Resources.PVP){				
-				properties.setLives(ExtendedPlayer.get(event.original).lives);
+			ExtendedPlayer old = ExtendedPlayer.get(event.original);
+			if(properties.inGame() && properties.gameMode == Resources.PVP 
+					&& (MiniGameUtil.isPvP(event.entityPlayer.dimension) || MiniGameUtil.isTreasure(event.entityPlayer.dimension))){
+				properties.setLives(old.lives);
+				/*
+				if(MiniGameUtil.isPvP(event.entityPlayer.dimension)){
+					properties.curDeaths = old.curDeaths;
+					properties.curKills = old.curKills;
+					properties.deaths = old.deaths;
+					properties.kills = old.kills;
+				}
+				if(MiniGameUtil.isTreasure(event.entityPlayer.dimension)){
+					properties.curTreasuresOpened = old.curTreasuresOpened;
+					properties.treasuresOpened = old.treasuresOpened;
+				}
+				*/
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(properties.lives);

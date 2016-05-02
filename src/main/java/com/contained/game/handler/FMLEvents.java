@@ -104,7 +104,7 @@ public class FMLEvents {
 			if (tick % 300 == 0) {
 				ArrayList<PlayerMiniGame> gamesToEnd = new ArrayList<PlayerMiniGame>();
 				for(PlayerMiniGame game : Contained.miniGames) {
-					if (game.numOnlinePlayers() == 0) {
+					if (game.numOnlinePlayers() == 0 && game.getGameDimension() != Resources.OVERWORLD) {
 						// Wait at least 60 seconds after it goes inactive to actually end it, though
 						inactivityChecks[game.getGameDimension()] += 1;
 						Util.serverDebugMessage("DIM"+game.getGameDimension()+" has been inactive for "+(inactivityChecks[game.getGameDimension()]*15)+" seconds...");

@@ -140,10 +140,20 @@ public class PlayerMiniGame {
 
 	public void endGame(){
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
-		for(int i = 0; i < teams.size(); i++)
+		String winningTeam = "";
+		int largestScore = 0;
+		for(int i = 0; i < teams.size(); i++){
+			if(winningTeam.equals("")){
+				largestScore = Contained.gameScores[dim][i];
+				winningTeam = teams.get(i).displayName;
+			}else if(largestScore < Contained.gameScores[dim][i]){
+				largestScore = Contained.gameScores[dim][i];
+				winningTeam = teams.get(i).displayName;
+			}
 			DataLogger.insertGameResults(Util.getServerID(), 
 					gameID, gameMode, teams.get(i).displayName, 
 					Contained.gameScores[dim][i], Contained.timeLeft[dim], Util.getDate());
+		}
 
 		Util.serverDebugMessage("Ending DIM"+dim+" game");
 
@@ -166,52 +176,37 @@ public class PlayerMiniGame {
 		for(EntityPlayer player : getOnlinePlayers()){
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
-
-			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null)
+			
+			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
 				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
-			else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null)
+				if(pdata.teamID.equals(winningTeam))
+					properties.pvpWon++;
+				else
+					properties.pvpLost++;
+			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
 				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
-
+				if(pdata.teamID.equals(winningTeam))
+					properties.treasureWon++;
+				else
+					properties.treasureLost++;
+			}			
+			
 			Util.travelToDimension(0, player);
 			
-			properties.gameMode = Resources.OVERWORLD;
-			properties.gameID = -1;
-			properties.setGame(false);
-			
-			/*
-			PacketCustom restorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
-			restorePacket.writeInt(pdata.xp);
-			
-			int count = 0;
-			for(ItemStack armor : pdata.armor)
-				if(armor != null)
-					count++;
-			restorePacket.writeInt(count);
-			for(int i = 0; i < pdata.armor.length; i++){
-				if(pdata.armor[i] != null){
-					restorePacket.writeInt(i);
-					NBTTagCompound armor = new NBTTagCompound();
-					pdata.armor[i].writeToNBT(armor);
-					restorePacket.writeNBTTagCompound(armor);
-				}
+			if(MiniGameUtil.isPvP(dim)){
+				PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
+				syncScore.writeInt(properties.pvpWon);
+				syncScore.writeInt(properties.pvpLost);
+				syncScore.writeInt(properties.kills);
+				syncScore.writeInt(properties.deaths);
+				Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+			}else if(MiniGameUtil.isTreasure(dim)){
+				PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
+				syncScore.writeInt(properties.treasureWon);
+				syncScore.writeInt(properties.treasureLost);
+				syncScore.writeInt(properties.treasuresOpened);
+				Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
 			}
-			
-			count = 0;
-			for(ItemStack item : pdata.inventory)
-				if(item != null)
-					count++;
-			restorePacket.writeInt(count);
-			for(int i = 0; i < pdata.inventory.length; i++){
-				if(pdata.inventory[i] != null){
-					restorePacket.writeInt(i);
-					NBTTagCompound item = new NBTTagCompound();
-					pdata.inventory[i].writeToNBT(item);
-					restorePacket.writeNBTTagCompound(item);
-				}
-			}
-			Contained.channel.sendTo(restorePacket.toPacket(), (EntityPlayerMP) player);
-			pdata.revertMiniGameChanges();
-			*/
 		}
 
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
