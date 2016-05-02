@@ -180,61 +180,68 @@ public class Util {
 	
 				player.experienceTotal = pdata.xp;
 				
-				if (pdata.armor != null)
+				int armorSize = 0;
+				if (pdata.armor != null) {
 					player.inventory.armorInventory = pdata.armor.clone();
+					
+					for(ItemStack item : pdata.armor) {
+						if(item != null){
+							System.out.println("Restore " + item.getDisplayName());
+							armorSize++;
+						}
+					}
+				}
 				else
 					player.inventory.armorInventory = new ItemStack[4];
 				
-				if (pdata.inventory != null)
+				int invSize = 0;
+				if (pdata.inventory != null) {
 					player.inventory.mainInventory = pdata.inventory.clone();
+					
+					for(ItemStack item : pdata.inventory) {
+						if(item != null){
+							System.out.println("Restore " + item.getDisplayName());
+							invSize++;
+						}
+					}
+				}
 				else
 					player.inventory.mainInventory = new ItemStack[36];
-	
-				int invSize = 0;
-				for(ItemStack item : pdata.inventory) {
-					if(item != null){
-						System.out.println("Restore " + item.getDisplayName());
-						invSize++;
-					}
-				}
-	
-				int armorSize = 0;
-				for(ItemStack item : pdata.armor) {
-					if(item != null){
-						System.out.println("Restore " + item.getDisplayName());
-						armorSize++;
-					}
-				}
 	
 				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
 				miniGamePacket.writeInt(pdata.xp);
 				miniGamePacket.writeInt(armorSize);
 				int index = 0;
-				for(ItemStack item : pdata.armor) {
-					if(item != null){
-						miniGamePacket.writeInt(index);
-						NBTTagCompound itemSave = new NBTTagCompound();
-						item.writeToNBT(itemSave);
-						miniGamePacket.writeNBTTagCompound(itemSave);
+				if (pdata.armor != null) {
+					for(ItemStack item : pdata.armor) {
+						if(item != null){
+							miniGamePacket.writeInt(index);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							item.writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+							index++;
+						}
 					}
+					pdata.armor = null;
 				}
 	
 				index = 0;
 				miniGamePacket.writeInt(invSize);
-				for(ItemStack item : pdata.inventory) {
-					if(item != null){
-						miniGamePacket.writeInt(index);
-						NBTTagCompound itemSave = new NBTTagCompound();
-						item.writeToNBT(itemSave);
-						miniGamePacket.writeNBTTagCompound(itemSave);
-						index++;
+				if (pdata.inventory != null) {
+					for(ItemStack item : pdata.inventory) {
+						if(item != null){
+							miniGamePacket.writeInt(index);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							item.writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+							index++;
+						}
 					}
+					pdata.inventory = null;	
 				}
 				Contained.channel.sendTo(miniGamePacket.toPacket(), mpPlayer);
 	
 				pdata.xp = 0;
-				pdata.armor = null;
-				pdata.inventory = null;	
 				pdata.revertMiniGameChanges();
 			}
 			
