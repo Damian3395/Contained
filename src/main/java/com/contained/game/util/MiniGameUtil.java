@@ -70,6 +70,12 @@ public class MiniGameUtil {
 		// a short period of time (~10 seconds?) and then terminate the dimension 
 		// and send everyone back to the overworld.
 		
+		if (teamID == null)
+			System.out.println("Game was a tie.");
+		else {
+			PlayerTeam t = PlayerTeam.get(teamID);
+			System.out.println(t.displayName+" wins!");
+		}
 		PlayerMiniGame.get(dimID).endGame();
 	}
 	
@@ -107,7 +113,6 @@ public class MiniGameUtil {
 			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
 			startMiniGame.gameID = game.getGameID();
 			startMiniGame.setGameMode(gameMode);
-			startMiniGame.setGame(true);
 			
 			//Set the player to not be waiting for a mini-game anymore.
 			MiniGameHandler.cancelMiniGame((EntityPlayerMP)player);
@@ -115,6 +120,7 @@ public class MiniGameUtil {
 			//Send the player to the dimension, and set their spawn location correctly.
 			Util.travelToDimension(dimID, player);
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
+			startMiniGame.setGame(true);
 			
 			if (teamSpawnLocations == null || pdata.teamID == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
 				Point p = Util.getRandomLocation(w);
