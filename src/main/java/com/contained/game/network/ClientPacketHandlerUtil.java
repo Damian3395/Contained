@@ -220,19 +220,6 @@ public class ClientPacketHandlerUtil {
 		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetUpdatePlayer(memberChanged).toPacket());
 	}
 	
-	public static void syncMinigameStart(PlayerMiniGame data) {
-		PacketCustom startGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
-		NBTTagCompound miniGameData = new NBTTagCompound();
-		data.writeToNBT(miniGameData);
-		startGamePacket.writeNBTTagCompound(miniGameData);
-		Contained.channel.sendToDimension(startGamePacket.toPacket(), data.getGameDimension());
-		
-		PacketCustom teamSync = packetSyncTeams(Contained.getTeamList(data.getGameDimension()));
-		Contained.channel.sendToDimension(teamSync.toPacket(), data.getGameDimension());
-		
-		syncMinigameTime(data.getGameDimension());
-	}
-	
 	public static void syncMinigameTime(int dimID) {
 		PacketCustom timePacket = new PacketCustom(Resources.MOD_ID, MINIGAME_TIMER_SYNC);
 		timePacket.writeInt(Contained.timeLeft[dimID]);

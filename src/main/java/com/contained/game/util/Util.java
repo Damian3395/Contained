@@ -166,10 +166,19 @@ public class Util {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
+			if (dimID == 0) {
+				try {
+					throw new Exception();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
 			if (properties.inGame()) {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	
 				properties.setGameMode(Resources.OVERWORLD);
+				properties.gameID = -1;
 				properties.setGame(false);
 				properties.curDeaths = 0;
 				properties.curKills = 0;
@@ -179,55 +188,66 @@ public class Util {
 				MiniGameUtil.clearArmorInventory(player);
 	
 				player.experienceTotal = pdata.xp;
-				player.inventory.armorInventory = pdata.armor.clone();
-				player.inventory.mainInventory = pdata.inventory.clone();
-				pdata.revertMiniGameChanges();
-	
-				int invSize = 0;
-				for(ItemStack item : pdata.inventory) {
-					if(item != null){
-						System.out.println("Restore " + item.getDisplayName());
-						invSize++;
-					}
-				}
-	
+				
 				int armorSize = 0;
-				for(ItemStack item : pdata.armor) {
-					if(item != null){
-						System.out.println("Restore " + item.getDisplayName());
-						armorSize++;
+				if (pdata.armor != null) {
+					player.inventory.armorInventory = pdata.armor.clone();
+					
+					for(ItemStack item : pdata.armor) {
+						if(item != null){
+							System.out.println("Restore " + item.getDisplayName());
+							armorSize++;
+						}
 					}
 				}
+				else
+					player.inventory.armorInventory = new ItemStack[4];
+				
+				int invSize = 0;
+				if (pdata.inventory != null) {
+					player.inventory.mainInventory = pdata.inventory.clone();
+					
+					for(ItemStack item : pdata.inventory) {
+						if(item != null){
+							System.out.println("Restore " + item.getDisplayName());
+							invSize++;
+						}
+					}
+				}
+				else
+					player.inventory.mainInventory = new ItemStack[36];
 	
 				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
 				miniGamePacket.writeInt(pdata.xp);
 				miniGamePacket.writeInt(armorSize);
-				int index = 0;
-				for(ItemStack item : pdata.armor) {
-					if(item != null){
-						miniGamePacket.writeInt(index);
-						NBTTagCompound itemSave = new NBTTagCompound();
-						item.writeToNBT(itemSave);
-						miniGamePacket.writeNBTTagCompound(itemSave);
+				if (pdata.armor != null) {
+					for(int i=0; i<pdata.armor.length; i++) {
+						if(pdata.armor[i] != null){
+							miniGamePacket.writeInt(i);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							pdata.armor[i].writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+						}
 					}
+					pdata.armor = null;
 				}
 	
-				index = 0;
 				miniGamePacket.writeInt(invSize);
-				for(ItemStack item : pdata.inventory) {
-					if(item != null){
-						miniGamePacket.writeInt(index);
-						NBTTagCompound itemSave = new NBTTagCompound();
-						item.writeToNBT(itemSave);
-						miniGamePacket.writeNBTTagCompound(itemSave);
-						index++;
+				if (pdata.inventory != null) {
+					for(int i=0; i<pdata.inventory.length; i++) {
+						if(pdata.inventory[i] != null){
+							miniGamePacket.writeInt(i);
+							NBTTagCompound itemSave = new NBTTagCompound();
+							pdata.inventory[i].writeToNBT(itemSave);
+							miniGamePacket.writeNBTTagCompound(itemSave);
+						}
 					}
+					pdata.inventory = null;	
 				}
 				Contained.channel.sendTo(miniGamePacket.toPacket(), mpPlayer);
 	
 				pdata.xp = 0;
-				pdata.armor = null;
-				pdata.inventory = null;	
+				pdata.revertMiniGameChanges();
 			}
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(

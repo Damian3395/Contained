@@ -74,9 +74,9 @@ public class PlayerMiniGame {
 	}
 
 	public PlayerMiniGame(int dimID, int gameMode){
-		super();
 		this.dim = dimID;
 		this.gameMode = gameMode;
+		this.gameID = -1;
 	}
 
 	public PlayerMiniGame(NBTTagCompound ntc) {
@@ -175,7 +175,7 @@ public class PlayerMiniGame {
 			Util.travelToDimension(0, player);
 			
 			properties.gameMode = Resources.OVERWORLD;
-			properties.inGameID = -1;
+			properties.gameID = -1;
 			properties.setGame(false);
 			
 			/*

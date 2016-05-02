@@ -46,12 +46,10 @@ public class MiniGameUtil {
 		return false;
 	}
 	
-	public static boolean isDimensionEmpty(int dim) {
-		for(PlayerMiniGame games : Contained.miniGames)
-			if(games.getGameDimension() == dim)
-				return false;
-		
-		return true;
+	public static boolean isDimensionInactive(int dim) {
+		if(PlayerMiniGame.get(dim) == null)
+			return true;
+		return false;
 	}
 	
 	public static int gameMode(int dimID) {
@@ -122,9 +120,10 @@ public class MiniGameUtil {
 			}
 			
 			ExtendedPlayer startMiniGame = ExtendedPlayer.get(player);
+			startMiniGame.gameID = game.getGameID();
 			startMiniGame.setGameMode(gameMode);
 			startMiniGame.setGame(true);
-			startMiniGame.inGameID = game.getGameID();
+			startMiniGame.gameID = game.getGameID();
 			
 			pdata.xp = player.experienceTotal;
 			pdata.armor = player.inventory.armorInventory.clone();
@@ -172,6 +171,7 @@ public class MiniGameUtil {
 		//Sync MiniGame & Teams
 		PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
 		miniGamePacket.writeInt(gameMode);
+		miniGamePacket.writeInt(game.getGameID());
 		NBTTagCompound miniGameData = new NBTTagCompound();
 		game.writeToNBT(miniGameData);
 		miniGamePacket.writeNBTTagCompound(miniGameData);

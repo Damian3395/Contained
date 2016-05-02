@@ -146,9 +146,13 @@ public class AdminHandler {
 	}
 	public void kick(EntityPlayerMP player, String targetPlayer){
 		PlayerTeamIndividual.get(targetPlayer).leaveTeam();
-		Util.travelToDimension(0, Util.getOnlinePlayer(targetPlayer));
-		Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
-		Util.displayMessage(Util.getOnlinePlayer(targetPlayer), "You've been kicked back to Overworld by Admin");
+		EntityPlayer toKick = Util.getOnlinePlayer(targetPlayer);
+		if (toKick != null) {
+			Contained.playersToKick.add(toKick);
+			Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
+			Util.displayMessage(toKick, "You've been kicked back to Overworld by Admin");
+		} else
+			Util.displayMessage(player, "Couldn't find the requested player");
 	}
 	
 	public void becomeRegularPlayer(EntityPlayerMP player){

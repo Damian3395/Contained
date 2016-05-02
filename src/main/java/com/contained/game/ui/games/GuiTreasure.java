@@ -47,7 +47,7 @@ public class GuiTreasure extends Gui {
 	public GuiTreasure(Minecraft mc){
 		super();
 		this.mc = mc;
-		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games");
+		this.img = new ResourceLocation(Resources.MOD_ID, "textures/gui/games.png");
 	}
 	
 	@SubscribeEvent

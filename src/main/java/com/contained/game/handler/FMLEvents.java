@@ -9,9 +9,11 @@ import org.apache.commons.io.FileDeleteStrategy;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
@@ -42,6 +44,21 @@ public class FMLEvents {
 			int rand = Util.randomRange(0, 100);
 			tick++;
 			
+			//Handle any players that are pending to be kicked back to the overworld.
+			if (!Contained.playersToKick.isEmpty()) {
+				for (EntityPlayer p : Contained.playersToKick) {
+					int remdimension = p.dimension;
+					Util.travelToDimension(Resources.OVERWORLD, p);
+					
+					if (MiniGameUtil.isPvP(remdimension) || MiniGameUtil.isTreasure(remdimension)) {
+						PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+						miniGamePacket.writeInt(remdimension);
+						Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)p);
+					}
+				}
+				Contained.playersToKick.clear();
+			}
+			
 			//Periodically see if a pending mini-game has enough players to start.
 			if (rand == 2) {
 				if (DimensionManager.getWorld(0) != null) {
@@ -65,6 +82,7 @@ public class FMLEvents {
 						for(EntityPlayer player : lobbyPlayers) {
 							if (ExtendedPlayer.get(player).isWaitingForMiniGame()) {
 								toEnter.addPlayer(player);
+								playersToJoin.add(player);
 								count++;
 								if (count >= toEnter.getCapacity())
 									break;
