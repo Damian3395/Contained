@@ -11,42 +11,46 @@
 <link>
  <text>Mini Games</text>
  <icon>miniGame</icon>
- <jump>1</jump>
+ <jump>2</jump>
 </link>
 <link>
  <text>Guilds</text>
  <icon>guild</icon>
- <jump>2</jump>
+ <jump>3</jump>
 </link>
 <link>
  <text>Getting Started</text>
  <icon>TerritoryFlag</icon>
- <jump>3</jump>
+ <jump>4</jump>
 </link>
 <link>
  <text>Town Hall</text>
  <icon>townHall</icon>
- <jump>4</jump>
+ <jump>5</jump>
 </link>
 <link>
  <text>Territory Gems/Machines</text>
  <icon>ClaimTerritoryMachine</icon>
- <jump>5</jump>
+ <jump>6</jump>
 </link>
 <link>
  <text>Occupational Classes</text>
  <icon>occupation</icon>
- <jump>6</jump>
+ <jump>7</jump>
 </link>
+</page>
+
+<page type="contents">
+<text>Table of Contents</text>
 <link>
  <text>Perks</text>
  <icon>xp</icon>
- <jump>8</jump>
+ <jump>9</jump>
 </link>
 <link>
  <text>Life and Death</text>
  <icon>AppleofLife</icon>
- <jump>14</jump>
+ <jump>15</jump>
 </link>
 </page>
 
@@ -59,6 +63,74 @@ By pressing the 'join' button, you will be added to a queue to be added to a ran
 While you are waiting for a queue, you can cancel your request to join a mini game.
 If your team wins the game, each player will be rewarded based on their performance with random items.
 </text>
+</page>
+
+<page type="sectionpage">
+<title>Winning Conditions Mini-Game</title>
+<text>§lPvP Winning Conditions§r
+One: Steal All Of Your Enemys' Territory.
+Two: Kill Off All Of Your Enemys.
+Three: The Team With The Most Kills.
+
+§lTreasure Hunt Winning Conditions§r
+One: Activate 3 out of the 4 Emblem Alters.
+Two: The Team With The The Most Treasures Found.
+</text>
+</page>
+
+<page type="toolpage">
+<title>Treasure Gems</title>
+<text>In order to activate a alter in the treasure hunt mini game. You must craft one of the following gems and right click the alter block to activate its' beacon.
+§lAlters:§r
+</text>
+<item>
+ <text>Fire</text>
+ <icon>fireEmblemBlockActive</icon>
+</item>
+<item>
+ <text>Earth</text>
+ <icon>earthEmblemBlockActive</icon>
+</item>
+<item>
+ <text>Water</text>
+ <icon>waterEmblemBlockActive</icon>
+</item>
+<item>
+ <text>Wind</text>
+ <icon>windEmblemBlockActive</icon>
+</item>
+</page>
+
+<page type="crafting">
+<text>Earth Treasure Gem</text>
+<recipe>
+ <name>contained:treasureGems11</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="crafting">
+<text>Water Treasure Gem</text>
+<recipe>
+ <name>contained:treasureGems12</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="crafting">
+<text>Fire Treasure Gem</text>
+<recipe>
+ <name>contained:treasureGems13</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="crafting">
+<text>Wind Treasure Gem</text>
+<recipe>
+ <name>contained:treasureGems14</name>
+ <size>three</size>
+</recipe>
 </page>
 
 <page type="sectionpage">

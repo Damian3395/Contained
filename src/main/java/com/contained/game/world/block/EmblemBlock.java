@@ -39,6 +39,11 @@ public class EmblemBlock {
 	public static BlockEmblemReciever waterEmblemAct = new BlockEmblemReciever(TreasureGem.BLUE, true, "waterEmblemBlockActive");
 	public static BlockEmblemReciever windEmblemAct = new BlockEmblemReciever(TreasureGem.WHITE, true, "windEmblemBlockActive");
 
+	public static String fireBlockName = fireEmblemAct.getUnlocalizedName().replace("tile.", "");
+	public static String earthBlockName = earthEmblemAct.getUnlocalizedName().replace("tile.", "");
+	public static String waterBlockName = waterEmblemAct.getUnlocalizedName().replace("tile.", "");
+	public static String windBlockName = windEmblemAct.getUnlocalizedName().replace("tile.", "");
+	
 	public void preInit(FMLPreInitializationEvent event){
 		GameRegistry.registerBlock(fireEmblemInact,  fireEmblemInact.getUnlocalizedName().replace("tile.", ""));
 		GameRegistry.registerBlock(earthEmblemInact,  earthEmblemInact.getUnlocalizedName().replace("tile.", ""));
@@ -50,7 +55,7 @@ public class EmblemBlock {
 		GameRegistry.registerBlock(windEmblemAct,  windEmblemAct.getUnlocalizedName().replace("tile.", ""));
 	}
 
-	static class BlockEmblemReciever extends BlockContainer {
+	private static class BlockEmblemReciever extends BlockContainer {
 		IIcon gor = null, dol = null, st1 = null, st2 = null, st3 = null, st4 = null;
 		public int myColor;
 		public boolean active;
