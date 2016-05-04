@@ -44,7 +44,7 @@ public class WizardClass {
 	public List<GuiButton> getButtonList(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
-		this.buttonList.add(bone = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 48, "-10% Skeleton Damage"));
+		this.buttonList.add(bone = new IconButton(3, x-15, y-90, 20, 20, "perkIcons.png", 0, 48, "-10% Skeleton Damage"));
 		
 		this.buttonList.add(book = new IconButton(47, x-75, y-60, 20, 20, "perkIcons.png", 16, 48, "-10% Magic Damage"));
 		this.buttonList.add(bottle = new IconButton(48, x+45, y-60, 20, 20, "perkIcons.png", 32, 48, "Potion of Swiftness"));

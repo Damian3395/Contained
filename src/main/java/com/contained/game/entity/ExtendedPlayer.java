@@ -250,6 +250,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("treasureLost", this.treasureLost);
 		save.setInteger("kills", this.kills);
 		save.setInteger("deaths", this.deaths);
+		save.setInteger("treasuresOpened", this.treasuresOpened);
 	}
 
 	@Override

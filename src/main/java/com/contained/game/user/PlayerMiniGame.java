@@ -338,6 +338,14 @@ public class PlayerMiniGame {
 
 		return false;
 	}
+	
+	private boolean teamColorExists(int index){
+		for(PlayerTeam team : Contained.getTeamList(dim))
+			if(team.colorID == index)
+				return true;
+		
+		return false;
+	}
 
 	private int getEmptyWorld(int gameMode){
 		int dim = -1;
@@ -371,10 +379,15 @@ public class PlayerMiniGame {
 	private void createTeam(EntityPlayer player){
 		Random rand = new Random();
 		String teamName = generateName();
+		int colorID = rand.nextInt(PlayerTeam.formatColors.length);
+		
 		while(teamExists(teamName))
 			teamName = generateName();
+		
+		while(teamColorExists(colorID))
+			colorID = rand.nextInt(PlayerTeam.formatColors.length);
 
-		PlayerTeam newTeam = new PlayerTeam(teamName, rand.nextInt(PlayerTeam.formatColors.length), dim);
+		PlayerTeam newTeam = new PlayerTeam(teamName, colorID, dim);
 		Contained.getTeamList(dim).add(newTeam);
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 		pdata.joinMiniTeam(newTeam.id);	

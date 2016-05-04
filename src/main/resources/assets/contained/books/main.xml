@@ -252,14 +252,42 @@ Symbols:
 <page type="sectionpage">
 <title>Collector Class</title>
 <text>§lPerks:§r
-To Be Added
+Wooden Shovel: (!) x1.75 Break Speed
+Stone Pickaxe: (!) x1.75 Break Speed
+Stone Axe: (#!) +10% Damage
+Iron Pickaxe: (!) x1.5 Break Speed
+Iron Axe: (!) x1.5 Break Speed
+Gold Pickaxe: (#!) -10% Damage
+Gold Axe: (#!) +10% Damage
+Diamond Pickaxe: (!) x1.25 Break Speed
+Diamond Shovel: (*!) -10% Damage
+Bucket: -10% Drowning Damage
+Ladder: -10% Falling Damage
+Tree: (*) -10% Damage in Forest
+Lamp: (#) +10% Damage
+Gold Shovel: (#!) +10% Damage
+Diamond Axe: (#!) +10% Damage
 </text>
 </page>
 
 <page type="sectionpage">
 <title>Builder Class</title>
 <text>§lPerks:§r
-To be Added
+Grass: -10% Damage in Plains
+Sand: +10% Speed
+Dirt: +10% Damage in Plains
+Sandstone: -10% Damage in Beach
+Sandstone Curved: +10% Damage in Desert
+Cobble: -10% Damage During Night
+Stone: +10% Damage with Stone Tools
+Furnace: -10% Fire Damage
+Gold: +10% Dmage With Gold Tools
+Glass: +10% Damage in Ice Plains
+Diamond: -10% Damage in Taiga
+Obsidian: +10% Damage in Nether
+Stone Brick: Chance of Gaining Back Placed Block
+Brick: +10% Damage in Overworld
+Iron: -10% Damage with Iron Tools
 </text>
 </page>
 

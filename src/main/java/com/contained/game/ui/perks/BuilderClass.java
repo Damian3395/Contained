@@ -44,26 +44,26 @@ public class BuilderClass {
 	public List<GuiButton> getButtonList(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
-		this.buttonList.add(grass = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 16, "Test"));
+		this.buttonList.add(grass = new IconButton(1, x-15, y-90, 20, 20, "perkIcons.png", 0, 16, "-10% Damage in Plains"));
 		
-		this.buttonList.add(sand = new IconButton(19, x-75, y-60, 20, 20, "perkIcons.png", 16, 16, "Test"));
-		this.buttonList.add(dirt = new IconButton(20, x+45, y-60, 20, 20, "perkIcons.png", 32, 16, "Test"));
+		this.buttonList.add(sand = new IconButton(19, x-75, y-60, 20, 20, "perkIcons.png", 16, 16, "+10% Speed"));
+		this.buttonList.add(dirt = new IconButton(20, x+45, y-60, 20, 20, "perkIcons.png", 32, 16, "+10% Damage in Plains"));
 		
-		this.buttonList.add(sandstone = new IconButton(21, x-105, y-30, 20, 20, "perkIcons.png", 48, 16, "Test"));
-		this.buttonList.add(sandstoneCurved = new IconButton(22, x-45, y-30, 20, 20, "perkIcons.png", 64, 16, "Test"));
+		this.buttonList.add(sandstone = new IconButton(21, x-105, y-30, 20, 20, "perkIcons.png", 48, 16, "-10% Damage in Beach"));
+		this.buttonList.add(sandstoneCurved = new IconButton(22, x-45, y-30, 20, 20, "perkIcons.png", 64, 16, "+10% Damage in Desert"));
 		
-		this.buttonList.add(cobble = new IconButton(23, x+15, y-30, 20, 20, "perkIcons.png", 80, 16, "Test"));
-		this.buttonList.add(stone = new IconButton(24, x+75, y-30, 20, 20, "perkIcons.png", 96, 16, "Test"));
+		this.buttonList.add(cobble = new IconButton(23, x+15, y-30, 20, 20, "perkIcons.png", 80, 16, "-10% Damage at Night"));
+		this.buttonList.add(stone = new IconButton(24, x+75, y-30, 20, 20, "perkIcons.png", 96, 16, "+10% Damage Stone Tools"));
 		
-		this.buttonList.add(furnace = new IconButton(29, x+90, y, 20, 20, "perkIcons.png", 176, 16, "Test"));
-		this.buttonList.add(gold = new IconButton(30, x+60, y, 20, 20, "perkIcons.png", 192, 16, "Test"));
-		this.buttonList.add(glass = new IconButton(31, x+30, y, 20, 20, "perkIcons.png", 208, 16, "Test"));
-		this.buttonList.add(diamond = new IconButton(32, x, y, 20, 20, "perkIcons.png", 224, 16, "Test"));
+		this.buttonList.add(furnace = new IconButton(29, x+90, y, 20, 20, "perkIcons.png", 176, 16, "-10% Fire Damage"));
+		this.buttonList.add(gold = new IconButton(30, x+60, y, 20, 20, "perkIcons.png", 192, 16, "+10% Damage Gold Tools"));
+		this.buttonList.add(glass = new IconButton(31, x+30, y, 20, 20, "perkIcons.png", 208, 16, "+10% Damage in Ice Plains"));
+		this.buttonList.add(diamond = new IconButton(32, x, y, 20, 20, "perkIcons.png", 224, 16, "-10% Damage in Taiga"));
 		
-		this.buttonList.add(obsidian = new IconButton(28, x-30, y, 20, 20, "perkIcons.png", 160, 16, "Test"));
-		this.buttonList.add(stoneBrick = new IconButton(27, x-60, y, 20, 20, "perkIcons.png", 144, 16, "Test"));
-		this.buttonList.add(brick = new IconButton(26, x-90, y, 20, 20, "perkIcons.png", 128, 16, "Test"));
-		this.buttonList.add(iron = new IconButton(25, x-120, y, 20, 20, "perkIcons.png", 112, 16, "Test"));
+		this.buttonList.add(obsidian = new IconButton(28, x-30, y, 20, 20, "perkIcons.png", 160, 16, "+10% Damage in Nether"));
+		this.buttonList.add(stoneBrick = new IconButton(27, x-60, y, 20, 20, "perkIcons.png", 144, 16, "Chance Return Block"));
+		this.buttonList.add(brick = new IconButton(26, x-90, y, 20, 20, "perkIcons.png", 128, 16, "+10% Damage in Overworld"));
+		this.buttonList.add(iron = new IconButton(25, x-120, y, 20, 20, "perkIcons.png", 112, 16, "-10% Damage Iron Tools"));
 		
 		renderTree();
 		

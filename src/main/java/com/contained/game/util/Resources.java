@@ -25,6 +25,7 @@ public class Resources {
 	public static final int MAX_PVP_GAMES = MAX_PVP_DIMID-MIN_PVP_DIMID+1;
 	public static final int MAX_TREASURE_GAMES = MAX_TREASURE_DIMID-MIN_TREASURE_DIMID+1;
 	
+	public static final int NETHER = -1;
 	public static final int OVERWORLD = 0;
 	public static final int MINIGAME = 1;
 	public static final int PVP = 1;

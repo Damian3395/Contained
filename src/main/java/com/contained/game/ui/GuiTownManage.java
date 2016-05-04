@@ -1266,7 +1266,7 @@ public class GuiTownManage extends GuiContainer {
 	@Override
 	protected void handleMouseClick(Slot slot, int slotId, int clickedButton, int clickType) {
 		if(clickedButton == 0 && clickType == 1 && slot != null && marketInd == CREATE_TRADE){
-			if(slot.getStack() != null){
+			if(slot.getStack() != null && !slot.getStack().isItemDamaged()){
 				this.makeOffer = slot.getStack();
 				selectedSlot = slotId;
 			}
