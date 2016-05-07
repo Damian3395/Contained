@@ -278,7 +278,7 @@ public class ServerPacketHandler {
 				break;
 				
 				case ServerPacketHandlerUtil.LEADERBOARD_PVP:
-					List playersPvp = MinecraftServer.getServer().worldServers[player.dimension].playerEntities;
+					List playersPvp = MinecraftServer.getServer().worldServerForDimension(player.dimension).playerEntities;
 					Iterator pvpIterator = playersPvp.iterator();
 					
 					PacketCustom pvpPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEADERBOARD_PVP_UPDATE);
@@ -294,7 +294,7 @@ public class ServerPacketHandler {
 				break;
 				
 				case ServerPacketHandlerUtil.LEADERBOARD_TREASURE:
-					List playersTreasure = MinecraftServer.getServer().worldServers[player.dimension].playerEntities;
+					List playersTreasure = MinecraftServer.getServer().worldServerForDimension(player.dimension).playerEntities;
 					Iterator treasureIterator = playersTreasure.iterator();
 					
 					PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEADERBOARD_TREASURE_UPDATE);

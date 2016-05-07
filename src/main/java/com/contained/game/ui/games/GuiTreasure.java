@@ -53,19 +53,19 @@ public class GuiTreasure extends Gui {
 	public void renderAllHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
 			if(!MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
-				System.out.println("Not MiniGame Dimension");
+				//System.out.println("Not MiniGame Dimension");
 				return;
 			}
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
 			if(game == null){
-				System.out.println("MiniGame Not Found");
+				//System.out.println("MiniGame Not Found");
 				return;
 			}
 			
 			int teamID = game.getTeamID(PlayerTeamIndividual.get(mc.thePlayer));
 			if(teamID == -1){
-				System.out.println("MiniGame Team Not Found");
+				//System.out.println("MiniGame Team Not Found");
 				return;
 			}
 					
