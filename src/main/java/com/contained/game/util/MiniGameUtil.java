@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -231,8 +232,16 @@ public class MiniGameUtil {
 		for(int i=0;i<chestAmount;i++){
 			Point randomSpawnPoint = Util.getRandomLocation(w);
 			x=randomSpawnPoint.x;
-			z=randomSpawnPoint.y;			
+			z=randomSpawnPoint.y;
 			y=w.getTopSolidOrLiquidBlock(x, z);		//coordinates to generate chests
+			
+			//Prevent Chests From Spawning Deep in the Ocean or in Lava
+			while(w.getBlock(x, y, z).getMaterial() == Material.water
+					|| w.getBlock(x, y, z).getMaterial() == Material.lava){
+				x+=r.nextInt(100)-r.nextInt(100);
+				z+=r.nextInt(100)-r.nextInt(100);
+				y=w.getTopSolidOrLiquidBlock(x, z);
+			}
 			
 			// Try to see if there's any caves underneath the chest's position,
 			// and spawn the chest down there instead.
