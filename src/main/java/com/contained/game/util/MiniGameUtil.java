@@ -72,11 +72,11 @@ public class MiniGameUtil {
 		// and send everyone back to the overworld.
 		
 		if (teamID == null){
-			System.out.println("Game was a tie.");
+			Util.dimensionMessage(dimID, "Game was a tie.");
 			teamID = "TIE";
 		}else {
 			PlayerTeam t = PlayerTeam.get(teamID);
-			System.out.println(t.displayName+" wins!");
+			Util.dimensionMessage(dimID, t.displayName+" wins!");
 		}
 		DataLogger.insertWinningTeam(Util.getServerID(), Util.getGameID(dimID), Util.getGameMode(dimID), teamID, winCondition, Util.getDate());
 		PlayerMiniGame.get(dimID).endGame();
