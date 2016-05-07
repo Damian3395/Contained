@@ -39,6 +39,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -111,6 +113,10 @@ public class PlayerEvents {
 				event.world.spawnEntityInWorld(new EntityItem(event.world, 
 						joined.posX, joined.posY+1, joined.posZ, 
 						new ItemStack(ContainedRegistry.book, 1)));
+			
+			// Players should get a short period of invincibility upon respawning
+			// to prevent spawn camping
+			joined.addPotionEffect(new PotionEffect(Potion.resistance.id, 20*15, 5));
 			
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
