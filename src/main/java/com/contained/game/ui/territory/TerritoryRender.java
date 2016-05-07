@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Util;
 
@@ -41,11 +42,35 @@ public class TerritoryRender {
 		String teamName = "Wilderness";
 		int teamColor = Color.WHITE.hashCode();
 		if (currentTerritory != null) {
-			teamName = currentTerritory.displayName+"'s Territory";
+			if (MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
+				PlayerTeam myTeam = PlayerTeam.get(mc.thePlayer);
+				if (myTeam != null && currentTerritory.id.equals(myTeam.id))
+					teamName = "Your Territory";
+				else
+					teamName = "Enemy Territory";
+			}
+			else
+				teamName = currentTerritory.displayName+"'s Territory";
 			teamColor = currentTerritory.getColor();
 		}
-		mc.fontRenderer.drawStringWithShadow(teamName, 5, 5, teamColor);
-		mc.fontRenderer.drawStringWithShadow("("+(int)mc.thePlayer.posX+","+(int)mc.thePlayer.posY+","+(int)mc.thePlayer.posZ+")", 5, 5+12, 0xFFFFFF);
+		
+		int mar = 5;
+		int sw = ev.resolution.getScaledWidth()-mar;
+		int sh = ev.resolution.getScaledHeight()-mar;
+		String coords = "("+(int)mc.thePlayer.posX+","+(int)mc.thePlayer.posY+","+(int)mc.thePlayer.posZ+")";
+		int xt = mar;
+		int xc = mar;
+		int yt = mar;
+		int yc = mar+12;
+		if (MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
+			xt = sw-mc.fontRenderer.getStringWidth(teamName);
+			xc = sw-mc.fontRenderer.getStringWidth(coords);
+			yt = sh-8;
+			yc = sh-20;
+		}
+		
+		mc.fontRenderer.drawStringWithShadow(teamName, xt, yt, teamColor);
+		mc.fontRenderer.drawStringWithShadow(coords, xc, yc, 0xFFFFFF);
 	}
 	
 	@SubscribeEvent
