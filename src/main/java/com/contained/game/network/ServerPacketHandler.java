@@ -1,6 +1,8 @@
 package com.contained.game.network;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.DataLogger;
@@ -17,6 +19,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -272,6 +275,37 @@ public class ServerPacketHandler {
 							SurveyData.scoreResponses(SurveyData.Q.EXTRAVERSION, pdata.surveyResponses.personality), 
 							SurveyData.scoreResponses(SurveyData.Q.AGREEABLENESS, pdata.surveyResponses.personality), 
 							SurveyData.scoreResponses(SurveyData.Q.NEUROTICISM, pdata.surveyResponses.personality), Util.getDate());
+				break;
+				
+				case ServerPacketHandlerUtil.LEADERBOARD_PVP:
+					List playersPvp = MinecraftServer.getServer().worldServers[player.dimension].playerEntities;
+					Iterator pvpIterator = playersPvp.iterator();
+					
+					PacketCustom pvpPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEADERBOARD_PVP_UPDATE);
+					pvpPacket.writeInt(playersPvp.size());
+					while(pvpIterator.hasNext()){
+						EntityPlayer playerPvp = (EntityPlayer) pvpIterator.next();
+						ExtendedPlayer pvpProperties = ExtendedPlayer.get(playerPvp);
+						pvpPacket.writeString(playerPvp.getDisplayName());
+						pvpPacket.writeInt(pvpProperties.curKills);
+						pvpPacket.writeInt(pvpProperties.curDeaths);
+					}
+					Contained.channel.sendTo(pvpPacket.toPacket(), player);
+				break;
+				
+				case ServerPacketHandlerUtil.LEADERBOARD_TREASURE:
+					List playersTreasure = MinecraftServer.getServer().worldServers[player.dimension].playerEntities;
+					Iterator treasureIterator = playersTreasure.iterator();
+					
+					PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEADERBOARD_TREASURE_UPDATE);
+					treasurePacket.writeInt(playersTreasure.size());
+					while(treasureIterator.hasNext()){
+						EntityPlayer playerTreasure = (EntityPlayer) treasureIterator.next();
+						ExtendedPlayer treasureProperties = ExtendedPlayer.get(playerTreasure);
+						treasurePacket.writeString(playerTreasure.getDisplayName());
+						treasurePacket.writeInt(treasureProperties.curTreasuresOpened);
+					}
+					Contained.channel.sendTo(treasurePacket.toPacket(), player);
 				break;
 			}
 		}

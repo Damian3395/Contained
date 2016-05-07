@@ -17,6 +17,7 @@ import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
+import com.contained.game.ui.games.GuiScoreboard;
 import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
@@ -622,6 +623,36 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					}
 					if(!(mc.currentScreen instanceof GuiSurvey))
 						mc.displayGuiScreen(new GuiSurvey(PlayerTeamIndividual.get(mc.thePlayer)));
+				break;
+				
+				case ClientPacketHandlerUtil.LEADERBOARD_PVP_UPDATE:
+					if(MiniGameUtil.isPvP(mc.thePlayer.dimension) 
+							&& mc.currentScreen instanceof GuiScoreboard){
+						int size = packet.readInt();
+						for(int i = 0; i < size; i++){
+							String userPvp = packet.readString();
+							int kills = packet.readInt();
+							int deaths = packet.readInt();
+							
+							GuiScoreboard.kills.put(userPvp, kills);
+							GuiScoreboard.deaths.put(userPvp, deaths);
+						}
+						GuiScoreboard.updated = true;
+					}
+				break;
+				
+				case ClientPacketHandlerUtil.LEADERBOARD_TREASURE_UPDATE:
+					if(MiniGameUtil.isTreasure(mc.thePlayer.dimension)
+							&& mc.currentScreen instanceof GuiScoreboard){
+						int size = packet.readInt();
+						for(int i = 0; i < size; i++){
+							String userTreasure = packet.readString();
+							int treasures = packet.readInt();
+							
+							GuiScoreboard.treasures.put(userTreasure, treasures);
+						}
+						GuiScoreboard.updated = true;
+					}
 				break;
 			}
 		}

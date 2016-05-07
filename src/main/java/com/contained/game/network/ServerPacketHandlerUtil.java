@@ -52,6 +52,8 @@ public class ServerPacketHandlerUtil {
 	public static final int ADMIN_REGULAR_PLAYER = 33;
 	
 	public static final int LOG_PERSONALITY = 34;
+	public static final int LEADERBOARD_PVP = 35;
+	public static final int LEADERBOARD_TREASURE = 36;
 	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);

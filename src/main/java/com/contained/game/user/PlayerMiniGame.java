@@ -103,11 +103,6 @@ public class PlayerMiniGame {
 			else
 				addPlayerToTeam(player, candidateTeams.get(0));
 		}
-
-		if(PlayerTeamIndividual.get(player) != null 
-				&& PlayerTeamIndividual.get(player).teamID != null
-				&& PlayerTeam.get(PlayerTeamIndividual.get(player).teamID) != null)
-			Util.serverDebugMessage(player.getDisplayName()+" is now on team "+PlayerTeam.get(PlayerTeamIndividual.get(player).teamID).displayName);
 	}
 
 	private void addPlayerToTeam(EntityPlayer player, int team) {

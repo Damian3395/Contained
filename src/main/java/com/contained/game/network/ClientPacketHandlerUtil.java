@@ -87,6 +87,9 @@ public class ClientPacketHandlerUtil {
 	
 	public static final int START_SURVEY = 54;
 	
+	public static final int LEADERBOARD_PVP_UPDATE = 55;
+	public static final int LEADERBOARD_TREASURE_UPDATE = 56;
+	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
 		territoryPacket.writeInt(territoryData.size());

@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
-import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.user.PlayerTeamIndividual;
@@ -53,16 +52,22 @@ public class GuiTreasure extends Gui {
 	@SubscribeEvent
 	public void renderAllHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
-			if(!MiniGameUtil.isTreasure(mc.thePlayer.dimension))
+			if(!MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
+				System.out.println("Not MiniGame Dimension");
 				return;
+			}
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
-			if(game == null)
+			if(game == null){
+				System.out.println("MiniGame Not Found");
 				return;
+			}
 			
 			int teamID = game.getTeamID(PlayerTeamIndividual.get(mc.thePlayer));
-			if(teamID == -1)
+			if(teamID == -1){
+				System.out.println("MiniGame Team Not Found");
 				return;
+			}
 					
 			renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID]);
 			//renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID]);

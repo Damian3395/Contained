@@ -51,20 +51,26 @@ public class GuiPVP extends Gui {
 	public void renderPVPHUD(RenderGameOverlayEvent.Pre event){
 		if(event.type.equals(ElementType.ALL)){
 			ExtendedPlayer properties = ExtendedPlayer.get(mc.thePlayer);
-			if(!MiniGameUtil.isPvP(mc.thePlayer.dimension))
+			if(!MiniGameUtil.isPvP(mc.thePlayer.dimension)){
+				System.out.println("Not MiniGame Dimension");
 				return;
+			}
 			
 			PlayerMiniGame game = PlayerMiniGame.get(mc.thePlayer.dimension);
 
-			if(game == null)
+			if(game == null){
+				System.out.println("MiniGame Not Found");
 				return;
+			}
 			
 			int teamID = game.getTeamID(PlayerTeamIndividual.get(mc.thePlayer));
-			if(teamID == -1)
+			if(teamID == -1){
+				System.out.println("MiniGame Team Not Found");
 				return;
+			}
 			
-			//renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);
-			renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);		
+			renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);
+			//renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);		
 		}
 	}
 	
