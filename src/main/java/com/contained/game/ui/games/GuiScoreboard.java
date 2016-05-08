@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
@@ -66,10 +66,10 @@ public class GuiScoreboard extends GuiScreen {
 		if(this.updated){
 			int yOffset = 20;
 			if(MiniGameUtil.isPvP(mc.thePlayer.dimension)){
-				Iterator<HashMap.Entry<String, Integer>> iterator = kills.entrySet().iterator();
+				Iterator<Entry<String, Integer>> iterator = kills.entrySet().iterator();
 				int index = 0;
 				while(iterator.hasNext()){
-					HashMap.Entry<String, Integer> entry = iterator.next();
+					Entry<String, Integer> entry = iterator.next();
 					String user = entry.getKey();
 					int userKills = entry.getValue();
 					int userDeaths = (int) deaths.get(user);
@@ -79,10 +79,10 @@ public class GuiScoreboard extends GuiScreen {
 					index++;
 				}
 			}else if(MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
-				Iterator<HashMap.Entry<String, Integer>> iterator = deaths.entrySet().iterator();
+				Iterator<Entry<String, Integer>> iterator = deaths.entrySet().iterator();
 				int index = 0;
 				while(iterator.hasNext()){
-					HashMap.Entry<String, Integer> entry = iterator.next();
+					Entry<String, Integer> entry = iterator.next();
 					String user = entry.getKey();
 					int userTreasures = entry.getValue();
 					this.renderFont(x-60,  y-60+(index * yOffset), user + ": Treasures=" + userTreasures, Color.WHITE);

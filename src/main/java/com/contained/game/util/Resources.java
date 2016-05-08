@@ -14,8 +14,14 @@ public class Resources {
 	
 	public static int wastelandPadding = 5; //Number of "transition" chunks between world and wasteland.
 	
+	// If true, debug messages will be printed to the in-game chat.
 	public static final boolean DEBUG_ENABLED = true;
+	
+	// If true, data will be logged to the connected MySQL database.
 	public static final boolean LOGGING_ENABLED = false;
+	
+	// If true, then the player will be forced to fill out the survey
+	// before being able to play on the server.
 	public static final boolean MANDATORY_SURVEY = false;
 	
 	public static final int MIN_PVP_DIMID = 2;

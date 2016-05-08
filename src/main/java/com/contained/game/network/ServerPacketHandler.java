@@ -15,15 +15,19 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
+import codechicken.lib.vec.BlockCoord;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.MathHelper;
 
 /**
  * Handling of packets sent from client to server.
@@ -306,6 +310,14 @@ public class ServerPacketHandler {
 						treasurePacket.writeInt(treasureProperties.curTreasuresOpened);
 					}
 					Contained.channel.sendTo(treasurePacket.toPacket(), player);
+				break;
+				
+				case ServerPacketHandlerUtil.SPAWN_VILLAGER:
+					BlockCoord spawnBlock = packet.readCoord();
+					EntityLiving mobSpawn = (EntityLiving)EntityList.createEntityByName("Villager", player.worldObj);
+					mobSpawn.setLocationAndAngles(spawnBlock.x, spawnBlock.y+2, spawnBlock.z, MathHelper.wrapAngleTo180_float(player.worldObj.rand.nextFloat() * 360.0F), 0f);
+					player.worldObj.spawnEntityInWorld(mobSpawn);
+					mobSpawn.playLivingSound();
 				break;
 			}
 		}

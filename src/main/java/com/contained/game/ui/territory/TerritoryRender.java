@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.contained.game.Contained;
 import com.contained.game.user.PlayerTeam;
+import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.RenderUtil;
 import com.contained.game.util.Util;
@@ -43,11 +44,13 @@ public class TerritoryRender {
 		int teamColor = Color.WHITE.hashCode();
 		if (currentTerritory != null) {
 			if (MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
-				PlayerTeam myTeam = PlayerTeam.get(mc.thePlayer);
-				if (myTeam != null && currentTerritory.id.equals(myTeam.id))
-					teamName = "Your Territory";
-				else
-					teamName = "Enemy Territory";
+				teamName = "Enemy Territory";
+				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(mc.thePlayer);
+				if (pdata.teamID != null) {
+					PlayerTeam myTeam = PlayerTeam.get(pdata.teamID, 0);
+					if (myTeam != null && currentTerritory.displayName.equals(myTeam.displayName))
+						teamName = "Your Territory";
+				}
 			}
 			else
 				teamName = currentTerritory.displayName+"'s Territory";

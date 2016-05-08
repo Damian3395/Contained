@@ -23,6 +23,7 @@ import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
+import com.contained.game.world.block.TownManageBlock;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -47,6 +48,11 @@ public class PVPEvents {
 			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) 
 				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) 
 					Contained.getTerritoryMap(dimID).put(new Point(newSpawnLocation.x+i, newSpawnLocation.y+j), team.id);
+		
+			int x = newSpawnLocation.x;
+			int z = newSpawnLocation.y; 
+			int y = w.getTopSolidOrLiquidBlock(x, z);
+			w.setBlock(x, y, z, TownManageBlock.instance);
 		}
 		
 		return teamSpawnPoints;
