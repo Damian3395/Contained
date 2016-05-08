@@ -3,7 +3,6 @@ package com.contained.game.handler.perks;
 import java.util.ArrayList;
 
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
@@ -104,7 +103,7 @@ public class CollectorEvents {
 	public void breakEvent(PlayerEvent.BreakSpeed event){
 		if(event.entityPlayer != null){
 			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			ItemStack item = event.entityPlayer.getItemInUse();
+			ItemStack item = event.entityPlayer.getHeldItem();
 			
 			if(item != null){
 				if(properties.perks.contains(WOODEN_SHOVEL) && item.getDisplayName().equals("Wooden Shovel"))

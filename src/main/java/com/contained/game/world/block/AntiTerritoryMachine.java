@@ -99,7 +99,7 @@ public class AntiTerritoryMachine {
 		
 		@Override
 		public TileEntity createNewTileEntity(World w, int par1) {
-			return new TerritoryMachineTE(false);
+			return new TerritoryMachineTE(false, w.provider.dimensionId);
 		}
 		
 		@Override

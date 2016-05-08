@@ -39,14 +39,13 @@ public class TerritoryMachineTE extends TileEntity {
 	
 	// Minecraft requires TileEntities to have default constructors.
 	public TerritoryMachineTE() {
-		this(false);
+		this(false, 0);
 	}
 	
-	public TerritoryMachineTE(boolean mode) {
+	public TerritoryMachineTE(boolean mode, int dimID) {
 		this.shouldClaim = mode;
 		this.teamID = null;
 		this.renderColor = 0xFFFFFF;
-		int dimID = this.worldObj.provider.dimensionId;
 		
 		if (shouldClaim) {
 			this.claimDelay = Contained.configs.claimDelay[Settings.getDimConfig(dimID)]*20;

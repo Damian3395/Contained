@@ -52,7 +52,7 @@ public class BuilderEvents {
 			ExtendedPlayer propertiesVictim = ExtendedPlayer.get(victim);
 			BiomeGenBase biome = victim.worldObj.getWorldChunkManager().getBiomeGenAt(victim.chunkCoordX, victim.chunkCoordZ);
 			World world = victim.worldObj;
-			ItemStack item = victim.getItemInUse();
+			ItemStack item = victim.getHeldItem();
 			
 			if(!world.isDaytime() && propertiesVictim.perks.contains(COBBLE))
 				damage -= (damage * 0.1f);
@@ -71,10 +71,10 @@ public class BuilderEvents {
 					damage -= (damage * 0.1f);
 			}
 		}else if(source.getSourceOfDamage() instanceof EntityPlayer){
-			EntityPlayer attacker = (EntityPlayer) event.entityLiving;
+			EntityPlayer attacker = (EntityPlayer) source.getSourceOfDamage();
 			ExtendedPlayer propertiesAttacker = ExtendedPlayer.get(attacker);
 			BiomeGenBase biome = attacker.worldObj.getWorldChunkManager().getBiomeGenAt(attacker.chunkCoordX, attacker.chunkCoordZ);
-			ItemStack item = attacker.getItemInUse();
+			ItemStack item = attacker.getHeldItem();
 			
 			if(biome.biomeID == PLAINS && propertiesAttacker.perks.contains(DIRT))
 				damage += (damage * 0.1f);
