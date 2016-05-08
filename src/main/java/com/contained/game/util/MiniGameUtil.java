@@ -128,14 +128,14 @@ public class MiniGameUtil {
 			
 			if (teamSpawnLocations == null || pdata.teamID == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
 				Point p = Util.getRandomLocation(w);
-				player.setLocationAndAngles(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y, player.rotationYaw, player.rotationPitch);
+				player.setPositionAndUpdate(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y);
 				if (teamSpawnLocations != null)
 					Util.serverDebugMessage("[Error] Failed to get spawn location for "+player.getDisplayName()+"!");
 			} else {
 				Point spawnPos = teamSpawnLocations.get(pdata.teamID);
 				spawnPos.x += Util.randomBoth(2);
 				spawnPos.y += Util.randomBoth(2);
-				player.setLocationAndAngles(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y, player.rotationYaw, player.rotationPitch);
+				player.setPositionAndUpdate(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y);
 			}
 			
 			pdata.xp = player.experienceTotal;
