@@ -37,6 +37,9 @@ public class Resources {
 	public static final int PVP = 1;
 	public static final int TREASURE = 2;
 	
+	public static final int GLOBAL_CHAT = 0;
+	public static final int TEAM_CHAT = 1;
+	
 	public static final int COAL = 0;
 	public static final int IRON = 1;
 	public static final int GOLD = 2;

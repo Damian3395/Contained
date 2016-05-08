@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -31,6 +32,7 @@ import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
@@ -654,7 +656,27 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						GuiScoreboard.updated = true;
 					}
 				break;
+				
+				case ClientPacketHandlerUtil.SET_CHAT_MODE:
+					Contained.chatMode = packet.readInt();
+					notifyChatMode(mc.thePlayer);
+				break;
+				
+				case ClientPacketHandlerUtil.SWITCH_CHAT_MODE:
+					if (Contained.chatMode == Resources.GLOBAL_CHAT)
+						Contained.chatMode = Resources.TEAM_CHAT;
+					else
+						Contained.chatMode = Resources.GLOBAL_CHAT;
+					notifyChatMode(mc.thePlayer);
+				return;
 			}
 		}
+	}
+	
+	public void notifyChatMode(EntityPlayer player) {
+		if (Contained.chatMode == Resources.GLOBAL_CHAT)
+			Util.displayMessage(player, "[*] You are now chatting publically.");
+		else if (Contained.chatMode == Resources.TEAM_CHAT)
+			Util.displayMessage(player, "[*] You are now chatting to your team members.");
 	}
 }

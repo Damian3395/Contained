@@ -45,7 +45,6 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = Resources.MOD_ID, name=Resources.NAME, version=Resources.VERSION)
@@ -122,10 +121,12 @@ public class Contained{
 	
 	public static int[][] gameScores;
 	public static int guiStyle = 0;
+	public static int chatMode = Resources.GLOBAL_CHAT;
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){
 		event.registerServerCommand(new CommandTeamChat());
+		event.registerServerCommand(new CommandGlobalChat());
 		event.registerServerCommand(new CommandBecomeAdmin());
 		event.registerServerCommand(new CommandCreate());
 		event.registerServerCommand(new CommandChangeStatus());
