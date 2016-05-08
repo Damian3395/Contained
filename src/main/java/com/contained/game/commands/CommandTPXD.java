@@ -89,7 +89,7 @@ public class CommandTPXD implements ICommand {
 	     
 				if (player != null && player.ridingEntity == null && player.riddenByEntity == null) {
 					if(player.dimension != dimID)
-						Util.travelToDimension(dimID, player);
+						Util.travelToDimension(dimID, player, false);
 					player.setPositionAndUpdate(x, y, z);
 				} else
 					sender.addChatMessage(new ChatComponentText("Teleport failed.")); 
