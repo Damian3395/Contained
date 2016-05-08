@@ -66,8 +66,10 @@ public class GuiTreasure extends Gui {
 				return;
 			}
 					
-			renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID]);
-			//renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID]);
+			if (Contained.guiStyle == 0)
+				renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID]);
+			else
+				renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID]);
 		}
 	}
 	

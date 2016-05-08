@@ -121,6 +121,7 @@ public class Contained{
 	public static HashMap<Integer, ArrayList<BlockCoord>> activeTreasures;
 	
 	public static int[][] gameScores;
+	public static int guiStyle = 0;
 	
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event){

@@ -43,7 +43,8 @@ public class TerritoryRender {
 		String teamName = "Wilderness";
 		int teamColor = Color.WHITE.hashCode();
 		if (currentTerritory != null) {
-			if (MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
+			if (Contained.guiStyle == 0 && 
+					(MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension))) {
 				teamName = "Enemy Territory";
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(mc.thePlayer);
 				if (pdata.teamID != null) {
@@ -65,7 +66,8 @@ public class TerritoryRender {
 		int xc = mar;
 		int yt = mar;
 		int yc = mar+12;
-		if (MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
+		if (Contained.guiStyle == 0 && 
+				(MiniGameUtil.isPvP(mc.thePlayer.dimension) || MiniGameUtil.isTreasure(mc.thePlayer.dimension))) {
 			xt = sw-mc.fontRenderer.getStringWidth(teamName);
 			xc = sw-mc.fontRenderer.getStringWidth(coords);
 			yt = sh-8;

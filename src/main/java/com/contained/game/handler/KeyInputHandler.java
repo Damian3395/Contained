@@ -1,5 +1,6 @@
 package com.contained.game.handler;
 
+import com.contained.game.Contained;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.games.GuiMiniGames;
@@ -58,6 +59,13 @@ public class KeyInputHandler {
 			}else{
 				mc.thePlayer.closeScreen();
 			}
+		
+		if (KeyBindings.toggleGUIStyle.isPressed()) {
+			if (Contained.guiStyle == 1)
+				Contained.guiStyle = 0;
+			else
+				Contained.guiStyle = 1;
+		}
 			
 	}
 }

@@ -66,8 +66,10 @@ public class GuiPVP extends Gui {
 				return;
 			}
 			
-			renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);
-			//renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);		
+			if (Contained.guiStyle == 0)
+				renderFancy(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);
+			else
+				renderSimple(event, Contained.gameScores[game.getGameDimension()][teamID], properties.lives);		
 		}
 	}
 	
