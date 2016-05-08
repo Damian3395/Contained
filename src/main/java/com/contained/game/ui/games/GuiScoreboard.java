@@ -1,6 +1,8 @@
 package com.contained.game.ui.games;
 
 import java.awt.Color;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +10,9 @@ import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
+import codechicken.lib.packet.PacketCustom;
+
+import com.contained.game.network.ServerPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 
@@ -32,10 +37,16 @@ public class GuiScoreboard extends GuiScreen {
 	public void initGui(){
 		this.updated = false;
 		
+		kills = new HashMap<String, Integer>();
+		deaths = new HashMap<String, Integer>();
+		treasures = new HashMap<String, Integer>();
+		
 		if(MiniGameUtil.isPvP(mc.thePlayer.dimension)) {
-			
+			PacketCustom pvpPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LEADERBOARD_PVP);
+			ServerPacketHandlerUtil.sendToServer(pvpPacket.toPacket());
 		}else if(MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
-			
+			PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LEADERBOARD_TREASURE);
+			ServerPacketHandlerUtil.sendToServer(treasurePacket.toPacket());
 		}
 		
 		x = this.width/2;
@@ -59,7 +70,7 @@ public class GuiScoreboard extends GuiScreen {
 		GL11.glDisable(GL11.GL_LIGHTING);   
 		
 		this.mc.getTextureManager().bindTexture(img);
-		this.drawTexturedModalRect(x-110, y-120, 0, 0, 256, 32);
+		this.drawTexturedModalRect(x-115, y-120, 0, 0, 256, 32);
 	
 		GL11.glPopMatrix();
 		
@@ -73,20 +84,25 @@ public class GuiScoreboard extends GuiScreen {
 					String user = entry.getKey();
 					int userKills = entry.getValue();
 					int userDeaths = (int) deaths.get(user);
-					double ratio = ((double) userKills) / ((double) userDeaths);
-					DecimalFormat f = new DecimalFormat("##.00");
-					this.renderFont(x-60, y-60+(index * yOffset), user + ": Kills=" + userKills + " Deaths=" + userDeaths + " Ratio=" + f.format(ratio), Color.WHITE);
+					double ratio = 0.0;
+					if(userDeaths != 0)
+						ratio = new BigDecimal(((double) userKills) / ((double) userDeaths)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+					else if(userKills != 0)
+						ratio = 1.0;
+					this.renderCenterFont(x, y-80, (index+1) + ". " + user + ": Kills= " + userKills + " Deaths= " + userDeaths + " Ratio= " + ratio, Color.WHITE);
 					index++;
+					//+(index * yOffset)
 				}
 			}else if(MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
-				Iterator<Entry<String, Integer>> iterator = deaths.entrySet().iterator();
+				Iterator<Entry<String, Integer>> iterator = treasures.entrySet().iterator();
 				int index = 0;
 				while(iterator.hasNext()){
 					Entry<String, Integer> entry = iterator.next();
 					String user = entry.getKey();
 					int userTreasures = entry.getValue();
-					this.renderFont(x-60,  y-60+(index * yOffset), user + ": Treasures=" + userTreasures, Color.WHITE);
+					this.renderCenterFont(x,  y-80, (index+1) + ". " + user + ": Treasures=" + userTreasures, Color.WHITE);
 					index++;
+					//+(index * yOffset)
 				}
 			}
 		}
