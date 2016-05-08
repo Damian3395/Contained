@@ -153,7 +153,7 @@ public class Util {
 		return Resources.OVERWORLD;
 	}
 	
-	public static void travelToDimension(int dimID, EntityPlayer player) {
+	public static void travelToDimension(int dimID, EntityPlayer player, boolean force) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
 			player.addPotionEffect(new PotionEffect(Potion.regeneration.id, 300, 4));
 			player.addPotionEffect(new PotionEffect(Potion.resistance.id, 300, 4));
@@ -166,7 +166,7 @@ public class Util {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
-			if (properties.inGame()) {
+			if (properties.inGame() || force) {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	
 				properties.setGameMode(Resources.OVERWORLD);

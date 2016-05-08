@@ -668,7 +668,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					else
 						Contained.chatMode = Resources.GLOBAL_CHAT;
 					notifyChatMode(mc.thePlayer);
-				return;
+				break;
 			}
 		}
 	}

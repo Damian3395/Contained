@@ -122,7 +122,7 @@ public class MiniGameUtil {
 			MiniGameHandler.cancelMiniGame((EntityPlayerMP)player);
 			
 			//Send the player to the dimension, and set their spawn location correctly.
-			Util.travelToDimension(dimID, player);
+			Util.travelToDimension(dimID, player, false);
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			startMiniGame.setGame(true);
 			

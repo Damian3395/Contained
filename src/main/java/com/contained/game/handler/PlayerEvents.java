@@ -114,6 +114,31 @@ public class PlayerEvents {
 						joined.posX, joined.posY+1, joined.posZ, 
 						new ItemStack(ContainedRegistry.book, 1)));
 			
+			//Update PlayerMiniGame
+			if(MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension)){
+				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
+				if(miniGame != null && ExtendedPlayer.get(joined).gameID == miniGame.getGameID()){
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+					miniGamePacket.writeInt(miniGame.getGameMode());
+					miniGamePacket.writeInt(miniGame.getGameID());
+					
+					NBTTagCompound miniGameTag = new NBTTagCompound();
+					miniGame.writeToNBT(miniGameTag);
+					miniGamePacket.writeNBTTagCompound(miniGameTag);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
+					
+					miniGamePacket.writeInt(miniGame.getGameDimension());
+					miniGamePacket.writeInt(Contained.getTeamList(miniGame.getGameDimension()).size());
+					for(PlayerTeam team : Contained.getTeamList(miniGame.getGameDimension())){
+						NBTTagCompound teamTag = new NBTTagCompound();
+						team.writeToNBT(teamTag);
+						miniGamePacket.writeNBTTagCompound(teamTag);
+					}
+					
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
+				}
+			}
+			
 			// Players should get a short period of invincibility upon respawning
 			// to prevent spawn camping
 			joined.addPotionEffect(new PotionEffect(Potion.resistance.id, 20*15, 5));
@@ -178,13 +203,31 @@ public class PlayerEvents {
 				int dim = player.dimension;
 				PlayerMiniGame miniGame = PlayerMiniGame.get(player.dimension);
 				
-				if(miniGame != null && miniGame.getGameID() != properties.gameID){
+				if(miniGame == null 
+						|| (miniGame != null && miniGame.getGameID() != properties.gameID)){
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player.getDisplayName());
 					Util.displayMessage(player, "The MiniGame You Were In Has Ended, We Are Sending You Back To Where You Belong!");
-					Util.travelToDimension(Resources.OVERWORLD, player);
+					Util.travelToDimension(Resources.OVERWORLD, player, true);
 					
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 					miniGamePacket.writeInt(dim);
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+					
+					//Update Player Stats
+					if(MiniGameUtil.isPvP(dim)){
+						PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
+						syncScore.writeInt(properties.pvpWon);
+						syncScore.writeInt(properties.pvpLost);
+						syncScore.writeInt(properties.kills);
+						syncScore.writeInt(properties.deaths);
+						Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+					}else if(MiniGameUtil.isTreasure(dim)){
+						PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
+						syncScore.writeInt(properties.treasureWon);
+						syncScore.writeInt(properties.treasureLost);
+						syncScore.writeInt(properties.treasuresOpened);
+						Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+					}
 				}
 			}
 			

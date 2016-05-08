@@ -185,7 +185,7 @@ public class PlayerMiniGame {
 					properties.treasureLost++;
 			}			
 			
-			Util.travelToDimension(0, player);
+			Util.travelToDimension(0, player, false);
 			
 			if(MiniGameUtil.isPvP(dim)){
 				PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
