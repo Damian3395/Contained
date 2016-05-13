@@ -74,7 +74,7 @@ public class CommandTPX implements ICommand {
 
 				if (player.ridingEntity == null && player.riddenByEntity == null) {
 					if(world.provider.dimensionId != dimID)
-						Util.travelToDimension(dimID, player);
+						Util.travelToDimension(dimID, player, false);
 				} else
 					sender.addChatMessage(new ChatComponentText("Teleport failed."));
 			} catch (NumberFormatException e) {

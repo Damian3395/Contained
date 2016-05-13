@@ -114,7 +114,7 @@ public class PlayerEvents {
 						joined.posX, joined.posY+1, joined.posZ, 
 						new ItemStack(ContainedRegistry.book, 1)));
 			
-			//Update PlayerMiniGame
+			//Update PlayerMiniGame When Joining Server
 			if(MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension)){
 				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
 				if(miniGame != null && ExtendedPlayer.get(joined).gameID == miniGame.getGameID()){
@@ -125,7 +125,6 @@ public class PlayerEvents {
 					NBTTagCompound miniGameTag = new NBTTagCompound();
 					miniGame.writeToNBT(miniGameTag);
 					miniGamePacket.writeNBTTagCompound(miniGameTag);
-					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
 					
 					miniGamePacket.writeInt(miniGame.getGameDimension());
 					miniGamePacket.writeInt(Contained.getTeamList(miniGame.getGameDimension()).size());
@@ -136,7 +135,8 @@ public class PlayerEvents {
 					}
 					
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
-				}
+				} else //If MiniGame Does Not Exist, Send Back To Lobby
+					Util.travelToDimension(Resources.OVERWORLD, joined, true);
 			}
 			
 			// Players should get a short period of invincibility upon respawning
