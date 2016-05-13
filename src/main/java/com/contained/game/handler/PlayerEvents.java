@@ -115,7 +115,8 @@ public class PlayerEvents {
 						new ItemStack(ContainedRegistry.book, 1)));
 			
 			//Update PlayerMiniGame When Joining Server
-			if(MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension)){
+			if(!ExtendedPlayer.get(joined).isAdmin() 
+					&& (MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension))){
 				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
 				if(miniGame != null && ExtendedPlayer.get(joined).gameID == miniGame.getGameID()){
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
@@ -199,7 +200,8 @@ public class PlayerEvents {
 			}
 			
 			//Check If Player Is In A Valid MiniGame Dimension
-			if(MiniGameUtil.isPvP(player.dimension) || MiniGameUtil.isTreasure(player.dimension)){
+			if(!properties.isAdmin() 
+					&& (MiniGameUtil.isPvP(player.dimension) || MiniGameUtil.isTreasure(player.dimension))){
 				int dim = player.dimension;
 				PlayerMiniGame miniGame = PlayerMiniGame.get(player.dimension);
 				

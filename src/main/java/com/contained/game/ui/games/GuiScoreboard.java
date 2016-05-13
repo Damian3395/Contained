@@ -89,9 +89,8 @@ public class GuiScoreboard extends GuiScreen {
 						ratio = new BigDecimal(((double) userKills) / ((double) userDeaths)).setScale(2, RoundingMode.HALF_UP).doubleValue();
 					else if(userKills != 0)
 						ratio = 1.0;
-					this.renderCenterFont(x, y-80, (index+1) + ". " + user + ": Kills= " + userKills + " Deaths= " + userDeaths + " Ratio= " + ratio, Color.WHITE);
+					this.renderCenterFont(x, y-80+(index * yOffset), (index+1) + ". " + user + ": Kills= " + userKills + " Deaths= " + userDeaths + " Ratio= " + ratio, Color.WHITE);
 					index++;
-					//+(index * yOffset)
 				}
 			}else if(MiniGameUtil.isTreasure(mc.thePlayer.dimension)){
 				Iterator<Entry<String, Integer>> iterator = treasures.entrySet().iterator();
@@ -100,9 +99,8 @@ public class GuiScoreboard extends GuiScreen {
 					Entry<String, Integer> entry = iterator.next();
 					String user = entry.getKey();
 					int userTreasures = entry.getValue();
-					this.renderCenterFont(x,  y-80, (index+1) + ". " + user + ": Treasures=" + userTreasures, Color.WHITE);
+					this.renderCenterFont(x,  y-80+(index * yOffset), (index+1) + ". " + user + ": Treasures=" + userTreasures, Color.WHITE);
 					index++;
-					//+(index * yOffset)
 				}
 			}
 		}
