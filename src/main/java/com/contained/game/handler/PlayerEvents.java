@@ -95,24 +95,32 @@ public class PlayerEvents {
 			}			
 			
 			//If player does not have a survey in their inventory, give them one.
-			if (!completedSurvey && !joined.inventory.hasItem(SurveyClipboard.instance))
-				event.world.spawnEntityInWorld(new EntityItem(event.world, 
-						joined.posX, joined.posY+1, joined.posZ, 
-						new ItemStack(SurveyClipboard.instance, 1)));
+			if (!completedSurvey && !joined.inventory.hasItem(SurveyClipboard.instance)
+					&& joined.inventory.getFirstEmptyStack() > -1){
+				joined.inventory.addItemStackToInventory(new ItemStack(SurveyClipboard.instance, 1));
+				PacketCustom itemPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+				itemPacket.writeItemStack(new ItemStack(SurveyClipboard.instance, 1));
+				Contained.channel.sendTo(itemPacket.toPacket(), (EntityPlayerMP) joined);
+			}
 			
 			//If dowsing is enabled, give the player a dowsing rod.
 			if (Contained.configs.enableDowsing[Settings.getDimConfig(joined.dimension)]
-					&& !joined.inventory.hasItem(DowsingRod.instance)) {
-				event.world.spawnEntityInWorld(new EntityItem(event.world, 
-						joined.posX, joined.posY+1, joined.posZ, 
-						new ItemStack(DowsingRod.instance, 1)));
+					&& !joined.inventory.hasItem(DowsingRod.instance)
+					&& joined.inventory.getFirstEmptyStack() > -1) {
+				joined.inventory.addItemStackToInventory(new ItemStack(DowsingRod.instance, 1));
+				PacketCustom itemPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+				itemPacket.writeItemStack(new ItemStack(DowsingRod.instance, 1));
+				Contained.channel.sendTo(itemPacket.toPacket(), (EntityPlayerMP) joined);
 			}
 			
 			//Tutorial book
-			if (!joined.inventory.hasItem(ContainedRegistry.book))
-				event.world.spawnEntityInWorld(new EntityItem(event.world, 
-						joined.posX, joined.posY+1, joined.posZ, 
-						new ItemStack(ContainedRegistry.book, 1)));
+			if (!joined.inventory.hasItem(ContainedRegistry.book)
+					&& joined.inventory.getFirstEmptyStack() > -1){
+				joined.inventory.addItemStackToInventory(new ItemStack(ContainedRegistry.book, 1));
+				PacketCustom itemPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+				itemPacket.writeItemStack(new ItemStack(ContainedRegistry.book, 1));
+				Contained.channel.sendTo(itemPacket.toPacket(), (EntityPlayerMP) joined);
+			}
 			
 			//Update PlayerMiniGame When Joining Server
 			if(!ExtendedPlayer.get(joined).isAdmin() 
