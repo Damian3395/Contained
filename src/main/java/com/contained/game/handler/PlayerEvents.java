@@ -58,7 +58,6 @@ import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
 public class PlayerEvents {
 	
-	
 	@SubscribeEvent
 	//When a player joins the server, send their client the territory & team data.
 	public void onJoin(EntityJoinWorldEvent event) {

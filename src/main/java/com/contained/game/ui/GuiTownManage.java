@@ -171,14 +171,14 @@ public class GuiTownManage extends GuiContainer {
 		this.xSize = bBg.width;
 		this.ySize = bBg.height;
 		
-		if (blockTeamID == null || playerTeamID == null || 
-				!blockTeamID.equals(playerTeamID)) 
-		{
+		if (blockTeamID == null 
+				|| playerTeamID == null 
+				|| !blockTeamID.equals(playerTeamID)) {
 			// This player is not a member of the team this town hall block
 			// belongs to. Just show permissions instead.
 			tabPermission = 0;
 			tabTerritory = 2;
-			if (playerTeamID == null)
+			if (playerTeamID == null) 
 				this.permTeamInd = -2; //Default permissions
 			else {
 				for(int i=0; i<localTeams.size(); i++) {
@@ -191,7 +191,7 @@ public class GuiTownManage extends GuiContainer {
 		} else {
 			// This player is a member of the team this town hall block
 			// belongs to. Show everything.
-			int maxLen = 0;	
+			int maxLen = 0;
 			listCounts[tabNPC] = 3;
 			listCounts[tabTerritory] = 6+availableAntiTeams.size();
 			
@@ -261,6 +261,10 @@ public class GuiTownManage extends GuiContainer {
 				listCounts[tabTerritory]++;
 			}
 		}
+		
+		xpCosts = new int[numTabs][3];
+		itemCosts = new ItemStack[numTabs][3];
+		listCounts[tabNPC] = 3;
 		
 		tabTitles = new String[numTabs];
 		tabTitles[tabTerritory] = "Purchase Territory";
