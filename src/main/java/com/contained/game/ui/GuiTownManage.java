@@ -188,6 +188,10 @@ public class GuiTownManage extends GuiContainer {
 					}
 				}
 			}
+			
+			xpCosts = new int[numTabs][3];
+			itemCosts = new ItemStack[numTabs][3];
+			listCounts[tabNPC] = 3;
 		} else {
 			// This player is a member of the team this town hall block
 			// belongs to. Show everything.
@@ -261,10 +265,6 @@ public class GuiTownManage extends GuiContainer {
 				listCounts[tabTerritory]++;
 			}
 		}
-		
-		xpCosts = new int[numTabs][3];
-		itemCosts = new ItemStack[numTabs][3];
-		listCounts[tabNPC] = 3;
 		
 		tabTitles = new String[numTabs];
 		tabTitles[tabTerritory] = "Purchase Territory";
