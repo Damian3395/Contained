@@ -247,6 +247,19 @@ public class Util {
 						mpPlayer, dimID, new GameTeleporter(newWorld));
 			if(dimID == Resources.OVERWORLD)
 				player.setPositionAndUpdate(properties.spawnX, properties.spawnY, properties.spawnZ);
+			else{
+				double posx = player.posX;
+				double posy = player.posY;
+				double posz = player.posZ;
+				
+				if(!newWorld.isAirBlock((int)posx, (int)posy, (int)posz)){
+					posz = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)posz);
+					while(!newWorld.isAirBlock((int)posx, (int)posy, (int)posz))
+						posz++;
+					
+					player.setPositionAndUpdate((int)posx, (int)posy, (int)(posz++));
+				}
+			}
 		}
 	}
 	
