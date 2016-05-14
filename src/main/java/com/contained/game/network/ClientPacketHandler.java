@@ -560,6 +560,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				case ClientPacketHandlerUtil.SAVE_PLAYER:
 					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
 					storePdata.xp = packet.readInt();
+					storePdata.level = packet.readInt();
 					storePdata.armor = new ItemStack[4];
 					int armorSize = packet.readInt();
 					for(int i = 0; i < armorSize; i++){
@@ -576,17 +577,17 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						storePdata.inventory[index] = itemStore;
 					}
 					
-					mc.thePlayer.experienceTotal = 0;
+					mc.thePlayer.addExperience(-(mc.thePlayer.experienceTotal));
 					MiniGameUtil.clearMainInventory(mc.thePlayer);
 					MiniGameUtil.clearArmorInventory(mc.thePlayer);
 				break;
 				
 				case ClientPacketHandlerUtil.RESTORE_PLAYER:
-					System.out.println("Restoring Client Side Pdata");
 					MiniGameUtil.clearMainInventory(mc.thePlayer);
 					MiniGameUtil.clearArmorInventory(mc.thePlayer);
 					
-					mc.thePlayer.experienceTotal = packet.readInt();
+					mc.thePlayer.addExperience(packet.readInt());
+					mc.thePlayer.addExperienceLevel(packet.readInt());
 					int armorSizeRestore = packet.readInt();
 					for(int i = 0; i < armorSizeRestore; i++){
 						int index = packet.readInt();

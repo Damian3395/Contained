@@ -139,6 +139,7 @@ public class MiniGameUtil {
 			}
 			
 			pdata.xp = player.experienceTotal;
+			pdata.level = player.experienceLevel;
 			pdata.armor = player.inventory.armorInventory.clone();
 			pdata.inventory = player.inventory.mainInventory.clone();
 			
@@ -154,6 +155,7 @@ public class MiniGameUtil {
 			
 			PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SAVE_PLAYER);
 			miniGamePacket.writeInt(player.experienceTotal);
+			miniGamePacket.writeInt(player.experienceLevel);
 			miniGamePacket.writeInt(armorSize);
 			int index = 0;
 			for(ItemStack item : pdata.armor)
@@ -176,7 +178,8 @@ public class MiniGameUtil {
 				}
 			Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)player);
 			
-			player.experienceTotal = 0;
+			player.addExperience(-(player.experienceTotal));
+			player.addExperienceLevel(-(player.experienceLevel));
 			clearMainInventory(player);
 			clearArmorInventory(player);
 		}
