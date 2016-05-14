@@ -234,8 +234,16 @@ public class Util {
 				pdata.revertMiniGameChanges();
 			}
 			
+			if(player.dimension == Resources.OVERWORLD){
+				properties.spawnX = player.posX;
+				properties.spawnY = player.posY;
+				properties.spawnZ = player.posZ;
+			}
+			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 						mpPlayer, dimID, new GameTeleporter(newWorld));
+			if(dimID == Resources.OVERWORLD)
+				player.setPositionAndUpdate(properties.spawnX, properties.spawnY, properties.spawnZ);
 		}
 	}
 	

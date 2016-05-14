@@ -47,6 +47,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int curDeaths = 0;
 	public int curTreasuresOpened = 0;
 	public String world = "";
+	public double spawnX = 0.0;
+	public double spawnY = 0.0;
+	public double spawnZ = 0.0;
 	
 	public ExtendedPlayer(EntityPlayer entity) {
 		this.entity = entity;
@@ -202,6 +205,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.kills = load.getInteger("kills");
 		this.deaths = load.getInteger("deaths");
 		this.treasuresOpened = load.getInteger("treasuresOpened");
+		
+		this.spawnX = load.getDouble("spawnX");
+		this.spawnY = load.getDouble("spawnY");
+		this.spawnZ = load.getDouble("spawnz");
 	}
 
 	@Override
@@ -251,6 +258,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("kills", this.kills);
 		save.setInteger("deaths", this.deaths);
 		save.setInteger("treasuresOpened", this.treasuresOpened);
+		
+		save.setDouble("spawnX", this.spawnX);
+		save.setDouble("spawnY", this.spawnY);
+		save.setDouble("spawnZ", this.spawnZ);
 	}
 
 	@Override
