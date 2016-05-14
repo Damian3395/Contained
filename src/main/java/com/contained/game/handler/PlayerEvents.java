@@ -53,6 +53,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
@@ -183,6 +184,17 @@ public class PlayerEvents {
 	public void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
 		PlayerTeamIndividual pdata = PlayerTeamIndividual.get(event.player);
 		pdata.lastOnline = System.currentTimeMillis();
+	}
+	
+	@SubscribeEvent
+	public void onRespawn(Clone event) {
+		if(event.entityPlayer != null) {
+			ExtendedPlayer newClone = ExtendedPlayer.get(event.entityPlayer);
+			ExtendedPlayer oldPlayer = ExtendedPlayer.get(event.original);
+			NBTTagCompound ntc = new NBTTagCompound();
+			oldPlayer.saveNBTData(ntc);
+			newClone.loadNBTData(ntc);
+		}
 	}
 	
 	@SubscribeEvent
