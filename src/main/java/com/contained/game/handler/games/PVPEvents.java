@@ -6,6 +6,7 @@ import java.util.HashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemFood;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldServer;
@@ -59,27 +60,6 @@ public class PVPEvents {
 	}
 	
 	@SubscribeEvent
-	public void onSpawn(Clone event){
-		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
-			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			ExtendedPlayer old = ExtendedPlayer.get(event.original);
-			if(properties.inGame() && properties.gameMode == Resources.PVP 
-					&& (MiniGameUtil.isPvP(event.entityPlayer.dimension) || MiniGameUtil.isTreasure(event.entityPlayer.dimension))){
-				properties.setLives(old.lives);
-				
-				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
-				syncLifePacket.writeInt(properties.lives);
-				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
-				
-				if(properties.lives == 0){
-					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
-					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
-				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
 	public void onEntityDeath(LivingDeathEvent event) {
 		DamageSource source = event.source;
 		if(event.entityLiving != null && event.entityLiving instanceof EntityPlayer 
@@ -102,6 +82,11 @@ public class PVPEvents {
 				syncLifePacket.writeInt(victimProp.lives);
 				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) victim);
 			
+				if(victimProp.lives == 0){
+					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
+					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) victim);
+				}
+				
 				PlayerTeamIndividual killerData = PlayerTeamIndividual.get(killer);
 				PlayerMiniGame miniGame = PlayerMiniGame.get(killerData.teamID);
 				if(miniGame == null)
