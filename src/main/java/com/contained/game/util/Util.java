@@ -252,15 +252,32 @@ public class Util {
 			else{
 				double posx = player.posX;
 				double posy = player.posY;
-				double posz = player.posZ;
+				double posz = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)player.posZ);
 				
-				if(!newWorld.isAirBlock((int)posx, (int)posy, (int)posz)){
-					posz = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)posz);
-					while(!newWorld.isAirBlock((int)posx, (int)posy, (int)posz))
-						posz++;
-					
-					player.setPositionAndUpdate((int)posx, (int)posy, (int)(posz++));
+				boolean spawn = true;
+				int indexZ = 0;
+				for(int i = 1; i <= 5; i++){
+					if(!newWorld.isAirBlock((int)posx, (int)posy, (int)(posz+i))){
+						spawn = false;
+						posz+=(i+1);
+						break;
+					}
 				}
+				
+				while(!spawn){
+					spawn = true;
+					int index = 0;
+					for(int i = 1; i <= 5; i++){
+						if(!newWorld.isAirBlock((int)posx, (int)posy, (int)(posz+i))){
+							spawn = false;
+							index = i;
+						}
+					}
+					if(!spawn)
+						posz+=(index+1);
+				}
+				
+				player.setPositionAndUpdate((int)posx, (int)posy, (int)(posz++));
 			}
 		}
 	}
@@ -436,7 +453,7 @@ public class Util {
 	
 	public static void dimensionMessage(int dim, String msg) {
 		@SuppressWarnings("unchecked")
-		List<EntityPlayer> players = MinecraftServer.getServer().worldServers[dim].playerEntities;
+		List<EntityPlayer> players = MinecraftServer.getServer().worldServerForDimension(dim).playerEntities;
 		Iterator<EntityPlayer> iterator = players.iterator();
 		while(iterator.hasNext()){
 			EntityPlayer player = iterator.next();

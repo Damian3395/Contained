@@ -312,23 +312,30 @@ public class PlayerMiniGame {
 			}
 			
 			//Reward XP Points To Player
-			boolean emptySlot = false;
-			int index = -1;
-			for(int i = 0; i < pdata.inventory.length; i++){
-				ItemStack item = pdata.inventory[i];
-				if(item == null){
-					emptySlot = true;
-					index = i;
-					break;
-				}	
+			String teamMiniGame = pdata.teamID;
+			if(teamID != null && winCondition != null && pdata.teamID.equals(teamID)
+					&& winCondition.equals("TIE")){
+				boolean emptySlot = false;
+				int index = -1;
+				for(int i = 0; i < pdata.inventory.length; i++){
+					ItemStack item = pdata.inventory[i];
+					if(item == null){
+						emptySlot = true;
+						index = i;
+						break;
+					}	
+				}
+				
+				if(!emptySlot)
+					rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
 			}
-			if(!emptySlot)
-				rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
+				
 			
 			Util.travelToDimension(0, player, false);
 			
 			//Reward Item To Player
-			if(pdata.teamID.equals(teamID) && !winCondition.equals("TIE")){
+			if(teamID != null && teamMiniGame != null && winCondition != null && 
+					teamMiniGame.equals(teamID) && !winCondition.equals("TIE")){
 				if(player.inventory.getFirstEmptyStack() > -1)
 					rewardItem(player, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
 			}
