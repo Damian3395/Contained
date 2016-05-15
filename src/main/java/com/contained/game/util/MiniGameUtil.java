@@ -74,13 +74,14 @@ public class MiniGameUtil {
 		
 		if (teamID == null){
 			Util.dimensionMessage(dimID, "Game was a tie.");
-			teamID = "TIE";
+			winCondition = "TIE";
+			teamID = "NONE";
 		}else {
 			PlayerTeam t = PlayerTeam.get(teamID);
 			Util.dimensionMessage(dimID, t.displayName+" wins!");
 		}
 		DataLogger.insertWinningTeam(Util.getServerID(), Util.getGameID(dimID), Util.getGameMode(dimID), teamID, winCondition, Util.getDate());
-		PlayerMiniGame.get(dimID).endGame();
+		PlayerMiniGame.get(dimID).endGame(teamID, winCondition);
 	}
 	
 	public static void testStartGame(int dimID, EntityPlayer player) {
@@ -296,6 +297,8 @@ public class MiniGameUtil {
 			}
 			if (isGameOver)
 				teamWins(winningTeam, dimID, "TERRITORY");
+			
+			
 		}
 	}
 	

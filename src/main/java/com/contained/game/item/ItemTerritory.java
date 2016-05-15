@@ -6,7 +6,9 @@ import java.util.List;
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
 import com.contained.game.data.DataLogger;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.ErrorCase;
@@ -145,6 +147,13 @@ public class ItemTerritory {
 					if (!p.capabilities.isCreativeMode)
 						p.inventory.consumeInventoryItem(ItemTerritory.removeTerritory);
 					MiniGameUtil.removeTerritoryBlock(blockToRemove, p.dimension);
+					if(MiniGameUtil.isPvP(p.dimension) ){
+						ExtendedPlayer properties = ExtendedPlayer.get(p);
+						int teamID = PlayerMiniGame.get(p.dimension).getTeamID(playerData);
+						properties.curAntiTerritory+=3;
+						Contained.gameScores[p.dimension][teamID]+=3;
+						ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
+					}
 					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());
 					DataLogger.insertRemoveTerritory(Util.getServerID(), Util.getDimensionString(p.dimension), Util.getGameID(p.dimension), MiniGameUtil.gameMode(p.dimension), teamToRemove, playerData.teamID, p.getDisplayName(), x, z, Util.getDate());
 				}

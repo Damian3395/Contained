@@ -174,7 +174,9 @@ public class Util {
 				properties.setGame(false);
 				properties.curDeaths = 0;
 				properties.curKills = 0;
+				properties.curAntiTerritory = 0;
 				properties.curTreasuresOpened = 0;
+				properties.curAltersActivated = 0;
 	
 				MiniGameUtil.clearMainInventory(player);
 				MiniGameUtil.clearArmorInventory(player);

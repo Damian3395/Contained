@@ -117,7 +117,6 @@ public class TreasureEvents {
 			int dimID = w.provider.dimensionId;
 			if (Contained.getActiveTreasures(dimID).contains(eventLocation)) {
 				ExtendedPlayer properties = ExtendedPlayer.get(p);
-				properties.treasuresOpened++;
 				properties.curTreasuresOpened++;
 				
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);

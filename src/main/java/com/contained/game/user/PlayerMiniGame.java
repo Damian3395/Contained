@@ -7,6 +7,7 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -132,21 +133,17 @@ public class PlayerMiniGame {
 		}
 	}
 
-	public void endGame(){
+	public void endGame(String teamID, String winCondition){
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
-		String winningTeam = "";
-		int largestScore = 0;
+		int winScore = 0;
 		for(int i = 0; i < teams.size(); i++){
-			if(winningTeam.equals("")){
-				largestScore = Contained.gameScores[dim][i];
-				winningTeam = teams.get(i).id;
-			}else if(largestScore < Contained.gameScores[dim][i]){
-				largestScore = Contained.gameScores[dim][i];
-				winningTeam = teams.get(i).id;
-			}
-			DataLogger.insertGameScore(Util.getServerID(), 
+			if(teams.get(i).id.equals(teamID)){
+				winScore = Contained.gameScores[dim][i];
+				DataLogger.insertGameScore(Util.getServerID(), 
 					gameID, gameMode, teams.get(i).displayName, 
 					Contained.gameScores[dim][i], Contained.timeLeft[dim], Util.getDate());
+				break;
+			}
 		}
 
 		Util.serverDebugMessage("Ending DIM"+dim+" game");
@@ -171,18 +168,36 @@ public class PlayerMiniGame {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
+			int playerScore = 0;
 			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
-				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
-				if(pdata.teamID.equalsIgnoreCase(winningTeam))
-					properties.pvpWon++;
-				else
-					properties.pvpLost++;
+				playerScore = properties.curKills - properties.curDeaths + properties.curAntiTerritory;
+				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), 
+						pdata.teamID, properties.curKills, properties.curDeaths, 
+						properties.curAntiTerritory, Util.getDate());
+				if(!winCondition.equals("TIE")){
+					if(pdata.teamID.equalsIgnoreCase(teamID))
+						properties.pvpWon++;
+					else if (!teamID.equals("Debug") && !teamID.equals("Kicked"))
+						properties.pvpLost++;
+				}
+				
+				properties.kills+=properties.curKills;
+				properties.deaths+=properties.curDeaths;
+				properties.antiTerritory+=properties.curAntiTerritory;
 			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
-				DataLogger.insertTreasureScore(Util.getServerID(), gameID, player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
-				if(pdata.teamID.equalsIgnoreCase(winningTeam))
-					properties.treasureWon++;
-				else
-					properties.treasureLost++;
+				playerScore = properties.curTreasuresOpened + properties.curAltersActivated;
+				DataLogger.insertTreasureScore(Util.getServerID(), 
+						gameID, player.getDisplayName(), pdata.teamID, 
+						properties.curTreasuresOpened, properties.curAltersActivated, Util.getDate());
+				if(!winCondition.equals("TIE")){
+					if(pdata.teamID.equalsIgnoreCase(teamID))
+						properties.treasureWon++;
+					else if (!teamID.equals("Debug") && !teamID.equals("Kicked"))
+						properties.treasureLost++;
+				}
+				
+				properties.treasuresOpened+=properties.curTreasuresOpened;
+				properties.altersActivated+=properties.curAltersActivated;
 			}			
 			
 			Util.travelToDimension(0, player, false);
@@ -193,13 +208,22 @@ public class PlayerMiniGame {
 				syncScore.writeInt(properties.pvpLost);
 				syncScore.writeInt(properties.kills);
 				syncScore.writeInt(properties.deaths);
+				syncScore.writeInt(properties.antiTerritory);
 				Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
 			}else if(MiniGameUtil.isTreasure(dim)){
 				PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
 				syncScore.writeInt(properties.treasureWon);
 				syncScore.writeInt(properties.treasureLost);
 				syncScore.writeInt(properties.treasuresOpened);
+				syncScore.writeInt(properties.altersActivated);
 				Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+			}
+			
+			if(pdata.teamID.equals(teamID)){
+				//if(player.inventory.getFirstEmptyStack() > -1)
+					//rewardItem(playerScore, winScore, winCondition);
+				//else
+					//rewardXP(playerScore, winScore);
 			}
 		}
 
@@ -225,10 +249,10 @@ public class PlayerMiniGame {
 			return new ArrayList<EntityPlayer>();
 	}
 
-	/*
-	private ItemStack rewardItem(int score, int totalScore){
+	private ItemStack rewardItem(int score, int totalScore, String winCondition){
 		ItemStack reward = null;
 
+		/*
 		Random rand = new Random();
 		double probability = ((double) score/(double) totalScore);
 		Iterator<Item> items = GameData.getItemRegistry().iterator();
@@ -238,14 +262,13 @@ public class PlayerMiniGame {
 
 			}
 		}
-
+		*/
 		return reward;
 	}
 
-	private int rewardXP(int curScore, int score, int totalScore){
-		return (curScore) * (score/totalScore);
+	private int rewardXP(int score, int totalScore){
+		return (score/totalScore);
 	}
-	 */
 
 	public boolean isGameReady() {		
 		int teamPlayerCount = 0;

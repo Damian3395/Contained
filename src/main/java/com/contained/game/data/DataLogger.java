@@ -159,37 +159,39 @@ public class DataLogger {
 		}
 	}
 	
-	public static void insertTreasureScore(String server, int gameID, String player, String team, int score, String date){
+	public static void insertTreasureScore(String server, int gameID, String player, String team, int score, int alters, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SCORETREASURE VALUES (?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SCORETREASURE VALUES (?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setString(3, player);
 			preparedStatement.setString(4, team);
 			preparedStatement.setInt(5, score);
-			preparedStatement.setString(6, date);
+			preparedStatement.setInt(6, alters);
+			preparedStatement.setString(7, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static void insertPVPScore(String server, int gameID, String player, String team, int kills, int deaths, String date){
+	public static void insertPVPScore(String server, int gameID, String player, String team, int kills, int deaths, int antiTerritory, String date){
 		if(!Resources.LOGGING_ENABLED)
 			return;
 		
 		try{
-			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SCOREPVP VALUES (?,?,?,?,?,?,?)");
+			PreparedStatement preparedStatement = DB.prepareStatement("INSERT INTO SCOREPVP VALUES (?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, server);
 			preparedStatement.setInt(2, gameID);
 			preparedStatement.setString(3, player);
 			preparedStatement.setString(4, team);
 			preparedStatement.setInt(5, kills);
 			preparedStatement.setInt(6, deaths);
-			preparedStatement.setString(7, date);
+			preparedStatement.setInt(7, antiTerritory);
+			preparedStatement.setString(8, date);
 			preparedStatement.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();

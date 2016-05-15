@@ -6,13 +6,11 @@ import java.util.HashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemFood;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
@@ -21,7 +19,6 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
-import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.TownManageBlock;
@@ -73,9 +70,7 @@ public class PVPEvents {
 			if(victimProp.inGame() && victimProp.gameMode == Resources.PVP
 					&& killerProp.inGame() && killerProp.gameMode == Resources.PVP){
 				victimProp.removeLife();
-				victimProp.deaths++;
 				victimProp.curDeaths++;
-				killerProp.kills++;
 				killerProp.curKills++;
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);

@@ -175,15 +175,22 @@ public class AdminHandler {
 		if(playerToKick != null){
 			if(MiniGameUtil.isTreasure(playerToKick.dimension) && pdata.teamID != null) {
 				if(PlayerTeam.get(pdata.teamID).numMembers() == 1){
-					PlayerMiniGame.get(playerToKick.dimension).endGame();
+					PlayerMiniGame.get(playerToKick.dimension).endGame("Kicked", "Kicked");
 					Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 					Util.displayMessage(playerToKick, "You've been kicked back to Overworld by Admin");
 					return;
 				} else {
-					DataLogger.insertTreasureScore(Util.getServerID(), PlayerMiniGame.get(playerToKick.dimension).getGameID(), player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
+					DataLogger.insertTreasureScore(Util.getServerID(), 
+							PlayerMiniGame.get(playerToKick.dimension).getGameID(), 
+							player.getDisplayName(), pdata.teamID, 
+							properties.curTreasuresOpened, properties.curAltersActivated, Util.getDate());
 				}
 			} else if(MiniGameUtil.isPvP(playerToKick.dimension) && pdata.teamID != null)
-				DataLogger.insertPVPScore(Util.getServerID(), PlayerMiniGame.get(playerToKick.dimension).getGameID(), player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
+				DataLogger.insertPVPScore(Util.getServerID(), 
+						PlayerMiniGame.get(playerToKick.dimension).getGameID(), 
+						player.getDisplayName(), pdata.teamID, 
+						properties.curKills, properties.curDeaths, 
+						properties.curAntiTerritory, Util.getDate());
 			
 			PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 			miniGamePacket.writeInt(playerToKick.dimension);

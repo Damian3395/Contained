@@ -526,6 +526,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					pvpStats.pvpLost = packet.readInt();
 					pvpStats.kills = packet.readInt();
 					pvpStats.deaths = packet.readInt();
+					pvpStats.antiTerritory = packet.readInt();
 				break;
 					
 				case ClientPacketHandlerUtil.SYNC_TEASURE_STATS:
@@ -533,6 +534,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					treasureStats.treasureWon = packet.readInt();
 					treasureStats.treasureLost = packet.readInt();
 					treasureStats.treasuresOpened = packet.readInt();
+					treasureStats.altersActivated = packet.readInt();
 				break;
 				
 				case ClientPacketHandlerUtil.SYNC_GAME_SCORE:
@@ -634,11 +636,9 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						int size = packet.readInt();
 						for(int i = 0; i < size; i++){
 							String userPvp = packet.readString();
-							int kills = packet.readInt();
-							int deaths = packet.readInt();
-							
-							GuiScoreboard.kills.put(userPvp, kills);
-							GuiScoreboard.deaths.put(userPvp, deaths);
+							GuiScoreboard.kills.put(userPvp, packet.readInt());
+							GuiScoreboard.deaths.put(userPvp, packet.readInt());
+							GuiScoreboard.territory.put(userPvp, packet.readInt());
 						}
 						GuiScoreboard.updated = true;
 					}
@@ -650,9 +650,8 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						int size = packet.readInt();
 						for(int i = 0; i < size; i++){
 							String userTreasure = packet.readString();
-							int treasures = packet.readInt();
-							
-							GuiScoreboard.treasures.put(userTreasure, treasures);
+							GuiScoreboard.treasures.put(userTreasure, packet.readInt());
+							GuiScoreboard.alters.put(userTreasure, packet.readInt());
 						}
 						GuiScoreboard.updated = true;
 					}

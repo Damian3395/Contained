@@ -7,13 +7,11 @@ import java.util.HashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.entity.ExtendedPlayer;
-import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -246,13 +244,15 @@ public class ClientPacketHandlerUtil {
 		pvpStatsPacket.writeInt(properties.pvpWon);
 		pvpStatsPacket.writeInt(properties.pvpLost);
 		pvpStatsPacket.writeInt(properties.kills);
-		pvpStatsPacket.writeInt(properties.deaths);		
+		pvpStatsPacket.writeInt(properties.deaths);	
+		pvpStatsPacket.writeInt(properties.antiTerritory);
 		Contained.channel.sendTo(pvpStatsPacket.toPacket(), player);
 		
 		PacketCustom treasureStatsPacket = new PacketCustom(Resources.MOD_ID, SYNC_TEASURE_STATS);
 		treasureStatsPacket.writeInt(properties.treasureWon);
 		treasureStatsPacket.writeInt(properties.treasureLost);
 		treasureStatsPacket.writeInt(properties.treasuresOpened);
+		treasureStatsPacket.writeInt(properties.altersActivated);
 		Contained.channel.sendTo(treasureStatsPacket.toPacket(), player);
 	}
 	

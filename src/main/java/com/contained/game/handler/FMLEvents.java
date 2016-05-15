@@ -99,7 +99,7 @@ public class FMLEvents {
 						inactivityChecks[game.getGameDimension()] = 0;
 				}
 				for (PlayerMiniGame game : gamesToEnd)
-					game.endGame();
+					game.endGame("Inactive", "Inactive");
 			}
 			
 			//Tick the mini-game timers, and check for game-over.

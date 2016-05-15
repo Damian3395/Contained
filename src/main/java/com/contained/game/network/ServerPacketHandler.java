@@ -293,6 +293,7 @@ public class ServerPacketHandler {
 						pvpPacket.writeString(playerPvp.getDisplayName());
 						pvpPacket.writeInt(pvpProperties.curKills);
 						pvpPacket.writeInt(pvpProperties.curDeaths);
+						pvpPacket.writeInt(pvpProperties.curAntiTerritory);
 					}
 					Contained.channel.sendTo(pvpPacket.toPacket(), player);
 				break;
@@ -308,6 +309,7 @@ public class ServerPacketHandler {
 						ExtendedPlayer treasureProperties = ExtendedPlayer.get(playerTreasure);
 						treasurePacket.writeString(playerTreasure.getDisplayName());
 						treasurePacket.writeInt(treasureProperties.curTreasuresOpened);
+						treasurePacket.writeInt(treasureProperties.curAltersActivated);
 					}
 					Contained.channel.sendTo(treasurePacket.toPacket(), player);
 				break;
