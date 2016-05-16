@@ -15,8 +15,10 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class AdminHandler {
@@ -226,5 +228,11 @@ public class AdminHandler {
 		player.capabilities.disableDamage = false;
 		PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_NORMAL);
 		Contained.channel.sendTo(adminPacket.toPacket(),player);
+	}
+	
+	public void setDimTime(int dim, long timeToSet){
+//		DimensionManager.getWorld(dim).setWorldTime(timeToSet);
+		MinecraftServer.getServer().worldServerForDimension(dim).setWorldTime(timeToSet);
+		System.out.println("Setting Dim"+dim+"'s time to"+timeToSet);
 	}
 }

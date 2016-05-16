@@ -20,6 +20,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 
 public class GuiAdmin extends GuiScreen {
 
@@ -36,9 +38,12 @@ public class GuiAdmin extends GuiScreen {
 
 	private boolean isObjectDefaultText = false;
 	private boolean isPlayerDefaultText = false;
+	private boolean isEditingDimTime = false;
+	
 
 	private int selectedDimID = -100;	// use -100 to represent the whole server
 	private String selectedPlayer = null;
+	private Long currentDimTime = -1L;
 
 	private int pageID = 0; // default page is Login page
 
@@ -53,6 +58,7 @@ public class GuiAdmin extends GuiScreen {
 	private GuiTextField tf_healthPercentage;
 	private GuiTextField tf_hungerPercentage;
 	private GuiTextField tf_targetPlayer;
+	private GuiTextField tf_dimTime;
 
 	// Buttons
 	private GuiButton btn_login;
@@ -71,6 +77,7 @@ public class GuiAdmin extends GuiScreen {
 	private GuiButton btn_confirm;
 	private GuiButton btn_cancel;
 	private GuiButton btn_regular;
+	private GuiButton btn_setTime;
 
 	// Button ID
 	private final int BTN_LOGIN = 0;
@@ -89,6 +96,8 @@ public class GuiAdmin extends GuiScreen {
 	private final int BTN_CONFIRM = 13;
 	private final int BTN_CANCEL = 14;
 	private final int BTN_REGULAR = 15;
+	private final int BTN_SET_TIME = 16;
+	
 
 	public GuiAdmin() {
 		this.player = FMLClientHandler.instance().getClient().thePlayer;
@@ -131,23 +140,27 @@ public class GuiAdmin extends GuiScreen {
 
 		this.tf_targetPlayer = new GuiTextField(this.mc.fontRenderer, x + 30, y - 70, 90, 20);
 		this.tf_targetPlayer.setTextColor(Color.WHITE.hashCode());
+		
+		this.tf_dimTime = new GuiTextField(this.mc.fontRenderer, x + 35, y - 30, 80, 20);
+		this.tf_dimTime.setTextColor(Color.WHITE.hashCode());
 
 		this.btn_login = new GuiButton(BTN_LOGIN, x - 65, y, 50, 20, "Login");
 		this.btn_loginCancel = new GuiButton(BTN_LOGIN_CANCEL, x + 15, y, 50, 20, "Cancel");
-		this.btn_create = new GuiButton(BTN_CREATE, x + 35, y + 35, 40, 20, "Create");
-		this.btn_change = new GuiButton(BTN_CHANGE, x + 75, y + 35, 40, 20, "Change");
+		this.btn_create = new GuiButton(BTN_CREATE, x + 35, y + 55, 40, 20, "Create");
+		this.btn_change = new GuiButton(BTN_CHANGE, x + 75, y + 55, 40, 20, "Change");
 		this.btn_getMostVulnerable = new GuiButton(BTN_VUL, x + 35, y + 55, 80, 20, "Most Vulnerable");
 		this.btn_getHungeriest = new GuiButton(BTN_HUN, x + 35, y + 35, 80, 20, "Hungriest");
 		this.btn_getClosest = new GuiButton(BTN_CLS, x + 35, y + 15, 80, 20, "Closest");
 		this.btn_getFarthest = new GuiButton(BTN_FAR, x + 35, y - 5, 80, 20, "Farthest");
 		this.btn_enter = new GuiButton(BTN_ENTER, x + 35, y , 80, 20, "Enter World");
 		this.btn_worldInfo = new GuiButton(BTN_WORLD_INFO, x + 35, y + 50, 80, 20, "View Info");
-		this.btn_kick = new GuiButton(BTN_KICK, x + 35, y - 5, 80, 20, "Kick");
-		this.btn_spect = new GuiButton(BTN_SPECT, x + 35, y + 15, 80, 20, "Spect");
+		this.btn_kick = new GuiButton(BTN_KICK, x + 35, y + 15, 80, 20, "Kick");
+		this.btn_spect = new GuiButton(BTN_SPECT, x + 35, y + 35, 80, 20, "Spect");
 		this.btn_back = new GuiButton(BTN_BACK, x + 35, y + 75, 80, 20, "Back");
 		this.btn_confirm = new GuiButton(BTN_CONFIRM, x - 65, y, 50, 20, "Confirm");
 		this.btn_cancel = new GuiButton(BTN_CANCEL, x + 15, y, 50, 20, "Cancel");
 		this.btn_regular = new GuiButton(BTN_REGULAR, x-110, y-90, 60, 20, "Regular");
+		this.btn_setTime = new GuiButton(BTN_SET_TIME, x + 35, y -5 , 80, 20, "Set Time");
 		
 		this.updateButtons();
 	}
@@ -173,11 +186,13 @@ public class GuiAdmin extends GuiScreen {
 			break;
 		case PLAYER_PAGE:
 			// Player Selection Page
-			this.buttonList.add(this.btn_create);
-			this.buttonList.add(this.btn_change);
+			this.buttonList.add(this.btn_setTime);
 			this.buttonList.add(this.btn_kick);
 			this.buttonList.add(this.btn_spect);
+			this.buttonList.add(this.btn_create);
+			this.buttonList.add(this.btn_change);
 			this.buttonList.add(this.btn_back);
+			
 			break;
 		case CONFIRM_PAGE:
 			this.buttonList.add(this.btn_confirm);
@@ -196,12 +211,15 @@ public class GuiAdmin extends GuiScreen {
 		this.tf_hungerPercentage.mouseClicked(i, j, k);
 		this.tf_objectName.mouseClicked(i, j, k);
 		this.tf_targetPlayer.mouseClicked(i, j, k);
+		this.tf_dimTime.mouseClicked(i, j, k);
 		this.playerInfo.mouseClicked(i, j, k);
 		this.dimensionInfo.mouseClicked(i, j, k);
 		if (this.playerInfo.isElementSelected) {
 			this.tf_targetPlayer.setText(this.playerInfo.getText());
 		}
-
+		if (this.tf_dimTime.isFocused()) {
+			this.isEditingDimTime = true;
+		}
 		// handle other mouseClicked events
 		super.mouseClicked(i, j, k);
 	}
@@ -242,7 +260,10 @@ public class GuiAdmin extends GuiScreen {
 			}
 		} else if(i == KeyBindings.toggleAdmin.getKeyCode()){
 			this.mc.thePlayer.closeScreen();
-		} else {
+		} else if(this.tf_dimTime.isFocused()){
+			this.tf_dimTime.textboxKeyTyped(c, i);
+		}	else {
+		
 		
 			// handle other keyTyped events
 			super.keyTyped(c, i);
@@ -522,6 +543,18 @@ public class GuiAdmin extends GuiScreen {
 				PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_REGULAR_PLAYER);
 				Contained.channel.sendToServer(spectatorPacket.toPacket());
 			break;
+			
+			case BTN_SET_TIME:
+				try{
+					PacketCustom setTimePacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_SET_TIME);
+					setTimePacket.writeInt(this.selectedDimID);
+					setTimePacket.writeLong(Long.parseLong(this.tf_dimTime.getText()));
+					Contained.channel.sendToServer(setTimePacket.toPacket());
+				} catch (NumberFormatException e) {
+					System.out.println("ERROR in parsing time string.");
+				}
+				
+			break;
 			}
 		}
 	}
@@ -564,8 +597,16 @@ public class GuiAdmin extends GuiScreen {
 		this.tf_hungerPercentage.drawTextBox();
 		this.tf_objectName.drawTextBox();
 		this.tf_targetPlayer.drawTextBox();
+		this.tf_dimTime.drawTextBox();
+		// show current dim time as a reference
+		if(!this.isEditingDimTime)
+		this.tf_dimTime.setText(""+this.currentDimTime);
+		
+		
+		
 		this.fontRendererObj.drawString("HP(%)  FP(%)   Object", x - 120, y - 85, Color.WHITE.hashCode());
 		this.fontRendererObj.drawString("Target Player", x + 40, y - 85, Color.WHITE.hashCode());
+		this.fontRendererObj.drawString("Dim Time:", x + 40, y - 45, Color.WHITE.hashCode());
 		if(this.selectedDimID == -100){
 			this.fontRendererObj.drawString("Players in whole server:", x - 120, y - 25, Color.WHITE.hashCode());
 		} else {
@@ -590,6 +631,10 @@ public class GuiAdmin extends GuiScreen {
 	
 	public void setSelectedDimID(int dimID){
 		this.selectedDimID = dimID;
+	}
+	
+	public void setDimTimeInfo(long currentDimTime){
+		this.currentDimTime = currentDimTime;
 	}
 	
 	@Override

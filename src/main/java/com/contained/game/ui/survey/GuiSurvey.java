@@ -47,6 +47,10 @@ public class GuiSurvey extends GuiScreen {
 	public static final int PAGE_MINECRAFT = 4;
 	public static final int PAGE_PERSONALITY = 5;
 	
+	private static final int BUTTON_CD = 100;
+	private boolean isFakeQuestion = false;
+	private int key = -1;
+	
 	private String[] ethnicities = {"Hispanic", "Latino", "American Indian", "Alaska Native", "Asian", "African American", "Native Hawaiian", "Pacific Islander", "White"};
 	private int ethnicityIndex;
 	
@@ -239,12 +243,7 @@ public class GuiSurvey extends GuiScreen {
     			if (playerCopy.surveyResponses.progress == PAGE_PERSONALITY) {
     				//Disable the survey buttons for a brief period to prevent
     				//the button click from being double-counted.
-    				this.disableTime = 10;
-    				this.buttonOptionA.enabled = false;
-    				this.buttonOptionB.enabled = false;
-    				this.buttonOptionC.enabled = false;
-    				this.buttonOptionD.enabled = false;
-    				this.buttonOptionE.enabled = false;
+    				this.setButtonCD(10);
     			}
     			updateButtons();
     		} else if(b.id == 9){ //Left Button
@@ -265,18 +264,64 @@ public class GuiSurvey extends GuiScreen {
     				this.buttonNext.enabled = true;
     		} else if (b.id >= 2 && b.id <= 6) //Option buttons
     		{
-    			playerCopy.surveyResponses.personality[playerCopy.surveyResponses.progress-PAGE_PERSONALITY] = b.id-2;
-    			playerCopy.surveyResponses.progress++;
-    			
-    			if(playerCopy.surveyResponses.progress > SurveyData.getSurveyLength()){
-    				PacketCustom surveyPacket = ServerPacketHandlerUtil.packetUpdateSurvey(playerCopy);
-    				ServerPacketHandlerUtil.sendToServer(surveyPacket.toPacket());
+    			//this.setButtonCD(BUTTON_CD);
+    			if(this.isFakeQuestion){
+    				if(b.id != this.key){
+    					if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q1 + PAGE_PERSONALITY){
+    						playerCopy.surveyResponses.progress = 0;
+    						this.isFakeQuestion = false;
+        				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q2 + PAGE_PERSONALITY){
+        					playerCopy.surveyResponses.progress = SurveyData.FAKE_Q1 + PAGE_PERSONALITY -1;
+        					this.key = 3;
+        				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q3 + PAGE_PERSONALITY){
+        					playerCopy.surveyResponses.progress = SurveyData.FAKE_Q2 + PAGE_PERSONALITY -1;
+        					this.key = 6;
+        				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q4 + PAGE_PERSONALITY){
+        					playerCopy.surveyResponses.progress = SurveyData.FAKE_Q3 + PAGE_PERSONALITY -1;
+        					this.key = 2;
+        				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q5 + PAGE_PERSONALITY){
+        					playerCopy.surveyResponses.progress = SurveyData.FAKE_Q4 + PAGE_PERSONALITY -1;
+        					this.key = 4;
+        				} 
+    				} else {
+    					this.isFakeQuestion = false;
+    				}
     				
-    				PacketCustom personalityPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LOG_PERSONALITY);
-    				ServerPacketHandlerUtil.sendToServer(personalityPacket.toPacket());
+    				playerCopy.surveyResponses.progress++;
+    			} else {
+    				if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q1 + PAGE_PERSONALITY -1){
+    					this.isFakeQuestion = true;
+    					this.key = 3;
+    				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q2 + PAGE_PERSONALITY -1){
+    					this.isFakeQuestion = true;
+    					this.key = 6;
+    				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q3 + PAGE_PERSONALITY -1){
+    					this.isFakeQuestion = true;
+    					this.key = 2;
+    				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q4 + PAGE_PERSONALITY -1){
+    					this.isFakeQuestion = true;
+    					this.key = 4;
+    				} else if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q5 + PAGE_PERSONALITY -1){
+    					this.isFakeQuestion = true;
+    					this.key = 5;
+    				}
+    					playerCopy.surveyResponses.personality[playerCopy.surveyResponses.progress-PAGE_PERSONALITY] = b.id-2;
+            			playerCopy.surveyResponses.progress++;
+            			
+            			
+            			
+            			if(playerCopy.surveyResponses.progress > SurveyData.getSurveyLength()){
+            				PacketCustom surveyPacket = ServerPacketHandlerUtil.packetUpdateSurvey(playerCopy);
+            				ServerPacketHandlerUtil.sendToServer(surveyPacket.toPacket());
+            				
+            				PacketCustom personalityPacket = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.LOG_PERSONALITY);
+            				ServerPacketHandlerUtil.sendToServer(personalityPacket.toPacket());
+            			}	
+    				
+    				
     			}
-    			
     			updateButtons();
+    			
     		}
     	}
     }
@@ -376,6 +421,15 @@ public class GuiSurvey extends GuiScreen {
     		return "+"+(new DecimalFormat("0.00").format(value));
     	else
     		return ""+(new DecimalFormat("0.00").format(value));
+    }
+    
+    private void setButtonCD(int cd){
+    	this.disableTime = cd;
+		this.buttonOptionA.enabled = false;
+		this.buttonOptionB.enabled = false;
+		this.buttonOptionC.enabled = false;
+		this.buttonOptionD.enabled = false;
+		this.buttonOptionE.enabled = false;
     }
 	
 }

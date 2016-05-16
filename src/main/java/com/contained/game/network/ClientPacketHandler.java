@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.DimensionManager;
 
 import com.contained.game.Contained;
 import com.contained.game.data.Data;
@@ -612,6 +613,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						newGuiAdmin.setPage(newGuiAdmin.PLAYER_PAGE);
 						newGuiAdmin.setSelectedDimID(selectedDimID);
 						newGuiAdmin.setPlayerInfoPanel(playerNames);
+						newGuiAdmin.setDimTimeInfo(DimensionManager.getWorld(selectedDimID).getWorldTime());
 					}
 				break;
 				

@@ -7,6 +7,11 @@ import net.minecraft.nbt.NBTTagCompound;
  * http://ipip.ori.org/New_IPIP-50-item-scale.htm
  */
 public class SurveyData {
+	public static final int FAKE_Q1 = 9;
+	public static final int FAKE_Q2 = 20;
+	public static final int FAKE_Q3 = 26;
+	public static final int FAKE_Q4 = 37;
+	public static final int FAKE_Q5 = 49;
 
 	public static final Q[] data = {
 		new Q("I respect authority.", Q.AGREEABLENESS, 1),
@@ -18,6 +23,9 @@ public class SurveyData {
 		new Q("I take an interest in others.", Q.AGREEABLENESS, 1),
 		new Q("I often worry about things.", Q.NEUROTICISM, 1),
 		new Q("I get things done quickly.", Q.CONSCIENTIOUSNESS, 1),
+		// fake question
+		new Q("I'd like to restart the survey unless I click Agree", Q.FAKE, 0),
+		
 		new Q("I can handle a lot of information.", Q.OPENNESS, 1),
 		new Q("I am the first to act.", Q.EXTRAVERSION, 1),
 		new Q("I dislike routine.", Q.CONSCIENTIOUSNESS, -1),
@@ -28,11 +36,15 @@ public class SurveyData {
 		new Q("I feel comfortable around people.", Q.EXTRAVERSION, 1),
 		new Q("I feel comfortable with myself.", Q.NEUROTICISM, -1),
 		new Q("I tend to keep to myself.", Q.EXTRAVERSION, -1),
+		// fake question
+				new Q("I would go to the first question if I don't choose Strongly Disagree", Q.FAKE, 0),
 		new Q("I experience frequent mood swings.", Q.NEUROTICISM, 1),
 		new Q("I follow a schedule.", Q.CONSCIENTIOUSNESS, 1),
 		new Q("I'm not interested in other's problems.", Q.AGREEABLENESS, -1),
 		new Q("I formulate ideas clearly.", Q.OPENNESS, 1),
 		new Q("I get deeply immersed in music.", Q.OPENNESS, 1),
+		// fake question
+				new Q("If I don't click Strongly Agree, I'll have to do this survey again", Q.FAKE, 0),
 		new Q("I don't mind messy people.", Q.CONSCIENTIOUSNESS, -1),
 		new Q("I am always prepared.", Q.CONSCIENTIOUSNESS, 1),
 		new Q("I tend to procrastinate a lot.", Q.CONSCIENTIOUSNESS, -1),
@@ -43,6 +55,8 @@ public class SurveyData {
 		new Q("I hold back my opinions.", Q.EXTRAVERSION, -1),		
 		new Q("I laugh a lot.", Q.EXTRAVERSION, 1),
 		new Q("I pay attention to details.", Q.CONSCIENTIOUSNESS, 1),
+		// fake question
+				new Q("I'll proceed to the next question only if I click Neutral", Q.FAKE, 0),
 		new Q("I often engage in arguments.", Q.AGREEABLENESS, -1),
 		new Q("I don't enjoy poetry.", Q.OPENNESS, -1),
 		new Q("I finish what I start.", Q.CONSCIENTIOUSNESS, 1),		
@@ -54,6 +68,8 @@ public class SurveyData {
 		new Q("I have a rich vocabulary.", Q.OPENNESS, 1),
 		new Q("I hate to seem pushy.", Q.AGREEABLENESS, 1),
 		new Q("I avoid drawing attention to myself.", Q.EXTRAVERSION, -1),
+		// fake question
+				new Q("All my answers will be disgard and the survey will restart if I fail to click Disagree", Q.FAKE, 0),
 		new Q("I don't have time for other people.", Q.AGREEABLENESS, -1),
 		new Q("I don't have a soft side.", Q.AGREEABLENESS, -1),
 		new Q("I often initiate conversations.", Q.EXTRAVERSION, 1),
@@ -67,6 +83,7 @@ public class SurveyData {
 		public static final int CONSCIENTIOUSNESS = 3;
 		public static final int NEUROTICISM = 4;
 		public static final int OPENNESS = 5;
+		public static final int FAKE = 6;
 		
 		public String question;
 		public int type;

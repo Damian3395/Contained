@@ -255,6 +255,10 @@ public class ServerPacketHandler {
 					admin.becomeRegularPlayer(player);
 				break;
 				
+				case ServerPacketHandlerUtil.ADMIN_SET_TIME:
+					admin.setDimTime(packet.readInt(), packet.readLong());
+				break;
+				
 				case ServerPacketHandlerUtil.LOG_PERSONALITY:
 					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 					DataLogger.insertPersonality(Util.getServerID(), player.getDisplayName(), 
