@@ -45,26 +45,26 @@ public class CollectorClass {
 	public List<GuiButton> getButtonList(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
-		this.buttonList.add(woodenShovel = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 0, "Test"));
+		this.buttonList.add(woodenShovel = new IconButton(0, x-15, y-90, 20, 20, "perkIcons.png", 0, 0, "x1.75 Break Speed"));
 		
-		this.buttonList.add(stonePickAxe = new IconButton(5, x-75, y-60, 20, 20, "perkIcons.png", 16, 0, "Test"));
-		this.buttonList.add(stoneAxe = new IconButton(6, x+45, y-60, 20, 20, "perkIcons.png", 32, 0, "Test"));
+		this.buttonList.add(stonePickAxe = new IconButton(5, x-75, y-60, 20, 20, "perkIcons.png", 16, 0, "x1.75 Break Speed"));
+		this.buttonList.add(stoneAxe = new IconButton(6, x+45, y-60, 20, 20, "perkIcons.png", 32, 0, "+10% Mob Damage"));
 		
-		this.buttonList.add(ironPickAxe = new IconButton(7, x-105, y-30, 20, 20, "perkIcons.png", 48, 0, "Test"));
-		this.buttonList.add(ironAxe = new IconButton(8, x-45, y-30, 20, 20, "perkIcons.png", 64, 0, "Test"));
+		this.buttonList.add(ironPickAxe = new IconButton(7, x-105, y-30, 20, 20, "perkIcons.png", 48, 0, "x1.5 Break Speed"));
+		this.buttonList.add(ironAxe = new IconButton(8, x-45, y-30, 20, 20, "perkIcons.png", 64, 0, "x1.5 Break Speed"));
 		
-		this.buttonList.add(goldPickAxe = new IconButton(9, x+15, y-30, 20, 20, "perkIcons.png", 80, 0, "Test"));
-		this.buttonList.add(goldAxe = new IconButton(10, x+75, y-30, 20, 20, "perkIcons.png", 96, 0, "Test"));
+		this.buttonList.add(goldPickAxe = new IconButton(9, x+15, y-30, 20, 20, "perkIcons.png", 80, 0, "-10% Mob Damage"));
+		this.buttonList.add(goldAxe = new IconButton(10, x+75, y-30, 20, 20, "perkIcons.png", 96, 0, "+10% Mob Damage"));
 		
-		this.buttonList.add(diamondAxe = new IconButton(15, x+90, y, 20, 20, "perkIcons.png", 128, 0, "Test"));
-		this.buttonList.add(goldShovel = new IconButton(16, x+60, y, 20, 20, "perkIcons.png", 160, 0, "Test"));
-		this.buttonList.add(lamp = new IconButton(17, x+30, y, 20, 20, "perkIcons.png", 208, 0, "Test"));
-		this.buttonList.add(tree = new IconButton(18, x, y, 20, 20, "perkIcons.png", 224, 0, "Test"));
+		this.buttonList.add(diamondAxe = new IconButton(15, x+90, y, 20, 20, "perkIcons.png", 128, 0, "+10% Player Damage"));
+		this.buttonList.add(goldShovel = new IconButton(16, x+60, y, 20, 20, "perkIcons.png", 160, 0, "+10% Player Damage"));
+		this.buttonList.add(lamp = new IconButton(17, x+30, y, 20, 20, "perkIcons.png", 208, 0, "+10% Damage in Day"));
+		this.buttonList.add(tree = new IconButton(18, x, y, 20, 20, "perkIcons.png", 224, 0, "-10% Damage in Forest"));
 		
-		this.buttonList.add(ladder = new IconButton(14, x-30, y, 20, 20, "perkIcons.png", 192, 0, "Test"));
-		this.buttonList.add(bucket = new IconButton(13, x-60, y, 20, 20, "perkIcons.png", 176, 0, "Test"));
-		this.buttonList.add(diamondShovel = new IconButton(12, x-90, y, 20, 20, "perkIcons.png", 144, 0, "Test"));
-		this.buttonList.add(diamondPickAxe = new IconButton(11, x-120, y, 20, 20, "perkIcons.png", 112, 0, "Test"));
+		this.buttonList.add(ladder = new IconButton(14, x-30, y, 20, 20, "perkIcons.png", 192, 0, "-10% Fall Damage"));
+		this.buttonList.add(bucket = new IconButton(13, x-60, y, 20, 20, "perkIcons.png", 176, 0, "-10% Drowning Damage"));
+		this.buttonList.add(diamondShovel = new IconButton(12, x-90, y, 20, 20, "perkIcons.png", 144, 0, "-10% Player Damage"));
+		this.buttonList.add(diamondPickAxe = new IconButton(11, x-120, y, 20, 20, "perkIcons.png", 112, 0, "x1.25 Break Speed"));
 		
 		renderTree();
 		

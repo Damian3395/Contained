@@ -45,7 +45,7 @@ public class WarriorClass {
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
 		
-		this.buttonList.add(woodSword = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 64, "+10% Attack"));
+		this.buttonList.add(woodSword = new IconButton(4, x-15, y-90, 20, 20, "perkIcons.png", 0, 64, "+10% Attack"));
 		
 		this.buttonList.add(chestPlate = new IconButton(61, x-75, y-60, 20, 20, "perkIcons.png", 16, 64, "-10% Damage"));
 		this.buttonList.add(stoneSword = new IconButton(62, x+45, y-60, 20, 20, "perkIcons.png", 32, 64, "+10% Attack"));

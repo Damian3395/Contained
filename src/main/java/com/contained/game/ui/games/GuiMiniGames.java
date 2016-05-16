@@ -17,7 +17,7 @@ public class GuiMiniGames extends GuiScreen {
 	private final int JOIN_GAME = 0;
 	private final int CANCEL_GAME = 1;
 	private int x,y;
-	private int pvpWon, pvpLost, treasureWon, treasureLost, kills, deaths, treasuresOpened;
+	private int pvpWon, pvpLost, treasureWon, treasureLost, kills, deaths, treasuresOpened, territory, alters;
 	
 	boolean inQueue = false;
 	
@@ -38,7 +38,9 @@ public class GuiMiniGames extends GuiScreen {
 		treasureLost = properties.treasureLost;
 		kills = properties.kills;
 		deaths = properties.deaths;
+		territory = properties.antiTerritory;
 		treasuresOpened = properties.treasuresOpened;
+		alters = properties.altersActivated;
 		inQueue = properties.isWaitingForMiniGame();
 		
 		x = this.width/2;
@@ -87,9 +89,17 @@ public class GuiMiniGames extends GuiScreen {
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Kills/Deaths: ")
 				, y-25, "("+this.kills+"/"+this.deaths+")"
 				, Color.RED);
-		renderFont(x-120, y-15, "Treasures Opened: ", Color.BLACK);
+		renderFont(x-120, y-15, "Removed Territories: ", Color.BLACK);
+		renderFont(x-120+mc.fontRenderer.getStringWidth("Removed Territories: ")
+				, y-15, "("+(this.territory/3)+")"
+				, Color.RED);
+		renderFont(x-120, y-5, "Treasures Opened: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Treasures Opened: ")
-				, y-15, "("+this.treasuresOpened+")"
+				, y-5, "("+this.treasuresOpened+")"
+				, Color.RED);
+		renderFont(x-120, y+5, "Alters Activated: ", Color.BLACK);
+		renderFont(x-120+mc.fontRenderer.getStringWidth("Alters Activated: ")
+				, y+5, "("+(this.alters/3)+")"
 				, Color.RED);
 		super.drawScreen(w, h, ticks);
 	}

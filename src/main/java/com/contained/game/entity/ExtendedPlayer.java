@@ -42,11 +42,18 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public int treasureLost = 0;
 	public int kills = 0;
 	public int deaths = 0;
+	public int antiTerritory = 0;
 	public int treasuresOpened = 0;
+	public int altersActivated = 0;
 	public int curKills = 0;
 	public int curDeaths = 0;
+	public int curAntiTerritory = 0;
 	public int curTreasuresOpened = 0;
+	public int curAltersActivated = 0;
 	public String world = "";
+	public double spawnX = 0.0;
+	public double spawnY = 0.0;
+	public double spawnZ = 0.0;
 	
 	public ExtendedPlayer(EntityPlayer entity) {
 		this.entity = entity;
@@ -165,7 +172,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.gameID = load.getInteger("gameID");
 		this.curKills = load.getInteger("curKills");
 		this.curDeaths = load.getInteger("curDeaths");
+		this.curAntiTerritory = load.getInteger("curAntiTerritory");
 		this.curTreasuresOpened = load.getInteger("curTreasuresOpened");
+		this.curAltersActivated = load.getInteger("curAltersActivated");
 		this.world = load.getString("world");
 		
 		this.occupationValues = load.getIntArray("occupationValues");
@@ -201,7 +210,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.treasureLost = load.getInteger("treasureLost");
 		this.kills = load.getInteger("kills");
 		this.deaths = load.getInteger("deaths");
+		this.antiTerritory = load.getInteger("antiTerritory");
 		this.treasuresOpened = load.getInteger("treasuresOpened");
+		this.altersActivated = load.getInteger("altersActivated");
+		
+		this.spawnX = load.getDouble("spawnX");
+		this.spawnY = load.getDouble("spawnY");
+		this.spawnZ = load.getDouble("spawnz");
 	}
 
 	@Override
@@ -213,7 +228,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("gameID", this.gameID);
 		save.setInteger("curKills", this.curKills);
 		save.setInteger("curDeaths", this.curDeaths);
+		save.setInteger("curAntiTerritory", this.curAntiTerritory);
 		save.setInteger("curTreasuresOpened", this.curTreasuresOpened);
+		save.setInteger("curAltersActivated", this.curAltersActivated);
 		save.setString("world", this.world);
 		
 		save.setIntArray("occupationValues", getOccupationValues());
@@ -250,6 +267,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setInteger("treasureLost", this.treasureLost);
 		save.setInteger("kills", this.kills);
 		save.setInteger("deaths", this.deaths);
+		save.setInteger("antiTerritory", this.antiTerritory);
+		save.setInteger("treasuresOpened", this.treasuresOpened);
+		save.setInteger("altersActivated", this.altersActivated);
+		
+		save.setDouble("spawnX", this.spawnX);
+		save.setDouble("spawnY", this.spawnY);
+		save.setDouble("spawnZ", this.spawnZ);
 	}
 
 	@Override

@@ -52,3 +52,6 @@ key.dataVisGUI=Toggle Data GUI
 key.territoryRender=Toggle Territory Render
 key.classPerkGUI=View Perks
 key.guildGUI=Manage Guild
+key.miniGamesGui=Mini-Game Menu
+key.guiStyle=GUI Style
+key.adminGui=Admin Console

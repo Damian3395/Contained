@@ -11,7 +11,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import codechicken.lib.packet.PacketCustom;
 
 import com.contained.game.Contained;
@@ -20,9 +19,9 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
-import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
+import com.contained.game.world.block.TownManageBlock;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -47,42 +46,14 @@ public class PVPEvents {
 			for (int i=-Contained.configs.pvpTerritorySize;i<=Contained.configs.pvpTerritorySize;i++) 
 				for (int j=-Contained.configs.pvpTerritorySize;j<=Contained.configs.pvpTerritorySize;j++) 
 					Contained.getTerritoryMap(dimID).put(new Point(newSpawnLocation.x+i, newSpawnLocation.y+j), team.id);
+		
+			int x = newSpawnLocation.x;
+			int z = newSpawnLocation.y; 
+			int y = w.getTopSolidOrLiquidBlock(x, z);
+			w.setBlock(x, y, z, TownManageBlock.instance);
 		}
 		
 		return teamSpawnPoints;
-	}
-	
-	@SubscribeEvent
-	public void onSpawn(Clone event){
-		if(event.wasDeath && event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote){
-			ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
-			ExtendedPlayer old = ExtendedPlayer.get(event.original);
-			if(properties.inGame() && properties.gameMode == Resources.PVP 
-					&& (MiniGameUtil.isPvP(event.entityPlayer.dimension) || MiniGameUtil.isTreasure(event.entityPlayer.dimension))){
-				properties.setLives(old.lives);
-				/*
-				if(MiniGameUtil.isPvP(event.entityPlayer.dimension)){
-					properties.curDeaths = old.curDeaths;
-					properties.curKills = old.curKills;
-					properties.deaths = old.deaths;
-					properties.kills = old.kills;
-				}
-				if(MiniGameUtil.isTreasure(event.entityPlayer.dimension)){
-					properties.curTreasuresOpened = old.curTreasuresOpened;
-					properties.treasuresOpened = old.treasuresOpened;
-				}
-				*/
-				
-				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
-				syncLifePacket.writeInt(properties.lives);
-				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
-				
-				if(properties.lives == 0){
-					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
-					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
-				}
-			}
-		}
 	}
 	
 	@SubscribeEvent
@@ -99,15 +70,18 @@ public class PVPEvents {
 			if(victimProp.inGame() && victimProp.gameMode == Resources.PVP
 					&& killerProp.inGame() && killerProp.gameMode == Resources.PVP){
 				victimProp.removeLife();
-				victimProp.deaths++;
 				victimProp.curDeaths++;
-				killerProp.kills++;
 				killerProp.curKills++;
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(victimProp.lives);
 				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) victim);
 			
+				if(victimProp.lives == 0){
+					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
+					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) victim);
+				}
+				
 				PlayerTeamIndividual killerData = PlayerTeamIndividual.get(killer);
 				PlayerMiniGame miniGame = PlayerMiniGame.get(killerData.teamID);
 				if(miniGame == null)

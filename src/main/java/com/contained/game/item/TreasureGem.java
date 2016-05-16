@@ -2,8 +2,11 @@ package com.contained.game.item;
 
 import com.contained.game.util.Resources;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.block.*;
 import net.minecraft.creativetab.*;
 import net.minecraft.item.*;
@@ -53,6 +56,21 @@ public class TreasureGem {
 				Character.valueOf('5'), 
 				new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,BOTTOM)), 1)
 			});
+		
+		ItemStack top = new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,TOP)), 1);
+		ItemStack left = new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,LEFT)), 1);
+		ItemStack center = new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,CENTER)), 1);
+		ItemStack right = new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,RIGHT)), 1);
+		ItemStack bottom = new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,BOTTOM)), 1);
+		ItemStack full = new ItemStack((Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+getUnlocalizedName(color,FULL)), 1);
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+			MantleClientRegistry.registerManualLargeRecipe(Resources.MOD_ID+":"+getUnlocalizedName(color,FULL), full,
+					null, top, null,
+					left, center, right,
+					null, bottom, null);
+			MantleClientRegistry.registerManualIcon(Resources.MOD_ID+":"+getUnlocalizedName(color,FULL), full);
+		}
 	}
 
 	/**

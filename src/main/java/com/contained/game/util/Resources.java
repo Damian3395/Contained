@@ -14,8 +14,14 @@ public class Resources {
 	
 	public static int wastelandPadding = 5; //Number of "transition" chunks between world and wasteland.
 	
+	// If true, debug messages will be printed to the in-game chat.
 	public static final boolean DEBUG_ENABLED = true;
+	
+	// If true, data will be logged to the connected MySQL database.
 	public static final boolean LOGGING_ENABLED = false;
+	
+	// If true, then the player will be forced to fill out the survey
+	// before being able to play on the server.
 	public static final boolean MANDATORY_SURVEY = false;
 	
 	public static final int MIN_PVP_DIMID = 2;
@@ -25,10 +31,14 @@ public class Resources {
 	public static final int MAX_PVP_GAMES = MAX_PVP_DIMID-MIN_PVP_DIMID+1;
 	public static final int MAX_TREASURE_GAMES = MAX_TREASURE_DIMID-MIN_TREASURE_DIMID+1;
 	
+	public static final int NETHER = -1;
 	public static final int OVERWORLD = 0;
 	public static final int MINIGAME = 1;
 	public static final int PVP = 1;
 	public static final int TREASURE = 2;
+	
+	public static final int GLOBAL_CHAT = 0;
+	public static final int TEAM_CHAT = 1;
 	
 	public static final int COAL = 0;
 	public static final int IRON = 1;

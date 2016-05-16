@@ -153,7 +153,7 @@ public class Util {
 		return Resources.OVERWORLD;
 	}
 	
-	public static void travelToDimension(int dimID, EntityPlayer player) {
+	public static void travelToDimension(int dimID, EntityPlayer player, boolean force) {
 		if (!player.worldObj.isRemote && !player.isDead && player instanceof EntityPlayerMP) {
 			player.addPotionEffect(new PotionEffect(Potion.regeneration.id, 300, 4));
 			player.addPotionEffect(new PotionEffect(Potion.resistance.id, 300, 4));
@@ -166,7 +166,7 @@ public class Util {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
-			if (properties.inGame()) {
+			if (properties.inGame() || force) {
 				// Player is currently participating in a mini-game... make them leave
 				// the game before teleporting out of the dimension.	
 				properties.setGameMode(Resources.OVERWORLD);
@@ -174,12 +174,15 @@ public class Util {
 				properties.setGame(false);
 				properties.curDeaths = 0;
 				properties.curKills = 0;
+				properties.curAntiTerritory = 0;
 				properties.curTreasuresOpened = 0;
+				properties.curAltersActivated = 0;
 	
 				MiniGameUtil.clearMainInventory(player);
 				MiniGameUtil.clearArmorInventory(player);
 	
-				player.experienceTotal = pdata.xp;
+				player.addExperience(pdata.xp);
+				player.addExperienceLevel(pdata.level);
 				
 				int armorSize = 0;
 				if (pdata.armor != null) {
@@ -203,6 +206,7 @@ public class Util {
 	
 				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.RESTORE_PLAYER);
 				miniGamePacket.writeInt(pdata.xp);
+				miniGamePacket.writeInt(pdata.level);
 				miniGamePacket.writeInt(armorSize);
 				if (pdata.armor != null) {
 					for(int i=0; i<pdata.armor.length; i++) {
@@ -231,11 +235,50 @@ public class Util {
 				Contained.channel.sendTo(miniGamePacket.toPacket(), mpPlayer);
 	
 				pdata.xp = 0;
+				pdata.level = 0;
 				pdata.revertMiniGameChanges();
+			}
+			
+			if(player.dimension == Resources.OVERWORLD){
+				properties.spawnX = player.posX;
+				properties.spawnY = player.posY;
+				properties.spawnZ = player.posZ;
 			}
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 						mpPlayer, dimID, new GameTeleporter(newWorld));
+			if(dimID == Resources.OVERWORLD)
+				player.setPositionAndUpdate(properties.spawnX, properties.spawnY, properties.spawnZ);
+			else{
+				double posx = player.posX;
+				double posy = player.posY;
+				double posz = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)player.posZ);
+				
+				boolean spawn = true;
+				int indexZ = 0;
+				for(int i = 1; i <= 5; i++){
+					if(!newWorld.isAirBlock((int)posx, (int)posy, (int)(posz+i))){
+						spawn = false;
+						posz+=(i+1);
+						break;
+					}
+				}
+				
+				while(!spawn){
+					spawn = true;
+					int index = 0;
+					for(int i = 1; i <= 5; i++){
+						if(!newWorld.isAirBlock((int)posx, (int)posy, (int)(posz+i))){
+							spawn = false;
+							index = i;
+						}
+					}
+					if(!spawn)
+						posz+=(index+1);
+				}
+				
+				player.setPositionAndUpdate((int)posx, (int)posy, (int)(posz++));
+			}
 		}
 	}
 	
@@ -410,7 +453,7 @@ public class Util {
 	
 	public static void dimensionMessage(int dim, String msg) {
 		@SuppressWarnings("unchecked")
-		List<EntityPlayer> players = MinecraftServer.getServer().worldServers[dim].playerEntities;
+		List<EntityPlayer> players = MinecraftServer.getServer().worldServerForDimension(dim).playerEntities;
 		Iterator<EntityPlayer> iterator = players.iterator();
 		while(iterator.hasNext()){
 			EntityPlayer player = iterator.next();

@@ -36,6 +36,7 @@ public class PlayerTeamIndividual {
 	public ItemStack[] inventory;
 	public ItemStack[] armor;
 	public int xp;
+	public int level;
 	
 	public PlayerTeamIndividual(String name) {
 		this.playerName = name;
@@ -213,6 +214,9 @@ public class PlayerTeamIndividual {
 		ntc.setBoolean("isLeader", this.isLeader);
 		ntc.setLong("joined", joinTime);
 		ntc.setLong("lastOnline", lastOnline);
+		ntc.setInteger("xp", this.xp);
+		ntc.setInteger("level", this.level);
+		
 		NBTTagCompound surveyData = new NBTTagCompound();
 		this.surveyResponses.writeToNBT(surveyData);
 		ntc.setTag("surveyResponses", surveyData);
@@ -260,6 +264,9 @@ public class PlayerTeamIndividual {
 		this.isLeader = ntc.getBoolean("isLeader");
 		this.joinTime = ntc.getLong("joined");
 		this.lastOnline = ntc.getLong("lastOnline");
+		this.xp = ntc.getInteger("xp");
+		this.level = ntc.getInteger("level");
+		
 		NBTTagCompound surveyData = ntc.getCompoundTag("surveyResponses");
 		this.surveyResponses = (new SurveyData()).new SurveyResponse();
 		this.surveyResponses.readFromNBT(surveyData);

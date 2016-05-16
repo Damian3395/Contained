@@ -1,7 +1,12 @@
 package com.contained.game.world.block;
 
+import com.contained.game.Contained;
+import com.contained.game.data.DataLogger;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.item.TreasureGem;
+import com.contained.game.network.ClientPacketHandlerUtil;
+import com.contained.game.user.PlayerMiniGame;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.util.MiniGameUtil;
@@ -38,6 +43,11 @@ public class EmblemBlock {
 	public static BlockEmblemReciever waterEmblemAct = new BlockEmblemReciever(TreasureGem.BLUE, true, "waterEmblemBlockActive");
 	public static BlockEmblemReciever windEmblemAct = new BlockEmblemReciever(TreasureGem.WHITE, true, "windEmblemBlockActive");
 
+	public static String fireBlockName = fireEmblemAct.getUnlocalizedName().replace("tile.", "");
+	public static String earthBlockName = earthEmblemAct.getUnlocalizedName().replace("tile.", "");
+	public static String waterBlockName = waterEmblemAct.getUnlocalizedName().replace("tile.", "");
+	public static String windBlockName = windEmblemAct.getUnlocalizedName().replace("tile.", "");
+	
 	public void preInit(FMLPreInitializationEvent event){
 		GameRegistry.registerBlock(fireEmblemInact,  fireEmblemInact.getUnlocalizedName().replace("tile.", ""));
 		GameRegistry.registerBlock(earthEmblemInact,  earthEmblemInact.getUnlocalizedName().replace("tile.", ""));
@@ -49,7 +59,7 @@ public class EmblemBlock {
 		GameRegistry.registerBlock(windEmblemAct,  windEmblemAct.getUnlocalizedName().replace("tile.", ""));
 	}
 
-	static class BlockEmblemReciever extends BlockContainer {
+	private static class BlockEmblemReciever extends BlockContainer {
 		IIcon gor = null, dol = null, st1 = null, st2 = null, st3 = null, st4 = null;
 		public int myColor;
 		public boolean active;
@@ -81,8 +91,7 @@ public class EmblemBlock {
 			if (pdata.teamID != null && !te.isActive && te.teamID != null && pdata.teamID.equals(te.teamID)) {
 				ItemStack holding = p.getHeldItem();
 				Item compareItem = (Item)Item.itemRegistry.getObject(Resources.MOD_ID+":"+TreasureGem.getUnlocalizedName(myColor,TreasureGem.FULL));
-				if (holding != null && holding.getItem().equals(compareItem)) 
-				{
+				if (holding != null && holding.getItem().equals(compareItem)) {
 					if (myColor == TreasureGem.RED)
 						w.setBlock(x, y, z, fireEmblemAct);
 					else if (myColor == TreasureGem.GREEN)
@@ -93,6 +102,14 @@ public class EmblemBlock {
 						w.setBlock(x, y, z, windEmblemAct);
 
 					p.inventory.consumeInventoryItem(compareItem);
+					
+					DataLogger.insertAlter(Util.getServerID(), Util.getGameID(p.dimension), pdata.teamID, p.getDisplayName(), Util.getDate());
+					
+					ExtendedPlayer properties = ExtendedPlayer.get(p);
+					properties.curAltersActivated+=3;
+					int teamID = PlayerMiniGame.get(p.dimension).getTeamID(pdata);
+					Contained.gameScores[p.dimension][teamID]+=3;
+					ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
 					
 					EmblemBlockTE newTE = getEmblemTE(w, x, y, z);
 					if (newTE != null && newTE.isActive) {
@@ -116,7 +133,7 @@ public class EmblemBlock {
 						}
 						
 						if (count >= 3)
-							MiniGameUtil.teamWins(pdata.teamID, p.dimension);
+							MiniGameUtil.teamWins(pdata.teamID, p.dimension, "EMBLEMS");
 					}
 					return true;
 				}

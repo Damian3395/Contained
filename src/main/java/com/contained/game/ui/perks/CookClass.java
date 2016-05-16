@@ -44,7 +44,7 @@ public class CookClass {
 	public List<GuiButton> getButtonList(){
 		int x = this.gui.width/2;
 		int y = this.gui.height/2;
-		this.buttonList.add(woodHoe = new IconButton(-1, x-15, y-90, 20, 20, "perkIcons.png", 0, 32, "-10% Damage When Held"));
+		this.buttonList.add(woodHoe = new IconButton(2, x-15, y-90, 20, 20, "perkIcons.png", 0, 32, "-10% Damage When Held"));
 		
 		this.buttonList.add(stoneHoe = new IconButton(33, x-75, y-60, 20, 20, "perkIcons.png", 16, 32, "-15% Damage When Held"));
 		this.buttonList.add(seeds = new IconButton(34, x+45,y-60, 20, 20, "perkIcons.png", 32, 32, "2x Harvest"));

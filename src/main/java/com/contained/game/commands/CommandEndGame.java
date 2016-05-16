@@ -53,12 +53,12 @@ public class CommandEndGame implements ICommand{
 						
 						PlayerMiniGame toEnd = PlayerMiniGame.get(dim);
 						if (toEnd != null)
-							toEnd.endGame();
+							toEnd.endGame("Debug", "Debug");
 						else {
 							if (MiniGameUtil.isPvP(dim))
-								new PlayerMiniGame(dim,Resources.PVP).endGame();
+								new PlayerMiniGame(dim,Resources.PVP).endGame("Debug", "Debug");
 							else
-								new PlayerMiniGame(dim,Resources.TREASURE).endGame();
+								new PlayerMiniGame(dim,Resources.TREASURE).endGame("Debug", "Debug");
 						}
 					} catch (Exception e){
 						e.printStackTrace();

@@ -29,10 +29,10 @@ public class TradeHandler {
 				break;
 			}
 		}
-		if(transTrade == null)
+		if(transTrade == null){
+			Util.displayMessage(player, Util.errorCode + "[Trade Error] Trade Not Found!");
 			return;
-		
-		Util.displayMessage(player, Util.errorCode + "[Trade Error] Trade Not Found!");
+		}
 		
 		//Find The Creator of the Trade
 		EntityPlayerMP creator = null;
@@ -44,10 +44,10 @@ public class TradeHandler {
               break;
             }
         }
-        if(creator == null)
+        if(creator == null){
+        	Util.displayMessage(player, Util.errorCode + "[Trade Error] Other Player Is Not Online!");
         	return;
-        
-        Util.displayMessage(player, Util.errorCode + "[Trade Error] Other Player Is Not Online!");
+        }
         
         //Check If Both Players Have Available Space in their inventory
         if(player.inventory.getFirstEmptyStack() < 0){
@@ -66,7 +66,7 @@ public class TradeHandler {
 		for(int i = 0; i < player.inventory.getSizeInventory(); i++){
 			ItemStack item = player.inventory.getStackInSlot(i);
 			if(count > 0){
-				if(item != null && item.getItem().equals(transTrade.request.getItem())){
+				if(item != null && item.getItem().equals(transTrade.request.getItem()) && !item.isItemDamaged()){
 					slots.add(i);
 					count -= item.stackSize;
 				}

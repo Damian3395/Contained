@@ -1,11 +1,14 @@
 package com.contained.game.handler;
 
+import com.contained.game.Contained;
 import com.contained.game.ui.DataVisualization;
 import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.games.GuiMiniGames;
+import com.contained.game.ui.games.GuiScoreboard;
 import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.perks.ClassPerks;
 import com.contained.game.ui.territory.TerritoryRender;
+import com.contained.game.util.MiniGameUtil;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -41,7 +44,11 @@ public class KeyInputHandler {
 		}
 		
 		if (KeyBindings.toggleMiniGames.isPressed())
-			mc.displayGuiScreen(new GuiMiniGames());
+			if(!MiniGameUtil.isPvP(mc.thePlayer.dimension) 
+					&& !MiniGameUtil.isTreasure(mc.thePlayer.dimension))
+				mc.displayGuiScreen(new GuiMiniGames());
+			else
+				mc.displayGuiScreen(new GuiScoreboard());
 		
 		if (KeyBindings.toggleTerritoryRender.isPressed())
 			territory.doRender = !territory.doRender;
@@ -52,6 +59,13 @@ public class KeyInputHandler {
 			}else{
 				mc.thePlayer.closeScreen();
 			}
+		
+		if (KeyBindings.toggleGUIStyle.isPressed()) {
+			if (Contained.guiStyle == 1)
+				Contained.guiStyle = 0;
+			else
+				Contained.guiStyle = 1;
+		}
 			
 	}
 }

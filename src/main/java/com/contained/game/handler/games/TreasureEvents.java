@@ -15,6 +15,8 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 import com.contained.game.world.block.EmblemBlock;
 import com.contained.game.world.block.EmblemBlockTE;
+import com.contained.game.world.block.TownManageBlock;
+
 import codechicken.lib.vec.BlockCoord;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -87,6 +89,11 @@ public class TreasureEvents {
 						embData.teamID = team.id;
 				}
 			}
+			
+			int x = newSpawnLocation.x;
+			int z = newSpawnLocation.y; 
+			int y = w.getTopSolidOrLiquidBlock(x, z);
+			w.setBlock(x, y, z, TownManageBlock.instance);
 		}
 		
 		return teamSpawnPoints;
@@ -110,7 +117,6 @@ public class TreasureEvents {
 			int dimID = w.provider.dimensionId;
 			if (Contained.getActiveTreasures(dimID).contains(eventLocation)) {
 				ExtendedPlayer properties = ExtendedPlayer.get(p);
-				properties.treasuresOpened++;
 				properties.curTreasuresOpened++;
 				
 				PlayerTeamIndividual pdata = PlayerTeamIndividual.get(p);

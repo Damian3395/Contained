@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -24,6 +25,7 @@ import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
+import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.handler.games.PVPEvents;
 import com.contained.game.handler.games.TreasureEvents;
@@ -62,7 +64,7 @@ public class MiniGameUtil {
 			return Resources.OVERWORLD;
 	}
 	
-	public static void teamWins(String teamID, int dimID) {
+	public static void teamWins(String teamID, int dimID, String winCondition) {
 		// TODO: When this function is called, a team has won the game. If teamID
 		// is null, then the game was a tie.
 		//
@@ -70,13 +72,16 @@ public class MiniGameUtil {
 		// a short period of time (~10 seconds?) and then terminate the dimension 
 		// and send everyone back to the overworld.
 		
-		if (teamID == null)
-			System.out.println("Game was a tie.");
-		else {
+		if (teamID == null){
+			Util.dimensionMessage(dimID, "Game was a tie.");
+			winCondition = "TIE";
+			teamID = "NONE";
+		}else {
 			PlayerTeam t = PlayerTeam.get(teamID);
-			System.out.println(t.displayName+" wins!");
+			Util.dimensionMessage(dimID, t.displayName+" wins!");
 		}
-		PlayerMiniGame.get(dimID).endGame();
+		DataLogger.insertWinningTeam(Util.getServerID(), Util.getGameID(dimID), Util.getGameMode(dimID), teamID, winCondition, Util.getDate());
+		PlayerMiniGame.get(dimID).endGame(teamID, winCondition);
 	}
 	
 	public static void testStartGame(int dimID, EntityPlayer player) {
@@ -118,23 +123,25 @@ public class MiniGameUtil {
 			MiniGameHandler.cancelMiniGame((EntityPlayerMP)player);
 			
 			//Send the player to the dimension, and set their spawn location correctly.
-			Util.travelToDimension(dimID, player);
+			Util.travelToDimension(dimID, player, false);
+			
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			startMiniGame.setGame(true);
 			
 			if (teamSpawnLocations == null || pdata.teamID == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
 				Point p = Util.getRandomLocation(w);
-				player.setLocationAndAngles(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y, player.rotationYaw, player.rotationPitch);
+				player.setPositionAndUpdate(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y);
 				if (teamSpawnLocations != null)
 					Util.serverDebugMessage("[Error] Failed to get spawn location for "+player.getDisplayName()+"!");
 			} else {
 				Point spawnPos = teamSpawnLocations.get(pdata.teamID);
 				spawnPos.x += Util.randomBoth(2);
 				spawnPos.y += Util.randomBoth(2);
-				player.setLocationAndAngles(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y, player.rotationYaw, player.rotationPitch);
+				player.setPositionAndUpdate(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y);
 			}
 			
 			pdata.xp = player.experienceTotal;
+			pdata.level = player.experienceLevel;
 			pdata.armor = player.inventory.armorInventory.clone();
 			pdata.inventory = player.inventory.mainInventory.clone();
 			
@@ -150,6 +157,7 @@ public class MiniGameUtil {
 			
 			PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SAVE_PLAYER);
 			miniGamePacket.writeInt(player.experienceTotal);
+			miniGamePacket.writeInt(player.experienceLevel);
 			miniGamePacket.writeInt(armorSize);
 			int index = 0;
 			for(ItemStack item : pdata.armor)
@@ -172,7 +180,8 @@ public class MiniGameUtil {
 				}
 			Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)player);
 			
-			player.experienceTotal = 0;
+			player.addExperience(-(player.experienceTotal));
+			player.addExperienceLevel(-(player.experienceLevel));
 			clearMainInventory(player);
 			clearArmorInventory(player);
 		}
@@ -228,8 +237,16 @@ public class MiniGameUtil {
 		for(int i=0;i<chestAmount;i++){
 			Point randomSpawnPoint = Util.getRandomLocation(w);
 			x=randomSpawnPoint.x;
-			z=randomSpawnPoint.y;			
+			z=randomSpawnPoint.y;
 			y=w.getTopSolidOrLiquidBlock(x, z);		//coordinates to generate chests
+			
+			//Prevent Chests From Spawning Deep in the Ocean or in Lava
+			while(w.getBlock(x, y, z).getMaterial() == Material.water
+					|| w.getBlock(x, y, z).getMaterial() == Material.lava){
+				x+=r.nextInt(100)-r.nextInt(100);
+				z+=r.nextInt(100)-r.nextInt(100);
+				y=w.getTopSolidOrLiquidBlock(x, z);
+			}
 			
 			// Try to see if there's any caves underneath the chest's position,
 			// and spawn the chest down there instead.
@@ -279,7 +296,9 @@ public class MiniGameUtil {
 					winningTeam = team.id;	
 			}
 			if (isGameOver)
-				teamWins(winningTeam, dimID);
+				teamWins(winningTeam, dimID, "TERRITORY");
+			
+			
 		}
 	}
 	

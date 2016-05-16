@@ -45,18 +45,18 @@ public class WizardEvents {
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			ArrayList<Integer> perks = properties.perks;
 			
-			EntityLivingBase attacker = (EntityLivingBase) source.getEntity();
 			if(perks.contains(BOOK) && source.isMagicDamage())
 				damage -= (damage * 0.1f);
 			if(source.isExplosion() && perks.contains(GUNPOWDER))
 				damage -= (damage * 0.1f);
 			if(source.isFireDamage() && perks.contains(MAGMA))
 				damage -= (damage * 0.1f);
-			if(attacker instanceof EntityGhast && perks.contains(GHAST))
-				damage -= (damage * 0.1f);
-			if(attacker instanceof EntitySkeleton && perks.contains(BONE))
-				damage -= (damage * 0.1f);
 			if(source.getEntity() instanceof EntityPlayer){
+				EntityLivingBase attacker = (EntityLivingBase) source.getEntity();
+				if(attacker instanceof EntityGhast && perks.contains(GHAST))
+					damage -= (damage * 0.1f);
+				if(attacker instanceof EntitySkeleton && perks.contains(BONE))
+					damage -= (damage * 0.1f);
 				if(perks.contains(NEITHER_BRICK) && !player.isPotionActive(8195)) //Potion of Fire Resistance
 					player.addPotionEffect(new PotionEffect(8195, 50));
 				if(perks.contains(SLIME) && !player.isPotionActive(8203)) //Potion of Leaping

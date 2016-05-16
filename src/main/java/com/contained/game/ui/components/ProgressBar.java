@@ -1,5 +1,7 @@
 package com.contained.game.ui.components;
 
+import org.lwjgl.opengl.GL11;
+
 import com.contained.game.util.Resources;
 
 import net.minecraft.client.Minecraft;
@@ -74,8 +76,14 @@ public class ProgressBar extends Gui{
 	}
 	
 	public void render(){
+		GL11.glPushMatrix();
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GL11.glDisable(GL11.GL_LIGHTING);   
+		
 		this.mc.getTextureManager().bindTexture(img);
 		this.drawTexturedModalRect(x, y, 0, 176, 96, 16);
 		this.drawTexturedModalRect(x, y, this.tx, this.ty, 1 * this.status, 16);
+	
+		GL11.glPopMatrix();
 	}
 }

@@ -1,6 +1,8 @@
 package com.contained.game.network;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import com.contained.game.Contained;
 import com.contained.game.data.DataLogger;
@@ -8,18 +10,24 @@ import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.ui.survey.SurveyData;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
+import codechicken.lib.vec.BlockCoord;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.MathHelper;
 
 /**
  * Handling of packets sent from client to server.
@@ -164,6 +172,10 @@ public class ServerPacketHandler {
 					String revivePlayer = packet.readString();
 					EntityPlayerMP teamPlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(revivePlayer);
 					ExtendedPlayer deadProperties = ExtendedPlayer.get(teamPlayer);
+					
+					if(!MiniGameUtil.isPvP(dimID))
+						return;
+					
 					if(deadProperties.lives == 0){
 						//Revive Player
 						deadProperties.resurrect();
@@ -191,6 +203,8 @@ public class ServerPacketHandler {
 						PacketCustom removeLifeStickPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.REMOVE_ITEM);
 						syncLifePacket.writeInt(slotID);
 						Contained.channel.sendTo(removeLifeStickPacket.toPacket(), teamPlayer);
+						
+						DataLogger.insertRestoreLife(Util.getServerID(), Util.getDimensionString(dimID), Util.getGameID(dimID), PlayerTeamIndividual.get(player.getDisplayName()).teamID, player.getDisplayName(), revivePlayer, Util.getDate());
 					}else
 						Util.displayMessage(player, "Selected Team-Player Is Already Alive!");
 				break;
@@ -269,6 +283,47 @@ public class ServerPacketHandler {
 							SurveyData.scoreResponses(SurveyData.Q.EXTRAVERSION, pdata.surveyResponses.personality), 
 							SurveyData.scoreResponses(SurveyData.Q.AGREEABLENESS, pdata.surveyResponses.personality), 
 							SurveyData.scoreResponses(SurveyData.Q.NEUROTICISM, pdata.surveyResponses.personality), Util.getDate());
+				break;
+				
+				case ServerPacketHandlerUtil.LEADERBOARD_PVP:
+					List playersPvp = MinecraftServer.getServer().worldServerForDimension(player.dimension).playerEntities;
+					Iterator pvpIterator = playersPvp.iterator();
+					
+					PacketCustom pvpPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEADERBOARD_PVP_UPDATE);
+					pvpPacket.writeInt(playersPvp.size());
+					while(pvpIterator.hasNext()){
+						EntityPlayer playerPvp = (EntityPlayer) pvpIterator.next();
+						ExtendedPlayer pvpProperties = ExtendedPlayer.get(playerPvp);
+						pvpPacket.writeString(playerPvp.getDisplayName());
+						pvpPacket.writeInt(pvpProperties.curKills);
+						pvpPacket.writeInt(pvpProperties.curDeaths);
+						pvpPacket.writeInt(pvpProperties.curAntiTerritory);
+					}
+					Contained.channel.sendTo(pvpPacket.toPacket(), player);
+				break;
+				
+				case ServerPacketHandlerUtil.LEADERBOARD_TREASURE:
+					List playersTreasure = MinecraftServer.getServer().worldServerForDimension(player.dimension).playerEntities;
+					Iterator treasureIterator = playersTreasure.iterator();
+					
+					PacketCustom treasurePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.LEADERBOARD_TREASURE_UPDATE);
+					treasurePacket.writeInt(playersTreasure.size());
+					while(treasureIterator.hasNext()){
+						EntityPlayer playerTreasure = (EntityPlayer) treasureIterator.next();
+						ExtendedPlayer treasureProperties = ExtendedPlayer.get(playerTreasure);
+						treasurePacket.writeString(playerTreasure.getDisplayName());
+						treasurePacket.writeInt(treasureProperties.curTreasuresOpened);
+						treasurePacket.writeInt(treasureProperties.curAltersActivated);
+					}
+					Contained.channel.sendTo(treasurePacket.toPacket(), player);
+				break;
+				
+				case ServerPacketHandlerUtil.SPAWN_VILLAGER:
+					BlockCoord spawnBlock = packet.readCoord();
+					EntityLiving mobSpawn = (EntityLiving)EntityList.createEntityByName("Villager", player.worldObj);
+					mobSpawn.setLocationAndAngles(spawnBlock.x, spawnBlock.y+2, spawnBlock.z, MathHelper.wrapAngleTo180_float(player.worldObj.rand.nextFloat() * 360.0F), 0f);
+					player.worldObj.spawnEntityInWorld(mobSpawn);
+					mobSpawn.playLivingSound();
 				break;
 			}
 		}

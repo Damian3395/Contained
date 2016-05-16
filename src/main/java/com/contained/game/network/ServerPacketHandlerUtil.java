@@ -50,9 +50,14 @@ public class ServerPacketHandlerUtil {
 	public static final int ADMIN_SPECT = 31;
 	public static final int ADMIN_WORLD_INFO = 32;
 	public static final int ADMIN_REGULAR_PLAYER = 33;
-	public static final int ADMIN_SET_TIME = 34;
+	public static final int ADMIN_SET_TIME = 38;
 	
-	public static final int LOG_PERSONALITY = 35;
+
+	public static final int LOG_PERSONALITY = 34;
+	public static final int LEADERBOARD_PVP = 35;
+	public static final int LEADERBOARD_TREASURE = 36;
+	
+	public static final int SPAWN_VILLAGER = 37;
 	
 	public static void sendToServer(FMLProxyPacket packet) {
 		Contained.channel.sendToServer(packet);

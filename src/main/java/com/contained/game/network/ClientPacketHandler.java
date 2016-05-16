@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -18,6 +19,7 @@ import com.contained.game.ui.GuiAdmin;
 import com.contained.game.ui.GuiTownManage;
 import com.contained.game.ui.games.GameOverUI;
 import com.contained.game.ui.games.GuiMiniGames;
+import com.contained.game.ui.games.GuiScoreboard;
 import com.contained.game.ui.guild.GuiGuild;
 import com.contained.game.ui.guild.GuildBase;
 import com.contained.game.ui.guild.GuildLeader;
@@ -31,6 +33,7 @@ import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.user.PlayerTrade;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
+import com.contained.game.util.Util;
 import com.contained.game.world.block.TerritoryMachineTE;
 
 import codechicken.lib.packet.PacketCustom;
@@ -524,6 +527,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					pvpStats.pvpLost = packet.readInt();
 					pvpStats.kills = packet.readInt();
 					pvpStats.deaths = packet.readInt();
+					pvpStats.antiTerritory = packet.readInt();
 				break;
 					
 				case ClientPacketHandlerUtil.SYNC_TEASURE_STATS:
@@ -531,6 +535,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					treasureStats.treasureWon = packet.readInt();
 					treasureStats.treasureLost = packet.readInt();
 					treasureStats.treasuresOpened = packet.readInt();
+					treasureStats.altersActivated = packet.readInt();
 				break;
 				
 				case ClientPacketHandlerUtil.SYNC_GAME_SCORE:
@@ -558,6 +563,7 @@ public class ClientPacketHandler extends ServerPacketHandler {
 				case ClientPacketHandlerUtil.SAVE_PLAYER:
 					PlayerTeamIndividual storePdata = PlayerTeamIndividual.get(mc.thePlayer.getDisplayName());
 					storePdata.xp = packet.readInt();
+					storePdata.level = packet.readInt();
 					storePdata.armor = new ItemStack[4];
 					int armorSize = packet.readInt();
 					for(int i = 0; i < armorSize; i++){
@@ -574,17 +580,17 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						storePdata.inventory[index] = itemStore;
 					}
 					
-					mc.thePlayer.experienceTotal = 0;
+					mc.thePlayer.addExperience(-(mc.thePlayer.experienceTotal));
 					MiniGameUtil.clearMainInventory(mc.thePlayer);
 					MiniGameUtil.clearArmorInventory(mc.thePlayer);
 				break;
 				
 				case ClientPacketHandlerUtil.RESTORE_PLAYER:
-					System.out.println("Restoring Client Side Pdata");
 					MiniGameUtil.clearMainInventory(mc.thePlayer);
 					MiniGameUtil.clearArmorInventory(mc.thePlayer);
 					
-					mc.thePlayer.experienceTotal = packet.readInt();
+					mc.thePlayer.addExperience(packet.readInt());
+					mc.thePlayer.addExperienceLevel(packet.readInt());
 					int armorSizeRestore = packet.readInt();
 					for(int i = 0; i < armorSizeRestore; i++){
 						int index = packet.readInt();
@@ -625,7 +631,54 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					if(!(mc.currentScreen instanceof GuiSurvey))
 						mc.displayGuiScreen(new GuiSurvey(PlayerTeamIndividual.get(mc.thePlayer)));
 				break;
+				
+				case ClientPacketHandlerUtil.LEADERBOARD_PVP_UPDATE:
+					if(MiniGameUtil.isPvP(mc.thePlayer.dimension) 
+							&& mc.currentScreen instanceof GuiScoreboard){
+						int size = packet.readInt();
+						for(int i = 0; i < size; i++){
+							String userPvp = packet.readString();
+							GuiScoreboard.kills.put(userPvp, packet.readInt());
+							GuiScoreboard.deaths.put(userPvp, packet.readInt());
+							GuiScoreboard.territory.put(userPvp, packet.readInt());
+						}
+						GuiScoreboard.updated = true;
+					}
+				break;
+				
+				case ClientPacketHandlerUtil.LEADERBOARD_TREASURE_UPDATE:
+					if(MiniGameUtil.isTreasure(mc.thePlayer.dimension)
+							&& mc.currentScreen instanceof GuiScoreboard){
+						int size = packet.readInt();
+						for(int i = 0; i < size; i++){
+							String userTreasure = packet.readString();
+							GuiScoreboard.treasures.put(userTreasure, packet.readInt());
+							GuiScoreboard.alters.put(userTreasure, packet.readInt());
+						}
+						GuiScoreboard.updated = true;
+					}
+				break;
+				
+				case ClientPacketHandlerUtil.SET_CHAT_MODE:
+					Contained.chatMode = packet.readInt();
+					notifyChatMode(mc.thePlayer);
+				break;
+				
+				case ClientPacketHandlerUtil.SWITCH_CHAT_MODE:
+					if (Contained.chatMode == Resources.GLOBAL_CHAT)
+						Contained.chatMode = Resources.TEAM_CHAT;
+					else
+						Contained.chatMode = Resources.GLOBAL_CHAT;
+					notifyChatMode(mc.thePlayer);
+				break;
 			}
 		}
+	}
+	
+	public void notifyChatMode(EntityPlayer player) {
+		if (Contained.chatMode == Resources.GLOBAL_CHAT)
+			Util.displayMessage(player, "[*] You are now chatting publically.");
+		else if (Contained.chatMode == Resources.TEAM_CHAT)
+			Util.displayMessage(player, "[*] You are now chatting to your team members.");
 	}
 }

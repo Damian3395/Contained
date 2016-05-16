@@ -67,7 +67,7 @@ public class TerritoryMachine {
 		
 		@Override
 		public TileEntity createNewTileEntity(World w, int par1) {
-			return new TerritoryMachineTE(true);
+			return new TerritoryMachineTE(true, w.provider.dimensionId);
 		}
 		
 		@Override

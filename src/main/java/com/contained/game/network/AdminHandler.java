@@ -65,7 +65,7 @@ public class AdminHandler {
 		}
 	}
 	public void join(EntityPlayerMP player, int dimID){
-		Util.travelToDimension(dimID, player);
+		Util.travelToDimension(dimID, player, false);
 		//TODO delete below code after enabling ExtendedPlayer carrying info through all dimensions
 		
 		/*
@@ -127,7 +127,7 @@ public class AdminHandler {
 	
 	public void spect(EntityPlayerMP player, String targetPlayer){
 		if(player.dimension != Util.getOnlinePlayer(targetPlayer).dimension){
-			Util.travelToDimension(Util.getOnlinePlayer(targetPlayer).dimension, player);
+			Util.travelToDimension(Util.getOnlinePlayer(targetPlayer).dimension, player, false);
 		}
 		int x,y,z;
 		x = 2+Util.getOnlinePlayer(targetPlayer).getPlayerCoordinates().posX;
@@ -177,21 +177,28 @@ public class AdminHandler {
 		if(playerToKick != null){
 			if(MiniGameUtil.isTreasure(playerToKick.dimension) && pdata.teamID != null) {
 				if(PlayerTeam.get(pdata.teamID).numMembers() == 1){
-					PlayerMiniGame.get(playerToKick.dimension).endGame();
+					PlayerMiniGame.get(playerToKick.dimension).endGame("Kicked", "Kicked");
 					Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 					Util.displayMessage(playerToKick, "You've been kicked back to Overworld by Admin");
 					return;
 				} else {
-					DataLogger.insertTreasureScore(Util.getServerID(), PlayerMiniGame.get(playerToKick.dimension).getGameID(), player.getDisplayName(), pdata.teamID, properties.curTreasuresOpened, Util.getDate());
+					DataLogger.insertTreasureScore(Util.getServerID(), 
+							PlayerMiniGame.get(playerToKick.dimension).getGameID(), 
+							player.getDisplayName(), pdata.teamID, 
+							properties.curTreasuresOpened, properties.curAltersActivated, Util.getDate());
 				}
 			} else if(MiniGameUtil.isPvP(playerToKick.dimension) && pdata.teamID != null)
-				DataLogger.insertPVPScore(Util.getServerID(), PlayerMiniGame.get(playerToKick.dimension).getGameID(), player.getDisplayName(), pdata.teamID, properties.curKills, properties.curDeaths, Util.getDate());
+				DataLogger.insertPVPScore(Util.getServerID(), 
+						PlayerMiniGame.get(playerToKick.dimension).getGameID(), 
+						player.getDisplayName(), pdata.teamID, 
+						properties.curKills, properties.curDeaths, 
+						properties.curAntiTerritory, Util.getDate());
 			
 			PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 			miniGamePacket.writeInt(playerToKick.dimension);
 			Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)playerToKick);
 			pdata.leaveTeam();
-			Util.travelToDimension(Resources.OVERWORLD, playerToKick);	
+			Util.travelToDimension(Resources.OVERWORLD, playerToKick, false);	
 			Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
 			Util.displayMessage(playerToKick, "You've been kicked back to Overworld by Admin");
 		} else {

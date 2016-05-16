@@ -99,7 +99,7 @@ public class FMLEvents {
 						inactivityChecks[game.getGameDimension()] = 0;
 				}
 				for (PlayerMiniGame game : gamesToEnd)
-					game.endGame();
+					game.endGame("Inactive", "Inactive");
 			}
 			
 			//Tick the mini-game timers, and check for game-over.
@@ -160,7 +160,7 @@ public class FMLEvents {
 				
 				for(int ind=0; ind<teamHasAlivePlayers.length; ind++) {
 					if (teamHasAlivePlayers[ind] == false) {
-						MiniGameUtil.teamWins(winningTeam, dimID);
+						MiniGameUtil.teamWins(winningTeam, dimID, "MAX_KILLS");
 						break;
 					}
 				}
@@ -172,7 +172,7 @@ public class FMLEvents {
 		if (DimensionManager.getWorld(dimID) == null && !Contained.gameActive[dimID]) {
 			//Dimension is empty and the game is over.
 			File dimDir = new File(DimensionManager.getCurrentSaveRootDirectory(), "DIM"+dimID);
-			if (dimDir.exists() && dimDir.isDirectory()) {
+			if (dimDir != null && dimDir.exists() && dimDir.isDirectory()) {
 				//...but the dimension still exists on disk.
 				//Remove it from disk.
 				
@@ -187,8 +187,10 @@ public class FMLEvents {
 				RegionFileCache.clearRegionFileReferences();
 				System.gc();
 				
-				for(File file : dimDir.listFiles())
-					FileDeleteStrategy.FORCE.deleteQuietly(file);
+				File[] fileList = dimDir.listFiles();
+				if (fileList != null)
+					for(File file : fileList)
+						FileDeleteStrategy.FORCE.deleteQuietly(file);
 				FileDeleteStrategy.FORCE.deleteQuietly(dimDir);
 				
 				Save.removeDimFiles(dimID);
@@ -239,7 +241,7 @@ public class FMLEvents {
 						maxTeam = null; //Currently a tie
 				}
 				
-				MiniGameUtil.teamWins(maxTeam, dimID);
+				MiniGameUtil.teamWins(maxTeam, dimID, "HIGHEST_SCORE");
 			}
 		}
 	}

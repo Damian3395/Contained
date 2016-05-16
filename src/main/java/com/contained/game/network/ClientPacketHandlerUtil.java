@@ -7,12 +7,11 @@ import java.util.HashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
-import com.contained.game.user.PlayerMiniGame;
+import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
 import com.contained.game.user.PlayerTeamInvitation;
@@ -85,6 +84,12 @@ public class ClientPacketHandlerUtil {
 	public static final int ADMIN_WORLD_INFO = 53;
 	
 	public static final int START_SURVEY = 54;
+	
+	public static final int LEADERBOARD_PVP_UPDATE = 55;
+	public static final int LEADERBOARD_TREASURE_UPDATE = 56;
+	
+	public static final int SET_CHAT_MODE = 57;
+	public static final int SWITCH_CHAT_MODE = 58;
 	
 	public static PacketCustom packetSyncTerritories(HashMap<Point, String> territoryData) {
 		PacketCustom territoryPacket = new PacketCustom(Resources.MOD_ID, FULL_TERRITORY_SYNC);
@@ -227,18 +232,28 @@ public class ClientPacketHandlerUtil {
 	}
 	
 	public static void syncMiniGameScore(int dimID, int teamID, int score){
-		for(PlayerTeamIndividual pdata : Contained.teamMemberData) {
-			if (pdata.teamID == null)
-				continue;
-			if(pdata.teamID.equals(Contained.getTeamList(dimID).get(teamID).displayName)){
-				EntityPlayerMP miniGamePlayer = (EntityPlayerMP) MinecraftServer.getServer().worldServers[dimID].getPlayerEntityByName(pdata.playerName);
-				PacketCustom syncGameScorePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_GAME_SCORE);
-				syncGameScorePacket.writeInt(dimID);
-				syncGameScorePacket.writeInt(teamID);
-				syncGameScorePacket.writeInt(score);
-				Contained.channel.sendTo(syncGameScorePacket.toPacket(), miniGamePlayer);
-			} 	
-		}
+		PacketCustom scorePacket = new PacketCustom(Resources.MOD_ID, SYNC_GAME_SCORE);
+		scorePacket.writeInt(dimID);
+		scorePacket.writeInt(teamID);
+		scorePacket.writeInt(score);
+		Contained.channel.sendToDimension(scorePacket.toPacket(), dimID);
+	}
+	
+	public static void syncPlayerStats(ExtendedPlayer properties, EntityPlayerMP player){
+		PacketCustom pvpStatsPacket = new PacketCustom(Resources.MOD_ID, SYNC_PVP_STATS);
+		pvpStatsPacket.writeInt(properties.pvpWon);
+		pvpStatsPacket.writeInt(properties.pvpLost);
+		pvpStatsPacket.writeInt(properties.kills);
+		pvpStatsPacket.writeInt(properties.deaths);	
+		pvpStatsPacket.writeInt(properties.antiTerritory);
+		Contained.channel.sendTo(pvpStatsPacket.toPacket(), player);
+		
+		PacketCustom treasureStatsPacket = new PacketCustom(Resources.MOD_ID, SYNC_TEASURE_STATS);
+		treasureStatsPacket.writeInt(properties.treasureWon);
+		treasureStatsPacket.writeInt(properties.treasureLost);
+		treasureStatsPacket.writeInt(properties.treasuresOpened);
+		treasureStatsPacket.writeInt(properties.altersActivated);
+		Contained.channel.sendTo(treasureStatsPacket.toPacket(), player);
 	}
 	
 	public static void addTreasureAndSync(int dimID, ArrayList<BlockCoord> points) {

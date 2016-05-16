@@ -39,6 +39,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -51,11 +53,11 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 
 public class PlayerEvents {
-	
 	
 	@SubscribeEvent
 	//When a player joins the server, send their client the territory & team data.
@@ -93,24 +95,62 @@ public class PlayerEvents {
 			}			
 			
 			//If player does not have a survey in their inventory, give them one.
-			if (!completedSurvey && !joined.inventory.hasItem(SurveyClipboard.instance))
-				event.world.spawnEntityInWorld(new EntityItem(event.world, 
-						joined.posX, joined.posY+1, joined.posZ, 
-						new ItemStack(SurveyClipboard.instance, 1)));
+			if (!completedSurvey && !joined.inventory.hasItem(SurveyClipboard.instance)
+					&& joined.inventory.getFirstEmptyStack() > -1){
+				joined.inventory.addItemStackToInventory(new ItemStack(SurveyClipboard.instance, 1));
+				PacketCustom itemPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+				itemPacket.writeItemStack(new ItemStack(SurveyClipboard.instance, 1));
+				Contained.channel.sendTo(itemPacket.toPacket(), (EntityPlayerMP) joined);
+			}
 			
 			//If dowsing is enabled, give the player a dowsing rod.
 			if (Contained.configs.enableDowsing[Settings.getDimConfig(joined.dimension)]
-					&& !joined.inventory.hasItem(DowsingRod.instance)) {
-				event.world.spawnEntityInWorld(new EntityItem(event.world, 
-						joined.posX, joined.posY+1, joined.posZ, 
-						new ItemStack(DowsingRod.instance, 1)));
+					&& !joined.inventory.hasItem(DowsingRod.instance)
+					&& joined.inventory.getFirstEmptyStack() > -1) {
+				joined.inventory.addItemStackToInventory(new ItemStack(DowsingRod.instance, 1));
+				PacketCustom itemPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+				itemPacket.writeItemStack(new ItemStack(DowsingRod.instance, 1));
+				Contained.channel.sendTo(itemPacket.toPacket(), (EntityPlayerMP) joined);
 			}
 			
 			//Tutorial book
-			if (!joined.inventory.hasItem(ContainedRegistry.book))
-				event.world.spawnEntityInWorld(new EntityItem(event.world, 
-						joined.posX, joined.posY+1, joined.posZ, 
-						new ItemStack(ContainedRegistry.book, 1)));
+			if (!joined.inventory.hasItem(ContainedRegistry.book)
+					&& joined.inventory.getFirstEmptyStack() > -1){
+				joined.inventory.addItemStackToInventory(new ItemStack(ContainedRegistry.book, 1));
+				PacketCustom itemPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
+				itemPacket.writeItemStack(new ItemStack(ContainedRegistry.book, 1));
+				Contained.channel.sendTo(itemPacket.toPacket(), (EntityPlayerMP) joined);
+			}
+			
+			//Update PlayerMiniGame When Joining Server
+			if(!ExtendedPlayer.get(joined).isAdmin() 
+					&& (MiniGameUtil.isPvP(joined.dimension) || MiniGameUtil.isTreasure(joined.dimension))){
+				PlayerMiniGame miniGame = PlayerMiniGame.get(joined.dimension);
+				if(miniGame != null && ExtendedPlayer.get(joined).gameID == miniGame.getGameID()){
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_STARTED);
+					miniGamePacket.writeInt(miniGame.getGameMode());
+					miniGamePacket.writeInt(miniGame.getGameID());
+					
+					NBTTagCompound miniGameTag = new NBTTagCompound();
+					miniGame.writeToNBT(miniGameTag);
+					miniGamePacket.writeNBTTagCompound(miniGameTag);
+					
+					miniGamePacket.writeInt(miniGame.getGameDimension());
+					miniGamePacket.writeInt(Contained.getTeamList(miniGame.getGameDimension()).size());
+					for(PlayerTeam team : Contained.getTeamList(miniGame.getGameDimension())){
+						NBTTagCompound teamTag = new NBTTagCompound();
+						team.writeToNBT(teamTag);
+						miniGamePacket.writeNBTTagCompound(teamTag);
+					}
+					
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
+				} else //If MiniGame Does Not Exist, Send Back To Lobby
+					Util.travelToDimension(Resources.OVERWORLD, joined, true);
+			}
+			
+			// Players should get a short period of invincibility upon respawning
+			// to prevent spawn camping
+			joined.addPotionEffect(new PotionEffect(Potion.resistance.id, 20*15, 5));
 			
 			if (joined instanceof EntityPlayerMP) {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
@@ -119,6 +159,8 @@ public class PlayerEvents {
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetPlayerList(Contained.teamMemberData).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncRelevantInvites(joined).toPacket(), (EntityPlayerMP)joined);
 				Contained.channel.sendTo(ClientPacketHandlerUtil.packetSyncTrades(Contained.getTradeList(joined.dimension)).toPacket(), (EntityPlayerMP) joined);
+				ClientPacketHandlerUtil.syncPlayerStats(ExtendedPlayer.get(joined), (EntityPlayerMP) joined);
+				
 				if (MiniGameUtil.isTreasure(joined.dimension))
 					Contained.channel.sendTo(ClientPacketHandlerUtil.packetAddTreasures(Contained.getActiveTreasures(joined.dimension), true).toPacket(), (EntityPlayerMP)joined);
 				
@@ -145,6 +187,17 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
+	public void onRespawn(Clone event) {
+		if(event.entityPlayer != null) {
+			ExtendedPlayer newClone = ExtendedPlayer.get(event.entityPlayer);
+			ExtendedPlayer oldPlayer = ExtendedPlayer.get(event.original);
+			NBTTagCompound ntc = new NBTTagCompound();
+			oldPlayer.saveNBTData(ntc);
+			newClone.loadNBTData(ntc);
+		}
+	}
+	
+	@SubscribeEvent
 	public void onEntityLiving(LivingUpdateEvent event) {
 		if (event.entity != null && event.entity instanceof EntityPlayer
 				&& !event.entity.worldObj.isRemote) {
@@ -166,17 +219,36 @@ public class PlayerEvents {
 			}
 			
 			//Check If Player Is In A Valid MiniGame Dimension
-			if(MiniGameUtil.isPvP(player.dimension) || MiniGameUtil.isTreasure(player.dimension)){
+			if(!properties.isAdmin() 
+					&& (MiniGameUtil.isPvP(player.dimension) || MiniGameUtil.isTreasure(player.dimension))){
 				int dim = player.dimension;
 				PlayerMiniGame miniGame = PlayerMiniGame.get(player.dimension);
 				
-				if(miniGame != null && miniGame.getGameID() != properties.gameID){
+				if(miniGame == null 
+						|| (miniGame != null && miniGame.getGameID() != properties.gameID)){
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player.getDisplayName());
 					Util.displayMessage(player, "The MiniGame You Were In Has Ended, We Are Sending You Back To Where You Belong!");
-					Util.travelToDimension(Resources.OVERWORLD, player);
+					Util.travelToDimension(Resources.OVERWORLD, player, true);
 					
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 					miniGamePacket.writeInt(dim);
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) player);
+					
+					//Update Player Stats
+					if(MiniGameUtil.isPvP(dim)){
+						PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
+						syncScore.writeInt(properties.pvpWon);
+						syncScore.writeInt(properties.pvpLost);
+						syncScore.writeInt(properties.kills);
+						syncScore.writeInt(properties.deaths);
+						Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+					}else if(MiniGameUtil.isTreasure(dim)){
+						PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
+						syncScore.writeInt(properties.treasureWon);
+						syncScore.writeInt(properties.treasureLost);
+						syncScore.writeInt(properties.treasuresOpened);
+						Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) player);
+					}
 				}
 			}
 			

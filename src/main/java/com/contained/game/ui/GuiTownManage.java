@@ -9,6 +9,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.packet.PacketCustom;
+import codechicken.lib.vec.BlockCoord;
 
 import com.contained.game.Contained;
 import com.contained.game.Settings;
@@ -72,7 +73,6 @@ public class GuiTownManage extends GuiContainer {
 	private RenderBlocks renderBlock = new RenderBlocks();
 	private TextureManager texMan;
 	private static final ResourceLocation bg = new ResourceLocation(Resources.MOD_ID, "textures/gui/townhall.png");
-	private int numTabs = 4;
 	private int selectedTab = 0;
 	public String blockTeamID;  //The ID of the territory this block is occupying.
 	public String playerTeamID; //The team of the player interacting with this block.
@@ -98,6 +98,7 @@ public class GuiTownManage extends GuiContainer {
 	private ItemStack[][] listItems; //Items to be sold in the given tab.
 	private int[][] xpCosts;         //XP cost of items in the given tab.
 	private ItemStack[][] itemCosts; //Trade cost of the items in the given tab.
+	private String[] npcText;
 	private ArrayList<String> availableAntiTeams;
 	private ArrayList<PlayerTrade> myTrades;
 	private ArrayList<PlayerTrade> marketTrades;
@@ -128,6 +129,7 @@ public class GuiTownManage extends GuiContainer {
 	private int tabNPC = 1;
 	private int tabPermission = 2;
 	private int tabMarket = 3;
+	private int numTabs = 4;
 	
 	public GuiTownManage(InventoryPlayer inv, TownManageTE te, String blockTeamID, String playerTeamID) {
 		super(new ContainerTownHall(inv, te));
@@ -169,14 +171,14 @@ public class GuiTownManage extends GuiContainer {
 		this.xSize = bBg.width;
 		this.ySize = bBg.height;
 		
-		if (blockTeamID == null || playerTeamID == null || 
-				!blockTeamID.equals(playerTeamID)) 
-		{
+		if (blockTeamID == null 
+				|| playerTeamID == null 
+				|| !blockTeamID.equals(playerTeamID)) {
 			// This player is not a member of the team this town hall block
 			// belongs to. Just show permissions instead.
 			tabPermission = 0;
 			tabTerritory = 2;
-			if (playerTeamID == null)
+			if (playerTeamID == null) 
 				this.permTeamInd = -2; //Default permissions
 			else {
 				for(int i=0; i<localTeams.size(); i++) {
@@ -186,11 +188,17 @@ public class GuiTownManage extends GuiContainer {
 					}
 				}
 			}
+			
+			xpCosts = new int[numTabs][3];
+			itemCosts = new ItemStack[numTabs][3];
+			listCounts[tabNPC] = 3;
 		} else {
 			// This player is a member of the team this town hall block
 			// belongs to. Show everything.
-			int maxLen = 0;		
-			listCounts[tabTerritory] = 4+availableAntiTeams.size();
+			int maxLen = 0;
+			listCounts[tabNPC] = 3;
+			listCounts[tabTerritory] = 6+availableAntiTeams.size();
+			
 			for(int i : listCounts) {
 				if (i > maxLen)
 					maxLen = i;
@@ -204,39 +212,39 @@ public class GuiTownManage extends GuiContainer {
 			//TODO: Do some testing with this on the server. I think if the config
 			// file on the client and the config file on the server are not the
 			// same, this will allow the player to override the server configs.
-			int i=0;
 			NBTTagCompound itemData = null;
 			
+			listCounts[tabTerritory] = 0;
 			if (!MiniGameUtil.isPvP(mc.thePlayer.dimension)) {
 				// Territory Gem
-				listItems[tabTerritory][i] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.smallGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
-				xpCosts[tabTerritory][i] = Contained.configs.smallGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
-				itemCosts[tabTerritory][i] = null;
-				i++;
+				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.smallGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
+				xpCosts[tabTerritory][listCounts[tabTerritory]] = Contained.configs.smallGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+				itemCosts[tabTerritory][listCounts[tabTerritory]] = null;
+				listCounts[tabTerritory]++;
 				
 				// Territory Gems in Bulk
-				listItems[tabTerritory][i] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.bulkGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
-				xpCosts[tabTerritory][i] = Contained.configs.bulkGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
-				itemCosts[tabTerritory][i] = null;
-				i++;
+				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.bulkGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
+				xpCosts[tabTerritory][listCounts[tabTerritory]] = Contained.configs.bulkGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+				itemCosts[tabTerritory][listCounts[tabTerritory]] = null;
+				listCounts[tabTerritory]++;
 				
 				// Anti-territory gem (refund style -- for own team)
-				listItems[tabTerritory][i] = new ItemStack(ItemTerritory.removeTerritory, 1);
-				itemData = Data.getTagCompound(listItems[tabTerritory][i]);
+				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.removeTerritory, 1);
+				itemData = Data.getTagCompound(listItems[tabTerritory][listCounts[tabTerritory]]);
 				if (this.blockTeamID == null)
 					itemData.setString("teamOwner", "");
 				else
 					itemData.setString("teamOwner", this.blockTeamID);
-				listItems[tabTerritory][i].setTagCompound(itemData);
-				xpCosts[tabTerritory][i] = -1;
-				itemCosts[tabTerritory][i] = new ItemStack(Items.dye, 4, 4);
-				i++;
+				listItems[tabTerritory][listCounts[tabTerritory]].setTagCompound(itemData);
+				xpCosts[tabTerritory][listCounts[tabTerritory]] = -1;
+				itemCosts[tabTerritory][listCounts[tabTerritory]] = new ItemStack(Items.dye, 4, 4);
+				listCounts[tabTerritory]++;
 				
 				// Territory Machine
-				listItems[tabTerritory][i] = new ItemStack(TerritoryMachine.instance, 1);			
-				xpCosts[tabTerritory][i] = Contained.configs.terrMachineEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];			
-				itemCosts[tabTerritory][i] = null;
-				i++;
+				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(TerritoryMachine.instance, 1);			
+				xpCosts[tabTerritory][listCounts[tabTerritory]] = Contained.configs.terrMachineEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];			
+				itemCosts[tabTerritory][listCounts[tabTerritory]] = null;
+				listCounts[tabTerritory]++;
 			}
 			
 			// Anti-Territory Machines
@@ -245,15 +253,16 @@ public class GuiTownManage extends GuiContainer {
 				antiCost = Contained.configs.pvpTerritorySize*4+2;
 			
 			for(int j=0; j<availableAntiTeams.size(); j++) {
-				listItems[tabTerritory][j+i] = new ItemStack(AntiTerritoryMachine.instance, 1);
-				itemData = Data.getTagCompound(listItems[tabTerritory][j+i]);
+				listItems[tabTerritory][j+listCounts[tabTerritory]] = new ItemStack(AntiTerritoryMachine.instance, 1);
+				itemData = Data.getTagCompound(listItems[tabTerritory][j+listCounts[tabTerritory]]);
 				itemData.setString("teamOwner", availableAntiTeams.get(j));
-				listItems[tabTerritory][j+i].setTagCompound(itemData);
-				xpCosts[tabTerritory][j+i] = 30;
-				itemCosts[tabTerritory][j+i] = new ItemStack(ItemTerritory.removeTerritory, antiCost);
-				itemData = Data.getTagCompound(itemCosts[tabTerritory][j+i]);
+				listItems[tabTerritory][j+listCounts[tabTerritory]].setTagCompound(itemData);
+				xpCosts[tabTerritory][j+listCounts[tabTerritory]] = 30;
+				itemCosts[tabTerritory][j+listCounts[tabTerritory]] = new ItemStack(ItemTerritory.removeTerritory, antiCost);
+				itemData = Data.getTagCompound(itemCosts[tabTerritory][j+listCounts[tabTerritory]]);
 				itemData.setString("teamOwner", availableAntiTeams.get(j));
-				itemCosts[tabTerritory][j+i].setTagCompound(itemData);
+				itemCosts[tabTerritory][j+listCounts[tabTerritory]].setTagCompound(itemData);
+				listCounts[tabTerritory]++;
 			}
 		}
 		
@@ -269,9 +278,21 @@ public class GuiTownManage extends GuiContainer {
 		tabItems[tabPermission] = new ItemStack(Items.diamond_pickaxe, 1);
 		tabItems[tabMarket] = new ItemStack(Items.gold_ingot, 1);
 		
+		npcText = new String[listCounts[tabNPC]];
+		npcText[0] = "Villager";
+		xpCosts[tabNPC][0] = 10;
+		itemCosts[tabNPC][0] = null;
+		
+		npcText[1] = "Villager";
+		xpCosts[tabNPC][1] = 5;
+		itemCosts[tabNPC][1] = new ItemStack(Items.emerald, 1);
+		
+		npcText[2] = "Villager";
+		xpCosts[tabNPC][2] = -1;
+		itemCosts[tabNPC][2] = new ItemStack(Items.emerald, 3);
+		
 		if (blockTeamID == null || playerTeamID == null || 
-				!blockTeamID.equals(playerTeamID)) 
-		{
+				!blockTeamID.equals(playerTeamID)) {
 			numTabs = 1;
 		}
 		
@@ -373,16 +394,14 @@ public class GuiTownManage extends GuiContainer {
 		
 		//Page Contents
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		if (selectedTab == this.tabTerritory)
+		if (selectedTab == this.tabTerritory || selectedTab == this.tabNPC)
 			shopList();
 		else if (selectedTab == tabPermission){
 			if (permTeamInd == -1)
 				teamList();
 			else
 				permList();
-		}else if (selectedTab == this.tabNPC){
-			npcList();
-		}else{
+		} else {
 			if (this.marketInd == -1)
 				marketList();
 			else
@@ -401,14 +420,6 @@ public class GuiTownManage extends GuiContainer {
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_LIGHTING);
-	}
-	
-	private void npcList(){
-		
-	}
-	
-	private void npcClick(int mouseX, int mouseY){
-		
 	}
 	
 	private void marketList(){
@@ -834,12 +845,19 @@ public class GuiTownManage extends GuiContainer {
 				this.drawTexturedModalRect(listX, y-2, bSelRect.x, bSelRect.y, bSelRect.width, bSelRect.height);
 			
 			//Item Icon
-			ItemStack stack = listItems[selectedTab][i];
-			if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, x, y)) {
-				texMan.bindTexture(TextureMap.locationItemsTexture);
-				GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, x, y);
+			if (selectedTab != tabNPC) {
+				ItemStack stack = listItems[selectedTab][i];
+				if (stack != null) {
+					if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, x, y)) {
+						texMan.bindTexture(TextureMap.locationItemsTexture);
+						GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, x, y);
+					}
+					GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, x, y);
+				}
+			} else {
+				fr.drawString(npcText[i], x, y+4, 0x000000);
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			}
-			GuiScreen.itemRender.renderItemOverlayIntoGUI(fr, texMan, stack, x, y);
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			
@@ -859,7 +877,7 @@ public class GuiTownManage extends GuiContainer {
 			
 			if (itemCosts[selectedTab][i] != null) {
 				//Item Cost
-				stack = itemCosts[selectedTab][i];
+				ItemStack stack = itemCosts[selectedTab][i];
 				if (!ForgeHooksClient.renderInventoryItem(renderBlock, texMan, stack, false, 200, priceX+itemOff, y)) {
 					texMan.bindTexture(TextureMap.locationItemsTexture);
 					GuiScreen.itemRender.renderItemAndEffectIntoGUI(fr, texMan, stack, priceX+itemOff, y);
@@ -879,6 +897,8 @@ public class GuiTownManage extends GuiContainer {
 			int lx = listX+4;
 			int ly = listY+2+bSelRect.height*(i-offset);
 			if (mouseX >= lx && mouseX < lx+16 && mouseY >= ly && mouseY < ly+16) {
+				if (selectedTab == tabNPC)
+					break;
 				this.renderToolTip(listItems[selectedTab][i], mouseX, mouseY);
 				break;
 			}
@@ -915,9 +935,17 @@ public class GuiTownManage extends GuiContainer {
 				packet.writeItemStack(itemCosts[selectedTab][id]);
 				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			}
-			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.INVENTORY_ADD);
-			packet.writeItemStack(listItems[selectedTab][id]);
-			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
+			
+			if (selectedTab != tabNPC) {
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.INVENTORY_ADD);
+				packet.writeItemStack(listItems[selectedTab][id]);
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
+			} else {
+				//Spawn villager
+				PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.SPAWN_VILLAGER);
+				packet.writeCoord(new BlockCoord(this.te.xCoord, this.te.yCoord, this.te.zCoord));
+				ServerPacketHandlerUtil.sendToServer(packet.toPacket());
+			}
 		}
 	}
 	
@@ -1169,15 +1197,13 @@ public class GuiTownManage extends GuiContainer {
 		
 		//Purchase item
 		if (itemHovering != -1) {
-			if (selectedTab == tabTerritory)
+			if (selectedTab == tabTerritory || selectedTab == tabNPC)
 				shopClick(x, y);
 			else if (selectedTab == tabPermission)
 				if (permTeamInd == -1)
 					teamClick(x, y);
 				else 
 					permClick(x, y);
-			else if (selectedTab == tabNPC)
-				npcClick(x, y);
 			else
 				marketClick(x, y);
 		}
@@ -1266,7 +1292,7 @@ public class GuiTownManage extends GuiContainer {
 	@Override
 	protected void handleMouseClick(Slot slot, int slotId, int clickedButton, int clickType) {
 		if(clickedButton == 0 && clickType == 1 && slot != null && marketInd == CREATE_TRADE){
-			if(slot.getStack() != null){
+			if(slot.getStack() != null && !slot.getStack().isItemDamaged()){
 				this.makeOffer = slot.getStack();
 				selectedSlot = slotId;
 			}

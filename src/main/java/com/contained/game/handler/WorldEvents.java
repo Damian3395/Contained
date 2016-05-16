@@ -186,13 +186,13 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public void close(WorldEvent.Unload event) {
-		if (Util.isOverworld(event.world.provider.dimensionId))
+		if (Util.isOverworld(event.world.provider.dimensionId) && !event.world.isRemote)
 			Save.saveWorldData(event.world.provider.dimensionId);
 	}
 	
 	@SubscribeEvent
 	public void close(WorldEvent.Save event) {
-		if (Util.isOverworld(event.world.provider.dimensionId))
+		if (Util.isOverworld(event.world.provider.dimensionId) && !event.world.isRemote)
 			Save.saveWorldData(event.world.provider.dimensionId);
 	}
 }
