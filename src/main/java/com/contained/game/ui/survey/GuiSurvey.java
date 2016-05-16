@@ -264,7 +264,7 @@ public class GuiSurvey extends GuiScreen {
     				this.buttonNext.enabled = true;
     		} else if (b.id >= 2 && b.id <= 6) //Option buttons
     		{
-    			//this.setButtonCD(BUTTON_CD);
+    			this.setButtonCD(BUTTON_CD);
     			if(this.isFakeQuestion){
     				if(b.id != this.key){
     					if(playerCopy.surveyResponses.progress == SurveyData.FAKE_Q1 + PAGE_PERSONALITY){
