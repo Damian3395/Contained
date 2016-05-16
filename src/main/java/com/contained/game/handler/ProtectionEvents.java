@@ -141,7 +141,7 @@ public class ProtectionEvents {
 						canHarvest = false;
 				}
 				
-				if (!canHarvest) {
+				if (!canHarvest && !isExempt(ev.world, ev.getPlayer())) {
 					Util.displayError(ev.getPlayer(), "This block must be in team-owned territory to be harvested.");
 					ev.setCanceled(true);
 				}
@@ -162,7 +162,7 @@ public class ProtectionEvents {
 					harvestBlock(ev.world, check, ev.getPlayer(), ev.x, ev.y, ev.z);
 					check.dropXpOnBlockBreak(ev.world, ev.x, ev.y, ev.z, ev.getExpToDrop());
 					
-					if (Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
+					if (!b.equals(Blocks.obsidian) && Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
 						ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
 						TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
 						if (te != null && te instanceof HarvestedOreTE) {
