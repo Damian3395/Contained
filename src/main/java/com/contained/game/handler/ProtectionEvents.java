@@ -116,7 +116,7 @@ public class ProtectionEvents {
 			}
 		}
 		
-		if (shouldCancel)
+		if (shouldCancel && !isExempt(ev.world, ev.getPlayer()))
 			ev.setCanceled(true);
 		else {
 			//Is this a wilderness protected block?
