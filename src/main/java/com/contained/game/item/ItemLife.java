@@ -58,17 +58,18 @@ public class ItemLife{
 	public static void defineRecipe(){
 		ItemStack outputApple = new ItemStack(addLife, 1);
 		ItemStack outputStick = new ItemStack(reviveLife, 1);
-		ItemStack inputGoldApple = new ItemStack(Items.golden_apple, 1);
+		ItemStack inputApple = new ItemStack(Items.apple, 1);
 		ItemStack inputDiamond = new ItemStack(Items.diamond, 1);
 		ItemStack inputStick = new ItemStack(Items.stick, 1);
 		ItemStack inputGold = new ItemStack(Items.gold_ingot, 2);
 		
 		GameRegistry.addRecipe(outputApple, new Object[]{
-			"X1X", 
+			"X2X", 
 			"101", 
-			"X1X", 
-			Character.valueOf('0'), inputGoldApple,
-			Character.valueOf('1'), inputDiamond 
+			"X2X", 
+			Character.valueOf('0'), inputApple,
+			Character.valueOf('1'), inputDiamond,
+			Character.valueOf('2'), inputGold 
 		});
 		
 		GameRegistry.addRecipe(outputStick, new Object[]{
@@ -83,9 +84,9 @@ public class ItemLife{
 		// Data for use in the Mantle books.
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			MantleClientRegistry.registerManualLargeRecipe(unlocNameApple, outputApple,
-					null, 		inputDiamond,     null,
-					inputDiamond, inputGoldApple, inputDiamond,
-					null        , inputDiamond,   null);
+					null, 		inputGold,     null,
+					inputDiamond, inputApple, inputDiamond,
+					null        , inputGold,   null);
 			MantleClientRegistry.registerManualIcon(unlocNameApple, outputApple);
 			MantleClientRegistry.registerManualLargeRecipe(unlocNameStick, outputStick,
 					inputGold, inputStick, inputGold,
