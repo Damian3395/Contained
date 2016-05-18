@@ -12,6 +12,7 @@ import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
@@ -131,9 +132,10 @@ public class PlayerTeam {
 			team.permissions.remove(this.id);
 		
 		//Remove the team.
-		Contained.teamData.remove(this);	
+		Contained.getTeamList(dimID).remove(this);	
 		
 		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTeams(Contained.getTeamList(dimID)).toPacket());
+		Contained.channel.sendToAll(ClientPacketHandlerUtil.packetSyncTerritories(Contained.getTerritoryMap(dimID)).toPacket());
 	}
 	
 	/**

@@ -205,8 +205,10 @@ public class ItemTerritory {
 					probe.y = toClaim.y+i;
 				}
 				if (Contained.getTerritoryMap(dimID).containsKey(probe)) {
-					foundAdj = true;
-					break;
+					if (Contained.getTerritoryMap(dimID).get(probe).equals(teamID)) {
+						foundAdj = true;
+						break;
+					}
 				}
 			}
 			if (foundAdj)
