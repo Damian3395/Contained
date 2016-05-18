@@ -7,6 +7,7 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,10 +18,13 @@ import codechicken.lib.packet.PacketCustom;
 import com.contained.game.Contained;
 import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
+import com.contained.game.world.block.EmblemBlock;
+import com.contained.game.world.block.TerritoryMachine;
 
 public class PlayerMiniGame {
 	private String[] intro = {"The", "League of", "Demons of"
@@ -47,23 +51,28 @@ public class PlayerMiniGame {
 			new ItemStack(Items.diamond_chestplate, 1),
 			new ItemStack(Items.diamond_helmet, 1),
 			new ItemStack(Items.diamond_leggings, 1),
-			new ItemStack(Items.diamond, 5)
+			new ItemStack(Items.diamond, 12),
+			new ItemStack(Blocks.enchanting_table, 1),
+			new ItemStack(Blocks.ender_chest, 2),
+			new ItemStack(ItemTerritory.addTerritory, 64),
+			new ItemStack(Items.emerald, 16),
+			new ItemStack(Items.spawn_egg, 8, 51),
+			new ItemStack(Items.spawn_egg, 8, 54)
 	};
 	
 	public static ItemStack[] secondPlace = {
-			new ItemStack(Items.golden_apple, 1),
-			new ItemStack(Items.golden_axe, 1),
-			new ItemStack(Items.golden_carrot, 1),
-			new ItemStack(Items.golden_hoe, 1),
-			new ItemStack(Items.golden_horse_armor, 1),
-			new ItemStack(Items.golden_pickaxe, 1),
-			new ItemStack(Items.golden_shovel, 1),
-			new ItemStack(Items.golden_sword, 1),
-			new ItemStack(Items.golden_boots, 1),
-			new ItemStack(Items.golden_chestplate, 1),
-			new ItemStack(Items.golden_helmet, 1),
-			new ItemStack(Items.golden_leggings, 1),
-			new ItemStack(Items.gold_ingot, 5)
+			new ItemStack(Items.golden_apple, 2),
+			new ItemStack(Items.golden_carrot, 2),
+			new ItemStack(Items.gold_ingot, 16),
+			new ItemStack(Blocks.rail, 32),
+			new ItemStack(Blocks.golden_rail, 16),
+			new ItemStack(EmblemBlock.earthEmblemAct, 2),
+			new ItemStack(EmblemBlock.fireEmblemAct, 2),
+			new ItemStack(EmblemBlock.waterEmblemAct, 2),
+			new ItemStack(EmblemBlock.windEmblemAct, 2),
+			new ItemStack(Blocks.obsidian, 8),
+			new ItemStack(TerritoryMachine.instance, 1),
+			new ItemStack(Items.experience_bottle, 32),
 	};
 	
 	public static ItemStack[] thirdPlace = {
@@ -79,17 +88,19 @@ public class PlayerMiniGame {
 			new ItemStack(Items.iron_helmet, 1),
 			new ItemStack(Items.iron_leggings, 1),
 			new ItemStack(Items.bucket, 1),
-			new ItemStack(Items.flint_and_steel, 1),
 			new ItemStack(Items.shears, 1),
 			new ItemStack(Items.compass, 1),
-			new ItemStack(Items.iron_ingot, 5)
+			new ItemStack(Items.iron_ingot, 16),
+			new ItemStack(Blocks.nether_brick, 64),
+			new ItemStack(Blocks.nether_brick_fence, 32),
+			new ItemStack(Blocks.nether_brick_stairs, 32),
 	};
 	
 	public static ItemStack[] fourthPlace = {
 			new ItemStack(Items.stone_axe, 1),
 			new ItemStack(Items.wooden_axe, 1),
 			new ItemStack(Items.stone_hoe, 1),
-			new ItemStack(Items.wooden_door, 1),
+			new ItemStack(Items.wooden_door, 2),
 			new ItemStack(Items.stone_pickaxe, 1),
 			new ItemStack(Items.wooden_hoe, 1),
 			new ItemStack(Items.stone_shovel, 1),
@@ -97,52 +108,52 @@ public class PlayerMiniGame {
 			new ItemStack(Items.stone_sword, 1),
 			new ItemStack(Items.wooden_shovel, 1),
 			new ItemStack(Items.wooden_sword, 1),
-			new ItemStack(Items.leather_boots,1 ),
+			new ItemStack(Items.leather_boots, 1),
 			new ItemStack(Items.leather_chestplate, 1),
 			new ItemStack(Items.leather_helmet, 1),
 			new ItemStack(Items.leather_leggings, 1),
-			new ItemStack(Items.leather, 5),
+			new ItemStack(Items.leather, 16),
 			new ItemStack(Items.fishing_rod, 1),
 			new ItemStack(Items.boat, 1),
 			new ItemStack(Items.bow, 1),
-			new ItemStack(Items.arrow, 16),
+			new ItemStack(Items.arrow, 24),
 			new ItemStack(Items.bed, 1),
 			new ItemStack(Items.cake, 1),
-			new ItemStack(Items.cookie, 1),
+			new ItemStack(Items.cookie, 16),
 			new ItemStack(Items.clock, 1),
 			new ItemStack(Items.saddle, 1)
 	};
 	
 	public static ItemStack[] fifthPlace = {
-			new ItemStack(Items.apple,1),
+			new ItemStack(Items.apple,8),
 			new ItemStack(Items.record_11, 1),
-			new ItemStack(Items.baked_potato, 1),
+			new ItemStack(Items.baked_potato, 8),
 			new ItemStack(Items.record_13, 1),
-			new ItemStack(Items.cooked_beef, 1),
+			new ItemStack(Items.cooked_beef, 8),
 			new ItemStack(Items.record_blocks, 1),
-			new ItemStack(Items.bone, 1),
+			new ItemStack(Items.bone, 16),
 			new ItemStack(Items.record_cat, 1),
-			new ItemStack(Items.bowl, 1),
+			new ItemStack(Items.bowl, 8),
 			new ItemStack(Items.record_chirp, 1),
-			new ItemStack(Items.bread, 1),
+			new ItemStack(Items.bread, 8),
 			new ItemStack(Items.record_far, 1),
-			new ItemStack(Items.carrot, 1),
+			new ItemStack(Items.carrot, 8),
 			new ItemStack(Items.record_mall, 1),
-			new ItemStack(Items.cooked_chicken, 1),
+			new ItemStack(Items.cooked_chicken, 8),
 			new ItemStack(Items.coal, 16),
 			new ItemStack(Items.record_mellohi, 1),
 			new ItemStack(Items.clay_ball, 16),
 			new ItemStack(Items.record_stal, 1),
-			new ItemStack(Items.cooked_fished, 1),
+			new ItemStack(Items.cooked_fished, 8),
 			new ItemStack(Items.record_strad, 1),
-			new ItemStack(Items.cooked_porkchop, 1),
+			new ItemStack(Items.cooked_porkchop, 8),
 			new ItemStack(Items.record_wait, 1),
 			new ItemStack(Items.egg, 16),
 			new ItemStack(Items.record_ward, 1),
 			new ItemStack(Items.feather, 16),
-			new ItemStack(Items.flint, 16),
+			new ItemStack(Items.flint, 32),
 			new ItemStack(Items.sugar, 16),
-			new ItemStack(Items.wheat, 16),
+			new ItemStack(Items.wheat, 32),
 			new ItemStack(Items.string, 16),
 	};
 
@@ -244,11 +255,11 @@ public class PlayerMiniGame {
 		}
 	}
 
-	public void endGame(String teamID, String winCondition){
+	public void endGame(String winningTeamID, String winCondition){
 		ArrayList<PlayerTeam> teams = Contained.getTeamList(dim);
 		int winScore = 0;
 		for(int i = 0; i < teams.size(); i++){
-			if(teams.get(i).id.equals(teamID)){
+			if(teams.get(i).id.equals(winningTeamID)){
 				winScore = Contained.gameScores[dim][i];
 				DataLogger.insertGameScore(Util.getServerID(), 
 					gameID, gameMode, teams.get(i).displayName, 
@@ -286,9 +297,9 @@ public class PlayerMiniGame {
 						pdata.teamID, properties.curKills, properties.curDeaths, 
 						properties.curAntiTerritory, Util.getDate());
 				if(!winCondition.equals("TIE")){
-					if(pdata.teamID.equalsIgnoreCase(teamID))
+					if(pdata.teamID.equalsIgnoreCase(winningTeamID))
 						properties.pvpWon++;
-					else if (!teamID.equals("Debug") && !teamID.equals("Kicked"))
+					else if (!winningTeamID.equals("Debug") && !winningTeamID.equals("Kicked"))
 						properties.pvpLost++;
 				}
 				
@@ -301,9 +312,9 @@ public class PlayerMiniGame {
 						gameID, player.getDisplayName(), pdata.teamID, 
 						properties.curTreasuresOpened, properties.curAltersActivated, Util.getDate());
 				if(!winCondition.equals("TIE")){
-					if(pdata.teamID.equalsIgnoreCase(teamID))
+					if(pdata.teamID.equalsIgnoreCase(winningTeamID))
 						properties.treasureWon++;
-					else if (!teamID.equals("Debug") && !teamID.equals("Kicked"))
+					else if (!winningTeamID.equals("Debug") && !winningTeamID.equals("Kicked"))
 						properties.treasureLost++;
 				}
 				
@@ -313,8 +324,7 @@ public class PlayerMiniGame {
 			
 			//Reward XP Points To Player
 			String teamMiniGame = pdata.teamID;
-			if(teamID != null && winCondition != null && pdata.teamID.equals(teamID)
-					&& winCondition.equals("TIE")){
+			if(winningTeamID != null && winCondition != null){
 				boolean emptySlot = false;
 				int index = -1;
 				for(int i = 0; i < pdata.inventory.length; i++){
@@ -327,16 +337,15 @@ public class PlayerMiniGame {
 				}
 				
 				if(!emptySlot)
-					rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
+					rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, teamMiniGame.equals(winningTeamID));
 			}
 			
 			Util.travelToDimension(0, player, false);
 			
 			//Reward Item To Player
-			if(teamID != null && teamMiniGame != null && winCondition != null && 
-					teamMiniGame.equals(teamID) && !winCondition.equals("TIE")){
+			if(winningTeamID != null && teamMiniGame != null && winCondition != null){
 				if(player.inventory.getFirstEmptyStack() > -1)
-					rewardItem(player, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
+					rewardItem(player, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, teamMiniGame.equals(winningTeamID));
 			}
 			
 			if(MiniGameUtil.isPvP(dim)){
@@ -379,8 +388,17 @@ public class PlayerMiniGame {
 			return new ArrayList<EntityPlayer>();
 	}
 
+	private static boolean ignoreWinCondition(String condition) {
+		if (condition.equals("Debug") || condition.equals("Inactive") || condition.equals("Kicked"))
+			return true;
+		return false;
+	}
+	
 	//Determine Your Reward Based on Your Contribution To The Teams' Total Score
-	public static void rewardItem(EntityPlayer player, int alters, int territory, int kills, int score, int totalScore, String winCondition){
+	public static void rewardItem(EntityPlayer player, int alters, int territory, int kills, int score, int totalScore, String winCondition, boolean inWinningTeam){
+		if (ignoreWinCondition(winCondition))
+			return;
+		
 		double percentage = (double)((double) score / (double) totalScore);
 		
 		//Special Rewards
@@ -401,16 +419,22 @@ public class PlayerMiniGame {
 		
 		ItemStack reward = null;
 		Random rand = new Random();
-		if(percentage >= 0.5)
-			reward = firstPlace[rand.nextInt(firstPlace.length)];
-		else if(percentage >= 0.4)
-			reward = secondPlace[rand.nextInt(secondPlace.length)];
-		else if(percentage >= 0.3)
-			reward = thirdPlace[rand.nextInt(thirdPlace.length)];
-		else if(percentage >= 0.2)
-			reward = fourthPlace[rand.nextInt(fourthPlace.length)];
-		else 
-			reward = fifthPlace[rand.nextInt(fifthPlace.length)];
+		// If on the winning team, eligible for first, second, or third tier rewards.
+		// If on the losing team, only eligible for fourth or fifth tier rewards.
+		if (inWinningTeam && !winCondition.equals("TIE")) {
+			if(percentage >= 0.3)
+				reward = firstPlace[rand.nextInt(firstPlace.length)];
+			else if(percentage >= 0.2)
+				reward = secondPlace[rand.nextInt(secondPlace.length)];
+			else
+				reward = thirdPlace[rand.nextInt(thirdPlace.length)];
+		}
+		else {
+			if(percentage >= 0.2)
+				reward = fourthPlace[rand.nextInt(fourthPlace.length)];
+			else 
+				reward = fifthPlace[rand.nextInt(fifthPlace.length)];
+		}
 		
 		player.inventory.addItemStackToInventory(reward);
 		
@@ -422,7 +446,10 @@ public class PlayerMiniGame {
 	//Determine Your Reward Based On Your Contribution To The Teams' Total Score
 	public static void rewardXP(PlayerTeamIndividual pdata, 
 			int alters, int territory, int kills,
-			int score, int totalScore, String winCondition){
+			int score, int totalScore, String winCondition, boolean inWinningTeam){
+		if (!inWinningTeam || winCondition.equals("TIE") || ignoreWinCondition(winCondition))
+			return;
+		
 		double percentage = (double)((double) score / (double) totalScore);
 		
 		//Find XP needed to Reach Next Level
