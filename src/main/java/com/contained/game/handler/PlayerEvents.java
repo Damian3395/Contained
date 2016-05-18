@@ -246,8 +246,7 @@ public class PlayerEvents {
 					
 					//Reward XP Points To Player
 					String teamMiniGame = pdata.teamID;
-					if(teamID != null && winCondition != null && pdata.teamID.equals(teamID)
-							&& winCondition.equals("TIE")){
+					if(teamID != null && winCondition != null){
 						boolean emptySlot = false;
 						int index = -1;
 						for(int i = 0; i < pdata.inventory.length; i++){
@@ -260,16 +259,15 @@ public class PlayerEvents {
 						}
 						
 						if(!emptySlot)
-							PlayerMiniGame.rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
+							PlayerMiniGame.rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, pdata.teamID.equals(teamID));
 					}
 					
 					Util.travelToDimension(Resources.OVERWORLD, event.entityPlayer, true);
 					
 					//Reward Item To Player
-					if(teamID != null && teamMiniGame != null && winCondition != null && 
-							teamMiniGame.equals(teamID) && !winCondition.equals("TIE")){
+					if(teamID != null && teamMiniGame != null && winCondition != null){
 						if(event.entityPlayer.inventory.getFirstEmptyStack() > -1)
-							PlayerMiniGame.rewardItem(event.entityPlayer, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
+							PlayerMiniGame.rewardItem(event.entityPlayer, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, pdata.teamID.equals(teamID));
 					}
 					
 					if(MiniGameUtil.isPvP(dim)){

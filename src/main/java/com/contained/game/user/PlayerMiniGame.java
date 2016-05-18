@@ -18,6 +18,7 @@ import codechicken.lib.packet.PacketCustom;
 import com.contained.game.Contained;
 import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedPlayer;
+import com.contained.game.item.DowsingRod;
 import com.contained.game.item.ItemTerritory;
 import com.contained.game.network.ClientPacketHandlerUtil;
 import com.contained.game.util.MiniGameUtil;
@@ -42,7 +43,6 @@ public class PlayerMiniGame {
 	
 	public static ItemStack[] firstPlace = {
 			new ItemStack(Items.diamond_axe, 1),
-			new ItemStack(Items.diamond_hoe, 1),
 			new ItemStack(Items.diamond_horse_armor, 1),
 			new ItemStack(Items.diamond_pickaxe, 1),
 			new ItemStack(Items.diamond_shovel, 1),
@@ -53,11 +53,16 @@ public class PlayerMiniGame {
 			new ItemStack(Items.diamond_leggings, 1),
 			new ItemStack(Items.diamond, 12),
 			new ItemStack(Blocks.enchanting_table, 1),
+			new ItemStack(Blocks.enchanting_table, 1),
 			new ItemStack(Blocks.ender_chest, 2),
 			new ItemStack(ItemTerritory.addTerritory, 64),
 			new ItemStack(Items.emerald, 16),
 			new ItemStack(Items.spawn_egg, 8, 51),
-			new ItemStack(Items.spawn_egg, 8, 54)
+			new ItemStack(Items.spawn_egg, 8, 54),
+			new ItemStack(DowsingRod.instanceFinite, 1),
+			new ItemStack(DowsingRod.instanceFinite, 1),
+			new ItemStack(DowsingRod.instanceFinite, 1),
+			new ItemStack(DowsingRod.instanceFinite, 1),
 	};
 	
 	public static ItemStack[] secondPlace = {
@@ -447,7 +452,7 @@ public class PlayerMiniGame {
 	public static void rewardXP(PlayerTeamIndividual pdata, 
 			int alters, int territory, int kills,
 			int score, int totalScore, String winCondition, boolean inWinningTeam){
-		if (!inWinningTeam || winCondition.equals("TIE") || ignoreWinCondition(winCondition))
+		if (ignoreWinCondition(winCondition))
 			return;
 		
 		double percentage = (double)((double) score / (double) totalScore);
@@ -481,18 +486,21 @@ public class PlayerMiniGame {
 		
 		System.out.println("XP Needed: " + xpNeeded);
 		
+		float multiplier = 20;
+		if (!inWinningTeam || winCondition.equals("TIE"))
+			multiplier = 4;
 		if(percentage >= 0.5)
-			xpNeeded*=0.9;
+			xpNeeded*=0.9*multiplier;
 		else if(percentage >= 0.4)
-			xpNeeded*=0.75;
+			xpNeeded*=0.75*multiplier;
 		else if(percentage >= 0.3)
-			xpNeeded*=0.5;
+			xpNeeded*=0.5*multiplier;
 		else if(percentage >= 0.2)
-			xpNeeded*=0.25;
+			xpNeeded*=0.25*multiplier;
 		else if(percentage >= 0.1)
-			xpNeeded*=0.1;
+			xpNeeded*=0.1*multiplier;
 		else
-			xpNeeded*=0.05;
+			xpNeeded*=0.05*multiplier;
 		
 		System.out.println("Percentage: " + percentage + " XP Rewarded " + xpNeeded);
 		
