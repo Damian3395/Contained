@@ -57,7 +57,7 @@ public class Settings {
 					defaultValue(i, 100, 0), 0, 99999,
 					"How many blocks of land must a team own before their territory is vulnerable to invasion from other teams?");
 			flagXPCost[i] = config.getInt("flagXPCost", category, 
-					defaultValue(i, 30, 10), 0, 999, 
+					defaultValue(i, 15, 10), 0, 999, 
 					"How many Minecraft levels do you need to use the flag item?");
 			claimRadius[i] = config.getInt("claimRadius", category, 
 					defaultValue(i, 2, 3), 0, 10, 
@@ -126,7 +126,7 @@ public class Settings {
 			}
 			
 			worldRadius[i] = config.getInt(prefix+"worldSize", category, 
-					defaultValue(i, 40, 10, 20), 0, 500, 
+					defaultValue(i, 40, 6, 15), 0, 500, 
 					"Radius of the finite world in chunks (16x16 blocks), centered around spawn.");			
 			maxTeamSize[i] = config.getInt(prefix+"maxTeamSize", category, 
 					defaultValue(i, 5, 5, 5), 1, 999, 
