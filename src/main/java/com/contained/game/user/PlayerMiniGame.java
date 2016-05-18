@@ -36,7 +36,7 @@ public class PlayerMiniGame {
 
 	private int gameMode, gameID, dim;
 	
-	private ItemStack[] firstPlace = {
+	public static ItemStack[] firstPlace = {
 			new ItemStack(Items.diamond_axe, 1),
 			new ItemStack(Items.diamond_hoe, 1),
 			new ItemStack(Items.diamond_horse_armor, 1),
@@ -50,7 +50,7 @@ public class PlayerMiniGame {
 			new ItemStack(Items.diamond, 5)
 	};
 	
-	private ItemStack[] secondPlace = {
+	public static ItemStack[] secondPlace = {
 			new ItemStack(Items.golden_apple, 1),
 			new ItemStack(Items.golden_axe, 1),
 			new ItemStack(Items.golden_carrot, 1),
@@ -66,7 +66,7 @@ public class PlayerMiniGame {
 			new ItemStack(Items.gold_ingot, 5)
 	};
 	
-	private ItemStack[] thirdPlace = {
+	public static ItemStack[] thirdPlace = {
 			new ItemStack(Items.iron_axe, 1),
 			new ItemStack(Items.iron_hoe, 1),
 			new ItemStack(Items.iron_door, 1),
@@ -85,7 +85,7 @@ public class PlayerMiniGame {
 			new ItemStack(Items.iron_ingot, 5)
 	};
 	
-	private ItemStack[] fourthPlace = {
+	public static ItemStack[] fourthPlace = {
 			new ItemStack(Items.stone_axe, 1),
 			new ItemStack(Items.wooden_axe, 1),
 			new ItemStack(Items.stone_hoe, 1),
@@ -113,7 +113,7 @@ public class PlayerMiniGame {
 			new ItemStack(Items.saddle, 1)
 	};
 	
-	private ItemStack[] fifthPlace = {
+	public static ItemStack[] fifthPlace = {
 			new ItemStack(Items.apple,1),
 			new ItemStack(Items.record_11, 1),
 			new ItemStack(Items.baked_potato, 1),
@@ -329,7 +329,6 @@ public class PlayerMiniGame {
 				if(!emptySlot)
 					rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition);
 			}
-				
 			
 			Util.travelToDimension(0, player, false);
 			
@@ -381,7 +380,7 @@ public class PlayerMiniGame {
 	}
 
 	//Determine Your Reward Based on Your Contribution To The Teams' Total Score
-	private void rewardItem(EntityPlayer player, int alters, int territory, int kills, int score, int totalScore, String winCondition){
+	public static void rewardItem(EntityPlayer player, int alters, int territory, int kills, int score, int totalScore, String winCondition){
 		double percentage = (double)((double) score / (double) totalScore);
 		
 		//Special Rewards
@@ -421,7 +420,7 @@ public class PlayerMiniGame {
 	}
 
 	//Determine Your Reward Based On Your Contribution To The Teams' Total Score
-	private void rewardXP(PlayerTeamIndividual pdata, 
+	public static void rewardXP(PlayerTeamIndividual pdata, 
 			int alters, int territory, int kills,
 			int score, int totalScore, String winCondition){
 		double percentage = (double)((double) score / (double) totalScore);
