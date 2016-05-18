@@ -58,7 +58,8 @@ public class Resources {
 		Blocks.diamond_ore,
 		Blocks.redstone_ore,
 		Blocks.emerald_ore,
-		Blocks.lapis_ore
+		Blocks.lapis_ore,
+		Blocks.obsidian
 	};
 	
 	public static void definePossibleChestLoot(ChestGenHooks hook) {

@@ -50,7 +50,7 @@ public class EntityAITargetTeamAfterHurt extends EntityAITarget {
         if (this.entityCallsForHelp)
         {
             double d0 = this.getTargetDistance();
-            List<EntityCreature> list = this.taskOwner.worldObj.getEntitiesWithinAABB(this.taskOwner.getClass(), AxisAlignedBB.getBoundingBox(this.taskOwner.posX, this.taskOwner.posY, this.taskOwner.posZ, this.taskOwner.posX + 1.0D, this.taskOwner.posY + 1.0D, this.taskOwner.posZ + 1.0D).expand(d0, 10.0D, d0));
+            List<EntityCreature> list = this.taskOwner.worldObj.getEntitiesWithinAABB(EntityCreature.class, AxisAlignedBB.getBoundingBox(this.taskOwner.posX, this.taskOwner.posY, this.taskOwner.posZ, this.taskOwner.posX + 1.0D, this.taskOwner.posY + 1.0D, this.taskOwner.posZ + 1.0D).expand(d0, 10.0D, d0));
             Iterator<EntityCreature> iterator = list.iterator();
             String myTeam = ExtendedLivingBase.get(this.taskOwner).getTeam();
             

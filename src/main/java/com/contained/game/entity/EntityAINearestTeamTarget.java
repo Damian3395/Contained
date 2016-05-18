@@ -69,7 +69,7 @@ public class EntityAINearestTeamTarget extends EntityAITarget {
             		return true;
             	} else {
             		for(EntityLivingBase ent : nearbyEnts) {
-            			if (!EntityUtil.isSameTeam(this.taskOwner, ent)) {
+            			if (!EntityUtil.isSameTeam(this.taskOwner, ent) && EntityUtil.isAttackableClass(ent)) {
             				this.targetEntity = ent;
             				return true;
             			}
