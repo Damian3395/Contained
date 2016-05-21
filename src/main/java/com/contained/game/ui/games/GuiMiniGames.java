@@ -87,11 +87,11 @@ public class GuiMiniGames extends GuiScreen {
 				, Color.RED);
 		renderFont(x-120, y-25, "Kills/Deaths: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Kills/Deaths: ")
-				, y-25, "("+this.kills+"/"+this.deaths+")"
+				, y-25, "("+(this.kills/3)+"/"+this.deaths+")"
 				, Color.RED);
 		renderFont(x-120, y-15, "Removed Territories: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Removed Territories: ")
-				, y-15, "("+(this.territory/3)+")"
+				, y-15, "("+this.territory+")"
 				, Color.RED);
 		renderFont(x-120, y-5, "Treasures Opened: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Treasures Opened: ")

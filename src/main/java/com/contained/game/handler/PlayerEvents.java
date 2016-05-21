@@ -260,7 +260,7 @@ public class PlayerEvents {
 						}
 						
 						if(!emptySlot)
-							PlayerMiniGame.rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, pdata.teamID.equals(teamID));
+							PlayerMiniGame.rewardXP(event.entityPlayer, pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, pdata.teamID.equals(teamID));
 					}
 					
 					Util.travelToDimension(Resources.OVERWORLD, event.entityPlayer, true);

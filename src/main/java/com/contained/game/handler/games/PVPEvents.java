@@ -71,7 +71,7 @@ public class PVPEvents {
 					&& killerProp.inGame() && killerProp.gameMode == Resources.PVP){
 				victimProp.removeLife();
 				victimProp.curDeaths++;
-				killerProp.curKills++;
+				killerProp.curKills+=3;
 				
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(victimProp.lives);
