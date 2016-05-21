@@ -16,6 +16,7 @@ tile.windEmblemBlockActive.name=Wind Emblem Altar
 item.StickofLife.name=Stick of Life
 item.AppleofLife.name=Apple of Life
 item.DowsingRod.name=Dowsing Rod
+item.DowsingRodF.name=Dowsing Rod
 item.ItemClaimTerritory.name=Territory Gem
 item.ItemRemoveTerritory.name=Anti-Territory Gem
 item.TerritoryFlag.name=Territory Flag

@@ -443,7 +443,7 @@ public class PlayerMiniGame {
 		
 		player.inventory.addItemStackToInventory(reward);
 		
-		Util.displayMessage(player, Util.infoCode+reward.getDisplayName());
+		Util.displayMessage(player, Util.infoCode+"[PRIZE] Recieved "+reward.getDisplayName()+" (x"+reward.stackSize+")");
 		
 		PacketCustom rewardPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
 		rewardPacket.writeItemStack(reward);
@@ -502,7 +502,7 @@ public class PlayerMiniGame {
 		else
 			xpNeeded*=0.05*multiplier;
 		
-		Util.displayMessage(player, Util.infoCode+xpNeeded);
+		Util.displayMessage(player, Util.infoCode+"[PRIZE] Recieved "+xpNeeded+" XP");
 		
 		pdata.xp+=xpNeeded;
 	}
