@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -287,6 +288,13 @@ public class ClientPacketHandler extends ServerPacketHandler {
 					ItemStack item = packet.readItemStack();
 					if(mc.thePlayer.inventory.getFirstEmptyStack() > -1 && item != null)
 						mc.thePlayer.inventory.addItemStackToInventory(item);
+					else if (item != null) {
+						// Player's inventory was full, drop this item on the ground 
+						// near them instead.
+						mc.theWorld.spawnEntityInWorld(new EntityItem(mc.theWorld, 
+								mc.thePlayer.posX, mc.thePlayer.posY+1, mc.thePlayer.posZ, 
+								item));
+					}
 					
 					if(mc.currentScreen instanceof GuiTownManage) {
 						GuiTownManage guiTown = (GuiTownManage)mc.currentScreen;

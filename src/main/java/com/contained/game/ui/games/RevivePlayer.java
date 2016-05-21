@@ -86,6 +86,7 @@ public class RevivePlayer extends GuiScreen {
 			this.mc.displayGuiScreen(null);
 		}else{
 			PacketCustom packet = new PacketCustom(Resources.MOD_ID, ServerPacketHandlerUtil.REVIVE_PLAYER);
+			packet.writeInt(mc.thePlayer.dimension);
 			packet.writeString(teamPlayers.get(button.id-1));
 			ServerPacketHandlerUtil.sendToServer(packet.toPacket());
 			

@@ -11,6 +11,7 @@ import com.contained.game.entity.DeepBlaze;
 import com.contained.game.entity.DeepLavaSlime;
 import com.contained.game.entity.DeepWitherSkeleton;
 import com.contained.game.item.*;
+import com.contained.game.ui.CleanSectionPage;
 import com.contained.game.ui.ToolPage;
 import com.contained.game.util.Resources;
 import com.contained.game.world.block.*;
@@ -89,12 +90,13 @@ public class ContainedRegistry {
 		MantleClientRegistry.registerManualIcon(EmblemBlock.fireBlockName, new ItemStack(EmblemBlock.fireEmblemAct, 1));
 		MantleClientRegistry.registerManualIcon(EmblemBlock.earthBlockName, new ItemStack(EmblemBlock.earthEmblemAct, 1));
 		MantleClientRegistry.registerManualIcon(EmblemBlock.waterBlockName, new ItemStack(EmblemBlock.waterEmblemAct, 1));
-		MantleClientRegistry.registerManualIcon(EmblemBlock.windBlockName, new ItemStack(EmblemBlock.windEmblemInact, 1));
+		MantleClientRegistry.registerManualIcon(EmblemBlock.windBlockName, new ItemStack(EmblemBlock.windEmblemAct, 1));
 		MantleClientRegistry.registerManualIcon("guild", new ItemStack(Items.diamond_sword, 1));
 		MantleClientRegistry.registerManualIcon("occupation", new ItemStack(Items.baked_potato, 1));
-		MantleClientRegistry.registerManualIcon("xp", new ItemStack(Items.experience_bottle, 1));
-		MantleClientRegistry.registerManualIcon("miniGame", new ItemStack(Items.blaze_powder, 1));
+		MantleClientRegistry.registerManualIcon("xp", new ItemStack(Items.gold_ingot, 1));
+		MantleClientRegistry.registerManualIcon("miniGame", new ItemStack(DowsingRod.instance, 1));
 		MProxyClient.registerManualPage("toolpage", ToolPage.class);
+		MProxyClient.registerManualPage("cleansectionpage", CleanSectionPage.class);
 		
 		GameRegistry.registerTileEntity(TerritoryMachineTE.class, "TerritoryMachineTE");
 		GameRegistry.registerTileEntity(TownManageTE.class, "TownManageTE");

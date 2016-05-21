@@ -39,6 +39,7 @@ public class TerritoryFlag {
 	public static void defineRecipe(){
 		ItemStack output = new ItemStack(instance, 1);
 		ItemStack inputWool = new ItemStack(Blocks.wool, 1, OreDictionary.WILDCARD_VALUE);
+		ItemStack inputWhiteWool = new ItemStack(Blocks.wool, 1);
 		ItemStack inputStick = new ItemStack(Items.stick, 1);
 		
 		GameRegistry.addRecipe(output, new Object[]{
@@ -59,8 +60,8 @@ public class TerritoryFlag {
 		// Data for use in the Mantle books.
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			MantleClientRegistry.registerManualLargeRecipe(unlocName, output,
-					inputWool, inputWool, inputStick,
-					inputWool, inputWool, inputStick,
+					inputWhiteWool, inputWhiteWool, inputStick,
+					inputWhiteWool, inputWhiteWool, inputStick,
 					null     , null     , inputStick);
 			MantleClientRegistry.registerManualIcon(unlocName, output);
 		}
