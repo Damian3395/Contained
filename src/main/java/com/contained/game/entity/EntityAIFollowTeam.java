@@ -50,7 +50,7 @@ public class EntityAIFollowTeam extends EntityAIBase {
             return false;
         else if (isSitting())
             return false;
-        else if (this.thePet.getDistanceSqToEntity(entitylivingbase) < (double)(this.minDist * this.minDist))
+        else if (this.thePet.getDistanceSqToEntity(entitylivingbase) < (double)(this.maxDist * this.maxDist))
             return false;
         else {
             this.theOwner = entitylivingbase;
