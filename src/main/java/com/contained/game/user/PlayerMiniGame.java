@@ -342,7 +342,7 @@ public class PlayerMiniGame {
 				}
 				
 				if(!emptySlot)
-					rewardXP(pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, teamMiniGame.equals(winningTeamID));
+					rewardXP(player, pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, teamMiniGame.equals(winningTeamID));
 			}
 			
 			Util.travelToDimension(0, player, false);
@@ -443,13 +443,15 @@ public class PlayerMiniGame {
 		
 		player.inventory.addItemStackToInventory(reward);
 		
+		Util.displayMessage(player, Util.infoCode+reward.getDisplayName());
+		
 		PacketCustom rewardPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
 		rewardPacket.writeItemStack(reward);
 		Contained.channel.sendTo(rewardPacket.toPacket(), (EntityPlayerMP) player);
 	}
 
 	//Determine Your Reward Based On Your Contribution To The Teams' Total Score
-	public static void rewardXP(PlayerTeamIndividual pdata, 
+	public static void rewardXP(EntityPlayer player, PlayerTeamIndividual pdata, 
 			int alters, int territory, int kills,
 			int score, int totalScore, String winCondition, boolean inWinningTeam){
 		if (ignoreWinCondition(winCondition))
@@ -484,8 +486,6 @@ public class PlayerMiniGame {
 			percentage+=((double)kills/total);
 		}
 		
-		System.out.println("XP Needed: " + xpNeeded);
-		
 		float multiplier = 20;
 		if (!inWinningTeam || winCondition.equals("TIE"))
 			multiplier = 4;
@@ -502,7 +502,7 @@ public class PlayerMiniGame {
 		else
 			xpNeeded*=0.05*multiplier;
 		
-		System.out.println("Percentage: " + percentage + " XP Rewarded " + xpNeeded);
+		Util.displayMessage(player, Util.infoCode+xpNeeded);
 		
 		pdata.xp+=xpNeeded;
 	}
