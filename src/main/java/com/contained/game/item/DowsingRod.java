@@ -27,6 +27,7 @@ public class DowsingRod {
 		instance = new ItemDousingRod(false);
 		instanceFinite = new ItemDousingRod(true);
 		Item.itemRegistry.addObject(473, unlocName, instance);
+		Item.itemRegistry.addObject(474, unlocName+"F", instanceFinite);
 	}
 
 	public static class ItemDousingRod extends Item {

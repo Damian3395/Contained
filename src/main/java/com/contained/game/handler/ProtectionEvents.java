@@ -276,6 +276,23 @@ public class ProtectionEvents {
 		if (event.entityLiving instanceof EntityCreature && !(event.entityLiving instanceof EntityPlayer)) {
 			if (EntityUtil.isSameTeam(event.entityLiving, attacker)) {
 				event.setCanceled(true);
+				// Try to teleport the entity somewhere nearby.
+				boolean teleportSuccess = false;
+				int newPosX = 0, newPosY = 0, newPosZ = 0;
+				for(int i=0; i<25; i+=1) {
+					newPosX = (int)(event.entityLiving.posX+Util.randomBoth(4));
+					newPosY = (int)(event.entityLiving.posY+Util.randomBoth(2));
+					newPosZ = (int)(event.entityLiving.posZ+Util.randomBoth(4));
+					if (event.entityLiving.worldObj.isAirBlock(newPosX, newPosY, newPosZ) && event.entityLiving.worldObj.isAirBlock(newPosX, newPosY+1, newPosZ))
+					{
+						event.entityLiving.setPositionAndUpdate(newPosX, newPosY, newPosZ);
+						teleportSuccess = true;
+						break;
+					}
+				}
+				
+				if (!teleportSuccess)
+					event.entityLiving.setPositionAndUpdate(newPosX, event.entityLiving.worldObj.getTopSolidOrLiquidBlock(newPosX, newPosZ), newPosZ);
 				return;
 			}
 		}

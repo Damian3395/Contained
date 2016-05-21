@@ -77,17 +77,17 @@ public class GuiMiniGames extends GuiScreen {
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Games Won/Games Lost: ")
 				, y-55, "("+(this.pvpWon+this.treasureWon)+"/"+(this.pvpLost+this.treasureLost)+")"
 				, Color.RED);
-		renderFont(x-120, y-45, "Pvp Won/Pvp Lost: " , Color.BLACK);
+		renderFont(x-120, y-45, "PvP Won/PvP Lost: " , Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Pvp Won/Pvp Lost: ")
 				, y-45, "("+this.pvpWon+"/"+this.pvpLost+")"
 				, Color.RED);
-		renderFont(x-120, y-35, "TreasureHunt Won/TreasureHunt Lost: ", Color.BLACK);
+		renderFont(x-120, y-35, "Treasure Won/Treasure Lost: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("TreasureHunt Won/TreasureHunt Lost: ")
 				, y-35, "("+this.treasureWon+"/"+this.treasureLost+")"
 				, Color.RED);
 		renderFont(x-120, y-25, "Kills/Deaths: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Kills/Deaths: ")
-				, y-25, "("+(this.kills/3)+"/"+this.deaths+")"
+				, y-25, "("+this.kills+"/"+this.deaths+")"
 				, Color.RED);
 		renderFont(x-120, y-15, "Removed Territories: ", Color.BLACK);
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Removed Territories: ")
@@ -97,9 +97,9 @@ public class GuiMiniGames extends GuiScreen {
 		renderFont(x-120+mc.fontRenderer.getStringWidth("Treasures Opened: ")
 				, y-5, "("+this.treasuresOpened+")"
 				, Color.RED);
-		renderFont(x-120, y+5, "Alters Activated: ", Color.BLACK);
-		renderFont(x-120+mc.fontRenderer.getStringWidth("Alters Activated: ")
-				, y+5, "("+(this.alters/3)+")"
+		renderFont(x-120, y+5, "Altars Activated: ", Color.BLACK);
+		renderFont(x-120+mc.fontRenderer.getStringWidth("Altars Activated: ")
+				, y+5, "("+this.alters+")"
 				, Color.RED);
 		super.drawScreen(w, h, ticks);
 	}
