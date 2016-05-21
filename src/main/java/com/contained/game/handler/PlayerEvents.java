@@ -196,6 +196,7 @@ public class PlayerEvents {
 			oldPlayer.saveNBTData(ntc);
 			newClone.loadNBTData(ntc);
 			
+			//TODO: Bugging Out on Developer Mode, will auto end game for pvp
 			int dim = event.entityPlayer.dimension;
 			if((MiniGameUtil.isPvP(dim) ||
 					MiniGameUtil.isTreasure(dim))){
@@ -247,7 +248,7 @@ public class PlayerEvents {
 					//Reward XP Points To Player
 					String teamMiniGame = pdata.teamID;
 					if(teamID != null && winCondition != null && pdata.teamID.equals(teamID)
-							&& winCondition.equals("TIE")){
+							&& !winCondition.equals("TIE")){
 						boolean emptySlot = false;
 						int index = -1;
 						for(int i = 0; i < pdata.inventory.length; i++){
