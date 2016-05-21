@@ -20,8 +20,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 
 public class GuiAdmin extends GuiScreen {
 

@@ -15,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 
 public class ItemLife{
 	public ItemLife(){}
@@ -31,6 +32,8 @@ public class ItemLife{
 		Item.itemRegistry.addObject(475, unlocNameStick, reviveLife);
 	}
 	
+	//Server Side Check in PVPEvents PlayerUseItemEvent.Finish
+	//Adds One Life Point in PVP
 	public static class AppleLife extends ItemFood{
 		public AppleLife(int healAmount, float saturationModifier, boolean wolvesFavorite) {
 	        super(healAmount, saturationModifier, wolvesFavorite);
@@ -41,6 +44,7 @@ public class ItemLife{
 	    }
 	}
 	
+	//Allows Player To Select A Player In Their Team Who is Dead and Revive Them
 	public static class StickLife extends Item{
 		public StickLife(){
 			this.maxStackSize = 1;
