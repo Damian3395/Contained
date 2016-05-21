@@ -150,8 +150,8 @@ public class ItemTerritory {
 					if(MiniGameUtil.isPvP(p.dimension) ){
 						ExtendedPlayer properties = ExtendedPlayer.get(p);
 						int teamID = PlayerMiniGame.get(p.dimension).getTeamID(playerData);
-						properties.curAntiTerritory+=3;
-						Contained.gameScores[p.dimension][teamID]+=3;
+						properties.curAntiTerritory+=1;
+						Contained.gameScores[p.dimension][teamID]+=1;
 						ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
 					}
 					Contained.channel.sendToAll(ClientPacketHandlerUtil.packetRemoveTerrBlock(x, z).toPacket());

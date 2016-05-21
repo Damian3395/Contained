@@ -297,7 +297,7 @@ public class PlayerMiniGame {
 			
 			int playerScore = 0;
 			if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
-				playerScore = properties.curKills - properties.curDeaths + properties.curAntiTerritory;
+				playerScore = (properties.curKills*3) - (properties.curDeaths*3) + properties.curAntiTerritory;
 				DataLogger.insertPVPScore(Util.getServerID(), gameID, player.getDisplayName(), 
 						pdata.teamID, properties.curKills, properties.curDeaths, 
 						properties.curAntiTerritory, Util.getDate());
@@ -312,7 +312,7 @@ public class PlayerMiniGame {
 				properties.deaths+=properties.curDeaths;
 				properties.antiTerritory+=properties.curAntiTerritory;
 			}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
-				playerScore = properties.curTreasuresOpened + properties.curAltersActivated;
+				playerScore = properties.curTreasuresOpened + properties.curAltersActivated*3;
 				DataLogger.insertTreasureScore(Util.getServerID(), 
 						gameID, player.getDisplayName(), pdata.teamID, 
 						properties.curTreasuresOpened, properties.curAltersActivated, Util.getDate());
@@ -408,17 +408,17 @@ public class PlayerMiniGame {
 		
 		//Special Rewards
 		if(winCondition.equals("EMBLEMS")){
-			switch(alters/3){
+			switch(alters){
 				case 1: percentage+=0.1; break;
 				case 2: percentage+=0.25; break;
 				case 3: percentage+=0.5; break;
 			}
 		}else if(winCondition.equals("TERRITORY")){
-			double anti = territory/3.0;
-			double total = 49.0;
+			double anti = territory;
+			double total = Math.pow((Contained.configs.pvpTerritorySize*2+1), 2.0);
 			percentage+=(anti/total);
 		}else if(winCondition.equals("MAX_KILLS")){
-			double total = 25.0;
+			double total = Contained.configs.pvpMaxLives*Contained.configs.maxTeamSize[Resources.PVP];
 			percentage+=((double)kills/total);
 		}
 		
@@ -470,17 +470,17 @@ public class PlayerMiniGame {
 		
 		//Special Rewards
 		if(winCondition.equals("EMBLEMS")){
-			switch(alters/3){
+			switch(alters){
 				case 1: percentage+=0.1; break;
 				case 2: percentage+=0.25; break;
 				case 3: percentage+=0.5; break;
 			}
 		}else if(winCondition.equals("TERRITORY")){
-			double anti = territory/3.0;
-			double total = 49.0;
+			double anti = territory;
+			double total = Math.pow((Contained.configs.pvpTerritorySize*2+1), 2.0);
 			percentage+=(anti/total);
 		}else if(winCondition.equals("MAX_KILLS")){
-			double total = 25.0;
+			double total = Contained.configs.pvpMaxLives*Contained.configs.maxTeamSize[Resources.PVP];
 			percentage+=((double)kills/total);
 		}
 		

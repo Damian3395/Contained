@@ -106,7 +106,7 @@ public class EmblemBlock {
 					DataLogger.insertAlter(Util.getServerID(), Util.getGameID(p.dimension), pdata.teamID, p.getDisplayName(), Util.getDate());
 					
 					ExtendedPlayer properties = ExtendedPlayer.get(p);
-					properties.curAltersActivated+=3;
+					properties.curAltersActivated++;
 					int teamID = PlayerMiniGame.get(p.dimension).getTeamID(pdata);
 					Contained.gameScores[p.dimension][teamID]+=3;
 					ClientPacketHandlerUtil.syncMiniGameScore(p.dimension, teamID, Contained.gameScores[p.dimension][teamID]);
