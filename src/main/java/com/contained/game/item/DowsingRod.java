@@ -40,7 +40,10 @@ public class DowsingRod {
 				setMaxDamage(0);
 			this.finite = finite;
 			maxStackSize = 1;
-			setUnlocalizedName(unlocName);
+			if (finite)
+				setUnlocalizedName(unlocName+"F");
+			else
+				setUnlocalizedName(unlocName);
 			setTextureName(texName);
 			setCreativeTab(CreativeTabs.tabTools);
 			setNoRepair();

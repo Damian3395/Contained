@@ -90,7 +90,8 @@ public class PlayerEvents {
 				// were online, let them know.
 				if (pdata.teamID != null && pdata.joinTime > pdata.lastOnline) {
 					PlayerTeam newTeam = PlayerTeam.get(pdata.teamID, joined.dimension);
-					Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
+					if (newTeam != null)
+						Util.displayMessage(joined, "§d§lYou are now a member of "+newTeam.getFormatCode()+"§l"+newTeam.displayName+"§d§l!");
 					pdata.lastOnline = System.currentTimeMillis();
 				}
 			}			

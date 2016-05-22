@@ -441,9 +441,8 @@ public class PlayerMiniGame {
 				reward = fifthPlace[rand.nextInt(fifthPlace.length)];
 		}
 		
-		player.inventory.addItemStackToInventory(reward);
-		
 		Util.displayMessage(player, Util.infoCode+"[PRIZE] Recieved "+reward.getDisplayName()+" (x"+reward.stackSize+")");
+		player.inventory.addItemStackToInventory(reward);
 		
 		PacketCustom rewardPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.ADD_ITEM);
 		rewardPacket.writeItemStack(reward);
