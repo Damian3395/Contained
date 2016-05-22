@@ -15,7 +15,6 @@ import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
 
 import codechicken.lib.packet.PacketCustom;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -173,8 +172,6 @@ public class AdminHandler {
 		 * 
 		 * if it's a PvP game, log the player's data and kick him
 		 * the game will automatically end if there's no one else in his team
-		 * 
-		 * 
 		 */
 		
 		if(playerToKick != null){
@@ -207,28 +204,6 @@ public class AdminHandler {
 		} else {
 			Util.displayMessage(player, "Cannot find player <"+targetPlayer+"> !");
 		}
-		/*
-		 * 
-		 * merge conflict
-		 * previous code
-		 * 
-		 * PlayerTeamIndividual.get(targetPlayer).leaveTeam();
-		EntityPlayer toKick = Util.getOnlinePlayer(targetPlayer);
-		if (toKick != null) {
-			int remdimension = toKick.dimension;
-			Util.travelToDimension(Resources.OVERWORLD, toKick);
-			
-			if (MiniGameUtil.isPvP(remdimension) || MiniGameUtil.isTreasure(remdimension)) {
-				PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
-				miniGamePacket.writeInt(remdimension);
-				Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)toKick);
-			}
-			Util.displayMessage(player, "You kicked "+targetPlayer+" back to Overworld");
-			Util.displayMessage(toKick, "You've been kicked back to Overworld by Admin");
-		} else
-			Util.displayMessage(player, "Couldn't find the requested player");
-		 */
-
 	}
 	
 	public void becomeRegularPlayer(EntityPlayerMP player){

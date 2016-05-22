@@ -32,11 +32,17 @@ import com.contained.game.world.block.TerritoryMachineTE;
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -44,6 +50,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -316,7 +323,39 @@ public class PlayerEvents {
 			EntityPlayer player = (EntityPlayer)event.entity;
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
-			//Update Admin Rights When Logging Back In Or Changing Dimensions
+			// Handle nether portal override
+			boolean wasInPortal = ReflectionHelper.getPrivateValue(Entity.class, player, "inPortal");			
+			if (wasInPortal) {
+				ReflectionHelper.setPrivateValue(Entity.class, player, false, "inPortal");
+				
+				for(int i=-3; i<=3; i+=1) {
+					for(int j=-3; j<=3; j+=1) {
+						for(int k=-3; k<=3; k+=1) {
+							if (player.worldObj.getBlock((int)player.posX+i, (int)player.posY+k, (int)player.posZ+j).equals(Blocks.portal))
+								player.worldObj.setBlock((int)player.posX+i, (int)player.posY+k, (int)player.posZ+j, Blocks.air);
+						}
+					}
+				}
+				player.worldObj.createExplosion(player, player.posX, player.posY, player.posZ, 1, false);
+				player.worldObj.spawnEntityInWorld(new EntityLightningBolt(player.worldObj, player.posX, player.posY+1, player.posZ));
+				EntityLiving mobSpawn = (EntityLiving)EntityList.createEntityByName(Util.choose("PigZombie", "PigZombie", "Blaze", "LavaSlime"), player.worldObj);
+				mobSpawn.setLocationAndAngles(player.posX, player.posY, player.posZ, MathHelper.wrapAngleTo180_float(player.worldObj.rand.nextFloat() * 360.0F), 0f);
+				player.worldObj.spawnEntityInWorld(mobSpawn);
+				
+				if (Math.random() < 0.5) {
+					player.worldObj.spawnEntityInWorld(new EntityItem(player.worldObj, player.posX, player.posY+1, player.posZ, 
+							Util.choose(new ItemStack(Items.quartz, 8)
+									,new ItemStack(Blocks.obsidian, 2)
+									,new ItemStack(Items.nether_wart, 4)
+									,new ItemStack(Items.netherbrick, 32)
+									,new ItemStack(Blocks.netherrack, 16)
+									,new ItemStack(Blocks.soul_sand, 8))));
+				}
+				
+				mobSpawn.playLivingSound();
+			}
+			
+			// Update Admin Rights When Logging Back In Or Changing Dimensions
 			if(properties.isAdmin()){
 				if(!player.isInvisible() ||
 						!player.capabilities.allowFlying || 

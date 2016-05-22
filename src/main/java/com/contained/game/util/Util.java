@@ -313,6 +313,14 @@ public class Util {
 		return values[randomRange(0, values.length)];
 	}
 	
+	public static String choose(String... values) {
+		return values[randomRange(0, values.length)];
+	}
+	
+	public static ItemStack choose(ItemStack... values) {
+		return values[randomRange(0, values.length)];
+	}
+	
 	public static String getDate(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 	}
