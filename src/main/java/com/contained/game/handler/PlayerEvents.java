@@ -197,8 +197,20 @@ public class PlayerEvents {
 			oldPlayer.saveNBTData(ntc);
 			newClone.loadNBTData(ntc);
 			
-			//TODO: Bugging Out on Developer Mode, will auto end game for pvp
 			int dim = event.entityPlayer.dimension;
+			if (MiniGameUtil.isPvP(dim)) {
+				ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
+				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
+				syncLifePacket.writeInt(properties.lives);
+				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
+
+				if(properties.lives == 0){
+					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
+					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
+				}				
+			}
+			
+			//TODO: Bugging Out on Developer Mode, will auto end game for pvp
 			if((MiniGameUtil.isPvP(dim) ||
 					MiniGameUtil.isTreasure(dim))){
 				boolean endGame = false;
@@ -207,7 +219,7 @@ public class PlayerEvents {
 				else if(PlayerMiniGame.get(dim).getGameID() != oldPlayer.gameID)
 					endGame = true;
 				
-				if(endGame){
+				if(endGame) {
 					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(event.entityPlayer.getDisplayName());
 					ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
 					

@@ -73,15 +73,6 @@ public class PVPEvents {
 				victimProp.curDeaths++;
 				killerProp.curKills++;
 				
-				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
-				syncLifePacket.writeInt(victimProp.lives);
-				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) victim);
-			
-				if(victimProp.lives == 0){
-					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
-					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) victim);
-				}
-				
 				PlayerTeamIndividual killerData = PlayerTeamIndividual.get(killer);
 				PlayerMiniGame miniGame = PlayerMiniGame.get(killerData.teamID);
 				if(miniGame == null)
