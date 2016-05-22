@@ -10,6 +10,7 @@ import cpw.mods.fml.relauncher.Side;
 import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
@@ -63,7 +64,7 @@ public class ItemLife{
 		ItemStack outputApple = new ItemStack(addLife, 1);
 		ItemStack outputStick = new ItemStack(reviveLife, 1);
 		ItemStack inputApple = new ItemStack(Items.apple, 1);
-		ItemStack inputDiamond = new ItemStack(Items.diamond, 1);
+		ItemStack inputLapis = new ItemStack(Blocks.lapis_block, 1);
 		ItemStack inputStick = new ItemStack(Items.stick, 1);
 		ItemStack inputGold = new ItemStack(Items.gold_ingot, 2);
 		
@@ -72,7 +73,7 @@ public class ItemLife{
 			"101", 
 			"X2X", 
 			Character.valueOf('0'), inputApple,
-			Character.valueOf('1'), inputDiamond,
+			Character.valueOf('1'), inputLapis,
 			Character.valueOf('2'), inputGold 
 		});
 		
@@ -81,7 +82,7 @@ public class ItemLife{
 				"101",
 				"202",
 				Character.valueOf('0'), inputStick,
-				Character.valueOf('1'), inputDiamond,
+				Character.valueOf('1'), inputLapis,
 				Character.valueOf('2'), inputGold
 		});
 		
@@ -89,12 +90,12 @@ public class ItemLife{
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			MantleClientRegistry.registerManualLargeRecipe(unlocNameApple, outputApple,
 					null, 		inputGold,     null,
-					inputDiamond, inputApple, inputDiamond,
+					inputLapis, inputApple, inputLapis,
 					null        , inputGold,   null);
 			MantleClientRegistry.registerManualIcon(unlocNameApple, outputApple);
 			MantleClientRegistry.registerManualLargeRecipe(unlocNameStick, outputStick,
 					inputGold, inputStick, inputGold,
-					inputDiamond, inputStick, inputDiamond,
+					inputLapis, inputStick, inputLapis,
 					inputGold, inputStick, inputGold);
 		}
 	}

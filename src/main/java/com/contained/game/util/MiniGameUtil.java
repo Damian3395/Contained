@@ -119,6 +119,13 @@ public class MiniGameUtil {
 			startMiniGame.gameID = game.getGameID();
 			startMiniGame.setGameMode(gameMode);
 			
+			if (gameMode == Resources.PVP) {
+				startMiniGame.setLives(Contained.configs.pvpMaxLives);
+				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
+				syncLifePacket.writeInt(startMiniGame.lives);
+				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) player);
+			}
+			
 			//Set the player to not be waiting for a mini-game anymore.
 			MiniGameHandler.cancelMiniGame((EntityPlayerMP)player);
 			
