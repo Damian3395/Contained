@@ -47,7 +47,7 @@ public class GuiSurvey extends GuiScreen {
 	public static final int PAGE_MINECRAFT = 4;
 	public static final int PAGE_PERSONALITY = 5;
 	
-	private static final int BUTTON_CD = 30;
+	private static final int BUTTON_CD = 20;
 	private boolean isFakeQuestion = false;
 	private int key = -1;
 	

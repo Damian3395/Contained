@@ -16,6 +16,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -135,6 +136,7 @@ public class MiniGameUtil {
 			PlayerTeamIndividual pdata = PlayerTeamIndividual.get(player);
 			startMiniGame.setGame(true);
 			
+			//Update player's position to their team's territory.
 			if (teamSpawnLocations == null || pdata.teamID == null || !teamSpawnLocations.containsKey(pdata.teamID)) {
 				Point p = Util.getRandomLocation(w);
 				player.setPositionAndUpdate(p.x, w.getTopSolidOrLiquidBlock(p.x, p.y)+1, p.y);
@@ -146,6 +148,8 @@ public class MiniGameUtil {
 				spawnPos.y += Util.randomBoth(2);
 				player.setPositionAndUpdate(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y);
 			}
+			Util.searchUpForLand(w, player);
+			player.setSpawnChunk(new ChunkCoordinates((int)player.posX, (int)player.posY, (int)player.posZ), false);
 			
 			pdata.xp = player.experienceTotal;
 			pdata.level = player.experienceLevel;

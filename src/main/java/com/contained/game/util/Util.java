@@ -249,36 +249,37 @@ public class Util {
 						mpPlayer, dimID, new GameTeleporter(newWorld));
 			if(dimID == Resources.OVERWORLD)
 				player.setPositionAndUpdate(properties.spawnX, properties.spawnY, properties.spawnZ);
-			else{
-				double posx = player.posX;
-				double posz = player.posZ;
-				double posy = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)posz);
-				
-				boolean spawn = true;
-				for(int i = 1; i <= 5; i++){
-					if(!newWorld.isAirBlock((int)posx, (int)(posy+1), (int)posz)){
-						spawn = false;
-						posy+=(i+1);
-						break;
-					}
-				}
-				
-				while(!spawn){
-					spawn = true;
-					int index = 0;
-					for(int i = 1; i <= 5; i++){
-						if(!newWorld.isAirBlock((int)posx, (int)(posy+1), (int)posz)){
-							spawn = false;
-							index = i;
-						}
-					}
-					if(!spawn)
-						posy+=(index+1);
-				}
-				
-				player.setPositionAndUpdate((int)posx, (int)(posy++), (int)posz);
+		}
+	}
+	
+	public static void searchUpForLand(World w, EntityPlayer player) {
+		double posx = player.posX;
+		double posz = player.posZ;
+		double posy = w.getTopSolidOrLiquidBlock((int)posx, (int)posz);
+		
+		boolean spawn = true;
+		for(int i = 1; i <= 5; i++){
+			if(!w.isAirBlock((int)posx, (int)(posy+1), (int)posz)){
+				spawn = false;
+				posy+=(i+1);
+				break;
 			}
 		}
+		
+		while(!spawn){
+			spawn = true;
+			int index = 0;
+			for(int i = 1; i <= 5; i++){
+				if(!w.isAirBlock((int)posx, (int)(posy+1), (int)posz)){
+					spawn = false;
+					index = i;
+				}
+			}
+			if(!spawn)
+				posy+=(index+1);
+		}
+		
+		player.setPositionAndUpdate((int)posx, (int)(posy++), (int)posz);
 	}
 	
 	/**
