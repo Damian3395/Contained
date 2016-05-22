@@ -324,9 +324,9 @@ public class PlayerEvents {
 			ExtendedPlayer properties = ExtendedPlayer.get(player);
 			
 			// Handle nether portal override
-			boolean wasInPortal = ReflectionHelper.getPrivateValue(Entity.class, player, "inPortal");			
+			boolean wasInPortal = ReflectionHelper.getPrivateValue(Entity.class, player, "inPortal", "field_71087_bX");			
 			if (wasInPortal) {
-				ReflectionHelper.setPrivateValue(Entity.class, player, false, "inPortal");
+				ReflectionHelper.setPrivateValue(Entity.class, player, false, "inPortal", "field_71087_bX");
 				
 				for(int i=-3; i<=3; i+=1) {
 					for(int j=-3; j<=3; j+=1) {
