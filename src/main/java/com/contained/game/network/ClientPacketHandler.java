@@ -619,7 +619,10 @@ public class ClientPacketHandler extends ServerPacketHandler {
 						newGuiAdmin.setPage(newGuiAdmin.PLAYER_PAGE);
 						newGuiAdmin.setSelectedDimID(selectedDimID);
 						newGuiAdmin.setPlayerInfoPanel(playerNames);
-						newGuiAdmin.setDimTimeInfo(DimensionManager.getWorld(selectedDimID).getWorldTime());
+						if(selectedDimID != -100){
+							newGuiAdmin.setDimTimeInfo(packet.readLong());	
+						}
+						
 					}
 				break;
 				

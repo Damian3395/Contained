@@ -83,7 +83,7 @@ public class AdminHandler {
 	}
 	
 	/*
-	 * write dimID,playerCount,playerNames to client
+	 * write dimID,playerCount,playerNames,dimTime to client
 	 */
 	public void viewWorldInfo(EntityPlayerMP player, int dimID){
 		List<String> playerNames = new ArrayList<String>();
@@ -116,6 +116,7 @@ public class AdminHandler {
 					for(int i=0; i<playerNames.size();i++){
 						worldInfoPacket.writeString(playerNames.get(i));
 					}
+					worldInfoPacket.writeLong(DimensionManager.getWorld(dimID).getWorldTime());
 					Contained.channel.sendTo(worldInfoPacket.toPacket(),player);
 				} else {
 					Util.displayMessage(player, "Dimension"+dimID+" is empty!");

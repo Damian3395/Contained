@@ -545,13 +545,15 @@ public class GuiAdmin extends GuiScreen {
 			break;
 			
 			case BTN_SET_TIME:
-				try{
-					PacketCustom setTimePacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_SET_TIME);
-					setTimePacket.writeInt(this.selectedDimID);
-					setTimePacket.writeLong(Long.parseLong(this.tf_dimTime.getText()));
-					Contained.channel.sendToServer(setTimePacket.toPacket());
-				} catch (NumberFormatException e) {
-					System.out.println("ERROR in parsing time string.");
+				if(this.selectedDimID != -100){	//only allow setting time of a certain dim
+					try{
+						PacketCustom setTimePacket = new PacketCustom(Resources.MOD_ID,ServerPacketHandlerUtil.ADMIN_SET_TIME);
+						setTimePacket.writeInt(this.selectedDimID);
+						setTimePacket.writeLong(Long.parseLong(this.tf_dimTime.getText()));
+						Contained.channel.sendToServer(setTimePacket.toPacket());
+					} catch (NumberFormatException e) {
+						System.out.println("ERROR in parsing time string.");
+					}
 				}
 				
 			break;
