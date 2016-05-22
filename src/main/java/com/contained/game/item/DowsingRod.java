@@ -19,21 +19,31 @@ import net.minecraft.world.World;
 public class DowsingRod {
 	public DowsingRod(){}
 	public static Item instance;
+	public static Item instanceFinite;
 	public static final String unlocName = "DowsingRod";
 	public static final String texName = Resources.MOD_ID+":dowser";
 
 	static {
-		instance = new ItemDousingRod();
+		instance = new ItemDousingRod(false);
+		instanceFinite = new ItemDousingRod(true);
 		Item.itemRegistry.addObject(473, unlocName, instance);
+		Item.itemRegistry.addObject(474, unlocName+"F", instanceFinite);
 	}
 
 	public static class ItemDousingRod extends Item {
-		public ItemDousingRod(){
-			setMaxDamage(0);
-			maxStackSize = 64;
+		boolean finite;
+		
+		public ItemDousingRod(boolean finite){
+			if (finite)
+				setMaxDamage(100);
+			else
+				setMaxDamage(0);
+			this.finite = finite;
+			maxStackSize = 1;
 			setUnlocalizedName(unlocName);
 			setTextureName(texName);
 			setCreativeTab(CreativeTabs.tabTools);
+			setNoRepair();
 		}
 
 		public float getStrVsBlock(ItemStack par1ItemStack, Block par2Block) {
@@ -66,6 +76,9 @@ public class DowsingRod {
 					player.addChatMessage(new ChatComponentText("Veins found in this chunk: None"));
 				else
 					player.addChatMessage(new ChatComponentText("Veins found in this chunk: "+out));
+	    	
+				if (finite)
+					stack.damageItem(1, player);
 	    	} 
 			return stack;
 	     }

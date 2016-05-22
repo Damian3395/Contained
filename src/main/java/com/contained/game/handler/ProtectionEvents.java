@@ -116,7 +116,7 @@ public class ProtectionEvents {
 			}
 		}
 		
-		if (shouldCancel)
+		if (shouldCancel && !isExempt(ev.world, ev.getPlayer()))
 			ev.setCanceled(true);
 		else {
 			//Is this a wilderness protected block?
@@ -141,7 +141,7 @@ public class ProtectionEvents {
 						canHarvest = false;
 				}
 				
-				if (!canHarvest) {
+				if (!canHarvest && !isExempt(ev.world, ev.getPlayer())) {
 					Util.displayError(ev.getPlayer(), "This block must be in team-owned territory to be harvested.");
 					ev.setCanceled(true);
 				}
@@ -162,7 +162,7 @@ public class ProtectionEvents {
 					harvestBlock(ev.world, check, ev.getPlayer(), ev.x, ev.y, ev.z);
 					check.dropXpOnBlockBreak(ev.world, ev.x, ev.y, ev.z, ev.getExpToDrop());
 					
-					if (Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
+					if (!b.equals(Blocks.obsidian) && Contained.configs.maxOreRegen[Settings.getDimConfig(ev.world.provider.dimensionId)] > 0) {
 						ev.world.setBlock(ev.x, ev.y, ev.z, HarvestedOre.instance);
 						TileEntity te = ev.world.getTileEntity(ev.x, ev.y, ev.z);
 						if (te != null && te instanceof HarvestedOreTE) {
@@ -276,6 +276,23 @@ public class ProtectionEvents {
 		if (event.entityLiving instanceof EntityCreature && !(event.entityLiving instanceof EntityPlayer)) {
 			if (EntityUtil.isSameTeam(event.entityLiving, attacker)) {
 				event.setCanceled(true);
+				// Try to teleport the entity somewhere nearby.
+				boolean teleportSuccess = false;
+				int newPosX = 0, newPosY = 0, newPosZ = 0;
+				for(int i=0; i<25; i+=1) {
+					newPosX = (int)(event.entityLiving.posX+Util.randomBoth(4));
+					newPosY = (int)(event.entityLiving.posY+Util.randomBoth(2));
+					newPosZ = (int)(event.entityLiving.posZ+Util.randomBoth(4));
+					if (event.entityLiving.worldObj.isAirBlock(newPosX, newPosY, newPosZ) && event.entityLiving.worldObj.isAirBlock(newPosX, newPosY+1, newPosZ))
+					{
+						event.entityLiving.setPositionAndUpdate(newPosX, newPosY, newPosZ);
+						teleportSuccess = true;
+						break;
+					}
+				}
+				
+				if (!teleportSuccess)
+					event.entityLiving.setPositionAndUpdate(newPosX, event.entityLiving.worldObj.getTopSolidOrLiquidBlock(newPosX, newPosZ), newPosZ);
 				return;
 			}
 		}

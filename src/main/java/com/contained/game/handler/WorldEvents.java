@@ -6,6 +6,7 @@ import com.contained.game.data.DataLogger;
 import com.contained.game.entity.ExtendedLivingBase;
 import com.contained.game.user.PlayerTeam;
 import com.contained.game.user.PlayerTeamIndividual;
+import com.contained.game.util.EntityUtil;
 import com.contained.game.util.Load;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Save;
@@ -162,6 +163,13 @@ public class WorldEvents {
 				
 				if (props.forceFireImmunity)
 					event.entity.extinguish();
+				
+				//Make sure entity is not trying to target someone from its team.
+				if (living.getAttackTarget() != null) {
+					EntityLivingBase target = living.getAttackTarget();
+					if (EntityUtil.isSameTeam(living, target))
+						living.setAttackTarget(null);
+				}
 			}
 		}
 	}

@@ -89,7 +89,7 @@ public class PVPEvents {
 				
 				int teamID = miniGame.getTeamID(killerData);
 				if (teamID != -1) {
-					Contained.gameScores[miniGame.getGameDimension()][teamID]++;
+					Contained.gameScores[miniGame.getGameDimension()][teamID]+=3;
 					ClientPacketHandlerUtil.syncMiniGameScore(killer.dimension, teamID, Contained.gameScores[killer.dimension][teamID]);
 				}
 			}

@@ -217,14 +217,26 @@ public class GuiTownManage extends GuiContainer {
 			listCounts[tabTerritory] = 0;
 			if (!MiniGameUtil.isPvP(mc.thePlayer.dimension)) {
 				// Territory Gem
-				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.smallGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
-				xpCosts[tabTerritory][listCounts[tabTerritory]] = Contained.configs.smallGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+				if (!MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
+					listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, 1);
+					xpCosts[tabTerritory][listCounts[tabTerritory]] = 1;
+				}
+				else {
+					listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, 5);
+					xpCosts[tabTerritory][listCounts[tabTerritory]] = 1;					
+				}
 				itemCosts[tabTerritory][listCounts[tabTerritory]] = null;
 				listCounts[tabTerritory]++;
 				
 				// Territory Gems in Bulk
-				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, Contained.configs.bulkGemCount[Settings.getDimConfig(mc.thePlayer.dimension)]);
-				xpCosts[tabTerritory][listCounts[tabTerritory]] = Contained.configs.bulkGemEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];
+				if (!MiniGameUtil.isTreasure(mc.thePlayer.dimension)) {
+					listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, 10);
+					xpCosts[tabTerritory][listCounts[tabTerritory]] = 7;
+				}
+				else {
+					listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(ItemTerritory.addTerritory, 50);
+					xpCosts[tabTerritory][listCounts[tabTerritory]] = 7;
+				}
 				itemCosts[tabTerritory][listCounts[tabTerritory]] = null;
 				listCounts[tabTerritory]++;
 				
@@ -242,7 +254,10 @@ public class GuiTownManage extends GuiContainer {
 				
 				// Territory Machine
 				listItems[tabTerritory][listCounts[tabTerritory]] = new ItemStack(TerritoryMachine.instance, 1);			
-				xpCosts[tabTerritory][listCounts[tabTerritory]] = Contained.configs.terrMachineEXPCost[Settings.getDimConfig(mc.thePlayer.dimension)];			
+				if (!MiniGameUtil.isTreasure(mc.thePlayer.dimension))
+					xpCosts[tabTerritory][listCounts[tabTerritory]] = 30;
+				else
+					xpCosts[tabTerritory][listCounts[tabTerritory]] = 10;
 				itemCosts[tabTerritory][listCounts[tabTerritory]] = null;
 				listCounts[tabTerritory]++;
 			}

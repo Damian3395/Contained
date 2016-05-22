@@ -2,6 +2,7 @@ package com.contained.game.data;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.contained.game.util.Resources;
@@ -16,6 +17,61 @@ public class DataLogger {
 	
 	public DataLogger(){
 		connectDataBase();
+	}
+	
+	public static int findGameWinScore(int gameID, String teamID){
+		if(!Resources.LOGGING_ENABLED)
+			return -1;
+		
+		int gameScore = 0;
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("SELECT score FROM TEAMSCORE WHERE gameID = ? AND team = ?");
+			preparedStatement.setInt(1, gameID);
+			preparedStatement.setString(2, teamID);
+			ResultSet rs = preparedStatement.executeQuery();
+			gameScore = rs.getInt("score");
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return gameScore;
+	}
+	
+	public static String findGameWinCondition(int gameID){
+		if(!Resources.LOGGING_ENABLED)
+			return "Debugging";
+		
+		String winCondition = "";
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("SELECT condition FROM TEAMWON WHERE gameID = ?");
+			preparedStatement.setInt(1, gameID);
+			ResultSet rs = preparedStatement.executeQuery();
+			winCondition = rs.getString("condition");
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return winCondition;
+	}
+	
+	public static String findGameWinTeamID(int gameID){
+		if(!Resources.LOGGING_ENABLED)
+			return "Debugging";
+		
+		String teamID = "";
+		
+		try{
+			PreparedStatement preparedStatement = DB.prepareStatement("SELECT team FROM TEAMWON WHERE gameID = ?");
+			preparedStatement.setInt(1, gameID);
+			ResultSet rs = preparedStatement.executeQuery();
+			teamID = rs.getString("team");
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return teamID;
 	}
 	
 	public static void insertPersonality(String server, String player, int age, int year, int month, String ethnicity, double openness, double conscientiousness, double extraversion, double agreeableness, double neuroticism, String date){

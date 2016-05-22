@@ -65,7 +65,7 @@ public class AdminHandler {
 		}
 	}
 	public void join(EntityPlayerMP player, int dimID){
-		Util.travelToDimension(dimID, player, false);
+		Util.travelToDimension(dimID, player, true);
 		//TODO delete below code after enabling ExtendedPlayer carrying info through all dimensions
 		
 		/*
@@ -73,13 +73,15 @@ public class AdminHandler {
 		 * the ExtendedPlayer somehow didn't carry the admin info into all dimensions
 		 * so we use this temporary solution to set admin rights when ever the admin change dimension
 		 */
+		/*
 		player.setInvisible(true);
 		player.capabilities.allowFlying = true;
 		player.capabilities.disableDamage = true;
 		ExtendedPlayer.get(player).setAdminRights(true);
 		PacketCustom adminPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_ADMIN);
-		Contained.channel.sendTo(adminPacket.toPacket(),player);
 		
+		Contained.channel.sendTo(adminPacket.toPacket(),player);
+		*/
 	}
 	
 	/*

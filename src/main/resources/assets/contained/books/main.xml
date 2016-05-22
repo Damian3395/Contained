@@ -9,94 +9,103 @@
 <page type="contents">
 <text>Table of Contents</text>
 <link>
- <text>Mini Games</text>
+ <text>Mini-Games</text>
  <icon>miniGame</icon>
- <jump>2</jump>
+ <jump>4</jump>
 </link>
 <link>
  <text>Guilds</text>
  <icon>guild</icon>
- <jump>3</jump>
+ <jump>15</jump>
 </link>
 <link>
- <text>Getting Started</text>
- <icon>TerritoryFlag</icon>
- <jump>4</jump>
+ <text>Territory Management</text>
+ <icon>ItemClaimTerritory</icon>
+ <jump>17</jump>
 </link>
-<link>
- <text>Town Hall</text>
- <icon>townHall</icon>
- <jump>5</jump>
-</link>
-<link>
- <text>Territory Gems/Machines</text>
- <icon>ClaimTerritoryMachine</icon>
- <jump>6</jump>
-</link>
-<link>
- <text>Occupational Classes</text>
- <icon>occupation</icon>
- <jump>7</jump>
-</link>
-</page>
-
-<page type="contents">
-<text>Table of Contents</text>
 <link>
  <text>Perks</text>
  <icon>xp</icon>
- <jump>9</jump>
-</link>
-<link>
- <text>Life and Death</text>
- <icon>AppleofLife</icon>
- <jump>15</jump>
+ <jump>24</jump>
 </link>
 </page>
 
-<page type="sectionpage">
-<title>Mini-Games</title>
-<text>§lPress 'L' To Access The Mini Games Lobby§r
-
-We have two mini games: PVP and Treasure Hunt.
-By pressing the 'join' button, you will be added to a queue to be added to a random game.
-While you are waiting for a queue, you can cancel your request to join a mini game.
-If your team wins the game, each player will be rewarded based on their performance with random items.
+<page type="cleansectionpage">
+<title>Introduction</title>
+<text>Contained is a mod that provides many different features to allow players to work together in groups. There are two primary components to the game world. The first is the "lobby" dimension, which is the main long-term area of the server where you spend time building, exploring, etc, like a traditional survival Minecraft server. The second is the "mini-game" dimensions, which are short-term dimensions where you compete in teams to win rare prizes that you can use in the lobby dimension.
 </text>
 </page>
 
-<page type="sectionpage">
-<title>Winning Conditions Mini-Game</title>
-<text>§lPvP Winning Conditions§r
-One: Steal All Of Your Enemys' Territory.
-Two: Kill Off All Of Your Enemys.
-Three: The Team With The Most Kills.
+<page type="cleansectionpage">
+<title>Mini-Games</title>
+<text>§lPress 'L' To Access The Mini Games Lobby. Press join to queue yourself; once enough people in the server are queued, the mini-game will automatically start.§r
 
-§lTreasure Hunt Winning Conditions§r
-One: Activate 3 out of the 4 Emblem Alters.
-Two: The Team With The The Most Treasures Found.
+Mini-games are short competitive games between two groups of players. They are also a fast way to get good items to use in the lobby dimension; regardless of whether your team wins or loses the game, you are awarded some prizes. Of course, the winning team's prizes are of much better quality and rarity. 
+
+There are two mini games: PVP and Treasure Hunt.
+</text>
+</page>
+
+<page type="cleansectionpage">
+<title>PVP Mini-Game</title>
+<text>§lWinning Conditions§r
+1. Steal all of the other team's territory.
+2. Kill off all of the players on the other team.
+3. Have the most kills at the end of the timer.
+</text>
+</page>
+
+<page type="cleansectionpage">
+<title>PVP Mini-Game</title>
+<text>In this game, your team is automatically given a small square area of territory; this territory cannot be expanded. Each player in your team is given a small set of lives. If you run out of lives, you will enter a spectating mode where you can continue watching the game, but can no longer participate. The Apple of Life item can be used to give yourself an extra life, and the Stick of Life item can be used to revive one of your teammates who has lost all of their lives.
+</text>
+</page>
+
+<page type="crafting">
+<text>Apple of Life</text>
+<recipe>
+ <name>AppleofLife</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="crafting">
+<text>Stick of Life</text>
+<recipe>
+ <name>StickofLife</name>
+ <size>three</size>
+</recipe>
+</page>
+
+<page type="cleansectionpage">
+<title>Treasure Hunt Mini-Game</title>
+<text>§lWinning Conditions§r
+1. Activate 3 out of the 4 Emblem Altars.
+2. Have the most collected chests at the end of the timer.
+
+PvP is disabled in this game. Instead, the goal of this game is to loot as many treasure chests in the world as possible. Each chest contains a fragment of an emblem, which are important to activate the "altars" that spawn in your team's territory. Chests contain many other useful items as well. You may sometimes find spawn eggs in chests, which can be used to summon friendly monsters that help your team.
 </text>
 </page>
 
 <page type="toolpage">
-<title>Treasure Gems</title>
-<text>In order to activate a alter in the treasure hunt mini game. You must craft one of the following gems and right click the alter block to activate its' beacon.
-§lAlters:§r
+<title>Treasure Hunt Mini-Game</title>
+<text>In order to activate an altar in the treasure hunt mini game, you must craft one of the following gems and right click the altar block of the same color to activate its beacon.
+§lAltars:§r
 </text>
 <item>
- <text>Fire</text>
+ <text>Fire Altar</text>
  <icon>fireEmblemBlockActive</icon>
 </item>
 <item>
- <text>Earth</text>
+ <text>Earth Altar</text>
  <icon>earthEmblemBlockActive</icon>
 </item>
 <item>
- <text>Water</text>
+ <text>Water Altar</text>
  <icon>waterEmblemBlockActive</icon>
 </item>
 <item>
- <text>Wind</text>
+ <text>Wind Altar</text>
  <icon>windEmblemBlockActive</icon>
 </item>
 </page>
@@ -133,40 +142,23 @@ Two: The Team With The The Most Treasures Found.
 </recipe>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>The Guilds</title>
 <text>§lPress 'G' To Access The Guild Interface§r
 
-Players can either join a guild or create their own. To create a guild, type in a unique name and select a color, then press the 'Create' button. The color you select will be used to highlight territories that you claim and highlight messages from your teammates. Guilds are allowed to have a maximum of 5 players on their teams and players are able to share a private chat log between each other. 
+Players can either join a guild or create their own. To create a guild, type in a unique name and select a color, then press the 'Create' button. The color you select will be used to highlight territories that you claim and highlight messages from your teammates. Guilds are allowed to have a maximum of 5 players on their teams and players are able to share a private chat log between each other (by typing "/t message" in chat). 
 </text>
 </page>
 
-<page type="sectionpage">
-<title>Guild Leader Pt.1</title>
-<text>A leader of a guild can access three tabs in the guild interface: actions, teammates, and settings tabs.
-
-§lActions Tab:§r This tab allows the leader to access diplomacy actions with other guilds on the server. The leader can also use it to set tasks for the guild members to accomplish to earn experience points for the town hall. Earning experience points will help the your guild purchase NPCs, items, and blocks from the town hall, which can give you advantages over other guilds.
+<page type="cleansectionpage">
+<title>Guild Leaders</title>
+<text>A leader of a guild can access several tabs from the guild interface. From these tabs, the leader can promote or demote players in the guild, or kick players out of the guild. The leader can also invite more players into the guild, if the guild has not reached the maximum members limit. The leader can also change the guilds' name and color. 
 </text>
 </page>
 
-<page type="sectionpage">
-<title>Guild Leader Pt.2</title>
-<text>§lTeam-mate Tab:§r This tab allows the leader to promote or demote a player in the guild, but the leader can also use it to kick a player out of the guild. If the guild leader demotes himself/herself, then another guild member who was promoted will become the guild leader.
-
-§lSettings Tab:§r If the guild has not reached the maximum members limit, the leader can invite more players into the guild. The leader can also change the guilds' name and color.    
-</text>
-</page>
-
-<page type="sectionpage">
-<title>Guild Player</title>
-<text>Guild players have the option to leave the guild they are currently in. They can also accomplish tasks from the quest list that their leader posts to earn xp for their guild.
-§lQuests: TODO§r
-</text>
-</page>
-
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Territory Flag</title>
-<text>This is an item usable only by guild leaders. It allows you to start a single block of land as your territory, which you and your guild members can later expand off of. There are no restrictions on where you can use this, as long as the block is not already owned by another guild. The first time use of the flag is free, but subsequent uses require a steep amount of experience levels. </text>
+<text>This is an item usable only by guild leaders. It allows you to start a single block of land as your territory, which you and your guild members can later expand off of. There are no restrictions on where you can use this, as long as the block is not already owned by another guild. The first time use of the flag is free, but each subsequent use requires spending 15 experience levels. </text>
 </page>
 
 <page type="crafting">
@@ -177,11 +169,13 @@ Players can either join a guild or create their own. To create a guild, type in 
 </recipe>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Town Hall</title>
-<text>This is an important block that every guild should have. It enables the purchasing and managing of various things that will be essential for the growth and success of the players' town.
+<text>This is an important block that every guild should have. It enables the purchasing and managing of various things that will be essential for the growth and success of the guild's territory.
 
 §lTerritory Purchasing:§r This tab allows you to spend experience levels in order to purchase items that will allow you to expand your guild's territory, as well as take over other guilds' territories, if you so desire.
+
+§lNPC Purchasing:§r This tab allows you to spend experience levels and emeralds to spawn villagers in your territory.
 </text>
 </page>
 
@@ -191,6 +185,14 @@ Players can either join a guild or create their own. To create a guild, type in 
  <name>townHall</name>
  <size>two</size>
 </recipe>
+</page>
+
+<page type="cleansectionpage">
+<title>Town Hall</title>
+<text>§lPermissions:§r This tab allows you to view (or if you're a team leader, to modify) the permissions that other teams have within your territory.
+
+§lTrades:§r This tab allows you to put some of your items up for trade with other people on the server, or to see any active trades other people have posted.
+</text>
 </page>
 
 <page type="toolpage">
@@ -225,14 +227,14 @@ a player from another guild.
 </item>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Occupational Classes Pt.1</title>
 <text>§lPress 'P' To Access The Occupations Class Interface§r
-You have the option of selecting a occupational class to specialize in: Collector, Builder, Cook, Wizard, and Warrior. By collecting specific items in the world, you can level up each one of the classes. You will be able to select a total of four different perks, but be wary of the perks you choose because when you select a perk, then you can only select that perks' child perks when leveling up again. It is highly recommended to select an occupation in order to gain advantages over other players and to give guild leaders an incentive to invite you into their guild.
+You have the option of selecting a occupational class to specialize in: Collector, Builder, Cook, Wizard, or Warrior. By collecting specific items in the world, you can level up each one of the classes. You will be able to select a total of four different perks, but be wary of the perks you choose because when you select a perk, then you can only select that perks' child perks when leveling up again. It is highly recommended to select an occupation that you think can best matches your playstyle and can best help your guild; having a diverse group of players in a guild can be beneficial.
 </text>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Occupational Classes Pt.2</title>
 <text>§lCollector Class:§r Mining ores and cutting down trees.
 §lBuilder Class:§r
@@ -249,7 +251,7 @@ Symbols:
 </text>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Collector Class</title>
 <text>§lPerks:§r
 Wooden Shovel: (!) x1.75 Break Speed
@@ -270,7 +272,7 @@ Diamond Axe: (#!) +10% Damage
 </text>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Builder Class</title>
 <text>§lPerks:§r
 Grass: -10% Damage in Plains
@@ -291,7 +293,7 @@ Iron: -10% Damage with Iron Tools
 </text>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Cook Class</title>
 <text>§lPerks:§r
 (!) Wooden Hoe: -10% Damage 
@@ -312,7 +314,7 @@ Fish: Potion of Water Breathing
 </text>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Wizard Class</title>
 <text>§lPerks:§r 
 Bone: -10% Skeleton Damage
@@ -333,7 +335,7 @@ magma: -10% Fire Damage
 </text>
 </page>
 
-<page type="sectionpage">
+<page type="cleansectionpage">
 <title>Warrior Class</title>
 <text>§lPerks:§r
 Wooden Sword: +10% Attack
@@ -352,27 +354,4 @@ Bow: +10% Range
 (~) Saddle: +5% Speed To Horse
 </text>
 </page>
-
-<page type="sectionpage">
-<title>Life and Death</title>
-<text>When joining the game, you start out with 10 lives. Each time you die, you lose a life. Once you reach 0 lives, you are kicked from the game and cannot join back unless a player in game uses the Stick of Life to revive you. You can consume the Apple of Life, in order to increase your life point by one. You can have a maximum of 10 life points.</text>
-<text>§lIf you complete the survey, you can gain two life points.§r</text>
-</page>
-
-<page type="crafting">
-<text>Apple of Life</text>
-<recipe>
- <name>AppleofLife</name>
- <size>three</size>
-</recipe>
-</page>
-
-<page type="crafting">
-<text>Stick of Life</text>
-<recipe>
- <name>StickofLife</name>
- <size>three</size>
-</recipe>
-</page>
-
 </book>

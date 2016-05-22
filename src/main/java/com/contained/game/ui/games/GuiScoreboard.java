@@ -105,7 +105,7 @@ public class GuiScoreboard extends GuiScreen {
 					String user = entry.getKey();
 					int userTreasures = entry.getValue();
 					int userAlters = (int) alters.get(user);
-					this.renderCenterFont(x,  y-80+(index * yOffset), (index+1) + ". " + user + ": Treasures= " + userTreasures + " Alters Activated= " + userAlters, Color.WHITE);
+					this.renderCenterFont(x,  y-80+(index * yOffset), (index+1) + ". " + user + ": Treasures= " + userTreasures + " Altars Activated= " + userAlters, Color.WHITE);
 					index++;
 				}
 			}

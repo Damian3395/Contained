@@ -28,11 +28,6 @@ public class Settings {
 	public int[] minOreRegen = new int[2];   //Min amount of time in seconds before ores regenerate.
 	public int[] maxOreRegen = new int[2];  //Max amount of time in seconds before ores regenerate.
 	
-	public int[] smallGemEXPCost = new int[2];
-	public int[] smallGemCount = new int[2];
-	public int[] bulkGemEXPCost = new int[2];
-	public int[] bulkGemCount = new int[2];
-	public int[] terrMachineEXPCost = new int[2];
 	public int pvpTerritorySize;
 	public int pvpMaxLives;
 	public int pvpResurrectLives;
@@ -57,7 +52,7 @@ public class Settings {
 					defaultValue(i, 100, 0), 0, 99999,
 					"How many blocks of land must a team own before their territory is vulnerable to invasion from other teams?");
 			flagXPCost[i] = config.getInt("flagXPCost", category, 
-					defaultValue(i, 30, 10), 0, 999, 
+					defaultValue(i, 15, 10), 0, 999, 
 					"How many Minecraft levels do you need to use the flag item?");
 			claimRadius[i] = config.getInt("claimRadius", category, 
 					defaultValue(i, 2, 3), 0, 10, 
@@ -83,22 +78,6 @@ public class Settings {
 			enableDowsing[i] = config.getBoolean("enableDowsing", category, 
 					defaultValue(i, false, true), 
 					"Give players access to the dowsing rod item for finding ore veins?");
-			
-			smallGemEXPCost[i] = config.getInt("shopSmallGemCost", category, 
-					defaultValue(i, 1, 1), 1, 999, 
-					"How much EXP does it cost to purchase a territory gem? (small quantity)");
-			smallGemCount[i] = config.getInt("shopSmallGemCount", category, 
-					defaultValue(i, 1, 5), 1, 64, 
-					"How many territory gems do you get for the purchase? (small quantity)");
-			bulkGemEXPCost[i] = config.getInt("shopBulkGemCost", category, 
-					defaultValue(i, 7, 7), 1, 999, 
-					"How much EXP does it cost to purchase many territory gems? (bulk quantity)");
-			bulkGemCount[i] = config.getInt("shopBulkGemCount", category, 
-					defaultValue(i, 10, 50), 1, 64, 
-					"How many territory gems do you get for the purchase? (bulk quantity)");
-			terrMachineEXPCost[i] = config.getInt("shopTerrMachineCost", category, 
-					defaultValue(i, 30, 10), 1, 999, 
-					"How much EXP does it cost to purchase a territory machine?");
 		}
 		
 		for(int i=0; i<=2; i++) {
@@ -126,7 +105,7 @@ public class Settings {
 			}
 			
 			worldRadius[i] = config.getInt(prefix+"worldSize", category, 
-					defaultValue(i, 40, 10, 20), 0, 500, 
+					defaultValue(i, 40, 6, 15), 0, 500, 
 					"Radius of the finite world in chunks (16x16 blocks), centered around spawn.");			
 			maxTeamSize[i] = config.getInt(prefix+"maxTeamSize", category, 
 					defaultValue(i, 5, 5, 5), 1, 999, 

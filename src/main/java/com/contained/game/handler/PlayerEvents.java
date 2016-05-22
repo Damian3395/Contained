@@ -9,6 +9,7 @@ import com.contained.game.ContainedRegistry;
 import com.contained.game.Settings;
 import com.contained.game.data.Data;
 import com.contained.game.data.DataItemStack;
+import com.contained.game.data.DataLogger;
 import com.contained.game.data.Data.OccupationRank;
 import com.contained.game.entity.ExtendedPlayer;
 import com.contained.game.item.BlockInteractItem;
@@ -194,6 +195,104 @@ public class PlayerEvents {
 			NBTTagCompound ntc = new NBTTagCompound();
 			oldPlayer.saveNBTData(ntc);
 			newClone.loadNBTData(ntc);
+			
+			//TODO: Bugging Out on Developer Mode, will auto end game for pvp
+			int dim = event.entityPlayer.dimension;
+			if((MiniGameUtil.isPvP(dim) ||
+					MiniGameUtil.isTreasure(dim))){
+				boolean endGame = false;
+				if(PlayerMiniGame.get(dim) == null)
+					endGame = true;
+				else if(PlayerMiniGame.get(dim).getGameID() != oldPlayer.gameID)
+					endGame = true;
+				
+				if(endGame){
+					PlayerTeamIndividual pdata = PlayerTeamIndividual.get(event.entityPlayer.getDisplayName());
+					ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
+					
+					int playerScore = 0;
+					int winScore = DataLogger.findGameWinScore(properties.gameID, pdata.teamID);
+					String winCondition = DataLogger.findGameWinCondition(properties.gameID);
+					String teamID = DataLogger.findGameWinTeamID(properties.gameID);
+					if(MiniGameUtil.isPvP(dim) && pdata.teamID != null){
+						playerScore = properties.curKills - properties.curDeaths + properties.curAntiTerritory;
+						DataLogger.insertPVPScore(Util.getServerID(), properties.gameID, event.entityPlayer.getDisplayName(), 
+								pdata.teamID, properties.curKills, properties.curDeaths, 
+								properties.curAntiTerritory, Util.getDate());
+						if(!winCondition.equals("TIE")){
+							if(pdata.teamID.equalsIgnoreCase(teamID))
+								properties.pvpWon++;
+							else if (!teamID.equals("Debug") && !teamID.equals("Kicked"))
+								properties.pvpLost++;
+						}
+						
+						properties.kills+=properties.curKills;
+						properties.deaths+=properties.curDeaths;
+						properties.antiTerritory+=properties.curAntiTerritory;
+					}else if(MiniGameUtil.isTreasure(dim) && pdata.teamID != null){
+						playerScore = properties.curTreasuresOpened + properties.curAltersActivated;
+						DataLogger.insertTreasureScore(Util.getServerID(), 
+								properties.gameID, event.entityPlayer.getDisplayName(), pdata.teamID, 
+								properties.curTreasuresOpened, properties.curAltersActivated, Util.getDate());
+						if(!winCondition.equals("TIE")){
+							if(pdata.teamID.equalsIgnoreCase(teamID))
+								properties.treasureWon++;
+							else if (!teamID.equals("Debug") && !teamID.equals("Kicked"))
+								properties.treasureLost++;
+						}
+						
+						properties.treasuresOpened+=properties.curTreasuresOpened;
+						properties.altersActivated+=properties.curAltersActivated;
+					}
+					
+					//Reward XP Points To Player
+					String teamMiniGame = pdata.teamID;
+					if(teamID != null && winCondition != null){
+						boolean emptySlot = false;
+						int index = -1;
+						for(int i = 0; i < pdata.inventory.length; i++){
+							ItemStack item = pdata.inventory[i];
+							if(item == null){
+								emptySlot = true;
+								index = i;
+								break;
+							}	
+						}
+						
+						if(!emptySlot)
+							PlayerMiniGame.rewardXP(event.entityPlayer, pdata, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, pdata.teamID.equals(teamID));
+					}
+					
+					Util.travelToDimension(Resources.OVERWORLD, event.entityPlayer, true);
+					
+					//Reward Item To Player
+					if(teamID != null && teamMiniGame != null && winCondition != null){
+						if(event.entityPlayer.inventory.getFirstEmptyStack() > -1)
+							PlayerMiniGame.rewardItem(event.entityPlayer, properties.altersActivated, properties.antiTerritory, properties.kills, playerScore, winScore, winCondition, pdata.teamID.equals(teamID));
+					}
+					
+					if(MiniGameUtil.isPvP(dim)){
+						PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_PVP_STATS);
+						syncScore.writeInt(properties.pvpWon);
+						syncScore.writeInt(properties.pvpLost);
+						syncScore.writeInt(properties.kills);
+						syncScore.writeInt(properties.deaths);
+						syncScore.writeInt(properties.antiTerritory);
+						Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) event.entityPlayer);
+					}else if(MiniGameUtil.isTreasure(dim)){
+						PacketCustom syncScore = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_TEASURE_STATS);
+						syncScore.writeInt(properties.treasureWon);
+						syncScore.writeInt(properties.treasureLost);
+						syncScore.writeInt(properties.treasuresOpened);
+						syncScore.writeInt(properties.altersActivated);
+						Contained.channel.sendTo(syncScore.toPacket(), (EntityPlayerMP) event.entityPlayer);
+					}
+					
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+					miniGamePacket.writeInt(dim);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)event.entityPlayer);
+				}
+			}
 		}
 	}
 	

@@ -12,6 +12,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityWolf;
@@ -86,23 +87,21 @@ public class EntityUtil {
 		return false;		
 	}
 	
-	public static boolean shouldAttack(EntityLivingBase attacker, String myTeam) {
-		if (!(attacker instanceof EntityCreeper) && !(attacker instanceof EntityGhast))
+	public static boolean shouldAttack(EntityLivingBase victim, String myTeam) {
+		if (!(victim instanceof EntityCreeper) && !(victim instanceof EntityGhast)
+				&& isAttackableClass(victim))
 		{
-			if (attacker instanceof EntityWolf) {
-				EntityWolf entitywolf = (EntityWolf)attacker;
-				if (entitywolf.isTamed()) {
-					PlayerTeamIndividual wolfPData = PlayerTeamIndividual.get(entitywolf.getOwner());
-					if (myTeam != null && wolfPData.teamID != null && wolfPData.teamID.equals(myTeam))
-						return false;
-				}
-			}
-			if (EntityUtil.isSameTeam(myTeam, attacker))
+			if (EntityUtil.isSameTeam(myTeam, victim))
 				return false;
+			return true;
 		}
-		else
-			return false;
-		return true;
+		return false;
+	}
+	
+	public static boolean isAttackableClass(EntityLivingBase victim) {
+		if ((victim instanceof EntityPlayer) || (victim instanceof EntityMob))
+			return true;
+		return false;
 	}
 	
 	public static void applyTeamAI(EntityCreature ent) {
