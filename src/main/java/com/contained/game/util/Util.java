@@ -251,15 +251,14 @@ public class Util {
 				player.setPositionAndUpdate(properties.spawnX, properties.spawnY, properties.spawnZ);
 			else{
 				double posx = player.posX;
-				double posy = player.posY;
-				double posz = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)player.posZ);
+				double posz = player.posZ;
+				double posy = newWorld.getTopSolidOrLiquidBlock((int)posx, (int)posz);
 				
 				boolean spawn = true;
-				int indexZ = 0;
 				for(int i = 1; i <= 5; i++){
-					if(!newWorld.isAirBlock((int)posx, (int)posy, (int)(posz+i))){
+					if(!newWorld.isAirBlock((int)posx, (int)(posy+1), (int)posz)){
 						spawn = false;
-						posz+=(i+1);
+						posy+=(i+1);
 						break;
 					}
 				}
@@ -268,16 +267,16 @@ public class Util {
 					spawn = true;
 					int index = 0;
 					for(int i = 1; i <= 5; i++){
-						if(!newWorld.isAirBlock((int)posx, (int)posy, (int)(posz+i))){
+						if(!newWorld.isAirBlock((int)posx, (int)(posy+1), (int)posz)){
 							spawn = false;
 							index = i;
 						}
 					}
 					if(!spawn)
-						posz+=(index+1);
+						posy+=(index+1);
 				}
 				
-				player.setPositionAndUpdate((int)posx, (int)posy, (int)(posz++));
+				player.setPositionAndUpdate((int)posx, (int)(posy++), (int)posz);
 			}
 		}
 	}
