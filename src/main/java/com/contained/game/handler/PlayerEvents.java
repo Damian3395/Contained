@@ -153,8 +153,17 @@ public class PlayerEvents {
 					}
 					
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
-				} else //If MiniGame Does Not Exist, Send Back To Lobby
+				} else { 
+					//If MiniGame Does Not Exist, Send Back To Lobby
+					//Do not reward player and do not update stats
+					int dim = joined.dimension;
+					
 					Util.travelToDimension(Resources.OVERWORLD, joined, true);
+					
+					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
+					miniGamePacket.writeInt(dim);
+					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP) joined);
+				}
 			}
 			
 			// Players should get a short period of invincibility upon respawning
