@@ -146,6 +146,9 @@ public class MiniGameUtil {
 				Point spawnPos = teamSpawnLocations.get(pdata.teamID);
 				spawnPos.x += Util.randomBoth(2);
 				spawnPos.y += Util.randomBoth(2);
+				startMiniGame.spawnMiniGameX = spawnPos.x;
+				startMiniGame.spawnMiniGameZ = w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1;
+				startMiniGame.spawnMiniGameY = spawnPos.y;
 				player.setPositionAndUpdate(spawnPos.x, w.getTopSolidOrLiquidBlock(spawnPos.x, spawnPos.y)+1, spawnPos.y);
 			}
 			Util.searchUpForLand(w, player);

@@ -25,6 +25,7 @@ import com.contained.game.user.PlayerTeamInvitation;
 import com.contained.game.util.MiniGameUtil;
 import com.contained.game.util.Resources;
 import com.contained.game.util.Util;
+import com.contained.game.world.GameTeleporter;
 import com.contained.game.world.block.AntiTerritoryMachine;
 import com.contained.game.world.block.TerritoryMachine;
 import com.contained.game.world.block.TerritoryMachineTE;
@@ -48,6 +49,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
@@ -214,21 +216,20 @@ public class PlayerEvents {
 			newClone.loadNBTData(ntc);
 			
 			int dim = event.entityPlayer.dimension;
-			if (MiniGameUtil.isPvP(dim)) {
+			if (MiniGameUtil.isPvP(dim) && event.wasDeath) {
 				ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
 				PacketCustom syncLifePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.SYNC_LIVES);
 				syncLifePacket.writeInt(properties.lives);
 				Contained.channel.sendTo(syncLifePacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
-
+				
 				if(properties.lives == 0){
 					PacketCustom spectatorPacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.PLAYER_SPECTATOR);
 					Contained.channel.sendTo(spectatorPacket.toPacket(), (EntityPlayerMP) event.entityPlayer);
 				}				
 			}
 			
-			//TODO: Bugging Out on Developer Mode, will auto end game for pvp
 			if((MiniGameUtil.isPvP(dim) ||
-					MiniGameUtil.isTreasure(dim))){
+					MiniGameUtil.isTreasure(dim)) && event.wasDeath){
 				boolean endGame = false;
 				if(PlayerMiniGame.get(dim) == null)
 					endGame = true;
@@ -320,6 +321,9 @@ public class PlayerEvents {
 					PacketCustom miniGamePacket = new PacketCustom(Resources.MOD_ID, ClientPacketHandlerUtil.MINIGAME_ENDED);
 					miniGamePacket.writeInt(dim);
 					Contained.channel.sendTo(miniGamePacket.toPacket(), (EntityPlayerMP)event.entityPlayer);
+				}else{
+					ExtendedPlayer properties = ExtendedPlayer.get(event.entityPlayer);
+					event.entityPlayer.setPositionAndUpdate(properties.spawnMiniGameX, properties.spawnMiniGameZ, properties.spawnMiniGameY);
 				}
 			}
 		}

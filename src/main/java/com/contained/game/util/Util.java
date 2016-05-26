@@ -247,8 +247,9 @@ public class Util {
 			
 			mcServer.getConfigurationManager().transferPlayerToDimension(
 						mpPlayer, dimID, new GameTeleporter(newWorld));
-			if(dimID == Resources.OVERWORLD)
+			if(dimID == Resources.OVERWORLD){
 				player.setPositionAndUpdate(properties.spawnX, properties.spawnY, properties.spawnZ);
+			}
 		}
 	}
 	

@@ -54,6 +54,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 	public double spawnX = 0.0;
 	public double spawnY = 0.0;
 	public double spawnZ = 0.0;
+	public double spawnMiniGameX = 0.0;
+	public double spawnMiniGameY = 0.0;
+	public double spawnMiniGameZ = 0.0;
 	
 	public ExtendedPlayer(EntityPlayer entity) {
 		this.entity = entity;
@@ -217,6 +220,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		this.spawnX = load.getDouble("spawnX");
 		this.spawnY = load.getDouble("spawnY");
 		this.spawnZ = load.getDouble("spawnz");
+		
+		this.spawnMiniGameX = load.getDouble("spawnMiniGameX");
+		this.spawnMiniGameY = load.getDouble("spawnMiniGameY");
+		this.spawnMiniGameZ = load.getDouble("spawnMiniGameZ");
 	}
 
 	@Override
@@ -274,6 +281,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 		save.setDouble("spawnX", this.spawnX);
 		save.setDouble("spawnY", this.spawnY);
 		save.setDouble("spawnZ", this.spawnZ);
+		
+		save.setDouble("spawnMiniGameX", this.spawnMiniGameX);
+		save.setDouble("spawnMiniGameY", this.spawnMiniGameY);
+		save.setDouble("spawnMiniGameZ", this.spawnMiniGameZ);
 	}
 
 	@Override
