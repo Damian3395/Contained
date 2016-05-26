@@ -61,13 +61,11 @@ public class FMLEvents {
 						// TODO: Prioritize this by sorting by amount of time player has been
 						// waiting in the queue. Players who have been waiting longest should
 						// be brought into the game first.
-						int count = 0;
 						for(EntityPlayer player : lobbyPlayers) {
 							if (ExtendedPlayer.get(player).isWaitingForMiniGame()) {
 								toEnter.addPlayer(player);
 								playersToJoin.add(player);
-								count++;
-								if (count >= toEnter.getCapacity())
+								if (playersToJoin.size() >= toEnter.getCapacity())
 									break;
 							}
 						}
