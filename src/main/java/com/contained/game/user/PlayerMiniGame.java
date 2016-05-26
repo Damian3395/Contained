@@ -601,8 +601,6 @@ public class PlayerMiniGame {
 	}
 
 	private int getEmptyWorld(int gameMode){
-		int dim = -1;
-
 		ArrayList<Integer> pvpDims = new ArrayList<Integer>();
 		ArrayList<Integer> treasureDims = new ArrayList<Integer>();
 		for(int i=Resources.MIN_PVP_DIMID; i<=Resources.MAX_PVP_DIMID; i++)
@@ -612,21 +610,21 @@ public class PlayerMiniGame {
 
 		for(PlayerMiniGame game : Contained.miniGames){
 			if(game != null){
-				if(game.gameMode == gameMode){
-					if(gameMode == Resources.PVP)
+				if(game.gameMode == this.gameMode){
+					if (this.gameMode == Resources.PVP)
 						pvpDims.remove(new Integer(game.dim));
-					else if(gameMode == Resources.TREASURE)
+					else if (this.gameMode == Resources.TREASURE)
 						treasureDims.remove(new Integer(game.dim));
 				}
 			}
 		}
 
-		if(gameMode == Resources.PVP && !pvpDims.isEmpty())
+		if (gameMode == Resources.PVP && !pvpDims.isEmpty())
 			return pvpDims.get(0);
-		else if(!treasureDims.isEmpty())
+		else if (gameMode == Resources.TREASURE && !treasureDims.isEmpty())
 			return treasureDims.get(0);
 
-		return dim;
+		return -1;
 	}
 
 	private void createTeam(EntityPlayer player){
